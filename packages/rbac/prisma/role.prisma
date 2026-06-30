@@ -1,0 +1,61 @@
+// Requires @appspine/auth's user.prisma fragment (for the UserRole relation) and
+// @appspine/m2m-api-key's api-key.prisma fragment (for the Role.apiKeys relation)
+// to also be present in this app's prisma/schema/ folder. Also requires the
+// consuming app to declare its own `enum Permission` (RolePermission.permission) —
+// the permission catalog grows per app as CRUD modules are added, so it is not
+// shipped by this package (see dev_docs/003-shared-package-reuse-plan.md).
+
+/// Default policy controlling how permission checks behave for a role.
+/// DENY_ALL: only explicitly granted permissions pass (default for all new roles).
+/// READ_ALL: all *_READ permissions pass automatically; writes/deletes require explicit grants.
+/// ALLOW_ALL: every permission check passes — custom ADMIN-level bypass for non-system roles.
+enum PermissionPolicy {
+  DENY_ALL
+  READ_ALL
+  ALLOW_ALL
+}
+
+/// System role or custom role. ADMIN and USER are seeded system roles and cannot be deleted.
+/// Excluded from the API-key scope catalog by MetaService. @internal
+model Role {
+  id               String           @id @default(cuid())
+  /// Unique machine name, e.g. "ADMIN", "USER", "EDITOR". Used in JWT roleName field.
+  name             String           @unique
+  /// Human-readable label shown in UI.
+  displayName      String           @map("display_name")
+  /// System roles (ADMIN / USER) cannot be deleted or renamed.
+  isSystem         Boolean          @default(false) @map("is_system")
+  /// Default deny; explicit permissions in RolePermission are additive on top of the policy.
+  permissionPolicy PermissionPolicy @default(DENY_ALL) @map("permission_policy")
+  permissions      RolePermission[]
+  userRoles        UserRole[]
+  apiKeys          ApiKey[]
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+/// Junction table between Role and the app's own Permission enum values.
+/// Excluded from the auto-derived scope catalog by MetaService. @internal
+model RolePermission {
+  id         String     @id @default(cuid())
+  roleId     String     @map("role_id")
+  permission Permission
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permission])
+  @@map("role_permissions")
+}
+
+/// Junction table supporting many-to-many User <-> Role assignment. @internal
+model UserRole {
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}

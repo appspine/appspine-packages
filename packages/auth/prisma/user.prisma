@@ -1,0 +1,22 @@
+// Requires @appspine/rbac's role.prisma fragment (for the UserRole relation) to
+// also be present in this app's prisma/schema/ folder.
+
+/// System user account. Used for authentication in local-auth mode.
+/// In OIDC mode the password field is unused; identity is verified via JWKS.
+/// Contains password hash; not exposed via MCP tools. @internal
+model User {
+  id        String   @id @default(cuid())
+  /// Login email, must be unique across the system.
+  email     String   @unique
+  password  String?
+  /// Display name shown in UI; optional.
+  name      String?
+  /// Soft-disable without deleting — preserves audit history.
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userRoles UserRole[]
+
+  @@map("users")
+}

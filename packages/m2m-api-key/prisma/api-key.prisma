@@ -1,0 +1,33 @@
+// Requires @appspine/rbac's role.prisma fragment (for the Role relation) to also
+// be present in this app's prisma/schema/ folder.
+
+/// Machine-to-machine API key for external integrations (n8n, AI agents).
+/// Created by ADMIN only. Raw key is shown once at creation and never stored. @internal
+model ApiKey {
+  id         String    @id @default(cuid())
+  /// Human-readable label, e.g. "n8n production" or "AI agent read-only".
+  name       String
+  /// First chars of the raw key, shown in lists for identification (e.g. "an_live_a1b2c3d4").
+  prefix     String
+  /// SHA-256 hash of the raw key. The raw key is never persisted.
+  hashedKey  String    @unique @map("hashed_key")
+  /// Role this key authenticates as; FK to roles table.
+  roleId     String    @map("role_id")
+  role       Role      @relation(fields: [roleId], references: [id])
+  /// Module-level scopes, e.g. ["users:read","users:*"]. "*" = all scopes. Empty = deny all.
+  scopes     String[]
+  /// Requests per minute. null = system default (60).
+  rateLimit  Int?      @map("rate_limit")
+  /// Whether this key can be used. Set false to revoke without deleting.
+  isActive   Boolean   @default(true) @map("is_active")
+  /// Optional expiry. null = never expires.
+  expiresAt  DateTime? @map("expires_at")
+  /// Email of the ADMIN who created this key. Snapshot string, no FK.
+  createdBy  String?   @map("created_by")
+  /// Timestamp of last successful authentication with this key.
+  lastUsedAt DateTime? @map("last_used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@map("api_keys")
+}

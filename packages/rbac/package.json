@@ -9,7 +9,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./prisma/role.prisma": "./prisma/role.prisma"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
