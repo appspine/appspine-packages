@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      # pnpm's --filter "...[ref]" only selects packages changed since main
+      # (plus their dependents), so unrelated @appspine/* packages are skipped.
+      - run: pnpm --filter "...[origin/main]" run typecheck
+        if: github.event_name == 'pull_request'
+      - run: pnpm --filter "...[origin/main]" run build
+        if: github.event_name == 'pull_request'
+      - run: pnpm --filter "...[origin/main]" run test
+        if: github.event_name == 'pull_request'
+
+      - run: pnpm run typecheck
+        if: github.event_name == 'push'
+      - run: pnpm run build
+        if: github.event_name == 'push'
+      - run: pnpm run test
+        if: github.event_name == 'push'
