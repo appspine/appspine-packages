@@ -1,0 +1,39 @@
+{
+  "name": "@appspine/common",
+  "version": "0.0.0",
+  "private": false,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "nestjs-pino": "^4.3.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.5",
+    "@nestjs/core": "^11.0.5",
+    "@prisma/client": "^6.2.0",
+    "express": "^5.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.0.5",
+    "@nestjs/core": "^11.0.5",
+    "@prisma/client": "^6.2.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "express": "^5.0.0",
+    "typescript": "^5.9.3",
+    "zod": "^4.4.3"
+  }
+}
