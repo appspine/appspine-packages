@@ -24,18 +24,22 @@ jobs:
 
       - run: pnpm lint
 
-      # pnpm's --filter "...[ref]" only selects packages changed since main
-      # (plus their dependents), so unrelated @appspine/* packages are skipped.
-      - run: pnpm --filter "...[origin/main]" run typecheck
-        if: github.event_name == 'pull_request'
+      # pnpm's --filter "...[ref]" selects packages changed since main PLUS their
+      # dependencies (so a changed package's deps are available to build/typecheck
+      # against), skipping unrelated @appspine/* packages. build must run before
+      # typecheck/test: each package's tsc resolves workspace deps via their built
+      # dist/*.d.ts, not TS project references, so a fresh checkout with no dist/
+      # yet fails typecheck on any cross-package import otherwise.
       - run: pnpm --filter "...[origin/main]" run build
+        if: github.event_name == 'pull_request'
+      - run: pnpm --filter "...[origin/main]" run typecheck
         if: github.event_name == 'pull_request'
       - run: pnpm --filter "...[origin/main]" run test
         if: github.event_name == 'pull_request'
 
-      - run: pnpm run typecheck
-        if: github.event_name == 'push'
       - run: pnpm run build
+        if: github.event_name == 'push'
+      - run: pnpm run typecheck
         if: github.event_name == 'push'
       - run: pnpm run test
         if: github.event_name == 'push'
