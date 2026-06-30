@@ -9,10 +9,12 @@ import { OidcStrategy } from './strategies/oidc.strategy';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 
-/**
- * Both strategies are always registered; JwtAuthGuard picks the one matching
- * AUTH_MODE, so only that one is ever actually invoked at request time.
- */
+// Only the strategy matching AUTH_MODE is registered. OidcStrategy's constructor
+// eagerly validates OIDC_JWKS_URL (jwks-rsa throws synchronously if it's empty), so
+// unconditionally registering both would crash app boot under AUTH_MODE=local
+// whenever OIDC_JWKS_URL isn't set — the common case.
+const ActiveStrategy = process.env.AUTH_MODE === 'oidc' ? OidcStrategy : LocalStrategy;
+
 @Global()
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { UsersService } from './users/users.service';
     }),
   ],
   controllers: [AuthController, UsersController],
-  providers: [UsersService, LocalStrategy, OidcStrategy, JwtAuthGuard, AdminGuard],
+  providers: [UsersService, ActiveStrategy, JwtAuthGuard, AdminGuard],
   exports: [UsersService, JwtAuthGuard, AdminGuard],
 })
 export class AuthModule {}
