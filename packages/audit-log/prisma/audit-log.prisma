@@ -1,0 +1,24 @@
+/// Audit log record for tracking data modification actions. @internal
+model AuditLog {
+  id            String      @id @default(cuid())
+  entityType    String      @map("entity_type")
+  entityId      String      @map("entity_id")
+  action        AuditAction
+  actorId       String      @map("actor_id")
+  /// Snapshot email of the user/agent who performed the action.
+  actorEmail    String      @map("actor_email")
+  appName       String      @map("app_name")
+  /// True when the operation was initiated by an AI agent via MCP.
+  isAiOperation Boolean     @default(false) @map("is_ai_operation")
+  /// MCP tool name that triggered this log entry. Null for human operations.
+  mcpTool       String?     @map("mcp_tool")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}

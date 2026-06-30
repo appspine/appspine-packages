@@ -1,0 +1,35 @@
+{
+  "name": "@appspine/audit-log",
+  "version": "0.0.0",
+  "private": false,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./prisma/audit-log.prisma": "./prisma/audit-log.prisma"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@appspine/common": "workspace:*"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.5",
+    "@nestjs/core": "^11.0.5",
+    "@prisma/client": "^6.2.0"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.0.5",
+    "@nestjs/core": "^11.0.5",
+    "@prisma/client": "^6.2.0",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3"
+  }
+}
