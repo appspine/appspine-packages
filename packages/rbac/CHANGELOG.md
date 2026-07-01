@@ -1,5 +1,13 @@
 # @appspine/rbac
 
+## 0.1.2
+
+### Patch Changes
+
+- d6fba5d: `RolesController`'s write operations (`create`/`update`/`replacePermissions`/`remove`) now record an `AuditLog` entry via `@appspine/audit-log`'s `AuditLogService`, added as a peer dependency. Same fire-and-forget behavior and actor resolution as `@appspine/auth`'s `UsersController` (see that package's changelog).
+- Updated dependencies [0399175]
+  - @appspine/auth@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
