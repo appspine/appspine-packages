@@ -1,11 +1,13 @@
-import { AdminGuard, JwtAuthGuard } from '@appspine/auth';
-import { ZodValidationPipe } from '@appspine/common';
+import { AuditLogService } from '@appspine/audit-log';
+import { AdminGuard, CurrentUser, JwtAuthGuard } from '@appspine/auth';
+import { AuditAction, ZodValidationPipe } from '@appspine/common';
 import {
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
+  Logger,
   Param,
   Patch,
   Post,
@@ -27,7 +29,31 @@ import { RolesService } from './roles.service';
 @Controller('roles')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  private readonly logger = new Logger(RolesController.name);
+
+  constructor(
+    private readonly rolesService: RolesService,
+    private readonly auditLogService: AuditLogService,
+  ) {}
+
+  // Fire-and-forget: an audit log failure must never block the business response
+  // (dev_docs/004-task-breakdown.md T-101).
+  private recordAudit(
+    entityId: string,
+    action: AuditAction,
+    actor: { sub: string; email?: string },
+  ) {
+    void this.auditLogService
+      .record({
+        entityType: 'Role',
+        entityId,
+        action,
+        actorId: actor.sub,
+        actorEmail: actor.email ?? `api-key:${actor.sub}`,
+        appName: process.env.APP_NAME ?? 'appspine-app-template',
+      })
+      .catch((err: unknown) => this.logger.warn(`Failed to record audit log: ${String(err)}`));
+  }
 
   @Get()
   findAll() {
@@ -35,8 +61,13 @@ export class RolesController {
   }
 
   @Post()
-  create(@Body(new ZodValidationPipe(createRoleSchema)) dto: CreateRoleDto) {
-    return this.rolesService.create(dto);
+  async create(
+    @Body(new ZodValidationPipe(createRoleSchema)) dto: CreateRoleDto,
+    @CurrentUser() actor: { sub: string; email?: string },
+  ) {
+    const role = await this.rolesService.create(dto);
+    this.recordAudit(role.id, AuditAction.CREATE, actor);
+    return role;
   }
 
   @Get(':id')
@@ -45,24 +76,31 @@ export class RolesController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateRoleSchema)) dto: UpdateRoleDto,
+    @CurrentUser() actor: { sub: string; email?: string },
   ) {
-    return this.rolesService.update(id, dto);
+    const role = await this.rolesService.update(id, dto);
+    this.recordAudit(id, AuditAction.UPDATE, actor);
+    return role;
   }
 
   @Put(':id/permissions')
-  replacePermissions(
+  async replacePermissions(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(replacePermissionsSchema)) dto: ReplacePermissionsDto,
+    @CurrentUser() actor: { sub: string; email?: string },
   ) {
-    return this.rolesService.replacePermissions(id, dto);
+    const role = await this.rolesService.replacePermissions(id, dto);
+    this.recordAudit(id, AuditAction.UPDATE, actor);
+    return role;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(id);
+  async remove(@Param('id') id: string, @CurrentUser() actor: { sub: string; email?: string }) {
+    await this.rolesService.remove(id);
+    this.recordAudit(id, AuditAction.DELETE, actor);
   }
 }
