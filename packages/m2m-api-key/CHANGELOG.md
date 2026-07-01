@@ -1,5 +1,14 @@
 # @appspine/m2m-api-key
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @appspine/common@0.1.1
+  - @appspine/audit-log@0.1.1
+  - @appspine/auth@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

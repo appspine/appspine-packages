@@ -1,6 +1,11 @@
 import { AuditLogService } from '@appspine/audit-log';
 import { AdminGuard, CurrentUser, JwtAuthGuard } from '@appspine/auth';
-import { AuditAction, ZodValidationPipe } from '@appspine/common';
+import {
+  AuditAction,
+  type PaginationQuery,
+  paginationQuerySchema,
+  ZodValidationPipe,
+} from '@appspine/common';
 import {
   Body,
   Controller,
@@ -12,6 +17,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -56,8 +62,14 @@ export class RolesController {
   }
 
   @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  findAll(@Query(new ZodValidationPipe(paginationQuerySchema)) query: PaginationQuery) {
+    return this.rolesService.findAll(query);
+  }
+
+  // Must be registered before @Get(':id') — otherwise Nest matches "options" as an :id param.
+  @Get('options')
+  findOptions() {
+    return this.rolesService.findOptions();
   }
 
   @Post()

@@ -1,5 +1,32 @@
 # @appspine/rbac
 
+## 0.3.0
+
+### Minor Changes
+
+- `@appspine/common`: extract `toPrismaSortDirection()` from `toPrismaOrderBy()` so callers that need a custom orderBy shape (e.g. a relation `_count` sort) can reuse the same ASC/DESC-to-asc/desc mapping instead of re-implementing it.
+
+  `@appspine/rbac`:
+
+  - `RolesService.findAll()`'s search now also matches the internal `name` field (previously `displayName` only), matching the visible `role.name` text in the admin UI and the search behavior of `UsersService.findAll()`.
+  - Every `resolveOrderBy()` branch now appends `name` (which is `@unique`) as a secondary tiebreaker, so paginating a sorted role list no longer risks duplicate/skipped rows when two roles share a `displayName`.
+  - Added `RolesService.findOptions()` / `GET /roles/options`: an unpaginated list of all roles (`id`, `name`, `displayName`, `isSystem`), for role-picker UIs that need every role rather than a page of them — `GET /roles` remains paginated and is no longer a suitable source for "all roles" dropdowns now that it enforces `paginationQuerySchema`'s 100-item `limit` cap.
+
+### Patch Changes
+
+- Updated dependencies
+  - @appspine/common@0.1.1
+  - @appspine/audit-log@0.1.1
+  - @appspine/auth@0.1.3
+
+## 0.2.0
+
+### Minor Changes
+
+- `RolesService.findAll()`/`RolesController`'s `GET /roles` now accepts the shared `PaginationQuery` (`page`, `limit`, `search`, `sortField`, `sortOrder`) and returns a `PaginatedResult<Role>` instead of a bare array, matching the pagination contract already used by `@appspine/auth`'s `UsersService` and `@appspine/m2m-api-key`'s `ApiKeysService`. Sortable fields are `displayName`, `userCount`, and `apiKeyCount` (the latter two sort by relation `_count`, which the shared `toPrismaOrderBy()` helper can't express, so they're resolved separately). When no sort is requested, ordering defaults to the previous `isSystem desc, name asc` behavior.
+
+  This changes the `GET /roles` response shape from `Role[]` to `{ data: Role[], total: number }` — a breaking change for any consumer reading the array directly.
+
 ## 0.1.2
 
 ### Patch Changes

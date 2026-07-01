@@ -1,6 +1,6 @@
 {
   "name": "@appspine/e2e-kit",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": false,
   "type": "commonjs",
   "main": "./dist/index.js",

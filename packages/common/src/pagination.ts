@@ -33,6 +33,10 @@ export function toPrismaPage(query: Pick<PaginationQuery, 'page' | 'limit'>): {
   return { skip: (page - 1) * limit, take: limit };
 }
 
+export function toPrismaSortDirection(sortOrder: PaginationQuery['sortOrder']): 'asc' | 'desc' {
+  return sortOrder === 'ASC' ? 'asc' : 'desc';
+}
+
 /** defaultOrderBy must have exactly ONE key — Prisma 6 does not accept multi-key orderBy objects. */
 export function toPrismaOrderBy(
   query: Pick<PaginationQuery, 'sortField' | 'sortOrder'>,
@@ -40,7 +44,7 @@ export function toPrismaOrderBy(
   defaultOrderBy: Record<string, 'asc' | 'desc'> = { createdAt: 'desc' },
 ): Record<string, 'asc' | 'desc'> {
   if (query.sortField && allowedFields.includes(query.sortField)) {
-    return { [query.sortField]: query.sortOrder === 'ASC' ? 'asc' : 'desc' };
+    return { [query.sortField]: toPrismaSortDirection(query.sortOrder) };
   }
   return defaultOrderBy;
 }

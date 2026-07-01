@@ -1,5 +1,13 @@
 import { SYSTEM_ADMIN_ROLE } from '@appspine/auth';
-import { PermissionPolicy, PrismaService } from '@appspine/common';
+import {
+  type PaginationQuery,
+  PermissionPolicy,
+  PrismaService,
+  paginate,
+  toPrismaOrderBy,
+  toPrismaPage,
+  toPrismaSortDirection,
+} from '@appspine/common';
 import {
   BadRequestException,
   ConflictException,
@@ -7,6 +15,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateRoleDto, ReplacePermissionsDto, UpdateRoleDto } from './dto/role.dto';
+
+// Non-relation fields go through the shared toPrismaOrderBy() helper; userCount/apiKeyCount
+// sort by relation _count, which toPrismaOrderBy can't express, so they're handled separately below.
+const SORTABLE_FIELDS = ['displayName'] as const;
+const SORTABLE_COUNT_FIELDS = ['userCount', 'apiKeyCount'] as const;
+type PrismaRoleOrderBy = Record<string, 'asc' | 'desc' | { _count: 'asc' | 'desc' }>;
+/** `name` is @unique, so appending it as a secondary key gives every ordering a stable, deterministic tiebreaker across pages. */
+const TIEBREAKER: PrismaRoleOrderBy = { name: 'asc' };
+const DEFAULT_ORDER_BY: PrismaRoleOrderBy[] = [{ isSystem: 'desc' }, TIEBREAKER];
 
 type RoleWithRelations = {
   id: string;
@@ -35,15 +52,57 @@ export class RolesService {
     };
   }
 
-  async findAll() {
-    const roles = await this.prisma.role.findMany({
+  /** Every branch returns an array with `TIEBREAKER` appended last, so ties on the primary key
+   *  (e.g. two roles sharing a displayName) still resolve to a stable order across pages. */
+  private resolveOrderBy(query: PaginationQuery): PrismaRoleOrderBy[] {
+    if (query.sortField && (SORTABLE_COUNT_FIELDS as readonly string[]).includes(query.sortField)) {
+      const direction = toPrismaSortDirection(query.sortOrder);
+      const primary: PrismaRoleOrderBy =
+        query.sortField === 'userCount'
+          ? { userRoles: { _count: direction } }
+          : { apiKeys: { _count: direction } };
+      return [primary, TIEBREAKER];
+    }
+    if (query.sortField && (SORTABLE_FIELDS as readonly string[]).includes(query.sortField)) {
+      return [toPrismaOrderBy(query, SORTABLE_FIELDS), TIEBREAKER];
+    }
+    return DEFAULT_ORDER_BY;
+  }
+
+  async findAll(query: PaginationQuery) {
+    const { skip, take } = toPrismaPage(query);
+    const orderBy = this.resolveOrderBy(query);
+    const where = query.search
+      ? {
+          OR: [
+            { displayName: { contains: query.search, mode: 'insensitive' as const } },
+            { name: { contains: query.search, mode: 'insensitive' as const } },
+          ],
+        }
+      : undefined;
+
+    const [roles, total] = await Promise.all([
+      this.prisma.role.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+        include: {
+          permissions: { select: { permission: true } },
+          _count: { select: { userRoles: true, apiKeys: true } },
+        },
+      }),
+      this.prisma.role.count({ where }),
+    ]);
+    return paginate(roles.map((r: RoleWithRelations) => this.mapRole(r)), total);
+  }
+
+  /** Unpaginated — for role pickers (create-user/create-api-key dialogs) that need every role, not a page of them. */
+  async findOptions() {
+    return this.prisma.role.findMany({
       orderBy: [{ isSystem: 'desc' }, { name: 'asc' }],
-      include: {
-        permissions: { select: { permission: true } },
-        _count: { select: { userRoles: true, apiKeys: true } },
-      },
+      select: { id: true, name: true, displayName: true, isSystem: true },
     });
-    return roles.map((r: RoleWithRelations) => this.mapRole(r));
   }
 
   async findOne(id: string) {
