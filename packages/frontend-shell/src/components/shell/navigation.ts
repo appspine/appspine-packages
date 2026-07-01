@@ -44,6 +44,7 @@ export interface ShellLinkProps {
   className?: string;
   target?: string;
   rel?: string;
+  'aria-current'?: 'page';
   children: ReactNode;
 }
 

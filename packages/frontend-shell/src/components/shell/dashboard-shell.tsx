@@ -1,9 +1,9 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { cn } from '../../lib/utils';
-import { Separator } from '../ui/separator';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '../ui/sidebar';
-import { AppSidebar } from './app-sidebar';
-import type { NavGroup, ShellLinkComponent } from './navigation';
+import { cn } from '../../lib/utils.js';
+import { Separator } from '../ui/separator.js';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '../ui/sidebar.js';
+import { AppSidebar } from './app-sidebar.js';
+import type { NavGroup, ShellLinkComponent } from './navigation.js';
 
 interface DashboardShellProps {
   readonly appName: string;

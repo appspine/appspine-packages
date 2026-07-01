@@ -4,10 +4,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": ["DOM", "DOM.Iterable", "ES2021"],
-    "jsx": "preserve"
+    "jsx": "react-jsx"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

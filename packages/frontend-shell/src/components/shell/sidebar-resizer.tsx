@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { useSidebar } from '../ui/sidebar';
+import { useSidebar } from '../ui/sidebar.js';
 
 const MIN_WIDTH = 160;
 const MAX_WIDTH = 480;
@@ -58,7 +58,10 @@ export function SidebarResizer() {
     }
 
     const handleMouseMove = (event: MouseEvent) => {
-      setPersistedWidth(event.clientX);
+      const container = document.querySelector('[data-slot="sidebar-container"]');
+      const offsetLeft =
+        container instanceof HTMLElement ? container.getBoundingClientRect().left : 0;
+      setPersistedWidth(event.clientX - offsetLeft);
     };
 
     const handleMouseUp = () => {

@@ -16,6 +16,10 @@ export function registerRbacSpec({
   unauthorizedPath = '/unauthorized',
   protectedPaths = ['/dashboard/users', '/dashboard/roles', '/dashboard/api-keys'],
 }: RegisterRbacSpecOptions) {
+  if (protectedPaths.length === 0) {
+    throw new Error('registerRbacSpec requires at least one entry in protectedPaths');
+  }
+
   test.describe('rbac', () => {
     test('redirects anonymous users to /login', async ({ page }) => {
       await page.goto(`${baseURL}${protectedPaths[0]}`);

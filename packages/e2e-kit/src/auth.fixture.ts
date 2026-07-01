@@ -73,7 +73,15 @@ async function loginAndSaveStorageState(browser: Browser, baseURL: string, user:
   await page.getByLabel('Email').fill(user.email);
   await page.getByLabel('Password').fill(user.password);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await page.waitForURL('**/dashboard');
+
+  try {
+    await page.waitForURL('**/dashboard');
+  } catch (error) {
+    throw new Error(
+      `Login timed out for ${user.email} — the account may not be registered/seeded, or the login form/redirect no longer matches this fixture's assumptions. Original error: ${(error as Error).message}`,
+    );
+  }
+
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   await page.context().storageState({ path: resolve(user.storageStatePath) });
   await page.close();

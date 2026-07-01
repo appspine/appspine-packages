@@ -2,8 +2,8 @@
 
 import { CircleUser, EllipsisVertical, LogOut } from 'lucide-react';
 
-import { getInitials } from '../../lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { getInitials } from '../../lib/utils.js';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar.js';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +12,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/sidebar';
+} from '../ui/dropdown-menu.js';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/sidebar.js';
 
 interface UserNavProps {
   readonly user: {

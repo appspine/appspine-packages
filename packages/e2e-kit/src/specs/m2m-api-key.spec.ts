@@ -11,11 +11,15 @@ interface RegisterM2mApiKeySpecOptions {
   readonly baseURL: string;
   readonly apiURL: string;
   readonly roleOptionName: string;
+  readonly protectedEndpoint?: string;
+  readonly restrictedScope?: string;
+  readonly wildcardScope?: string;
+  readonly apiKeyValueLocator?: string;
 }
 
 async function createApiKeyFromUi(
   adminPage: AuthFixtures['adminPage'],
-  options: { name: string; roleOptionName: string; scopes: string[] },
+  options: { name: string; roleOptionName: string; scopes: string[]; apiKeyValueLocator: string },
 ) {
   await adminPage.goto('/dashboard/api-keys');
   await adminPage.getByRole('button', { name: 'New API Key' }).click();
@@ -31,9 +35,7 @@ async function createApiKeyFromUi(
   await dialog.getByRole('button', { name: 'Create' }).click();
   await expect(adminPage.getByRole('heading', { name: 'API key created' })).toBeVisible();
 
-  const key = (
-    await adminPage.locator('.break-all.rounded-md.border.bg-muted').textContent()
-  )?.trim();
+  const key = (await adminPage.locator(options.apiKeyValueLocator).textContent())?.trim();
   expect(key).toBeTruthy();
 
   await adminPage.keyboard.press('Escape');
@@ -46,6 +48,10 @@ export function registerM2mApiKeySpec({
   baseURL,
   apiURL,
   roleOptionName,
+  protectedEndpoint = '/metadata/schema',
+  restrictedScope = 'users:read',
+  wildcardScope = '* (full access)',
+  apiKeyValueLocator = '.break-all.rounded-md.border.bg-muted',
 }: RegisterM2mApiKeySpecOptions) {
   test.describe('m2m api keys', () => {
     test('enforces API key scopes on metadata schema access', async ({ adminPage, request }) => {
@@ -54,10 +60,11 @@ export function registerM2mApiKeySpec({
       const restrictedKey = await createApiKeyFromUi(adminPage, {
         name: `restricted-${Date.now()}`,
         roleOptionName,
-        scopes: ['users:read'],
+        scopes: [restrictedScope],
+        apiKeyValueLocator,
       });
 
-      const restrictedResponse = await request.get(`${apiURL}/metadata/schema`, {
+      const restrictedResponse = await request.get(`${apiURL}${protectedEndpoint}`, {
         headers: {
           'x-api-key': restrictedKey,
         },
@@ -67,10 +74,11 @@ export function registerM2mApiKeySpec({
       const wildcardKey = await createApiKeyFromUi(adminPage, {
         name: `wildcard-${Date.now()}`,
         roleOptionName,
-        scopes: ['* (full access)'],
+        scopes: [wildcardScope],
+        apiKeyValueLocator,
       });
 
-      const allowedResponse = await request.get(`${apiURL}/metadata/schema`, {
+      const allowedResponse = await request.get(`${apiURL}${protectedEndpoint}`, {
         headers: {
           'x-api-key': wildcardKey,
         },

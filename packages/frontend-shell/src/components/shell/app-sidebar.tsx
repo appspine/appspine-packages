@@ -10,11 +10,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '../ui/sidebar';
-import { NavMain } from './nav-main';
-import type { NavGroup, ShellLinkComponent } from './navigation';
-import { SidebarResizer } from './sidebar-resizer';
-import { UserNav } from './user-nav';
+} from '../ui/sidebar.js';
+import { NavMain } from './nav-main.js';
+import type { NavGroup, ShellLinkComponent } from './navigation.js';
+import { SidebarResizer } from './sidebar-resizer.js';
+import { UserNav } from './user-nav.js';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   readonly appName: string;

@@ -2,7 +2,7 @@
 
 import { Monitor, Moon, Sun } from 'lucide-react';
 
-import { Button } from '../ui/button';
+import { Button } from '../ui/button.js';
 
 const THEME_CYCLE = ['light', 'dark', 'system'] as const;
 

@@ -3,7 +3,7 @@
 import { Tooltip as TooltipPrimitive } from 'radix-ui';
 import * as React from 'react';
 
-import { cn } from '../../lib/utils';
+import { cn } from '../../lib/utils.js';
 
 export function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
   return <TooltipPrimitive.Root data-slot="tooltip" {...props} />;

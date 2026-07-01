@@ -2,15 +2,15 @@
 
 import { ChevronRight } from 'lucide-react';
 
-import { cn } from '../../lib/utils';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { cn } from '../../lib/utils.js';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible.js';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '../ui/dropdown-menu.js';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -23,7 +23,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from '../ui/sidebar';
+} from '../ui/sidebar.js';
 import type {
   NavBadge,
   NavGroup,
@@ -31,7 +31,7 @@ import type {
   NavMainLinkItem,
   NavMainParentItem,
   ShellLinkComponent,
-} from './navigation';
+} from './navigation.js';
 
 interface NavMainProps {
   readonly items: readonly NavGroup[];
@@ -51,6 +51,10 @@ function hasSubItems(item: NavMainItem): item is NavMainParentItem {
   return Boolean(item.subItems?.length);
 }
 
+function isPathWithin(currentPath: string, url: string) {
+  return currentPath === url || currentPath.startsWith(`${url}/`);
+}
+
 function CollapsedIconFallback({ title }: { title: string }) {
   return (
     <span className="flex size-4 shrink-0 items-center justify-center rounded-xs font-medium text-[10px] outline">
@@ -62,7 +66,7 @@ function CollapsedIconFallback({ title }: { title: string }) {
 export function NavMain({ items, currentPath, LinkComponent }: NavMainProps) {
   const isItemActive = (item: NavMainItem) => {
     if (hasSubItems(item)) {
-      return item.subItems.some((subItem) => currentPath.startsWith(subItem.url));
+      return item.subItems.some((subItem) => isPathWithin(currentPath, subItem.url));
     }
 
     return currentPath === item.url;
@@ -70,7 +74,7 @@ export function NavMain({ items, currentPath, LinkComponent }: NavMainProps) {
 
   const isSubItemActive = (url: string) => currentPath === url;
   const isSubmenuOpen = (item: NavMainParentItem) =>
-    item.subItems.some((subItem) => currentPath.startsWith(subItem.url));
+    item.subItems.some((subItem) => isPathWithin(currentPath, subItem.url));
 
   return (
     <>
@@ -224,6 +228,7 @@ function NavDropdownItem({
                     href={subItem.url}
                     target={subItem.newTab ? '_blank' : undefined}
                     rel={subItem.newTab ? 'noreferrer' : undefined}
+                    aria-current={isSubItemActive(subItem.url) ? 'page' : undefined}
                     className={cn(
                       'flex items-center gap-2',
                       isSubItemActive(subItem.url) ? 'font-medium' : undefined,
