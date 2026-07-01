@@ -79,10 +79,10 @@ export function registerM2mApiKeySpec({
 
       const schema = (await allowedResponse.json()) as {
         models?: unknown[];
-        scopeCatalog?: unknown[];
+        availableScopes?: unknown[];
       };
       expect(Array.isArray(schema.models)).toBeTruthy();
-      expect(Array.isArray(schema.scopeCatalog)).toBeTruthy();
+      expect(Array.isArray(schema.availableScopes)).toBeTruthy();
     });
   });
 }
