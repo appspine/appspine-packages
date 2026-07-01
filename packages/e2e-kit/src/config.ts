@@ -5,7 +5,7 @@ interface CreatePlaywrightConfigOptions {
   readonly apiURL: string;
   readonly testDir?: string;
   readonly outputDir?: string;
-  readonly storageStatePath?: string;
+  readonly storageStatePath?: string | undefined;
   readonly reporter?: PlaywrightTestConfig['reporter'];
 }
 
@@ -14,7 +14,7 @@ export function createPlaywrightConfig({
   apiURL,
   testDir = './e2e',
   outputDir = 'test-results',
-  storageStatePath = 'e2e/.auth/admin.json',
+  storageStatePath,
   reporter = [['list'], ['html', { open: 'never' }]],
 }: CreatePlaywrightConfigOptions) {
   return defineConfig({
