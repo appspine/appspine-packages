@@ -1,3 +1,7 @@
+export * from './components/shell/app-sidebar';
+export * from './components/shell/dashboard-shell';
+export * from './components/shell/nav-main';
+export * from './components/shell/navigation';
 export * from './components/shell/sidebar-resizer';
 export * from './components/shell/theme-switcher';
 export * from './components/shell/user-nav';
