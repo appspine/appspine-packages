@@ -24,7 +24,7 @@ interface CreateAuthFixturesOptions {
   readonly user?: AuthUserConfig;
 }
 
-interface AuthFixtures {
+export interface AuthFixtures {
   adminPage: Page;
   adminContext: BrowserContext;
   userPage: Page;
