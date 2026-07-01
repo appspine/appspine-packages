@@ -1,3 +1,4 @@
+export * from './components/list-search-form.js';
 export * from './components/shell/app-sidebar.js';
 export * from './components/shell/dashboard-shell.js';
 export * from './components/shell/locale-switcher.js';
