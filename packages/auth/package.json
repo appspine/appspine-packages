@@ -25,6 +25,7 @@
     "passport-jwt": "^4.0.1"
   },
   "peerDependencies": {
+    "@appspine/audit-log": "^0.1.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/jwt": "^11.0.2",
@@ -33,6 +34,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@appspine/audit-log": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/jwt": "^11.0.2",
