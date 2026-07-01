@@ -1,5 +1,6 @@
 export * from './components/shell/app-sidebar.js';
 export * from './components/shell/dashboard-shell.js';
+export * from './components/shell/locale-switcher.js';
 export * from './components/shell/nav-main.js';
 export * from './components/shell/navigation.js';
 export * from './components/shell/sidebar-resizer.js';
