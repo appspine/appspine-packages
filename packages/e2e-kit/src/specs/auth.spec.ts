@@ -51,22 +51,18 @@ export function registerAuthSpec({
       });
 
       expect(meResponse.ok()).toBeTruthy();
-      await expect
-        .poll(async () => {
-          const body = (await meResponse.json()) as {
-            email: string;
-            roleNames: string[];
-          };
+      const body = (await meResponse.json()) as {
+        email: string;
+        roleNames: string[];
+      };
 
-          return {
-            email: body.email,
-            roleNames: body.roleNames,
-          };
-        })
-        .toEqual({
-          email: user.email,
-          roleNames: ['USER'],
-        });
+      expect({
+        email: body.email,
+        roleNames: body.roleNames,
+      }).toEqual({
+        email: user.email,
+        roleNames: ['USER'],
+      });
     });
   });
 }

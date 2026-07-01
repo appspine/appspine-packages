@@ -52,9 +52,12 @@ async function ensureRegisteredUser(apiURL: string, user: AuthUserConfig) {
     return;
   }
 
-  if (response.status === 400) {
+  if (response.status === 400 || response.status === 409) {
     const body = (await response.json().catch(() => null)) as { message?: string } | null;
-    if (body?.message?.includes('already exists')) {
+    if (
+      body?.message?.includes('already exists') ||
+      body?.message?.includes('already registered')
+    ) {
       return;
     }
   }

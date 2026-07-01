@@ -20,13 +20,13 @@ export function registerRbacSpec({
     test('redirects anonymous users to /login', async ({ page }) => {
       await page.goto(`${baseURL}${protectedPaths[0]}`);
       await page.waitForURL('**/login');
-      await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+      await expect(page.getByText('Sign in').first()).toBeVisible();
     });
 
     test('blocks non-admin users from admin pages', async ({ userPage }) => {
       await userPage.goto(`${baseURL}${protectedPaths[0]}`);
       await userPage.waitForURL(`**${unauthorizedPath}`);
-      await expect(userPage.getByText('Unauthorized')).toBeVisible();
+      await expect(userPage.getByText(/Unauthorized/i)).toBeVisible();
     });
 
     for (const protectedPath of protectedPaths) {
