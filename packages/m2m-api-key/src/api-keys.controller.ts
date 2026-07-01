@@ -1,12 +1,14 @@
+import { AuditLogService } from '@appspine/audit-log';
 import { AdminGuard, CurrentUser } from '@appspine/auth';
 import type { PaginationQuery } from '@appspine/common';
-import { paginationQuerySchema, ZodValidationPipe } from '@appspine/common';
+import { AuditAction, paginationQuerySchema, ZodValidationPipe } from '@appspine/common';
 import {
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
+  Logger,
   Param,
   Patch,
   Post,
@@ -22,15 +24,42 @@ import { JwtOrApiKeyGuard } from './guards/jwt-or-api-key.guard';
 @Controller('api-keys')
 @UseGuards(JwtOrApiKeyGuard, AdminGuard)
 export class ApiKeysController {
-  constructor(private readonly apiKeysService: ApiKeysService) {}
+  private readonly logger = new Logger(ApiKeysController.name);
+
+  constructor(
+    private readonly apiKeysService: ApiKeysService,
+    private readonly auditLogService: AuditLogService,
+  ) {}
+
+  // Fire-and-forget: an audit log failure must never block the business response
+  // (dev_docs/004-task-breakdown.md T-101). Never pass the raw key into `entityId`
+  // or any audit payload field — only the key's id/name/scopes are non-secret.
+  private recordAudit(
+    entityId: string,
+    action: AuditAction,
+    actor: { sub: string; email?: string },
+  ) {
+    void this.auditLogService
+      .record({
+        entityType: 'ApiKey',
+        entityId,
+        action,
+        actorId: actor.sub,
+        actorEmail: actor.email ?? `api-key:${actor.sub}`,
+        appName: process.env.APP_NAME ?? 'appspine-app-template',
+      })
+      .catch((err: unknown) => this.logger.warn(`Failed to record audit log: ${String(err)}`));
+  }
 
   @Post()
-  create(
+  async create(
     @Body(new ZodValidationPipe(createApiKeySchema)) dto: CreateApiKeyDto,
     // The caller may be JWT (has email) or another API key (only `sub`); fall back accordingly.
     @CurrentUser() actor: { sub: string; email?: string },
   ) {
-    return this.apiKeysService.create(dto, actor.email ?? `api-key:${actor.sub}`);
+    const result = await this.apiKeysService.create(dto, actor.email ?? `api-key:${actor.sub}`);
+    this.recordAudit(result.id, AuditAction.CREATE, actor);
+    return result;
   }
 
   @Get()
@@ -44,16 +73,20 @@ export class ApiKeysController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateApiKeySchema)) dto: UpdateApiKeyDto,
+    @CurrentUser() actor: { sub: string; email?: string },
   ) {
-    return this.apiKeysService.update(id, dto);
+    const result = await this.apiKeysService.update(id, dto);
+    this.recordAudit(id, AuditAction.UPDATE, actor);
+    return result;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.apiKeysService.remove(id);
+  async remove(@Param('id') id: string, @CurrentUser() actor: { sub: string; email?: string }) {
+    await this.apiKeysService.remove(id);
+    this.recordAudit(id, AuditAction.DELETE, actor);
   }
 }
