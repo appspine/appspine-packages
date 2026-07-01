@@ -1,5 +1,6 @@
 export * from './components/shell/sidebar-resizer';
 export * from './components/shell/theme-switcher';
+export * from './components/shell/user-nav';
 export * from './components/ui/avatar';
 export * from './components/ui/button';
 export * from './components/ui/collapsible';
