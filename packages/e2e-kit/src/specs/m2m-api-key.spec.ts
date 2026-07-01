@@ -36,8 +36,7 @@ async function createApiKeyFromUi(
   )?.trim();
   expect(key).toBeTruthy();
 
-  await adminPage.getByRole('button', { name: 'Copy to clipboard' }).click();
-  await adminPage.getByRole('button', { name: "I've copied it, done" }).click();
+  await adminPage.keyboard.press('Escape');
 
   return key as string;
 }
