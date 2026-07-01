@@ -19,15 +19,16 @@ async function createApiKeyFromUi(
 ) {
   await adminPage.goto('/dashboard/api-keys');
   await adminPage.getByRole('button', { name: 'New API Key' }).click();
-  await adminPage.getByLabel('Name').fill(options.name);
-  await adminPage.getByLabel('Role').click();
+  const dialog = adminPage.getByRole('dialog', { name: 'Create API key' });
+  await dialog.getByLabel('Name').fill(options.name);
+  await dialog.getByLabel('Role').click();
   await adminPage.getByRole('option', { name: options.roleOptionName }).click();
 
   for (const scope of options.scopes) {
-    await adminPage.getByText(scope, { exact: true }).click();
+    await dialog.getByLabel(scope, { exact: true }).click();
   }
 
-  await adminPage.getByRole('button', { name: 'Create' }).click();
+  await dialog.getByRole('button', { name: 'Create' }).click();
   await expect(adminPage.getByRole('heading', { name: 'API key created' })).toBeVisible();
 
   const key = (
