@@ -16,4 +16,5 @@ export * from './components/ui/sidebar.js';
 export * from './components/ui/skeleton.js';
 export * from './components/ui/tooltip.js';
 export * from './hooks/use-mobile.js';
+export * from './i18n/index.js';
 export * from './lib/utils.js';
