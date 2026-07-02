@@ -32,6 +32,8 @@ export function registerAuthSpec({
       });
       expect(registerResponse.ok()).toBeTruthy();
 
+      // Force English so the locators below work regardless of the app's default locale.
+      await page.context().addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
       await page.goto(`${baseURL}/login`);
       await page.getByLabel('Email').fill(user.email);
       await page.getByLabel('Password').fill(user.password);

@@ -22,6 +22,8 @@ export function registerRbacSpec({
 
   test.describe('rbac', () => {
     test('redirects anonymous users to /login', async ({ page }) => {
+      // Force English so this assertion works regardless of the app's default locale.
+      await page.context().addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
       await page.goto(`${baseURL}${protectedPaths[0]}`);
       await page.waitForURL('**/login');
       await expect(page.getByText('Sign in').first()).toBeVisible();

@@ -68,7 +68,12 @@ async function ensureRegisteredUser(apiURL: string, user: AuthUserConfig) {
 async function loginAndSaveStorageState(browser: Browser, baseURL: string, user: AuthUserConfig) {
   await ensureAuthDirectory(user.storageStatePath);
 
-  const page = await browser.newPage();
+  const context = await browser.newContext();
+  // Force English so this fixture's English-language locators (getByLabel('Email'), etc.)
+  // work regardless of the app's default locale (e.g. appspine-app-template defaults to
+  // zh-TW). Saved into storageState below, so it carries over into adminContext/userContext too.
+  await context.addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
+  const page = await context.newPage();
   await page.goto(`${baseURL}/login`);
   await page.getByLabel('Email').fill(user.email);
   await page.getByLabel('Password').fill(user.password);
@@ -83,8 +88,9 @@ async function loginAndSaveStorageState(browser: Browser, baseURL: string, user:
   }
 
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-  await page.context().storageState({ path: resolve(user.storageStatePath) });
+  await context.storageState({ path: resolve(user.storageStatePath) });
   await page.close();
+  await context.close();
 }
 
 async function ensureStorageState(

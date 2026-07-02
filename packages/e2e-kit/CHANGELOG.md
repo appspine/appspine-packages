@@ -1,5 +1,11 @@
 # @appspine/e2e-kit
 
+## 0.1.2
+
+### Patch Changes
+
+- Force the `locale=en` cookie before interacting with the login form in `auth.fixture.ts`, `auth.spec.ts`, and `rbac.spec.ts`'s anonymous test. These specs use hardcoded English locators (`getByLabel('Email')`, `getByText('Sign in')`, etc.), which broke against any app whose default locale isn't English — including `appspine-app-template`, which defaults to `zh-TW`.
+
 ## 0.1.1
 
 ### Patch Changes
