@@ -1,5 +1,11 @@
 # @appspine/metadata-schema
 
+## 0.2.0
+
+### Minor Changes
+
+- 926e10a: Add enum translation gap collection utilities.
+
 ## 0.1.3
 
 ### Patch Changes
