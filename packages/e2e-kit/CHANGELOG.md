@@ -1,5 +1,11 @@
 # @appspine/e2e-kit
 
+## 0.1.1
+
+### Patch Changes
+
+- Publish to the registry instead of being consumed only via a local `file:` link. `appspine-app-template/e2e/package.json` depended on it via `file:../../appspine/packages/e2e-kit`, which only resolves when both repos are checked out as siblings in this dev workspace (broke both CI and any real fork, same issue as frontend-shell).
+
 ## 0.1.0
 
 ### Minor Changes
