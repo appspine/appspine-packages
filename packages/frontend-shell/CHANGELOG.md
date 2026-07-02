@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.1.2
+
+### Patch Changes
+
+- Publish to the registry instead of being consumed only via a local `file:` link. Business-system repos forked from `appspine-app-template` don't have this monorepo checked out as a sibling directory, so the `file:../../appspine/packages/frontend-shell` dependency in `frontend/package.json` couldn't resolve outside the original dev workspace (broke both CI and any real fork).
+
 ## 0.1.1
 
 ### Patch Changes

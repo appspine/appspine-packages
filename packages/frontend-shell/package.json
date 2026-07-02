@@ -1,7 +1,10 @@
 {
   "name": "@appspine/frontend-shell",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
