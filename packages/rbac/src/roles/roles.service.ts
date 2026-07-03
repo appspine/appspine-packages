@@ -94,7 +94,10 @@ export class RolesService {
       }),
       this.prisma.role.count({ where }),
     ]);
-    return paginate(roles.map((r: RoleWithRelations) => this.mapRole(r)), total);
+    return paginate(
+      roles.map((r: RoleWithRelations) => this.mapRole(r)),
+      total,
+    );
   }
 
   /** Unpaginated — for role pickers (create-user/create-api-key dialogs) that need every role, not a page of them. */

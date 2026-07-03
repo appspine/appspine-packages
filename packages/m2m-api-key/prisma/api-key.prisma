@@ -14,6 +14,16 @@ model ApiKey {
   /// Role this key authenticates as; FK to roles table.
   roleId     String    @map("role_id")
   role       Role      @relation(fields: [roleId], references: [id])
+  /// User this key acts as for identity-bound writes (createdById, ownership checks).
+  /// Must be a dedicated service-account user, never a real employee's personal
+  /// account — see policy note below. Null = no bound identity; endpoints
+  /// requiring a real user must reject such calls.
+  /// onDelete: Restrict — deleting a bound user is blocked; unbind or deactivate
+  /// the key first. (In practice Users are never hard-deleted in this framework,
+  /// only soft-disabled via `isActive`; Restrict is defense-in-depth, not the
+  /// primary safeguard — see the isActive check in the guard.)
+  actingUserId String? @map("acting_user_id")
+  actingUser   User?   @relation("ApiKeyActingUser", fields: [actingUserId], references: [id], onDelete: Restrict)
   /// Module-level scopes, e.g. ["users:read","users:*"]. "*" = all scopes. Empty = deny all.
   scopes     String[]
   /// Requests per minute. null = system default (60).

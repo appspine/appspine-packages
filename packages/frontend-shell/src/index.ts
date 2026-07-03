@@ -1,6 +1,5 @@
 export * from './components/list-pagination.js';
 export * from './components/list-search-form.js';
-export * from './components/sortable-column-header.js';
 export * from './components/shell/app-sidebar.js';
 export * from './components/shell/dashboard-shell.js';
 export * from './components/shell/locale-switcher.js';
@@ -9,6 +8,7 @@ export * from './components/shell/navigation.js';
 export * from './components/shell/sidebar-resizer.js';
 export * from './components/shell/theme-switcher.js';
 export * from './components/shell/user-nav.js';
+export * from './components/sortable-column-header.js';
 export * from './components/ui/avatar.js';
 export * from './components/ui/button.js';
 export * from './components/ui/collapsible.js';

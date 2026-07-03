@@ -10,6 +10,7 @@ export interface RecordAuditLogDto {
   appName: string;
   isAiOperation?: boolean;
   mcpTool?: string | null;
+  actingApiKeyId?: string | null;
 }
 
 @Injectable()
@@ -27,6 +28,7 @@ export class AuditLogService {
         appName: dto.appName,
         isAiOperation: dto.isAiOperation ?? false,
         mcpTool: dto.mcpTool ?? null,
+        actingApiKeyId: dto.actingApiKeyId ?? null,
       },
     });
   }

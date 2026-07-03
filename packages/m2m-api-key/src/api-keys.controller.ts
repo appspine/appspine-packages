@@ -37,7 +37,7 @@ export class ApiKeysController {
   private recordAudit(
     entityId: string,
     action: AuditAction,
-    actor: { sub: string; email?: string },
+    actor: { sub: string; email?: string; isApiKey?: boolean },
   ) {
     void this.auditLogService
       .record({
@@ -47,6 +47,7 @@ export class ApiKeysController {
         actorId: actor.sub,
         actorEmail: actor.email ?? `api-key:${actor.sub}`,
         appName: process.env.APP_NAME ?? 'appspine-app-template',
+        actingApiKeyId: actor.isApiKey ? actor.sub : null,
       })
       .catch((err: unknown) => this.logger.warn(`Failed to record audit log: ${String(err)}`));
   }
@@ -55,7 +56,7 @@ export class ApiKeysController {
   async create(
     @Body(new ZodValidationPipe(createApiKeySchema)) dto: CreateApiKeyDto,
     // The caller may be JWT (has email) or another API key (only `sub`); fall back accordingly.
-    @CurrentUser() actor: { sub: string; email?: string },
+    @CurrentUser() actor: { sub: string; email?: string; isApiKey?: boolean },
   ) {
     const result = await this.apiKeysService.create(dto, actor.email ?? `api-key:${actor.sub}`);
     this.recordAudit(result.id, AuditAction.CREATE, actor);
@@ -76,7 +77,7 @@ export class ApiKeysController {
   async update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateApiKeySchema)) dto: UpdateApiKeyDto,
-    @CurrentUser() actor: { sub: string; email?: string },
+    @CurrentUser() actor: { sub: string; email?: string; isApiKey?: boolean },
   ) {
     const result = await this.apiKeysService.update(id, dto);
     this.recordAudit(id, AuditAction.UPDATE, actor);
@@ -85,7 +86,10 @@ export class ApiKeysController {
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: string, @CurrentUser() actor: { sub: string; email?: string }) {
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() actor: { sub: string; email?: string; isApiKey?: boolean },
+  ) {
     await this.apiKeysService.remove(id);
     this.recordAudit(id, AuditAction.DELETE, actor);
   }

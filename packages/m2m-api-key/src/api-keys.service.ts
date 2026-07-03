@@ -9,6 +9,7 @@ export interface ApiKeyRecord {
   name: string;
   prefix: string;
   roleId: string;
+  actingUserId: string | null;
   role: RoleRef;
   scopes: string[];
   rateLimit: number | null;
@@ -34,6 +35,7 @@ const API_KEY_SELECT = {
   name: true,
   prefix: true,
   roleId: true,
+  actingUserId: true,
   role: { select: { id: true, name: true, displayName: true } },
   scopes: true,
   rateLimit: true,
@@ -51,6 +53,7 @@ export class ApiKeysService {
 
   async create(dto: CreateApiKeyDto, createdBy?: string): Promise<CreateApiKeyResponse> {
     this.validateScopes(dto.scopes);
+    if (dto.actingUserId) await this.assertActingUser(dto.actingUserId);
 
     const raw = KEY_PREFIX + randomBytes(16).toString('hex');
     const hashedKey = createHash('sha256').update(raw).digest('hex');
@@ -62,6 +65,7 @@ export class ApiKeysService {
         prefix,
         hashedKey,
         roleId: dto.roleId,
+        actingUserId: dto.actingUserId ?? null,
         scopes: dto.scopes,
         rateLimit: dto.rateLimit ?? null,
         expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
@@ -76,6 +80,7 @@ export class ApiKeysService {
       prefix: apiKey.prefix,
       name: apiKey.name,
       roleId: apiKey.roleId,
+      actingUserId: apiKey.actingUserId,
       role: apiKey.role,
       scopes: apiKey.scopes,
       createdAt: apiKey.createdAt,
@@ -109,12 +114,14 @@ export class ApiKeysService {
   async update(id: string, dto: UpdateApiKeyDto): Promise<ApiKeyRecord> {
     await this.findOne(id);
     if (dto.scopes) this.validateScopes(dto.scopes);
+    if (dto.actingUserId) await this.assertActingUser(dto.actingUserId);
 
     return this.prisma.apiKey.update({
       where: { id },
       data: {
         ...(dto.name !== undefined && { name: dto.name }),
         ...(dto.roleId !== undefined && { roleId: dto.roleId }),
+        ...(dto.actingUserId !== undefined && { actingUserId: dto.actingUserId }),
         ...(dto.scopes !== undefined && { scopes: dto.scopes }),
         ...(dto.rateLimit !== undefined && { rateLimit: dto.rateLimit }),
         ...(dto.isActive !== undefined && { isActive: dto.isActive }),
@@ -135,6 +142,19 @@ export class ApiKeysService {
     const invalid = scopes.filter((s) => s !== '*' && !SCOPE_PATTERN.test(s));
     if (invalid.length > 0) {
       throw new BadRequestException(`Invalid scopes: ${invalid.join(', ')}`);
+    }
+  }
+
+  private async assertActingUser(actingUserId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: actingUserId },
+      select: { id: true, isServiceAccount: true },
+    });
+    if (!user) throw new BadRequestException(`Acting user ${actingUserId} not found`);
+    if (!user.isServiceAccount) {
+      throw new BadRequestException(
+        'This account is not marked as a service account and cannot be bound as an API key acting user.',
+      );
     }
   }
 }

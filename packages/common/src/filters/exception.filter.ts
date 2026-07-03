@@ -40,11 +40,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
     }
 
+    const requestId = (req as Request & { id?: string }).id;
+
     res.status(status).json({
       statusCode: status,
       message,
       ...(details !== undefined && { details }),
-      traceId: req['id'] || req.headers['x-request-id'] || randomUUID(),
+      traceId: requestId || req.headers['x-request-id'] || randomUUID(),
       timestamp: new Date().toISOString(),
       path: req.url,
     });
