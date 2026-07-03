@@ -4,12 +4,14 @@ export const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   name: z.string().optional(),
+  isServiceAccount: z.boolean().optional(),
   roleIds: z.array(z.string()).optional(),
 });
 
 export const updateUserSchema = z.object({
   name: z.string().optional(),
   isActive: z.boolean().optional(),
+  isServiceAccount: z.boolean().optional(),
 });
 
 export const updateRolesSchema = z.object({

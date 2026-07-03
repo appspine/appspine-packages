@@ -13,10 +13,16 @@ model User {
   name      String?
   /// Soft-disable without deleting — preserves audit history.
   isActive  Boolean  @default(true) @map("is_active")
+  /// Marks a dedicated machine/integration account (not a real person's login).
+  /// Only service accounts may be bound as an API key's acting user — see the
+  /// actingUserId policy on ApiKey. @internal
+  isServiceAccount Boolean @default(false) @map("is_service_account")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   userRoles UserRole[]
+  /// API keys that act as this user for identity-bound writes.
+  actingApiKeys ApiKey[] @relation("ApiKeyActingUser")
 
   @@map("users")
 }

@@ -28,6 +28,7 @@ const PUBLIC_FIELDS = {
     },
   },
   isActive: true,
+  isServiceAccount: true,
   createdAt: true,
 } as const;
 
@@ -39,6 +40,7 @@ type UserWithRoles = {
     role: { id: string; name: string; displayName: string; permissionPolicy: string };
   }[];
   isActive: boolean;
+  isServiceAccount: boolean;
   createdAt: Date;
 };
 
@@ -58,19 +60,26 @@ export class UsersService {
     return userRole.id;
   }
 
-  async create(data: { email: string; password: string; name?: string; roleIds?: string[] }) {
+  async create(data: {
+    email: string;
+    password: string;
+    name?: string;
+    isServiceAccount?: boolean;
+    roleIds?: string[];
+  }) {
     const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
     if (existing) throw new ConflictException('Email already registered');
 
     const roleIds =
       data.roleIds && data.roleIds.length > 0 ? data.roleIds : [await this.resolveDefaultRoleId()];
 
-    const { email, password, name } = data;
+    const { email, password, name, isServiceAccount } = data;
     const user = await this.prisma.user.create({
       data: {
         email,
         password,
         name,
+        isServiceAccount,
         userRoles: {
           create: roleIds.map((roleId) => ({ roleId })),
         },

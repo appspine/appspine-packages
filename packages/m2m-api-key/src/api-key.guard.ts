@@ -38,7 +38,10 @@ export class ApiKeyGuard implements CanActivate {
         isActive: true,
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       },
-      include: { role: { include: { permissions: true } } },
+      include: {
+        role: { include: { permissions: true } },
+        actingUser: { select: { id: true, isActive: true } },
+      },
     });
 
     if (!apiKey) return false;
@@ -57,11 +60,14 @@ export class ApiKeyGuard implements CanActivate {
       .update({ where: { id: apiKey.id }, data: { lastUsedAt: now } })
       .catch((e: unknown) => console.error('[ApiKeyGuard] lastUsedAt update failed:', e));
 
+    const actingUserId = apiKey.actingUser?.isActive ? apiKey.actingUser.id : null;
+
     request.user = {
       sub: apiKey.id,
       ...buildUserContext([apiKey.role]),
       scopes: apiKey.scopes,
       isApiKey: true,
+      actingUserId,
     };
 
     return true;

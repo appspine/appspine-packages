@@ -1,6 +1,6 @@
 {
   "name": "@appspine/auth",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "private": false,
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
@@ -18,6 +18,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -28,7 +29,7 @@
     "passport-jwt": "^4.0.1"
   },
   "peerDependencies": {
-    "@appspine/audit-log": "^0.1.1",
+    "@appspine/audit-log": "^0.2.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/jwt": "^11.0.2",
@@ -47,6 +48,7 @@
     "@types/node": "^22.10.0",
     "@types/passport-jwt": "^4.0.1",
     "typescript": "^5.9.3",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "vitest": "^3.2.4"
   }
 }

@@ -12,6 +12,9 @@ model AuditLog {
   isAiOperation Boolean     @default(false) @map("is_ai_operation")
   /// MCP tool name that triggered this log entry. Null for human operations.
   mcpTool       String?     @map("mcp_tool")
+  /// Id of the API key that performed this action, when the actor was an API key
+  /// acting as a bound user. Snapshot string, no FK. Null for direct human actions.
+  actingApiKeyId String? @map("acting_api_key_id")
   createdAt     DateTime    @default(now()) @map("created_at")
 
   @@map("audit_logs")

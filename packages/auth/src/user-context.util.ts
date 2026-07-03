@@ -19,6 +19,7 @@ export interface ApiKeyUser extends UserContext {
   sub: string;
   scopes: string[];
   isApiKey: true;
+  actingUserId: string | null; // User this key acts as; null = no bound identity.
 }
 
 const POLICY_ORDER: Record<string, number> = { ALLOW_ALL: 2, READ_ALL: 1, DENY_ALL: 0 };

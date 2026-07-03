@@ -1,14 +1,13 @@
 'use client';
 
+import { Languages } from 'lucide-react';
 import { useTransition } from 'react';
 
-import { Languages } from 'lucide-react';
-
-import { locales, type Locale, useTranslations } from '../../i18n/index.js';
+import { type Locale, locales, useTranslations } from '../../i18n/index.js';
 import { Button } from '../ui/button.js';
 import {
-  DropdownMenuCheckboxItem,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu.js';

@@ -16,6 +16,7 @@ export * from './guards/jwt-auth.guard';
 export * from './strategies/local.strategy';
 export * from './strategies/oidc.strategy';
 export * from './user-context.util';
+export * from './user-identity.util';
 export * from './users/dto/user.dto';
 // Users
 export * from './users/users.controller';
