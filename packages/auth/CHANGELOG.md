@@ -1,5 +1,23 @@
 # @appspine/auth
 
+## 1.0.1
+
+### Patch Changes
+
+- Sync internal `@appspine/common` dependency to `0.2.0` (previously pinned to `0.1.1` from the last
+  publish). No functional code changes.
+
+  This closes a gap left by the `@appspine/mcp-server`/`@appspine/common`/`@appspine/audit-log` minor
+  release (wiki app 011 prerequisites): that release only targeted those three packages, so the
+  `changeset version` internal-dependency cascade to these five `@appspine/common` consumers was
+  discarded instead of applied, leaving their published manifests pinned to the stale
+  `@appspine/common@0.1.1`. Any app installing both a direct `@appspine/common@^0.2.0` dependency and
+  one of these five packages ends up with two separate `@appspine/common` copies in `node_modules`,
+  which NestJS resolves as two distinct `PrismaService` class tokens and fails DI resolution — see
+  `dev_docs/Z05-template-common-singleton-override.md` for the concrete failure and the
+  `pnpm-workspace.yaml` override that was needed as a workaround in `appspine-app-template`. This
+  release removes the need for that override going forward.
+
 ## 1.0.0
 
 ### Minor Changes
