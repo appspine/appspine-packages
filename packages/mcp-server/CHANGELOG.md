@@ -1,5 +1,16 @@
 # @appspine/mcp-server
 
+## 0.2.2
+
+### Patch Changes
+
+- Fix `registerMcpToolsFromInstance()` dropping the `McpCallContext` argument when invoking
+  `@McpTool()`-decorated methods. `McpService.createServer()` already calls `tool.handler(args, ctx)`,
+  but the registration helper's generated handler only forwarded `args`, so any app registering tools
+  this way had no way to read `ctx.actingUserId`/`ctx.roleNames`/`ctx.scopes` inside the tool method —
+  defeating the point of the acting-user context added for wiki app MCP tools. See
+  `dev_docs/Z08-mcp-tool-decorator-ctx-drop.md`.
+
 ## 0.2.1
 
 ### Patch Changes
