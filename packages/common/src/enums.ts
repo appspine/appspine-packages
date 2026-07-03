@@ -14,5 +14,7 @@ export const AuditAction = {
   CREATE: 'CREATE',
   UPDATE: 'UPDATE',
   DELETE: 'DELETE',
+  RESTORE: 'RESTORE',
+  MOVE: 'MOVE',
 } as const;
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];

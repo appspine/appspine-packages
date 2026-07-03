@@ -25,6 +25,8 @@ export class McpController {
       scopes: user?.scopes ?? [],
       isApiKey: user?.isApiKey ?? false,
       roleNames: user?.roleNames ?? [],
+      actingUserId: user?.actingUserId ?? null,
+      sub: user?.sub ?? '',
     };
 
     const server = this.mcpService.createServer(ctx);

@@ -1,5 +1,13 @@
 # @appspine/common
 
+## 0.2.0
+
+### Minor Changes
+
+- Add MCP acting-user context and AuditAction RESTORE/MOVE for wiki app prerequisites.
+
+  Consumers of `@appspine/audit-log` must also update their Prisma schema fragment: the `AuditAction` enum now includes `RESTORE` and `MOVE`. The fragment is not synchronized automatically through the npm package.
+
 ## 0.1.1
 
 ### Patch Changes

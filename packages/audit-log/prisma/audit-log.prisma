@@ -24,4 +24,6 @@ enum AuditAction {
   CREATE
   UPDATE
   DELETE
+  RESTORE
+  MOVE
 }

@@ -1,0 +1,99 @@
+import type { ApiKeyUser } from '@appspine/auth';
+import type { Request, Response } from 'express';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { McpController } from './mcp.controller';
+import type { McpCallContext } from './types';
+
+const handleRequest = vi.fn().mockResolvedValue(undefined);
+const closeTransport = vi.fn().mockResolvedValue(undefined);
+
+vi.mock('@appspine/m2m-api-key', () => ({
+  ApiKeyGuard: class {},
+}));
+
+vi.mock('@modelcontextprotocol/sdk/server/streamableHttp.js', () => ({
+  StreamableHTTPServerTransport: vi.fn().mockImplementation(() => ({
+    handleRequest,
+    close: closeTransport,
+  })),
+}));
+
+const baseApiKeyUser = {
+  sub: 'api-key-1',
+  scopes: ['wiki-pages:read'],
+  isApiKey: true,
+  roleNames: ['ADMIN'],
+  permissionPolicy: 'ALLOW_ALL',
+  permissions: [],
+} satisfies Omit<ApiKeyUser, 'actingUserId'>;
+
+function createRequest(user: ApiKeyUser): Request {
+  return { user, body: { jsonrpc: '2.0' } } as unknown as Request;
+}
+
+function createResponse(): Response {
+  return { on: vi.fn() } as unknown as Response;
+}
+
+describe('McpController', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('forwards the bound acting user and API key id into the MCP call context', async () => {
+    const contexts: McpCallContext[] = [];
+    const server = {
+      connect: vi.fn().mockResolvedValue(undefined),
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const controller = new McpController(
+      {
+        createServer: vi.fn((ctx: McpCallContext) => {
+          contexts.push(ctx);
+          return server;
+        }),
+      } as never,
+      { getToolCount: vi.fn() } as never,
+    );
+
+    await controller.handlePost(
+      createRequest({ ...baseApiKeyUser, actingUserId: 'service-user-1' }),
+      createResponse(),
+    );
+
+    expect(contexts).toEqual([
+      {
+        scopes: ['wiki-pages:read'],
+        isApiKey: true,
+        roleNames: ['ADMIN'],
+        actingUserId: 'service-user-1',
+        sub: 'api-key-1',
+      },
+    ]);
+  });
+
+  it('forwards null when the API key has no active bound acting user', async () => {
+    const contexts: McpCallContext[] = [];
+    const server = {
+      connect: vi.fn().mockResolvedValue(undefined),
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const controller = new McpController(
+      {
+        createServer: vi.fn((ctx: McpCallContext) => {
+          contexts.push(ctx);
+          return server;
+        }),
+      } as never,
+      { getToolCount: vi.fn() } as never,
+    );
+
+    await controller.handlePost(
+      createRequest({ ...baseApiKeyUser, actingUserId: null }),
+      createResponse(),
+    );
+
+    expect(contexts[0]?.actingUserId).toBeNull();
+    expect(contexts[0]?.sub).toBe('api-key-1');
+  });
+});
