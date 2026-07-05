@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AdminGuard } from './guards/admin.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtVerifierService } from './jwt-verifier.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { OidcStrategy } from './strategies/oidc.strategy';
 import { UsersController } from './users/users.controller';
@@ -27,7 +28,7 @@ const ActiveStrategy = process.env.AUTH_MODE === 'oidc' ? OidcStrategy : LocalSt
     }),
   ],
   controllers: [AuthController, UsersController],
-  providers: [UsersService, ActiveStrategy, JwtAuthGuard, AdminGuard],
-  exports: [UsersService, JwtAuthGuard, AdminGuard],
+  providers: [UsersService, JwtVerifierService, ActiveStrategy, JwtAuthGuard, AdminGuard],
+  exports: [UsersService, JwtVerifierService, JwtAuthGuard, AdminGuard],
 })
 export class AuthModule {}

@@ -1,5 +1,12 @@
 # @appspine/auth
 
+## 1.1.0
+
+### Minor Changes
+
+- Add `JwtVerifierService.verifyJwtToken()` for non-HTTP JWT verification so WebSocket
+  gateways can reuse the same JWT validation flow without changing existing HTTP auth behavior.
+
 ## 1.0.1
 
 ### Patch Changes

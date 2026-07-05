@@ -1,6 +1,6 @@
 {
   "name": "@appspine/rbac",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": false,
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"

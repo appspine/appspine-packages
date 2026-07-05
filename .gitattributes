@@ -1,0 +1,4 @@
+# Check out every text file with LF on all platforms. Biome's formatter is
+# pinned to lineEnding "lf", so a CRLF checkout (Windows core.autocrlf=true)
+# would fail `pnpm check` on a fresh clone before any code is written.
+* text=auto eol=lf

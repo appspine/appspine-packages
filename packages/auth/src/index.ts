@@ -11,6 +11,7 @@ export * from './dto/auth.dto';
 // Guards
 export * from './guards/admin.guard';
 export * from './guards/jwt-auth.guard';
+export * from './jwt-verifier.service';
 
 // Strategies
 export * from './strategies/local.strategy';
