@@ -162,8 +162,7 @@ export class UsersService {
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        // biome-ignore lint/suspicious/noExplicitAny: prisma client typing bypass
-        (error as any).code === 'P2003'
+        (error as { code?: string }).code === 'P2003'
       ) {
         throw new ConflictException(
           'This user still has records referencing them elsewhere in the system and cannot be permanently deleted. Deactivate the account instead.',
