@@ -1,5 +1,23 @@
 # @appspine/frontend-shell
 
+## 0.2.2
+
+### Patch Changes
+
+- Thread `accountLabel`/`signOutLabel` through `DashboardShell` → `AppSidebar` to `UserNav`, which already accepted them but had no way to receive anything but its hardcoded English defaults ("Account"/"Log out") from a consuming app.
+
+## 0.2.1
+
+### Patch Changes
+
+- Fix SidebarPagePortal losing its target when the sidebar switches between desktop and mobile (Sheet) presentations, which re-mounts the slot as a new DOM node.
+
+## 0.2.0
+
+### Minor Changes
+
+- Add SidebarPageSlot/SidebarPagePortal so page-level content (e.g. a chat app's channel list) can render into the persistent app sidebar instead of the content area.
+
 ## 0.1.2
 
 ### Patch Changes

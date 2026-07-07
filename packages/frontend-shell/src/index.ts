@@ -5,6 +5,7 @@ export * from './components/shell/dashboard-shell.js';
 export * from './components/shell/locale-switcher.js';
 export * from './components/shell/nav-main.js';
 export * from './components/shell/navigation.js';
+export * from './components/shell/sidebar-page-slot.js';
 export * from './components/shell/sidebar-resizer.js';
 export * from './components/shell/theme-switcher.js';
 export * from './components/shell/user-nav.js';

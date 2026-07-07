@@ -13,6 +13,7 @@ import {
 } from '../ui/sidebar.js';
 import { NavMain } from './nav-main.js';
 import type { NavGroup, ShellLinkComponent } from './navigation.js';
+import { SidebarPageSlot } from './sidebar-page-slot.js';
 import { SidebarResizer } from './sidebar-resizer.js';
 import { UserNav } from './user-nav.js';
 
@@ -27,6 +28,8 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     readonly avatar?: string | null;
   };
   readonly onSignOut: () => void;
+  readonly accountLabel?: string;
+  readonly signOutLabel?: string;
 }
 
 export function AppSidebar({
@@ -36,6 +39,8 @@ export function AppSidebar({
   LinkComponent,
   user,
   onSignOut,
+  accountLabel,
+  signOutLabel,
   ...props
 }: AppSidebarProps) {
   return (
@@ -54,9 +59,15 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} currentPath={currentPath} LinkComponent={LinkComponent} />
+        <SidebarPageSlot />
       </SidebarContent>
       <SidebarFooter>
-        <UserNav user={user} onSignOut={onSignOut} />
+        <UserNav
+          user={user}
+          onSignOut={onSignOut}
+          accountLabel={accountLabel}
+          signOutLabel={signOutLabel}
+        />
       </SidebarFooter>
       <SidebarResizer />
     </Sidebar>

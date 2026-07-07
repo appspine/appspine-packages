@@ -16,6 +16,8 @@ interface DashboardShellProps {
     readonly avatar?: string | null;
   };
   readonly onSignOut: () => void;
+  readonly accountLabel?: string;
+  readonly signOutLabel?: string;
   readonly defaultOpen: boolean;
   readonly sidebarVariant: 'sidebar' | 'floating' | 'inset';
   readonly sidebarCollapsible: 'offcanvas' | 'icon' | 'none';
@@ -31,6 +33,8 @@ export function DashboardShell({
   LinkComponent,
   user,
   onSignOut,
+  accountLabel,
+  signOutLabel,
   defaultOpen,
   sidebarVariant,
   sidebarCollapsible,
@@ -54,6 +58,8 @@ export function DashboardShell({
         LinkComponent={LinkComponent}
         user={user}
         onSignOut={onSignOut}
+        accountLabel={accountLabel}
+        signOutLabel={signOutLabel}
         variant={sidebarVariant}
         collapsible={sidebarCollapsible}
       />
