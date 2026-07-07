@@ -1,5 +1,6 @@
 import {
   type PaginationQuery,
+  Prisma,
   PrismaService,
   paginate,
   toPrismaOrderBy,
@@ -155,6 +156,20 @@ export class UsersService {
 
   async remove(id: string) {
     await this.findById(id);
-    await this.prisma.user.delete({ where: { id } });
+
+    try {
+      await this.prisma.user.delete({ where: { id } });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        // biome-ignore lint/suspicious/noExplicitAny: prisma client typing bypass
+        (error as any).code === 'P2003'
+      ) {
+        throw new ConflictException(
+          'This user still has records referencing them elsewhere in the system and cannot be permanently deleted. Deactivate the account instead.',
+        );
+      }
+      throw error;
+    }
   }
 }

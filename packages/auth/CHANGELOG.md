@@ -1,5 +1,11 @@
 # @appspine/auth
 
+## 1.1.1
+
+### Patch Changes
+
+- catch Prisma P2003 FK violation on user delete and return a 409 ConflictException instead of an unhandled 500
+
 ## 1.1.0
 
 ### Minor Changes
