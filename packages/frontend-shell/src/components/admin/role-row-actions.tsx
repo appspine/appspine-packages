@@ -28,7 +28,7 @@ import { Input } from '../ui/input.js';
 import { Label } from '../ui/label.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
 
-import type { RoleRow } from './types.js';
+import type { EnumOption, RoleRow } from './types.js';
 
 export function RoleRowActions({
   role,
@@ -36,14 +36,12 @@ export function RoleRowActions({
   permissionOptions,
   updateRoleAction,
   deleteRoleAction,
-  renderEnumLabel,
 }: {
   role: RoleRow;
-  policyOptions: readonly string[];
-  permissionOptions: readonly string[];
+  policyOptions: EnumOption[];
+  permissionOptions: EnumOption[];
   updateRoleAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
   deleteRoleAction: (id: string) => Promise<{ error?: string }>;
-  renderEnumLabel: (kind: 'PermissionPolicy' | 'Permission', value: string) => string;
 }) {
   const t = useTranslations('roles');
   const tCommon = useTranslations('common');
@@ -139,9 +137,9 @@ export function RoleRowActions({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {policyOptions.map((policy) => (
-                      <SelectItem key={policy} value={policy}>
-                        {renderEnumLabel('PermissionPolicy', policy)}
+                    {policyOptions.map(({ value, label }) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -157,15 +155,15 @@ export function RoleRowActions({
                   )}
                 </FieldLabel>
                 <div className="flex flex-col gap-2">
-                  {permissionOptions.map((permission) => (
-                    <Label key={permission} className="flex items-center gap-2 font-normal">
+                  {permissionOptions.map(({ value, label }) => (
+                    <Label key={value} className="flex items-center gap-2 font-normal">
                       <Checkbox
                         name="permissions"
-                        value={permission}
+                        value={value}
                         disabled={isAdmin}
-                        defaultChecked={role.permissions.includes(permission)}
+                        defaultChecked={role.permissions.includes(value)}
                       />
-                      {renderEnumLabel('Permission', permission)}
+                      {label}
                     </Label>
                   ))}
                 </div>

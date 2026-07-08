@@ -20,16 +20,16 @@ import { Input } from '../ui/input.js';
 import { Label } from '../ui/label.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
 
+import type { EnumOption } from './types.js';
+
 export function CreateRoleDialog({
   policyOptions,
   permissionOptions,
   createRoleAction,
-  renderEnumLabel,
 }: {
-  policyOptions: readonly string[];
-  permissionOptions: readonly string[];
+  policyOptions: EnumOption[];
+  permissionOptions: EnumOption[];
   createRoleAction: (formData: FormData) => Promise<{ error?: string }>;
-  renderEnumLabel: (kind: 'PermissionPolicy' | 'Permission', value: string) => string;
 }) {
   const t = useTranslations('roles');
   const [open, setOpen] = useState(false);
@@ -89,9 +89,9 @@ export function CreateRoleDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {policyOptions.map((policy) => (
-                    <SelectItem key={policy} value={policy}>
-                      {renderEnumLabel('PermissionPolicy', policy)}
+                  {policyOptions.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -100,10 +100,10 @@ export function CreateRoleDialog({
             <Field>
               <FieldLabel>{t('permissions')}</FieldLabel>
               <div className="flex flex-col gap-2">
-                {permissionOptions.map((permission) => (
-                  <Label key={permission} className="flex items-center gap-2 font-normal">
-                    <Checkbox name="permissions" value={permission} />
-                    {renderEnumLabel('Permission', permission)}
+                {permissionOptions.map(({ value, label }) => (
+                  <Label key={value} className="flex items-center gap-2 font-normal">
+                    <Checkbox name="permissions" value={value} />
+                    {label}
                   </Label>
                 ))}
               </div>

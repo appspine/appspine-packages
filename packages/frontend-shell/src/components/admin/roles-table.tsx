@@ -32,6 +32,21 @@ export function RolesTable({
   updateRoleAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
   deleteRoleAction: (id: string) => Promise<{ error?: string }>;
 }) {
+  // RolesTable itself has no 'use client' directive, so it renders as a Server
+  // Component — calling `renderEnumLabel` (a plain function passed down from
+  // another Server Component) here is fine, no serialization boundary is
+  // crossed. It must NOT be forwarded as-is into RoleRowActions below, which
+  // IS a Client Component — React RSC rejects passing plain functions across
+  // that boundary. Resolve to plain {value,label} data here instead.
+  const policyOptionsWithLabels = policyOptions.map((value) => ({
+    value,
+    label: renderEnumLabel('PermissionPolicy', value),
+  }));
+  const permissionOptionsWithLabels = permissionOptions.map((value) => ({
+    value,
+    label: renderEnumLabel('Permission', value),
+  }));
+
   return (
     <div className="rounded-lg border">
       <Table>
@@ -108,11 +123,10 @@ export function RolesTable({
               <TableCell>
                 <RoleRowActions
                   role={role}
-                  policyOptions={policyOptions}
-                  permissionOptions={permissionOptions}
+                  policyOptions={policyOptionsWithLabels}
+                  permissionOptions={permissionOptionsWithLabels}
                   updateRoleAction={updateRoleAction}
                   deleteRoleAction={deleteRoleAction}
-                  renderEnumLabel={renderEnumLabel}
                 />
               </TableCell>
             </TableRow>

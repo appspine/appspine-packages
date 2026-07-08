@@ -1,5 +1,15 @@
 # @appspine/frontend-shell
 
+## 0.4.1
+
+### Patch Changes
+
+- Fix `RolesPage` crashing with "Functions cannot be passed directly to Client Components" (React Server Components error). `CreateRoleDialog` and `RoleRowActions` previously accepted a `renderEnumLabel` callback prop, which is a plain function and cannot cross the Server-to-Client Component boundary — this made the Roles admin page 500 on every render in every consuming app.
+
+  `CreateRoleDialog` and `RoleRowActions` now accept `policyOptions`/`permissionOptions` as pre-resolved `{ value, label }[]` data (a new `EnumOption` type) instead of raw enum values plus a label-rendering function. `RolesTable` (which has no `'use client'` directive and therefore still safely receives `renderEnumLabel` from its Server Component parent) resolves the labels itself before handing the enriched data down to `RoleRowActions`.
+
+  **Consumers must update their `roles/page.tsx`**: build `{ value, label }[]` arrays for `policyOptions`/`permissionOptions` before passing them to `<CreateRoleDialog>` (e.g. `permissionPolicyOptions.map((value) => ({ value, label: enumLabel(tEnum, "PermissionPolicy", value) }))`), and drop the `renderEnumLabel` prop from `<CreateRoleDialog>` — `<RolesTable>`'s own props are unchanged.
+
 ## 0.4.0
 
 ### Minor Changes

@@ -25,6 +25,16 @@ export interface UserRoleOption {
   isSystem: boolean;
 }
 
+// A resolved enum value ready for display. Producing the label requires
+// server-side i18n (`getTranslations`/`enumLabel`, which stay app-owned per
+// dev_docs/021 §2.3) — passing a `value` + already-resolved `label` pair
+// keeps this plain, serializable data instead of a function prop, which is
+// illegal to pass from a Server Component into a Client Component.
+export interface EnumOption {
+  value: string;
+  label: string;
+}
+
 // Mirrors @appspine/rbac's RolesService.mapRole() output
 // (packages/rbac/src/roles/roles.service.ts). Defined locally because the frontend
 // doesn't depend on backend packages.
