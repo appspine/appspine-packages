@@ -49,8 +49,8 @@ export function DateRangePicker({
         <Button variant="outline" disabled={disabled} className={`font-normal ${className ?? ''}`}>
           {dateRange?.from
             ? dateRange.to
-              ? `${format(dateRange.from, 'd MMM yyyy', { locale: dateFnsLocale })} - ${format(dateRange.to, 'd MMM yyyy', { locale: dateFnsLocale })}`
-              : format(dateRange.from, 'd MMM yyyy', { locale: dateFnsLocale })
+              ? `${format(dateRange.from, 'yyyy/M/d')} - ${format(dateRange.to, 'yyyy/M/d')}`
+              : format(dateRange.from, 'yyyy/M/d')
             : placeholder}
         </Button>
       </PopoverTrigger>
