@@ -1,8 +1,8 @@
 'use client';
 
 import { format, subDays } from 'date-fns';
-import type { DateRange } from 'react-day-picker';
 import * as React from 'react';
+import type { DateRange } from 'react-day-picker';
 
 import { useDateFnsLocale } from './date-picker.js';
 import { Button } from './ui/button.js';

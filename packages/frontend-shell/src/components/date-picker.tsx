@@ -1,6 +1,6 @@
 'use client';
 
-import { zhTW, enUS } from 'date-fns/locale';
+import { enUS, zhTW } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
 
 import { useLocale } from '../i18n/index.js';

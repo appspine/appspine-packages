@@ -1,8 +1,8 @@
 'use client';
 
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { DayPicker, getDefaultClassNames, type DayButton, type Locale } from 'react-day-picker';
 import * as React from 'react';
+import { type DayButton, DayPicker, getDefaultClassNames, type Locale } from 'react-day-picker';
 
 import { cn } from '../../lib/utils.js';
 import { Button, buttonVariants } from './button.js';
@@ -79,10 +79,7 @@ export function Calendar({
           defaultClassNames.weekday,
         ),
         week: cn('mt-2 flex w-full', defaultClassNames.week),
-        week_number_header: cn(
-          'w-(--cell-size) select-none',
-          defaultClassNames.week_number_header,
-        ),
+        week_number_header: cn('w-(--cell-size) select-none', defaultClassNames.week_number_header),
         week_number: cn(
           'text-[0.8rem] text-muted-foreground select-none',
           defaultClassNames.week_number,

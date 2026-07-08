@@ -41,7 +41,11 @@ export function PopoverAnchor(props: React.ComponentProps<typeof PopoverPrimitiv
 
 export function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="popover-header" className={cn('flex flex-col gap-0.5 text-sm', className)} {...props} />
+    <div
+      data-slot="popover-header"
+      className={cn('flex flex-col gap-0.5 text-sm', className)}
+      {...props}
+    />
   );
 }
 
@@ -51,6 +55,10 @@ export function PopoverTitle({ className, ...props }: React.ComponentProps<'h2'>
 
 export function PopoverDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
-    <p data-slot="popover-description" className={cn('text-muted-foreground', className)} {...props} />
+    <p
+      data-slot="popover-description"
+      className={cn('text-muted-foreground', className)}
+      {...props}
+    />
   );
 }

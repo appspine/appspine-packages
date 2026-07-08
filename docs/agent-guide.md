@@ -6,12 +6,17 @@ This document is the development guide for adding or modifying shared `@appspine
 
 To avoid circular dependencies (which cause build and runtime issues), packages must adhere to the following dependency direction:
 
-- **`common`** — The foundation package. It has no dependencies on other shared framework packages.
-- **`auth`** — Depends on `common` (for Exception Filters, Prisma, Zod pipes).
-- **`rbac`** — Depends on `auth` (utilizes the user context utilities and profiles).
-- **`m2m-api-key`** — Depends on `rbac` (roles with scoped capabilities).
-- **`mcp-server`** — Depends on `m2m-api-key` (for `ApiKeyGuard`) and `auth` (for the `ApiKeyUser` type).
-- **`audit-log`**, **`health-check`**, **`metadata-schema`**, **`e2e-kit`**, **`frontend-shell`** — Independent services and wrappers; they do not depend on one another but consume `common` and/or `auth`.
+- **`common`** — The foundation package. No dependencies on other shared framework packages.
+- **`auth`** — Depends on `common`.
+- **`rbac`** — Depends on `auth` and `common`.
+- **`m2m-api-key`** — Depends on `auth` and `common`.
+- **`mcp-server`** — Depends on `auth` and `m2m-api-key` (for `ApiKeyGuard` / `ApiKeyUser`).
+- **`metadata-schema`** — Depends on `common` and `m2m-api-key`.
+- **`audit-log`** — Depends on `common`.
+- **`health-check`** — Depends on `common`.
+- **`e2e-kit`** — No workspace dependencies (Playwright-only).
+- **`frontend-shell`** — No workspace dependencies (frontend peer deps only).
+
 
 ## Standard Flow for Adding a New Package
 

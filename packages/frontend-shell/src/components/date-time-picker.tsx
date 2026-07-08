@@ -117,7 +117,12 @@ export function DateTimePicker({
           </button>
         )}
         <PopoverContent className="flex w-auto flex-col p-0" align="start">
-          <Calendar mode="single" selected={date} onSelect={handleDateSelect} locale={dateFnsLocale} />
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={handleDateSelect}
+            locale={dateFnsLocale}
+          />
           <div className="flex items-center gap-2 border-border border-t p-3">
             <span className="text-muted-foreground text-xs">Time:</span>
             <div className="flex flex-1 items-center gap-1">
