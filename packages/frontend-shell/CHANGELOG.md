@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.4.0
+
+### Minor Changes
+
+- Add `admin/*` exports (including `UsersTable`, `RolesTable`, `ApiKeysTable`, their dialogs and row-actions, 12 `*Request` pure action functions, and consolidated types) and seven new shadcn primitive exports (`dialog`, `alert-dialog`, `checkbox`, `label`, `field`, `table`, `badge`).
+
 ## 0.3.1
 
 ### Patch Changes
