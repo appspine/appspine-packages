@@ -1,5 +1,13 @@
 # @appspine/frontend-shell
 
+## 0.3.0
+
+### Minor Changes
+
+- Add `<DateTimePicker>`, `<DateRangePicker>`, `<DatePicker>` components (and the underlying `<Calendar>`/`<Popover>` primitives) to `@appspine/frontend-shell`, consolidating five copy-pasted forks (`appspine-app-template`, `apps/wiki`, `apps/calendar`, `apps/chat`, `apps/project`) into one shared implementation. `<DateTimePicker>` uses the version with the nested-`<button>` hydration fix; `<DateRangePicker>`/`<DatePicker>` use `apps/project`'s i18n-aware versions (`useDateFnsLocale()`), which are now wired into all three components' popover `<Calendar>`.
+
+  **New peerDependencies**: `date-fns@^4.4.0` and `react-day-picker@^10.0.1` (already in use by all five consuming apps at this version, so no consumer needs to bump anything to stay compatible — but any new app forking from `appspine-app-template` with a different version should check compatibility).
+
 ## 0.2.2
 
 ### Patch Changes
