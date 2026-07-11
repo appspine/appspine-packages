@@ -15,6 +15,15 @@ model AuditLog {
   /// Id of the API key that performed this action, when the actor was an API key
   /// acting as a bound user. Snapshot string, no FK. Null for direct human actions.
   actingApiKeyId String? @map("acting_api_key_id")
+  /// Caller-supplied correlation id from the X-Appspine-Workflow-Id request header
+  /// (dev_docs 002/023 §2.5). Untrusted, debugging/cross-app-workflow-tracing use only —
+  /// never used for authorization or attribution decisions. Null when the caller didn't
+  /// send the header. This field only exists once this fragment's consuming app has run
+  /// the migration that adds it (dev_docs 023 §5 execution list, per-app rollout in the
+  /// task breakdown's Group E) -- AuditLogService.record() omits it from the write
+  /// entirely when the caller doesn't pass a workflowId, so apps that haven't migrated
+  /// yet are unaffected.
+  workflowId    String?     @map("workflow_id")
   createdAt     DateTime    @default(now()) @map("created_at")
 
   @@map("audit_logs")
