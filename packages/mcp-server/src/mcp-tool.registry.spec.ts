@@ -99,3 +99,34 @@ describe('McpToolRegistry dual registration', () => {
     expect(() => registry.registerTool(makeTool())).toThrow(/MCP_TOOL_PREFIX/);
   });
 });
+
+describe('McpToolRegistry.getCatalogSnapshot', () => {
+  afterEach(() => {
+    delete process.env.MCP_TOOL_PREFIX;
+  });
+
+  it('reports one entry per logical tool, not per registered (dual-registration) name', () => {
+    process.env.MCP_TOOL_PREFIX = 'wiki';
+    const registry = new McpToolRegistry();
+    registry.registerTool(makeTool());
+    registry.registerTool(makeTool({ name: 'create_page', requiredScopes: ['pages:create'] }));
+
+    expect(registry.getToolCount()).toBe(4);
+    const snapshot = registry.getCatalogSnapshot();
+    expect(snapshot).toHaveLength(2);
+    expect(snapshot).toEqual([
+      { name: 'wiki_list_pages', description: 'test', requiredScopes: ['pages:read'], readOnlyHint: true },
+      { name: 'wiki_create_page', description: 'test', requiredScopes: ['pages:create'], readOnlyHint: false },
+    ]);
+  });
+
+  it('reports bare names when no prefix is configured', () => {
+    delete process.env.MCP_TOOL_PREFIX;
+    const registry = new McpToolRegistry();
+    registry.registerTool(makeTool());
+
+    expect(registry.getCatalogSnapshot()).toEqual([
+      { name: 'list_pages', description: 'test', requiredScopes: ['pages:read'], readOnlyHint: true },
+    ]);
+  });
+});

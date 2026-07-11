@@ -51,10 +51,21 @@ export function classifyToolAsReadOnly(requiredScopes: string[]): boolean {
 // Tools are registered exclusively by the app via @McpTool() + registerMcpToolsFromInstance()
 // — this framework package does not auto-generate CRUD tools from the Prisma schema
 // (dev_docs 001 "MCP tool 產生方式：By app 自行產生").
+export interface McpCatalogEntry {
+  name: string;
+  description: string;
+  requiredScopes: string[];
+  readOnlyHint: boolean;
+}
+
 @Injectable()
 export class McpToolRegistry {
   private readonly logger = new Logger(McpToolRegistry.name);
   private readonly toolMap = new Map<string, McpToolDefinition>();
+  // One entry per @McpTool(), pre-prefixing — the source list getCatalogSnapshot() derives
+  // its external-facing names from, so a dual-registered tool isn't reported twice (023 §2.1
+  // discovery push, T-9700).
+  private readonly logicalTools: McpToolDefinition[] = [];
 
   listTools(ctx: McpCallContext): McpToolDefinition[] {
     return Array.from(this.toolMap.values()).filter((tool) =>
@@ -78,11 +89,27 @@ export class McpToolRegistry {
    */
   registerTool(tool: McpToolDefinition): void {
     this.registerSingle(tool);
+    this.logicalTools.push(tool);
 
     const prefix = getConfiguredToolPrefix();
     if (prefix) {
       this.registerSingle({ ...tool, name: `${prefix}_${tool.name}` });
     }
+  }
+
+  /**
+   * External-facing catalog snapshot (023 §2.1 discovery push, T-9700) — one entry per
+   * logical tool, named however an outside caller would actually have to call it (prefixed
+   * when `MCP_TOOL_PREFIX` is configured, bare name during the transition window otherwise).
+   */
+  getCatalogSnapshot(): McpCatalogEntry[] {
+    const prefix = getConfiguredToolPrefix();
+    return this.logicalTools.map((tool) => ({
+      name: prefix ? `${prefix}_${tool.name}` : tool.name,
+      description: tool.description,
+      requiredScopes: tool.requiredScopes,
+      readOnlyHint: classifyToolAsReadOnly(tool.requiredScopes),
+    }));
   }
 
   private registerSingle(tool: McpToolDefinition): void {

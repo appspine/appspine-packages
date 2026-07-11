@@ -1,3 +1,4 @@
+export * from './discovery-push.service';
 export * from './mcp.controller';
 export * from './mcp.module';
 export * from './mcp.service';
