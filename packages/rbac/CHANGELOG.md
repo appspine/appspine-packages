@@ -1,5 +1,13 @@
 # @appspine/rbac
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [81bd3a5]
+  - @appspine/audit-log@0.4.0
+  - @appspine/auth@2.0.0
+
 ## 1.0.3
 
 ### Patch Changes

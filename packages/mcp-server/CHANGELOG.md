@@ -1,5 +1,16 @@
 # @appspine/mcp-server
 
+## 0.3.0
+
+### Minor Changes
+
+- 1276664: Add cross-app tool naming dual registration (`MCP_TOOL_PREFIX` env var, dev_docs 002/023 §2.2) and automatic `readOnlyHint` derivation from `requiredScopes` in `tools/list` responses (dev_docs 002/023 §2.3/§6.4). Both are additive and backward compatible — apps that haven't set `MCP_TOOL_PREFIX` yet keep registering only the unprefixed tool name.
+
+### Patch Changes
+
+- @appspine/auth@2.0.0
+- @appspine/m2m-api-key@2.0.0
+
 ## 0.2.4
 
 ### Patch Changes

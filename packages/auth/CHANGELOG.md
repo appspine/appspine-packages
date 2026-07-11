@@ -1,5 +1,12 @@
 # @appspine/auth
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [81bd3a5]
+  - @appspine/audit-log@0.4.0
+
 ## 1.1.1
 
 ### Patch Changes
