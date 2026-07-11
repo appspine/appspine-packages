@@ -97,3 +97,21 @@ describe('McpController', () => {
     expect(contexts[0]?.sub).toBe('api-key-1');
   });
 });
+
+describe('McpController.getHealth', () => {
+  it('omits the challenge key when no challenge query param is given', () => {
+    const controller = new McpController({} as never, { getToolCount: () => 0 } as never);
+
+    const result = controller.getHealth(undefined) as Record<string, unknown>;
+
+    expect(result).not.toHaveProperty('challenge');
+  });
+
+  it('echoes the challenge query param back unchanged (023 §2.1 endpoint-change verification)', () => {
+    const controller = new McpController({} as never, { getToolCount: () => 0 } as never);
+
+    const result = controller.getHealth('nonce-abc-123') as Record<string, unknown>;
+
+    expect(result.challenge).toBe('nonce-abc-123');
+  });
+});
