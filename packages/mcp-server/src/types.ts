@@ -10,6 +10,11 @@ export interface McpCallContext {
   actingUserId: string | null;
   /// The calling API key's id (ApiKeyUser.sub) -- needed for AuditLog.actingApiKeyId snapshots.
   sub: string;
+  /// Caller-supplied correlation id from the X-Appspine-Workflow-Id request header (dev_docs
+  /// 002/023 §2.5), already extracted via @appspine/audit-log's extractWorkflowId() -- tool
+  /// handlers that write audit log entries should pass this straight through as
+  /// RecordAuditLogDto.workflowId. Untrusted, optional, debugging/cross-app-tracing only.
+  workflowId: string | null;
 }
 
 export interface McpToolDefinition {

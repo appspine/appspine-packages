@@ -10,6 +10,7 @@ const ctx: McpCallContext = {
   roleNames: [],
   actingUserId: null,
   sub: 'k1',
+  workflowId: null,
 };
 
 function makeTool(overrides: Partial<McpToolDefinition> = {}): McpToolDefinition {

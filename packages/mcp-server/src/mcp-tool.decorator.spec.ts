@@ -36,6 +36,7 @@ describe('registerMcpToolsFromInstance', () => {
       roleNames: [],
       actingUserId: 'service-user-1',
       sub: 'api-key-1',
+      workflowId: null,
     };
 
     const result = await tool?.handler({ q: 'x' }, ctx);

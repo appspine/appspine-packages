@@ -1,5 +1,24 @@
 # @appspine/mcp-server
 
+## 0.5.0
+
+### Minor Changes
+
+- Fix: `McpCallContext` now carries `workflowId` (the caller-supplied
+  `X-Appspine-Workflow-Id` correlation header, dev_docs 002/023 §2.5), extracted in
+  `McpController.handlePost()` and passed through to every `@McpTool()` handler. Previously
+  this header was documented and referenced throughout dev_docs 023 (including T-9610's own
+  stated verification criteria — "帶 X-Appspine-Workflow-Id header 呼叫一支 tool 後，
+  audit_logs 該筆記錄含 header 值") but was never actually read anywhere in this package, so
+  the correlation id never reached any consuming app's audit log regardless of what the caller
+  sent. `McpToolDefinition` handlers should pass `ctx.workflowId` through as
+  `RecordAuditLogDto.workflowId` when recording an audit log entry for a write tool.
+
+  This is a breaking type change for anyone constructing a `McpCallContext` object literal by
+  hand (the new field is required, not optional, to keep it impossible to silently forget) —
+  bumped minor rather than major since this package hasn't reached 1.0 yet and no consuming app
+  constructs this type directly (only `McpController` does).
+
 ## 0.4.0
 
 ### Minor Changes

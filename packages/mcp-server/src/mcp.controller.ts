@@ -7,6 +7,19 @@ import { McpService } from './mcp.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
 
+const WORKFLOW_ID_HEADER = 'x-appspine-workflow-id';
+
+// Deliberately re-implemented here rather than imported from @appspine/audit-log's identical
+// extractWorkflowId(): this monorepo's tsconfig.base.json uses classic "Node"
+// moduleResolution, which can't resolve package.json `exports` subpaths, and importing
+// audit-log's default entrypoint transitively pulls in AuditLogService's @prisma/client
+// dependency (a generated client this package never `prisma generate`s), breaking at require
+// time. Four lines, zero behavior drift risk -- not worth a moduleResolution-wide change.
+function extractWorkflowId(headers: Record<string, unknown>): string | null {
+  const value = headers[WORKFLOW_ID_HEADER];
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
 // MCP is for external agents (n8n, AI clients) authenticated via M2M API key —
 // same auth layer as the rest of the M2M surface (dev_docs 001 "MCP Server transport").
 @Controller('mcp')
@@ -27,6 +40,7 @@ export class McpController {
       roleNames: user?.roleNames ?? [],
       actingUserId: user?.actingUserId ?? null,
       sub: user?.sub ?? '',
+      workflowId: extractWorkflowId(req.headers as Record<string, unknown>),
     };
 
     const server = this.mcpService.createServer(ctx);

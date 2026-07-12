@@ -27,8 +27,8 @@ const baseApiKeyUser = {
   permissions: [],
 } satisfies Omit<ApiKeyUser, 'actingUserId'>;
 
-function createRequest(user: ApiKeyUser): Request {
-  return { user, body: { jsonrpc: '2.0' } } as unknown as Request;
+function createRequest(user: ApiKeyUser, headers: Record<string, string> = {}): Request {
+  return { user, body: { jsonrpc: '2.0' }, headers } as unknown as Request;
 }
 
 function createResponse(): Response {
@@ -68,8 +68,57 @@ describe('McpController', () => {
         roleNames: ['ADMIN'],
         actingUserId: 'service-user-1',
         sub: 'api-key-1',
+        workflowId: null,
       },
     ]);
+  });
+
+  it('extracts workflowId from the X-Appspine-Workflow-Id header (023 §2.5)', async () => {
+    const contexts: McpCallContext[] = [];
+    const server = {
+      connect: vi.fn().mockResolvedValue(undefined),
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const controller = new McpController(
+      {
+        createServer: vi.fn((ctx: McpCallContext) => {
+          contexts.push(ctx);
+          return server;
+        }),
+      } as never,
+      { getToolCount: vi.fn() } as never,
+    );
+
+    await controller.handlePost(
+      createRequest(
+        { ...baseApiKeyUser, actingUserId: 'service-user-1' },
+        { 'x-appspine-workflow-id': 'host-conv-123' },
+      ),
+      createResponse(),
+    );
+
+    expect(contexts[0]?.workflowId).toBe('host-conv-123');
+  });
+
+  it('leaves workflowId null when the header is absent (023 §2.5 "可選/非強制")', async () => {
+    const contexts: McpCallContext[] = [];
+    const server = {
+      connect: vi.fn().mockResolvedValue(undefined),
+      close: vi.fn().mockResolvedValue(undefined),
+    };
+    const controller = new McpController(
+      {
+        createServer: vi.fn((ctx: McpCallContext) => {
+          contexts.push(ctx);
+          return server;
+        }),
+      } as never,
+      { getToolCount: vi.fn() } as never,
+    );
+
+    await controller.handlePost(createRequest({ ...baseApiKeyUser, actingUserId: 'service-user-1' }), createResponse());
+
+    expect(contexts[0]?.workflowId).toBeNull();
   });
 
   it('forwards null when the API key has no active bound acting user', async () => {
