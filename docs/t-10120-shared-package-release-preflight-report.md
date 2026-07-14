@@ -67,6 +67,14 @@ pnpm install: ERR_PNPM_FETCH_403 for https://npm.pkg.github.com/@appspine%2Fcomm
 npm install: E401 Unauthorized for https://npm.pkg.github.com/@appspine%2fcommon
 ```
 
+The failure also reproduces without the new tarballs when installing
+`@appspine/common@0.2.0` as the only dependency in a clean temporary project:
+
+```text
+pnpm install: ERR_PNPM_FETCH_403 for https://npm.pkg.github.com/@appspine%2Fcommon
+npm install: E401 Unauthorized for https://npm.pkg.github.com/@appspine%2fcommon
+```
+
 `npm view` from the workspace can read:
 
 ```bash
