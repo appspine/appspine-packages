@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 export type McpIdempotencyStatus = 'processing' | 'succeeded' | 'failed';
 
 export interface McpIdempotencyRecord {
+  apiKeyId: string;
+  toolName: string;
   operationId: string;
   requestHash: string;
   status: McpIdempotencyStatus;
@@ -11,26 +13,38 @@ export interface McpIdempotencyRecord {
   error?: { name: string; message: string };
 }
 
+export interface McpIdempotencyScope {
+  apiKeyId: string;
+  toolName: string;
+}
+
 export interface McpIdempotencyBeginInput {
+  scope: McpIdempotencyScope;
   operationId: string;
   requestHash: string;
   leaseExpiresAt: Date;
 }
 
 export interface McpIdempotencyCompleteInput {
+  scope: McpIdempotencyScope;
   operationId: string;
   requestHash: string;
   result: unknown;
 }
 
 export interface McpIdempotencyFailInput {
+  scope: McpIdempotencyScope;
   operationId: string;
   requestHash: string;
   error: { name: string; message: string };
 }
 
 export interface McpIdempotencyStore<Tx = unknown> {
-  find(operationId: string, tx: Tx): Promise<McpIdempotencyRecord | null>;
+  find(
+    scope: McpIdempotencyScope,
+    operationId: string,
+    tx: Tx,
+  ): Promise<McpIdempotencyRecord | null>;
   insertProcessing(input: McpIdempotencyBeginInput, tx: Tx): Promise<boolean>;
   claimStaleProcessing(input: McpIdempotencyBeginInput, tx: Tx): Promise<boolean>;
   complete(input: McpIdempotencyCompleteInput, tx: Tx): Promise<void>;
@@ -43,7 +57,8 @@ export interface McpTransactionRunner<Tx = unknown> {
 
 export interface ExecuteIdempotentWriteInput<Tx, TResult> {
   operationId: string | null | undefined;
-  operationName: string;
+  toolName: string;
+  apiKeyId: string;
   request: unknown;
   store: McpIdempotencyStore<Tx>;
   transactionRunner: McpTransactionRunner<Tx>;
@@ -53,6 +68,7 @@ export interface ExecuteIdempotentWriteInput<Tx, TResult> {
 }
 
 export interface McpIdempotencyExecutionContext {
+  scope: McpIdempotencyScope;
   operationId: string;
   requestHash: string;
 }
@@ -84,7 +100,8 @@ export function createMcpRequestHash(input: { operationName: string; request: un
 
 export async function executeIdempotentWrite<Tx, TResult>({
   operationId,
-  operationName,
+  toolName,
+  apiKeyId,
   request,
   store,
   transactionRunner,
@@ -100,8 +117,9 @@ export async function executeIdempotentWrite<Tx, TResult>({
     );
   }
 
-  const requestHash = createMcpRequestHash({ operationName, request });
-  const context = { operationId: normalizedOperationId, requestHash };
+  const scope = normalizeScope({ apiKeyId, toolName });
+  const requestHash = createMcpRequestHash({ operationName: scope.toolName, request });
+  const context = { scope, operationId: normalizedOperationId, requestHash };
   const acquire = await transactionRunner.transaction((tx) =>
     acquireOperation(store, tx, context, addMs(now(), leaseMs), now()),
   );
@@ -134,7 +152,7 @@ async function acquireOperation<Tx>(
   leaseExpiresAt: Date,
   now: Date,
 ): Promise<AcquireOutcome> {
-  const existing = await store.find(context.operationId, tx);
+  const existing = await store.find(context.scope, context.operationId, tx);
   if (!existing) {
     const inserted = await store.insertProcessing({ ...context, leaseExpiresAt }, tx);
     if (inserted) return { kind: 'acquired' };
@@ -169,6 +187,24 @@ async function acquireOperation<Tx>(
   const claimed = await store.claimStaleProcessing({ ...context, leaseExpiresAt }, tx);
   if (claimed) return { kind: 'acquired' };
   return acquireOperation(store, tx, context, leaseExpiresAt, now);
+}
+
+function normalizeScope(scope: McpIdempotencyScope): McpIdempotencyScope {
+  const apiKeyId = scope.apiKeyId.trim();
+  const toolName = scope.toolName.trim();
+  if (!apiKeyId) {
+    throw new McpIdempotencyError(
+      'MCP_IDEMPOTENCY_MISSING_OPERATION_ID',
+      'write MCP tools require an API key id for idempotency isolation',
+    );
+  }
+  if (!toolName) {
+    throw new McpIdempotencyError(
+      'MCP_IDEMPOTENCY_MISSING_OPERATION_ID',
+      'write MCP tools require a tool name for idempotency isolation',
+    );
+  }
+  return { apiKeyId, toolName };
 }
 
 function addMs(date: Date, ms: number): Date {

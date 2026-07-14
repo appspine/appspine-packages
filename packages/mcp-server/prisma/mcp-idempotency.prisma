@@ -1,0 +1,25 @@
+/// MCP write idempotency record for @appspine/mcp-server.
+///
+/// Copy this fragment into the consuming app's Prisma schema and create a
+/// migration in that app. The composite unique key isolates retries by verified
+/// API key, logical MCP tool name, and caller operation id.
+model McpIdempotencyRecord {
+  id             String   @id @default(cuid())
+  apiKeyId       String   @map("api_key_id")
+  toolName       String   @map("tool_name")
+  operationId    String   @map("operation_id")
+  requestHash    String   @map("request_hash")
+  status         String
+  leaseExpiresAt DateTime @map("lease_expires_at")
+  resultJson     Json?    @map("result_json")
+  errorJson      Json?    @map("error_json")
+  completedAt    DateTime? @map("completed_at")
+  expiresAt      DateTime? @map("expires_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([apiKeyId, toolName, operationId], name: "mcp_idempotency_scope_operation_unique")
+  @@index([status, leaseExpiresAt], name: "mcp_idempotency_status_lease_idx")
+  @@index([expiresAt], name: "mcp_idempotency_expires_at_idx")
+  @@map("mcp_idempotency_records")
+}

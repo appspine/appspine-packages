@@ -21,16 +21,22 @@ class MemoryStore implements McpIdempotencyStore<undefined> {
   readonly records = new Map<string, McpIdempotencyRecord>();
 
   constructor(records: McpIdempotencyRecord[] = []) {
-    for (const record of records) this.records.set(record.operationId, record);
+    for (const record of records) this.records.set(recordKey(record), record);
   }
 
-  async find(operationId: string): Promise<McpIdempotencyRecord | null> {
-    return this.records.get(operationId) ?? null;
+  async find(
+    scope: McpIdempotencyBeginInput['scope'],
+    operationId: string,
+  ): Promise<McpIdempotencyRecord | null> {
+    return this.records.get(recordKey({ ...scope, operationId })) ?? null;
   }
 
   async insertProcessing(input: McpIdempotencyBeginInput): Promise<boolean> {
-    if (this.records.has(input.operationId)) return false;
-    this.records.set(input.operationId, {
+    const key = recordKey({ ...input.scope, operationId: input.operationId });
+    if (this.records.has(key)) return false;
+    this.records.set(key, {
+      apiKeyId: input.scope.apiKeyId,
+      toolName: input.scope.toolName,
       operationId: input.operationId,
       requestHash: input.requestHash,
       status: 'processing',
@@ -40,18 +46,20 @@ class MemoryStore implements McpIdempotencyStore<undefined> {
   }
 
   async claimStaleProcessing(input: McpIdempotencyBeginInput): Promise<boolean> {
-    const record = this.records.get(input.operationId);
+    const key = recordKey({ ...input.scope, operationId: input.operationId });
+    const record = this.records.get(key);
     if (record?.status !== 'processing' || record.requestHash !== input.requestHash) {
       return false;
     }
-    this.records.set(input.operationId, { ...record, leaseExpiresAt: input.leaseExpiresAt });
+    this.records.set(key, { ...record, leaseExpiresAt: input.leaseExpiresAt });
     return true;
   }
 
   async complete(input: McpIdempotencyCompleteInput): Promise<void> {
-    const record = this.records.get(input.operationId);
+    const key = recordKey({ ...input.scope, operationId: input.operationId });
+    const record = this.records.get(key);
     if (!record) throw new Error('record not found');
-    this.records.set(input.operationId, {
+    this.records.set(key, {
       ...record,
       requestHash: input.requestHash,
       status: 'succeeded',
@@ -60,9 +68,10 @@ class MemoryStore implements McpIdempotencyStore<undefined> {
   }
 
   async fail(input: McpIdempotencyFailInput): Promise<void> {
-    const record = this.records.get(input.operationId);
+    const key = recordKey({ ...input.scope, operationId: input.operationId });
+    const record = this.records.get(key);
     if (!record) throw new Error('record not found');
-    this.records.set(input.operationId, {
+    this.records.set(key, {
       ...record,
       requestHash: input.requestHash,
       status: 'failed',
@@ -73,9 +82,25 @@ class MemoryStore implements McpIdempotencyStore<undefined> {
 
 const runner = new ImmediateRunner();
 const fixedNow = () => new Date('2026-07-14T00:00:00.000Z');
+const defaultScope = { apiKeyId: 'api-key-1', toolName: 'create_page' };
 
 function requestHash(request: unknown): string {
   return createMcpRequestHash({ operationName: 'create_page', request });
+}
+
+function recordKey(input: { apiKeyId: string; toolName: string; operationId: string }): string {
+  return `${input.apiKeyId}:${input.toolName}:${input.operationId}`;
+}
+
+function writeInput(overrides: Record<string, unknown> = {}) {
+  return {
+    operationId: 'op-1',
+    apiKeyId: defaultScope.apiKeyId,
+    toolName: defaultScope.toolName,
+    request: { title: 'A' },
+    transactionRunner: runner,
+    ...overrides,
+  };
 }
 
 describe('createMcpRequestHash', () => {
@@ -98,11 +123,8 @@ describe('executeIdempotentWrite', () => {
   it('fails closed when a write operation id is missing', async () => {
     await expect(
       executeIdempotentWrite({
-        operationId: ' ',
-        operationName: 'create_page',
-        request: { title: 'A' },
+        ...writeInput({ operationId: ' ' }),
         store: new MemoryStore(),
-        transactionRunner: runner,
         handler: async () => ({ id: 'page-1' }),
       }),
     ).rejects.toMatchObject({ code: 'MCP_IDEMPOTENCY_MISSING_OPERATION_ID' });
@@ -112,17 +134,14 @@ describe('executeIdempotentWrite', () => {
     const store = new MemoryStore();
 
     const result = await executeIdempotentWrite({
-      operationId: 'op-1',
-      operationName: 'create_page',
-      request: { title: 'A' },
+      ...writeInput(),
       store,
-      transactionRunner: runner,
       now: fixedNow,
       handler: async () => ({ id: 'page-1' }),
     });
 
     expect(result).toEqual({ id: 'page-1' });
-    expect(store.records.get('op-1')).toMatchObject({
+    expect(store.records.get('api-key-1:create_page:op-1')).toMatchObject({
       status: 'succeeded',
       result: { id: 'page-1' },
     });
@@ -132,6 +151,7 @@ describe('executeIdempotentWrite', () => {
     const request = { title: 'A' };
     const store = new MemoryStore([
       {
+        ...defaultScope,
         operationId: 'op-1',
         requestHash: requestHash(request),
         status: 'succeeded',
@@ -141,11 +161,9 @@ describe('executeIdempotentWrite', () => {
     ]);
 
     const result = await executeIdempotentWrite({
-      operationId: 'op-1',
-      operationName: 'create_page',
+      ...writeInput(),
       request,
       store,
-      transactionRunner: runner,
       handler: async () => {
         throw new Error('handler should not run');
       },
@@ -157,6 +175,7 @@ describe('executeIdempotentWrite', () => {
   it('rejects the same operation id with a different request hash', async () => {
     const store = new MemoryStore([
       {
+        ...defaultScope,
         operationId: 'op-1',
         requestHash: requestHash({ title: 'A' }),
         status: 'succeeded',
@@ -167,11 +186,9 @@ describe('executeIdempotentWrite', () => {
 
     await expect(
       executeIdempotentWrite({
-        operationId: 'op-1',
-        operationName: 'create_page',
+        ...writeInput(),
         request: { title: 'B' },
         store,
-        transactionRunner: runner,
         handler: async () => ({ id: 'page-2' }),
       }),
     ).rejects.toMatchObject({ code: 'MCP_IDEMPOTENCY_CONFLICT' });
@@ -181,6 +198,7 @@ describe('executeIdempotentWrite', () => {
     const request = { title: 'A' };
     const store = new MemoryStore([
       {
+        ...defaultScope,
         operationId: 'op-1',
         requestHash: requestHash(request),
         status: 'processing',
@@ -190,11 +208,9 @@ describe('executeIdempotentWrite', () => {
 
     await expect(
       executeIdempotentWrite({
-        operationId: 'op-1',
-        operationName: 'create_page',
+        ...writeInput(),
         request,
         store,
-        transactionRunner: runner,
         now: fixedNow,
         handler: async () => ({ id: 'page-1' }),
       }),
@@ -205,6 +221,7 @@ describe('executeIdempotentWrite', () => {
     const request = { title: 'A' };
     const store = new MemoryStore([
       {
+        ...defaultScope,
         operationId: 'op-1',
         requestHash: requestHash(request),
         status: 'processing',
@@ -213,17 +230,15 @@ describe('executeIdempotentWrite', () => {
     ]);
 
     const result = await executeIdempotentWrite({
-      operationId: 'op-1',
-      operationName: 'create_page',
+      ...writeInput(),
       request,
       store,
-      transactionRunner: runner,
       now: fixedNow,
       handler: async () => ({ id: 'page-1' }),
     });
 
     expect(result).toEqual({ id: 'page-1' });
-    expect(store.records.get('op-1')).toMatchObject({ status: 'succeeded' });
+    expect(store.records.get('api-key-1:create_page:op-1')).toMatchObject({ status: 'succeeded' });
   });
 
   it('persists a failed state when the handler throws', async () => {
@@ -232,11 +247,8 @@ describe('executeIdempotentWrite', () => {
 
     await expect(
       executeIdempotentWrite({
-        operationId: 'op-1',
-        operationName: 'create_page',
-        request: { title: 'A' },
+        ...writeInput(),
         store,
-        transactionRunner: runner,
         now: fixedNow,
         handler: async () => {
           throw error;
@@ -244,7 +256,7 @@ describe('executeIdempotentWrite', () => {
       }),
     ).rejects.toThrow(error);
 
-    expect(store.records.get('op-1')).toMatchObject({
+    expect(store.records.get('api-key-1:create_page:op-1')).toMatchObject({
       status: 'failed',
       error: { name: 'Error', message: 'database rejected the write' },
     });
@@ -254,6 +266,7 @@ describe('executeIdempotentWrite', () => {
     const request = { title: 'A' };
     const store = new MemoryStore([
       {
+        ...defaultScope,
         operationId: 'op-1',
         requestHash: requestHash(request),
         status: 'failed',
@@ -264,13 +277,41 @@ describe('executeIdempotentWrite', () => {
 
     await expect(
       executeIdempotentWrite({
-        operationId: 'op-1',
-        operationName: 'create_page',
+        ...writeInput(),
         request,
         store,
-        transactionRunner: runner,
         handler: async () => ({ id: 'page-1' }),
       }),
     ).rejects.toBeInstanceOf(McpIdempotencyError);
+  });
+
+  it('isolates the same operation id by API key and tool name', async () => {
+    const request = { title: 'A' };
+    const store = new MemoryStore([
+      {
+        ...defaultScope,
+        operationId: 'op-1',
+        requestHash: requestHash(request),
+        status: 'succeeded',
+        leaseExpiresAt: new Date('2026-07-14T00:05:00.000Z'),
+        result: { id: 'page-api-key-1' },
+      },
+    ]);
+
+    const otherApiKeyResult = await executeIdempotentWrite({
+      ...writeInput({ apiKeyId: 'api-key-2' }),
+      request,
+      store,
+      handler: async () => ({ id: 'page-api-key-2' }),
+    });
+    const otherToolResult = await executeIdempotentWrite({
+      ...writeInput({ toolName: 'update_page' }),
+      request,
+      store,
+      handler: async () => ({ id: 'page-update-tool' }),
+    });
+
+    expect(otherApiKeyResult).toEqual({ id: 'page-api-key-2' });
+    expect(otherToolResult).toEqual({ id: 'page-update-tool' });
   });
 });
