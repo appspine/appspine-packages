@@ -1,31 +1,48 @@
 /// Audit log record for tracking data modification actions. @internal
 model AuditLog {
-  id            String      @id @default(cuid())
-  entityType    String      @map("entity_type")
-  entityId      String      @map("entity_id")
-  action        AuditAction
-  actorId       String      @map("actor_id")
+  id              String      @id @default(cuid())
+  entityType      String      @map("entity_type")
+  entityId        String      @map("entity_id")
+  action          AuditAction
+  actorId         String      @map("actor_id")
   /// Snapshot email of the user/agent who performed the action.
-  actorEmail    String      @map("actor_email")
-  appName       String      @map("app_name")
+  actorEmail      String      @map("actor_email")
+  appName         String      @map("app_name")
   /// True when the operation was initiated by an AI agent via MCP.
-  isAiOperation Boolean     @default(false) @map("is_ai_operation")
+  isAiOperation   Boolean     @default(false) @map("is_ai_operation")
   /// MCP tool name that triggered this log entry. Null for human operations.
-  mcpTool       String?     @map("mcp_tool")
+  mcpTool         String?     @map("mcp_tool")
   /// Id of the API key that performed this action, when the actor was an API key
   /// acting as a bound user. Snapshot string, no FK. Null for direct human actions.
-  actingApiKeyId String? @map("acting_api_key_id")
-  /// Caller-supplied correlation id from the X-Appspine-Workflow-Id request header
-  /// (dev_docs 002/023 §2.5). Untrusted, debugging/cross-app-workflow-tracing use only —
-  /// never used for authorization or attribution decisions. Null when the caller didn't
-  /// send the header. This field only exists once this fragment's consuming app has run
-  /// the migration that adds it (dev_docs 023 §5 execution list, per-app rollout in the
-  /// task breakdown's Group E) -- AuditLogService.record() omits it from the write
-  /// entirely when the caller doesn't pass a workflowId, so apps that haven't migrated
-  /// yet are unaffected.
-  workflowId    String?     @map("workflow_id")
-  createdAt     DateTime    @default(now()) @map("created_at")
+  actingApiKeyId  String?     @map("acting_api_key_id")
+  /// Caller-supplied correlation id from the X-Appspine-Workflow-Id request header.
+  /// Untrusted, debugging/cross-app-workflow-tracing use only; never used for
+  /// authorization or attribution decisions. AuditLogService.record() omits it
+  /// from the write when the caller does not pass workflowId, so unmigrated apps
+  /// are unaffected.
+  workflowId      String?     @map("workflow_id")
+  /// Chat BotRun id or equivalent caller run correlation id. Untrusted
+  /// correlation only; never use for authorization or actor attribution.
+  runId           String?     @map("run_id")
+  /// Immutable ChatBotDeployment id associated with the run, when available.
+  deploymentId    String?     @map("deployment_id")
+  /// n8n execution id or equivalent workflow runtime execution id.
+  executionId     String?     @map("execution_id")
+  /// MCP operation id injected by the private adapter for write idempotency.
+  operationId     String?     @map("operation_id")
+  /// Source Chat message/action id that initiated the operation, when available.
+  sourceMessageId String?     @map("source_message_id")
+  /// Source Chat actor/user/bot id supplied for correlation. Keep separate from
+  /// verified actorId and actingApiKeyId.
+  sourceActorId   String?     @map("source_actor_id")
+  /// Source origin enum value as a bounded string, for example USER_UI or CHAT_BOT.
+  sourceOrigin    String?     @map("source_origin")
+  createdAt       DateTime    @default(now()) @map("created_at")
 
+  @@index([runId], name: "audit_logs_run_id_idx")
+  @@index([operationId], name: "audit_logs_operation_id_idx")
+  @@index([executionId], name: "audit_logs_execution_id_idx")
+  @@index([sourceMessageId], name: "audit_logs_source_message_id_idx")
   @@map("audit_logs")
 }
 

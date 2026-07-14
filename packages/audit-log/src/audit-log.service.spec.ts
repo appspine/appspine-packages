@@ -15,7 +15,13 @@ vi.mock('@appspine/common', () => ({
   },
 }));
 
-import { AuditLogService, extractWorkflowId, type RecordAuditLogDto } from './audit-log.service';
+import {
+  AuditLogService,
+  AuditTraceValidationError,
+  extractWorkflowId,
+  normalizeAuditTrace,
+  type RecordAuditLogDto,
+} from './audit-log.service';
 
 function baseDto(overrides: Partial<RecordAuditLogDto> = {}): RecordAuditLogDto {
   return {
@@ -77,5 +83,129 @@ describe('AuditLogService.record', () => {
 
     const data = create.mock.calls[0]?.[0]?.data;
     expect(data).toHaveProperty('workflowId', null);
+  });
+
+  it('writes bounded distributed trace fields when trace metadata is passed', async () => {
+    const { service, create } = createServiceWithSpy();
+
+    await service.record(
+      baseDto({
+        trace: {
+          runId: 'run-1',
+          deploymentId: 'deployment-1',
+          workflowId: 'workflow-1',
+          executionId: 'execution-1',
+          operationId: '0123456789abcdef0123456789abcdef',
+          sourceMessageId: 'message-1',
+          sourceActorId: 'actor-1',
+          sourceOrigin: 'USER_UI',
+        },
+      }),
+    );
+
+    expect(create.mock.calls[0]?.[0]?.data).toMatchObject({
+      runId: 'run-1',
+      deploymentId: 'deployment-1',
+      workflowId: 'workflow-1',
+      executionId: 'execution-1',
+      operationId: '0123456789abcdef0123456789abcdef',
+      sourceMessageId: 'message-1',
+      sourceActorId: 'actor-1',
+      sourceOrigin: 'USER_UI',
+    });
+  });
+
+  it('keeps verified principal fields separate from caller trace correlation', async () => {
+    const { service, create } = createServiceWithSpy();
+
+    await service.record(
+      baseDto({
+        actorId: 'verified-service-account',
+        actingApiKeyId: 'verified-key',
+        trace: {
+          sourceActorId: 'caller-claimed-human',
+          sourceOrigin: 'CHAT_BOT',
+        },
+      }),
+    );
+
+    expect(create.mock.calls[0]?.[0]?.data).toMatchObject({
+      actorId: 'verified-service-account',
+      actingApiKeyId: 'verified-key',
+      sourceActorId: 'caller-claimed-human',
+      sourceOrigin: 'CHAT_BOT',
+    });
+  });
+
+  it('writes trace nulls when the migrated caller explicitly opts into trace columns', async () => {
+    const { service, create } = createServiceWithSpy();
+
+    await service.record(baseDto({ trace: {} }));
+
+    expect(create.mock.calls[0]?.[0]?.data).toMatchObject({
+      workflowId: null,
+      runId: null,
+      deploymentId: null,
+      executionId: null,
+      operationId: null,
+      sourceMessageId: null,
+      sourceActorId: null,
+      sourceOrigin: null,
+    });
+  });
+
+  it('does not serialize prompt, capability, or attachment URL shaped extra trace keys', async () => {
+    const { service, create } = createServiceWithSpy();
+
+    await service.record(
+      baseDto({
+        trace: {
+          runId: 'run-1',
+          prompt: 'do not store',
+          capability: 'secret-capability',
+          attachmentUrl: 'https://example.invalid/file',
+        } as RecordAuditLogDto['trace'] & Record<string, unknown>,
+      }),
+    );
+
+    const data = create.mock.calls[0]?.[0]?.data;
+    expect(data).not.toHaveProperty('prompt');
+    expect(data).not.toHaveProperty('capability');
+    expect(data).not.toHaveProperty('attachmentUrl');
+  });
+
+  it('rejects malformed trace metadata before writing', async () => {
+    const { service, create } = createServiceWithSpy();
+
+    await expect(
+      service.record(baseDto({ trace: { operationId: 'not-lowercase-hex' } })),
+    ).rejects.toBeInstanceOf(AuditTraceValidationError);
+    expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe('normalizeAuditTrace', () => {
+  it('trims IDs and converts empty optional fields to null', () => {
+    expect(normalizeAuditTrace({ runId: ' run-1 ', deploymentId: ' ' })).toMatchObject({
+      runId: 'run-1',
+      deploymentId: null,
+    });
+  });
+
+  it('rejects control characters and overlong IDs', () => {
+    expect(() => normalizeAuditTrace({ runId: 'run\n1' })).toThrow(AuditTraceValidationError);
+    expect(() => normalizeAuditTrace({ runId: 'a'.repeat(129) })).toThrow(
+      AuditTraceValidationError,
+    );
+  });
+
+  it('rejects unsupported source origins', () => {
+    const unsupportedOrigin = 'USER_SUPPLIED' as NonNullable<
+      RecordAuditLogDto['trace']
+    >['sourceOrigin'];
+
+    expect(() => normalizeAuditTrace({ sourceOrigin: unsupportedOrigin })).toThrow(
+      AuditTraceValidationError,
+    );
   });
 });
