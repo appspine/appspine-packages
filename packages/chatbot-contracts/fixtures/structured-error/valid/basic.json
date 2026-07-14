@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "code": "MCP_IDEMPOTENCY_CONFLICT",
+  "message": "A different request hash was seen for this operationId.",
+  "retryable": false,
+  "details": {
+    "toolName": "calendar.createEvent",
+    "operationId": "op-123"
+  }
+}

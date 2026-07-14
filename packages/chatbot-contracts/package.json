@@ -1,6 +1,6 @@
 {
-  "name": "@appspine/audit-log",
-  "version": "0.5.0",
+  "name": "@appspine/chatbot-contracts",
+  "version": "0.1.1",
   "private": false,
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
@@ -13,31 +13,26 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./prisma/audit-log.prisma": "./prisma/audit-log.prisma"
+    "./schemas/*.schema.json": "./dist/schemas/*.schema.json"
   },
   "files": [
-    "dist",
-    "prisma"
+    "dist"
   ],
   "scripts": {
+    "generate": "node scripts/generate-types.mjs",
+    "prebuild": "node scripts/generate-types.mjs && node scripts/copy-schemas.mjs",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/common": "workspace:*"
-  },
-  "peerDependencies": {
-    "@nestjs/common": "^11.0.5",
-    "@nestjs/core": "^11.0.5",
-    "@prisma/client": "^6.2.0"
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
   },
   "devDependencies": {
-    "@nestjs/common": "^11.0.5",
-    "@nestjs/core": "^11.0.5",
-    "@prisma/client": "^6.2.0",
     "@types/node": "^22.10.0",
+    "json-schema-to-typescript": "^15.0.4",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

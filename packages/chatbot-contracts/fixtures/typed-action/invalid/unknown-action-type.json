@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "actionEventId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+  "actionId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "actionType": "DELETE_EVERYTHING",
+  "threadId": "66666666-6666-4666-8666-666666666666",
+  "botId": "44444444-4444-4444-8444-444444444444",
+  "actorId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "clientNonce": "nonce-0003",
+  "payload": {},
+  "createdAt": "2026-07-13T12:00:00.000Z"
+}

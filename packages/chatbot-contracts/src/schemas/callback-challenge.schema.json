@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/callback-challenge.schema.json",
+  "title": "CallbackChallenge",
+  "description": "No-side-effect challenge used by the safe Health Check to prove n8n can reach Chat's completion callback path (024 plan §5.4) without executing model/tool code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "deploymentId", "challengeToken", "issuedAt", "expiresAt"],
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "deploymentId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "challengeToken": { "$ref": "common.schema.json#/$defs/opaqueCapabilityToken" },
+    "issuedAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" },
+    "expiresAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+  }
+}

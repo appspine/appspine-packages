@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "parts": [
+    {
+      "type": "text",
+      "text": "See the link below."
+    },
+    {
+      "type": "link",
+      "url": "https://chat.internal.example/docs/report",
+      "label": "Report"
+    }
+  ]
+}

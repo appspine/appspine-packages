@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "code": "MCP_DOMAIN_ERROR",
+  "message": "x",
+  "retryable": false,
+  "details": {
+    "rawToolResult": {
+      "nested": "object not allowed here"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/typed-action.schema.json",
+  "title": "TypedActionEvent",
+  "description": "A validated click/submit on an allowlisted rich-content action (024 plan §6.6). Each actionType is a fully self-contained variant so the payload shape is structurally tied to actionType, not just documented — a CONFIRM event can never carry FORM_SUBMIT's `fields` payload.",
+  "oneOf": [
+    { "$ref": "#/$defs/confirmAction" },
+    { "$ref": "#/$defs/cancelAction" },
+    { "$ref": "#/$defs/formSubmitAction" }
+  ],
+  "$defs": {
+    "confirmAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "actionEventId",
+        "actionId",
+        "actionType",
+        "threadId",
+        "botId",
+        "actorId",
+        "clientNonce",
+        "payload",
+        "createdAt"
+      ],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "actionEventId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actionId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actionType": { "const": "CONFIRM" },
+        "threadId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "botId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actorId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "clientNonce": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "payload": { "type": "object", "additionalProperties": false, "properties": {} },
+        "createdAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+      }
+    },
+    "cancelAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "actionEventId",
+        "actionId",
+        "actionType",
+        "threadId",
+        "botId",
+        "actorId",
+        "clientNonce",
+        "payload",
+        "createdAt"
+      ],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "actionEventId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actionId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actionType": { "const": "CANCEL" },
+        "threadId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "botId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actorId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "clientNonce": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "reason": { "type": "string", "maxLength": 500 }
+          }
+        },
+        "createdAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+      }
+    },
+    "formSubmitAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "actionEventId",
+        "actionId",
+        "actionType",
+        "threadId",
+        "botId",
+        "actorId",
+        "clientNonce",
+        "payload",
+        "createdAt"
+      ],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "actionEventId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actionId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actionType": { "const": "FORM_SUBMIT" },
+        "threadId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "botId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "actorId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "clientNonce": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fields"],
+          "properties": {
+            "fields": {
+              "type": "object",
+              "maxProperties": 30,
+              "additionalProperties": { "type": ["string", "number", "boolean"] }
+            }
+          }
+        },
+        "createdAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+      }
+    }
+  }
+}

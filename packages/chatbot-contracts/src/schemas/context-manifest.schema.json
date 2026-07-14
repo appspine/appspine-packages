@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/context-manifest.schema.json",
+  "title": "ContextManifest",
+  "description": "Immutable, hash-addressed reference to the bounded conversation context a Run was dispatched with (024 plan §6.3). Never carries full prompt text — only fixed IDs/revisions and a manifest hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "threadId",
+    "rootMessageId",
+    "cutoffMessageId",
+    "messageRefs",
+    "summaryRevision",
+    "attachmentRefs",
+    "locale",
+    "timezone",
+    "generatedAt",
+    "manifestHash"
+  ],
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "threadId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "rootMessageId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "cutoffMessageId": {
+      "description": "The trigger message/action ID this manifest is bounded by. Nothing with a later sequence is included.",
+      "$ref": "common.schema.json#/$defs/uuid"
+    },
+    "messageRefs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["messageId", "revisionId", "sequence"],
+        "properties": {
+          "messageId": { "$ref": "common.schema.json#/$defs/uuid" },
+          "revisionId": { "$ref": "common.schema.json#/$defs/uuid" },
+          "sequence": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "summaryRevision": {
+      "description": "null when no summary applies yet.",
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "summarizedThroughMessageId": {
+      "anyOf": [{ "$ref": "common.schema.json#/$defs/uuid" }, { "type": "null" }]
+    },
+    "attachmentRefs": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attachmentId", "checksumSha256"],
+        "properties": {
+          "attachmentId": { "$ref": "common.schema.json#/$defs/uuid" },
+          "checksumSha256": { "$ref": "common.schema.json#/$defs/sha256Hex" }
+        }
+      }
+    },
+    "locale": { "$ref": "common.schema.json#/$defs/locale" },
+    "timezone": { "$ref": "common.schema.json#/$defs/ianaTimezone" },
+    "generatedAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" },
+    "manifestHash": { "$ref": "common.schema.json#/$defs/sha256Hex" }
+  }
+}

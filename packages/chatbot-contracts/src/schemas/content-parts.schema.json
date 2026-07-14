@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/content-parts.schema.json",
+  "title": "ContentParts",
+  "description": "Versioned allowlist of rich-reply content parts (024 plan §6.6). No raw HTML, script, or arbitrary callback URLs are representable in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "parts"],
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/contentPart" }
+    }
+  },
+  "$defs": {
+    "contentPart": {
+      "oneOf": [
+        { "$ref": "#/$defs/textPart" },
+        { "$ref": "#/$defs/linkPart" },
+        { "$ref": "#/$defs/attachmentPart" },
+        { "$ref": "#/$defs/toolResultCardPart" },
+        { "$ref": "#/$defs/actionPart" }
+      ]
+    },
+    "textPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "text"],
+      "properties": {
+        "type": { "const": "text" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 8000 }
+      }
+    },
+    "linkPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "url", "label"],
+      "properties": {
+        "type": { "const": "link" },
+        "url": { "$ref": "common.schema.json#/$defs/httpsUrl" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "attachmentPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "attachmentId"],
+      "properties": {
+        "type": { "const": "attachment" },
+        "attachmentId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "caption": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "toolResultCardPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "title", "fields"],
+      "properties": {
+        "type": { "const": "tool_result_card" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "fields": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 100 },
+              "value": { "type": "string", "maxLength": 1000 }
+            }
+          }
+        }
+      }
+    },
+    "actionPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "actionId", "label"],
+      "properties": {
+        "type": { "const": "action" },
+        "actionId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "style": { "type": "string", "enum": ["PRIMARY", "SECONDARY", "DESTRUCTIVE"] }
+      }
+    }
+  }
+}

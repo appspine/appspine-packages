@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/structured-error.schema.json",
+  "title": "StructuredError",
+  "description": "Machine-readable error classification per the 024 plan §7.4. Never carries secrets, capability tokens, or raw prompt/tool payloads.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "code", "message", "retryable"],
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "code": {
+      "type": "string",
+      "enum": [
+        "BOT_DISABLED_OR_UNBOUND",
+        "DEPLOYMENT_UNAVAILABLE",
+        "INGRESS_AUTH_ERROR",
+        "CLAIM_AUTH_ERROR",
+        "CONTRACT_VALIDATION_ERROR",
+        "ENDPOINT_UNAVAILABLE",
+        "WORKFLOW_DEADLINE_EXCEEDED",
+        "WORKFLOW_OR_MODEL_FAILURE",
+        "MCP_PROTOCOL_ERROR",
+        "MCP_AUTHORIZATION_ERROR",
+        "MCP_DOMAIN_ERROR",
+        "MCP_IDEMPOTENCY_CONFLICT",
+        "ATTACHMENT_TRANSFER_ERROR",
+        "ATTACHMENT_SCAN_REJECTED",
+        "ATTACHMENT_PROMOTION_ERROR",
+        "RICH_ACTION_VALIDATION_ERROR",
+        "NO_DISPLAYABLE_CONTENT"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "description": "Safe-to-display summary. No secrets, no raw tool/model output.",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "retryable": { "type": "boolean" },
+    "details": {
+      "type": "object",
+      "description": "Optional bounded, redacted structured detail. Never a raw payload dump.",
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] },
+      "maxProperties": 20
+    }
+  }
+}

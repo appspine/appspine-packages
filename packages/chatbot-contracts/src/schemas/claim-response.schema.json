@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/claim-response.schema.json",
+  "title": "ClaimResponse",
+  "description": "Only the first successful claim for a Run may proceed to model/tool execution (024 plan §7.1/§7.3).",
+  "oneOf": [{ "$ref": "#/$defs/claimed" }, { "$ref": "#/$defs/notClaimed" }],
+  "$defs": {
+    "claimed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "runId", "status", "deadlineAt"],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "status": { "const": "CLAIMED" },
+        "deadlineAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+      }
+    },
+    "notClaimed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "runId", "status", "deadlineAt", "reason"],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "status": {
+          "type": "string",
+          "enum": ["ALREADY_CLAIMED", "EXPIRED", "INVALID"]
+        },
+        "deadlineAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

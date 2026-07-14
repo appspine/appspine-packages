@@ -1,0 +1,1320 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`schema snapshots (breaking-change detection) > attachmentManifest matches its committed snapshot 1`] = `
+{
+  "$id": "https://chatbot-contracts.appspine.internal/v1/attachment-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Metadata + run-scoped download/upload capability for one attachment. Never carries the binary itself (024 plan §6.5).",
+  "properties": {
+    "attachmentId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "capability": {
+      "$ref": "common.schema.json#/$defs/opaqueCapabilityToken",
+    },
+    "checksumSha256": {
+      "$ref": "common.schema.json#/$defs/sha256Hex",
+    },
+    "direction": {
+      "enum": [
+        "INPUT",
+        "OUTPUT",
+      ],
+      "type": "string",
+    },
+    "expiresAt": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "fileName": {
+      "maxLength": 255,
+      "minLength": 1,
+      "type": "string",
+    },
+    "mimeType": {
+      "maxLength": 255,
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+-]*/[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+-]*$",
+      "type": "string",
+    },
+    "runId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+    "sizeBytes": {
+      "maximum": 536870912,
+      "minimum": 0,
+      "type": "integer",
+    },
+    "status": {
+      "enum": [
+        "STAGING",
+        "SCANNING",
+        "READY",
+        "REJECTED",
+        "EXPIRED",
+      ],
+      "type": "string",
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "attachmentId",
+    "runId",
+    "direction",
+    "status",
+    "mimeType",
+    "sizeBytes",
+    "checksumSha256",
+    "capability",
+    "expiresAt",
+  ],
+  "title": "AttachmentManifest",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > callbackChallenge matches its committed snapshot 1`] = `
+{
+  "$id": "https://chatbot-contracts.appspine.internal/v1/callback-challenge.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "No-side-effect challenge used by the safe Health Check to prove n8n can reach Chat's completion callback path (024 plan §5.4) without executing model/tool code.",
+  "properties": {
+    "challengeToken": {
+      "$ref": "common.schema.json#/$defs/opaqueCapabilityToken",
+    },
+    "deploymentId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "expiresAt": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "issuedAt": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "deploymentId",
+    "challengeToken",
+    "issuedAt",
+    "expiresAt",
+  ],
+  "title": "CallbackChallenge",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > claimRequest matches its committed snapshot 1`] = `
+{
+  "$id": "https://chatbot-contracts.appspine.internal/v1/claim-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Wrapper's first business action: attempt to claim a Run before any model/tool executes (024 plan §7.1). Authenticated by the claim capability from IngressRequest.capabilities.claim, not by this body.",
+  "properties": {
+    "claimedAt": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "deploymentId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "executionId": {
+      "$ref": "common.schema.json#/$defs/nonEmptyString",
+      "description": "n8n execution ID attempting the claim.",
+    },
+    "requestId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "runId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "runId",
+    "executionId",
+    "deploymentId",
+    "claimedAt",
+  ],
+  "title": "ClaimRequest",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > claimResponse matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "claimed": {
+      "additionalProperties": false,
+      "properties": {
+        "deadlineAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "runId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "status": {
+          "const": "CLAIMED",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "status",
+        "deadlineAt",
+      ],
+      "type": "object",
+    },
+    "notClaimed": {
+      "additionalProperties": false,
+      "properties": {
+        "deadlineAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "reason": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string",
+        },
+        "runId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "status": {
+          "enum": [
+            "ALREADY_CLAIMED",
+            "EXPIRED",
+            "INVALID",
+          ],
+          "type": "string",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "runId",
+        "status",
+        "deadlineAt",
+        "reason",
+      ],
+      "type": "object",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/claim-response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Only the first successful claim for a Run may proceed to model/tool execution (024 plan §7.1/§7.3).",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/claimed",
+    },
+    {
+      "$ref": "#/$defs/notClaimed",
+    },
+  ],
+  "title": "ClaimResponse",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > common matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "contractVersion": {
+      "description": "chatbot-contracts schemaVersion, semver-like (major.minor.patch). A breaking change bumps major.",
+      "maxLength": 20,
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string",
+    },
+    "deploymentRevisionSnapshot": {
+      "additionalProperties": false,
+      "description": "Immutable snapshot of the Deployment identity a Run was pinned to at dispatch time.",
+      "properties": {
+        "contractVersion": {
+          "$ref": "#/$defs/contractVersion",
+        },
+        "declaredModel": {
+          "$ref": "#/$defs/nonEmptyString",
+        },
+        "declaredModelProvider": {
+          "$ref": "#/$defs/nonEmptyString",
+        },
+        "deploymentId": {
+          "$ref": "#/$defs/uuid",
+        },
+        "workflowKey": {
+          "$ref": "#/$defs/nonEmptyString",
+        },
+        "workflowRevision": {
+          "$ref": "#/$defs/nonEmptyString",
+        },
+        "wrapperRevision": {
+          "$ref": "#/$defs/nonEmptyString",
+        },
+      },
+      "required": [
+        "deploymentId",
+        "workflowKey",
+        "workflowRevision",
+        "wrapperRevision",
+        "contractVersion",
+      ],
+      "type": "object",
+    },
+    "httpsUrl": {
+      "format": "uri",
+      "maxLength": 2048,
+      "pattern": "^https://",
+      "type": "string",
+    },
+    "ianaTimezone": {
+      "description": "IANA time zone database name (e.g. Asia/Taipei, UTC).",
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^(UTC|Etc/UTC|[A-Za-z_+-]+(/[A-Za-z0-9_+-]+)+)$",
+      "type": "string",
+    },
+    "locale": {
+      "description": "BCP 47 language tag, e.g. en, en-US, zh-TW.",
+      "maxLength": 35,
+      "minLength": 2,
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+      "type": "string",
+    },
+    "nonEmptyString": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string",
+    },
+    "opaqueCapabilityToken": {
+      "description": "Short-lived, run-scoped capability token. Opaque to the schema; never logged, never rendered to a client.",
+      "maxLength": 2048,
+      "minLength": 16,
+      "type": "string",
+    },
+    "sha256Hex": {
+      "description": "Lowercase hex-encoded SHA-256 digest, exactly 64 characters.",
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string",
+    },
+    "trustedOrigin": {
+      "description": "Server-controlled message/actor origin. Only USER_UI may ever appear as a *trigger* origin (see ingress-request.schema.json) — this enum exists for completion/context/audit payloads that legitimately reference other origins after the fact.",
+      "enum": [
+        "USER_UI",
+        "CHAT_BOT",
+        "INCOMING_WEBHOOK",
+        "MCP",
+        "SYSTEM",
+      ],
+      "type": "string",
+    },
+    "utcTimestamp": {
+      "description": "Server-generated UTC timestamp, RFC 3339 with a literal Z offset.",
+      "format": "date-time",
+      "maxLength": 40,
+      "pattern": "Z$",
+      "type": "string",
+    },
+    "uuid": {
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "type": "string",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/common.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Common definitions shared by all chatbot-contracts schemas",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > completion matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "failed": {
+      "additionalProperties": false,
+      "properties": {
+        "completedAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "deploymentId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "digest": {
+          "$ref": "common.schema.json#/$defs/sha256Hex",
+        },
+        "error": {
+          "$ref": "structured-error.schema.json#",
+        },
+        "executionId": {
+          "$ref": "common.schema.json#/$defs/nonEmptyString",
+        },
+        "replyText": {
+          "description": "Safe fallback text explaining the failure to the end user.",
+          "maxLength": 8000,
+          "type": "string",
+        },
+        "requestId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "runId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "status": {
+          "const": "FAILED",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "runId",
+        "deploymentId",
+        "executionId",
+        "status",
+        "replyText",
+        "error",
+        "digest",
+        "completedAt",
+      ],
+      "type": "object",
+    },
+    "succeeded": {
+      "additionalProperties": false,
+      "properties": {
+        "attachmentIds": {
+          "items": {
+            "$ref": "common.schema.json#/$defs/uuid",
+          },
+          "maxItems": 20,
+          "type": "array",
+        },
+        "completedAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "contentParts": {
+          "$ref": "content-parts.schema.json#",
+        },
+        "deploymentId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "digest": {
+          "$ref": "common.schema.json#/$defs/sha256Hex",
+          "description": "sha256 over the canonical result payload. Same digest on retry -> return the original result. Different digest for the same runId -> reject and alert (024 plan §6.4).",
+        },
+        "executionId": {
+          "$ref": "common.schema.json#/$defs/nonEmptyString",
+        },
+        "replyText": {
+          "description": "Fallback plain-text reply for every client, even when contentParts is present.",
+          "maxLength": 8000,
+          "type": "string",
+        },
+        "requestId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "runId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "status": {
+          "const": "SUCCEEDED",
+        },
+        "summaryUpdate": {
+          "additionalProperties": false,
+          "properties": {
+            "revision": {
+              "minimum": 0,
+              "type": "integer",
+            },
+            "summarizedThroughMessageId": {
+              "$ref": "common.schema.json#/$defs/uuid",
+            },
+            "text": {
+              "maxLength": 24000,
+              "type": "string",
+            },
+          },
+          "required": [
+            "revision",
+            "summarizedThroughMessageId",
+            "text",
+          ],
+          "type": "object",
+        },
+        "usage": {
+          "additionalProperties": false,
+          "properties": {
+            "completionTokens": {
+              "minimum": 0,
+              "type": "integer",
+            },
+            "modelCallCount": {
+              "minimum": 0,
+              "type": "integer",
+            },
+            "promptTokens": {
+              "minimum": 0,
+              "type": "integer",
+            },
+            "toolCallCount": {
+              "minimum": 0,
+              "type": "integer",
+            },
+          },
+          "type": "object",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "runId",
+        "deploymentId",
+        "executionId",
+        "status",
+        "replyText",
+        "digest",
+        "completedAt",
+      ],
+      "type": "object",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/completion.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "n8n -> Chat authenticated completion callback (024 plan §6.4). Bound to a single Run via a short-lived capability; digest reuse makes retries idempotent.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/succeeded",
+    },
+    {
+      "$ref": "#/$defs/failed",
+    },
+  ],
+  "title": "CompletionCallback",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > contentParts matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "actionPart": {
+      "additionalProperties": false,
+      "properties": {
+        "actionId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "label": {
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string",
+        },
+        "style": {
+          "enum": [
+            "PRIMARY",
+            "SECONDARY",
+            "DESTRUCTIVE",
+          ],
+          "type": "string",
+        },
+        "type": {
+          "const": "action",
+        },
+      },
+      "required": [
+        "type",
+        "actionId",
+        "label",
+      ],
+      "type": "object",
+    },
+    "attachmentPart": {
+      "additionalProperties": false,
+      "properties": {
+        "attachmentId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "caption": {
+          "maxLength": 500,
+          "type": "string",
+        },
+        "type": {
+          "const": "attachment",
+        },
+      },
+      "required": [
+        "type",
+        "attachmentId",
+      ],
+      "type": "object",
+    },
+    "contentPart": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/textPart",
+        },
+        {
+          "$ref": "#/$defs/linkPart",
+        },
+        {
+          "$ref": "#/$defs/attachmentPart",
+        },
+        {
+          "$ref": "#/$defs/toolResultCardPart",
+        },
+        {
+          "$ref": "#/$defs/actionPart",
+        },
+      ],
+    },
+    "linkPart": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string",
+        },
+        "type": {
+          "const": "link",
+        },
+        "url": {
+          "$ref": "common.schema.json#/$defs/httpsUrl",
+        },
+      },
+      "required": [
+        "type",
+        "url",
+        "label",
+      ],
+      "type": "object",
+    },
+    "textPart": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 8000,
+          "minLength": 1,
+          "type": "string",
+        },
+        "type": {
+          "const": "text",
+        },
+      },
+      "required": [
+        "type",
+        "text",
+      ],
+      "type": "object",
+    },
+    "toolResultCardPart": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string",
+              },
+              "value": {
+                "maxLength": 1000,
+                "type": "string",
+              },
+            },
+            "required": [
+              "label",
+              "value",
+            ],
+            "type": "object",
+          },
+          "maxItems": 20,
+          "type": "array",
+        },
+        "title": {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string",
+        },
+        "type": {
+          "const": "tool_result_card",
+        },
+      },
+      "required": [
+        "type",
+        "title",
+        "fields",
+      ],
+      "type": "object",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/content-parts.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Versioned allowlist of rich-reply content parts (024 plan §6.6). No raw HTML, script, or arbitrary callback URLs are representable in this schema.",
+  "properties": {
+    "parts": {
+      "items": {
+        "$ref": "#/$defs/contentPart",
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "type": "array",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "parts",
+  ],
+  "title": "ContentParts",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > contextManifest matches its committed snapshot 1`] = `
+{
+  "$id": "https://chatbot-contracts.appspine.internal/v1/context-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Immutable, hash-addressed reference to the bounded conversation context a Run was dispatched with (024 plan §6.3). Never carries full prompt text — only fixed IDs/revisions and a manifest hash.",
+  "properties": {
+    "attachmentRefs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "attachmentId": {
+            "$ref": "common.schema.json#/$defs/uuid",
+          },
+          "checksumSha256": {
+            "$ref": "common.schema.json#/$defs/sha256Hex",
+          },
+        },
+        "required": [
+          "attachmentId",
+          "checksumSha256",
+        ],
+        "type": "object",
+      },
+      "maxItems": 50,
+      "type": "array",
+    },
+    "cutoffMessageId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+      "description": "The trigger message/action ID this manifest is bounded by. Nothing with a later sequence is included.",
+    },
+    "generatedAt": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "locale": {
+      "$ref": "common.schema.json#/$defs/locale",
+    },
+    "manifestHash": {
+      "$ref": "common.schema.json#/$defs/sha256Hex",
+    },
+    "messageRefs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "messageId": {
+            "$ref": "common.schema.json#/$defs/uuid",
+          },
+          "revisionId": {
+            "$ref": "common.schema.json#/$defs/uuid",
+          },
+          "sequence": {
+            "minimum": 0,
+            "type": "integer",
+          },
+        },
+        "required": [
+          "messageId",
+          "revisionId",
+          "sequence",
+        ],
+        "type": "object",
+      },
+      "maxItems": 200,
+      "minItems": 1,
+      "type": "array",
+    },
+    "rootMessageId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+    "summarizedThroughMessageId": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        {
+          "type": "null",
+        },
+      ],
+    },
+    "summaryRevision": {
+      "description": "null when no summary applies yet.",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null",
+      ],
+    },
+    "threadId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "timezone": {
+      "$ref": "common.schema.json#/$defs/ianaTimezone",
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "threadId",
+    "rootMessageId",
+    "cutoffMessageId",
+    "messageRefs",
+    "summaryRevision",
+    "attachmentRefs",
+    "locale",
+    "timezone",
+    "generatedAt",
+    "manifestHash",
+  ],
+  "title": "ContextManifest",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > ingressAcceptance matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "accepted": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "const": true,
+        },
+        "requestId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "runId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "runId",
+        "accepted",
+      ],
+      "type": "object",
+    },
+    "rejected": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "const": false,
+        },
+        "rejectionReason": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string",
+        },
+        "requestId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "runId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "runId",
+        "accepted",
+        "rejectionReason",
+      ],
+      "type": "object",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/ingress-acceptance.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "n8n's immediate 2xx/202 response to an IngressRequest. Acknowledges receipt only — the final result always arrives later via the completion callback (024 plan §6.1).",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/accepted",
+    },
+    {
+      "$ref": "#/$defs/rejected",
+    },
+  ],
+  "title": "IngressAcceptance",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > ingressRequest matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "actionTrigger": {
+      "additionalProperties": false,
+      "properties": {
+        "actionEventId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "kind": {
+          "const": "ACTION",
+        },
+      },
+      "required": [
+        "kind",
+        "actionEventId",
+        "actionId",
+      ],
+      "type": "object",
+    },
+    "messageTrigger": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "MESSAGE",
+        },
+        "messageId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "messageRevisionId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+      },
+      "required": [
+        "kind",
+        "messageId",
+        "messageRevisionId",
+      ],
+      "type": "object",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/ingress-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Chat -> n8n Webhook Trigger payload (024 plan §6.2). Every identity/time/origin/revision/capability value is server-generated by Chat; nothing here is frontend-supplied.",
+  "properties": {
+    "attachments": {
+      "items": {
+        "$ref": "attachment-manifest.schema.json#",
+      },
+      "maxItems": 50,
+      "type": "array",
+    },
+    "botId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "capabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "attachment": {
+          "$ref": "common.schema.json#/$defs/opaqueCapabilityToken",
+        },
+        "claim": {
+          "$ref": "common.schema.json#/$defs/opaqueCapabilityToken",
+        },
+        "completion": {
+          "$ref": "common.schema.json#/$defs/opaqueCapabilityToken",
+        },
+      },
+      "required": [
+        "claim",
+        "completion",
+      ],
+      "type": "object",
+    },
+    "channelId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "contextHash": {
+      "$ref": "common.schema.json#/$defs/sha256Hex",
+    },
+    "contextManifest": {
+      "$ref": "context-manifest.schema.json#",
+    },
+    "deadlineAt": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "deployment": {
+      "$ref": "common.schema.json#/$defs/deploymentRevisionSnapshot",
+    },
+    "locale": {
+      "$ref": "common.schema.json#/$defs/locale",
+    },
+    "requestId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "requestTime": {
+      "$ref": "common.schema.json#/$defs/utcTimestamp",
+    },
+    "rootMessageId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "runId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "actorId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "origin": {
+          "const": "USER_UI",
+          "description": "A Bot can only ever be triggered by a real human acting through the Chat UI/API. CHAT_BOT, INCOMING_WEBHOOK, MCP and SYSTEM origins must never appear here — enforced by fixing this to a const, not just documenting it.",
+        },
+        "userId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+          "description": "Context/audit only — never an authorization identity for target apps (024 plan §8.1).",
+        },
+      },
+      "required": [
+        "actorId",
+        "userId",
+        "origin",
+      ],
+      "type": "object",
+    },
+    "threadId": {
+      "$ref": "common.schema.json#/$defs/uuid",
+    },
+    "timezone": {
+      "$ref": "common.schema.json#/$defs/ianaTimezone",
+    },
+    "trigger": {
+      "description": "Discriminated: a Bot Thread is started/continued either by a message or by a typed rich-content action. Both carry a stable ID and the revision they were evaluated against.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/messageTrigger",
+        },
+        {
+          "$ref": "#/$defs/actionTrigger",
+        },
+      ],
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "runId",
+    "deployment",
+    "botId",
+    "channelId",
+    "threadId",
+    "rootMessageId",
+    "trigger",
+    "source",
+    "requestTime",
+    "timezone",
+    "locale",
+    "contextManifest",
+    "contextHash",
+    "capabilities",
+    "deadlineAt",
+  ],
+  "title": "IngressRequest",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > structuredError matches its committed snapshot 1`] = `
+{
+  "$id": "https://chatbot-contracts.appspine.internal/v1/structured-error.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Machine-readable error classification per the 024 plan §7.4. Never carries secrets, capability tokens, or raw prompt/tool payloads.",
+  "properties": {
+    "code": {
+      "enum": [
+        "BOT_DISABLED_OR_UNBOUND",
+        "DEPLOYMENT_UNAVAILABLE",
+        "INGRESS_AUTH_ERROR",
+        "CLAIM_AUTH_ERROR",
+        "CONTRACT_VALIDATION_ERROR",
+        "ENDPOINT_UNAVAILABLE",
+        "WORKFLOW_DEADLINE_EXCEEDED",
+        "WORKFLOW_OR_MODEL_FAILURE",
+        "MCP_PROTOCOL_ERROR",
+        "MCP_AUTHORIZATION_ERROR",
+        "MCP_DOMAIN_ERROR",
+        "MCP_IDEMPOTENCY_CONFLICT",
+        "ATTACHMENT_TRANSFER_ERROR",
+        "ATTACHMENT_SCAN_REJECTED",
+        "ATTACHMENT_PROMOTION_ERROR",
+        "RICH_ACTION_VALIDATION_ERROR",
+        "NO_DISPLAYABLE_CONTENT",
+      ],
+      "type": "string",
+    },
+    "details": {
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean",
+          "null",
+        ],
+      },
+      "description": "Optional bounded, redacted structured detail. Never a raw payload dump.",
+      "maxProperties": 20,
+      "type": "object",
+    },
+    "message": {
+      "description": "Safe-to-display summary. No secrets, no raw tool/model output.",
+      "maxLength": 2000,
+      "minLength": 1,
+      "type": "string",
+    },
+    "retryable": {
+      "type": "boolean",
+    },
+    "schemaVersion": {
+      "$ref": "common.schema.json#/$defs/contractVersion",
+    },
+  },
+  "required": [
+    "schemaVersion",
+    "code",
+    "message",
+    "retryable",
+  ],
+  "title": "StructuredError",
+  "type": "object",
+}
+`;
+
+exports[`schema snapshots (breaking-change detection) > typedAction matches its committed snapshot 1`] = `
+{
+  "$defs": {
+    "cancelAction": {
+      "additionalProperties": false,
+      "properties": {
+        "actionEventId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionType": {
+          "const": "CANCEL",
+        },
+        "actorId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "botId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "clientNonce": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string",
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 500,
+              "type": "string",
+            },
+          },
+          "type": "object",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "threadId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "actionEventId",
+        "actionId",
+        "actionType",
+        "threadId",
+        "botId",
+        "actorId",
+        "clientNonce",
+        "payload",
+        "createdAt",
+      ],
+      "type": "object",
+    },
+    "confirmAction": {
+      "additionalProperties": false,
+      "properties": {
+        "actionEventId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionType": {
+          "const": "CONFIRM",
+        },
+        "actorId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "botId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "clientNonce": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string",
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "payload": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "threadId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "actionEventId",
+        "actionId",
+        "actionType",
+        "threadId",
+        "botId",
+        "actorId",
+        "clientNonce",
+        "payload",
+        "createdAt",
+      ],
+      "type": "object",
+    },
+    "formSubmitAction": {
+      "additionalProperties": false,
+      "properties": {
+        "actionEventId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "actionType": {
+          "const": "FORM_SUBMIT",
+        },
+        "actorId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "botId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+        "clientNonce": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string",
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/utcTimestamp",
+        },
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "fields": {
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                ],
+              },
+              "maxProperties": 30,
+              "type": "object",
+            },
+          },
+          "required": [
+            "fields",
+          ],
+          "type": "object",
+        },
+        "schemaVersion": {
+          "$ref": "common.schema.json#/$defs/contractVersion",
+        },
+        "threadId": {
+          "$ref": "common.schema.json#/$defs/uuid",
+        },
+      },
+      "required": [
+        "schemaVersion",
+        "actionEventId",
+        "actionId",
+        "actionType",
+        "threadId",
+        "botId",
+        "actorId",
+        "clientNonce",
+        "payload",
+        "createdAt",
+      ],
+      "type": "object",
+    },
+  },
+  "$id": "https://chatbot-contracts.appspine.internal/v1/typed-action.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A validated click/submit on an allowlisted rich-content action (024 plan §6.6). Each actionType is a fully self-contained variant so the payload shape is structurally tied to actionType, not just documented — a CONFIRM event can never carry FORM_SUBMIT's \`fields\` payload.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/confirmAction",
+    },
+    {
+      "$ref": "#/$defs/cancelAction",
+    },
+    {
+      "$ref": "#/$defs/formSubmitAction",
+    },
+  ],
+  "title": "TypedActionEvent",
+}
+`;

@@ -1,5 +1,11 @@
 # @appspine/audit-log
 
+## 0.5.0
+
+### Minor Changes
+
+- Add 024 distributed trace audit fields, `AuditTraceInput`, `normalizeAuditTrace()`, bounded source-origin/operation metadata validation, and an updated copyable Prisma fragment for run, deployment, workflow, execution, operation, and source correlation.
+
 ## 0.4.0
 
 ### Minor Changes

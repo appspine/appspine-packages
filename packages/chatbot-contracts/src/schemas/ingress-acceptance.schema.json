@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/ingress-acceptance.schema.json",
+  "title": "IngressAcceptance",
+  "description": "n8n's immediate 2xx/202 response to an IngressRequest. Acknowledges receipt only — the final result always arrives later via the completion callback (024 plan §6.1).",
+  "oneOf": [{ "$ref": "#/$defs/accepted" }, { "$ref": "#/$defs/rejected" }],
+  "$defs": {
+    "accepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "requestId", "runId", "accepted"],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "requestId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "accepted": { "const": true }
+      }
+    },
+    "rejected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "requestId", "runId", "accepted", "rejectionReason"],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "requestId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "accepted": { "const": false },
+        "rejectionReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/claim-request.schema.json",
+  "title": "ClaimRequest",
+  "description": "Wrapper's first business action: attempt to claim a Run before any model/tool executes (024 plan §7.1). Authenticated by the claim capability from IngressRequest.capabilities.claim, not by this body.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "requestId", "runId", "executionId", "deploymentId", "claimedAt"],
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "requestId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "executionId": {
+      "description": "n8n execution ID attempting the claim.",
+      "$ref": "common.schema.json#/$defs/nonEmptyString"
+    },
+    "deploymentId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "claimedAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+  }
+}

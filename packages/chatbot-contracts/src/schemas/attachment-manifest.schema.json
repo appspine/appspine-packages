@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/attachment-manifest.schema.json",
+  "title": "AttachmentManifest",
+  "description": "Metadata + run-scoped download/upload capability for one attachment. Never carries the binary itself (024 plan §6.5).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "attachmentId",
+    "runId",
+    "direction",
+    "status",
+    "mimeType",
+    "sizeBytes",
+    "checksumSha256",
+    "capability",
+    "expiresAt"
+  ],
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "attachmentId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "direction": {
+      "type": "string",
+      "enum": ["INPUT", "OUTPUT"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["STAGING", "SCANNING", "READY", "REJECTED", "EXPIRED"]
+    },
+    "mimeType": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+-]*/[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+-]*$",
+      "maxLength": 255
+    },
+    "sizeBytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 536870912
+    },
+    "checksumSha256": { "$ref": "common.schema.json#/$defs/sha256Hex" },
+    "capability": { "$ref": "common.schema.json#/$defs/opaqueCapabilityToken" },
+    "expiresAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" },
+    "fileName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    }
+  }
+}

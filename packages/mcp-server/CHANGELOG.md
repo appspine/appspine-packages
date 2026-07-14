@@ -1,5 +1,11 @@
 # @appspine/mcp-server
 
+## 0.6.0
+
+### Minor Changes
+
+- Add 024 MCP operation metadata parsing, write-tool fail-closed behavior, scoped idempotency primitives, structural Prisma idempotency adapter, and the copyable `./prisma/mcp-idempotency.prisma` export for consuming apps.
+
 ## 0.5.0
 
 ### Minor Changes

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chatbot-contracts.appspine.internal/v1/completion.schema.json",
+  "title": "CompletionCallback",
+  "description": "n8n -> Chat authenticated completion callback (024 plan §6.4). Bound to a single Run via a short-lived capability; digest reuse makes retries idempotent.",
+  "oneOf": [{ "$ref": "#/$defs/succeeded" }, { "$ref": "#/$defs/failed" }],
+  "$defs": {
+    "succeeded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "runId",
+        "deploymentId",
+        "executionId",
+        "status",
+        "replyText",
+        "digest",
+        "completedAt"
+      ],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "requestId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "deploymentId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "executionId": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "status": { "const": "SUCCEEDED" },
+        "replyText": {
+          "description": "Fallback plain-text reply for every client, even when contentParts is present.",
+          "type": "string",
+          "maxLength": 8000
+        },
+        "contentParts": { "$ref": "content-parts.schema.json#" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "common.schema.json#/$defs/uuid" }
+        },
+        "summaryUpdate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revision", "summarizedThroughMessageId", "text"],
+          "properties": {
+            "revision": { "type": "integer", "minimum": 0 },
+            "summarizedThroughMessageId": { "$ref": "common.schema.json#/$defs/uuid" },
+            "text": { "type": "string", "maxLength": 24000 }
+          }
+        },
+        "usage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "toolCallCount": { "type": "integer", "minimum": 0 },
+            "modelCallCount": { "type": "integer", "minimum": 0 },
+            "promptTokens": { "type": "integer", "minimum": 0 },
+            "completionTokens": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "digest": {
+          "description": "sha256 over the canonical result payload. Same digest on retry -> return the original result. Different digest for the same runId -> reject and alert (024 plan §6.4).",
+          "$ref": "common.schema.json#/$defs/sha256Hex"
+        },
+        "completedAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+      }
+    },
+    "failed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "runId",
+        "deploymentId",
+        "executionId",
+        "status",
+        "replyText",
+        "error",
+        "digest",
+        "completedAt"
+      ],
+      "properties": {
+        "schemaVersion": { "$ref": "common.schema.json#/$defs/contractVersion" },
+        "requestId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "runId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "deploymentId": { "$ref": "common.schema.json#/$defs/uuid" },
+        "executionId": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "status": { "const": "FAILED" },
+        "replyText": {
+          "description": "Safe fallback text explaining the failure to the end user.",
+          "type": "string",
+          "maxLength": 8000
+        },
+        "error": { "$ref": "structured-error.schema.json#" },
+        "digest": { "$ref": "common.schema.json#/$defs/sha256Hex" },
+        "completedAt": { "$ref": "common.schema.json#/$defs/utcTimestamp" }
+      }
+    }
+  }
+}
