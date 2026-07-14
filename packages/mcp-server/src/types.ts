@@ -1,4 +1,5 @@
 import type { ZodType } from 'zod';
+import type { McpOperationMetadata } from './metadata';
 
 export interface McpCallContext {
   scopes: string[];
@@ -15,6 +16,9 @@ export interface McpCallContext {
   /// handlers that write audit log entries should pass this straight through as
   /// RecordAuditLogDto.workflowId. Untrusted, optional, debugging/cross-app-tracing only.
   workflowId: string | null;
+  /// Caller-supplied operation metadata from MCP request params._meta. This is untrusted
+  /// correlation data from the caller; verified principal/API-key identity remains above.
+  operation?: McpOperationMetadata | null;
 }
 
 export interface McpToolDefinition {

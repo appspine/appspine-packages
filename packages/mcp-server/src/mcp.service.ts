@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Injectable } from '@nestjs/common';
 import { classifyToolAsReadOnly, McpToolRegistry } from './mcp-tool.registry';
+import { parseMcpOperationMetadata } from './metadata';
 import type { McpCallContext } from './types';
 
 @Injectable()
@@ -27,9 +28,21 @@ export class McpService {
           // (023 §3.5) — `requiredScopes` itself never leaves the server.
           annotations: { readOnlyHint: classifyToolAsReadOnly(tool.requiredScopes) },
         },
-        async (args: unknown) => {
+        async (args: unknown, extra: { _meta?: unknown }) => {
           try {
-            const result = await tool.handler(args, ctx);
+            const metadata = parseMcpOperationMetadata(extra._meta);
+            const isReadOnly = classifyToolAsReadOnly(tool.requiredScopes);
+            if (!isReadOnly && (!metadata.ok || metadata.metadata === null)) {
+              const reason = metadata.ok
+                ? 'write MCP tools require operation metadata'
+                : metadata.reason;
+              return { isError: true, content: [{ type: 'text' as const, text: reason }] };
+            }
+
+            const result = await tool.handler(args, {
+              ...ctx,
+              operation: metadata.ok ? metadata.metadata : null,
+            });
 
             if (
               result !== null &&
