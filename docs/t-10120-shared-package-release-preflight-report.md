@@ -1,11 +1,10 @@
 # T-10120 - Shared Package Release Preflight Report
 
-Status: **in progress; publish gate not complete**.
+Status: **completed**.
 
-This preflight prepares the 024 shared packages for the T-10120 release gate,
-but does not mark T-10120 complete. Clean consumer installation is currently
-blocked by GitHub Packages authentication while resolving existing
-`@appspine/common` dependencies.
+This preflight completed the 024 shared package release gate. The prepared
+packages were validated from local tarballs in a clean consumer project and
+published to GitHub Packages.
 
 ## Prepared Packages
 
@@ -57,9 +56,9 @@ Pack artifact checks:
 - `workspace:*` dependencies in packed manifests are rewritten to concrete
   package versions.
 
-## Blocking Evidence
+## Previously Blocking Evidence
 
-Clean install of a temporary consumer project from the local tarballs failed
+Earlier clean install of a temporary consumer project from the local tarballs failed
 while resolving existing published `@appspine/common`:
 
 ```text
@@ -84,15 +83,53 @@ npm view @appspine/m2m-api-key version --registry=https://npm.pkg.github.com
 npm view @appspine/rbac version --registry=https://npm.pkg.github.com
 ```
 
-The token/configuration therefore needs a clean-consumer install fix before
-T-10120 can be completed and before publishing these prepared versions.
+On 2026-07-15, GitHub Packages authentication was available again and direct
+clean install of `@appspine/common@0.2.0` succeeded from a temporary consumer
+project.
 
-## Not Yet Done
+## Completion Evidence
 
-- No `changeset publish` or `npm publish` command was run.
-- T-10120 must not be checked off until clean install succeeds and the prepared
-  versions are published to GitHub Packages.
-- After publish, verify `npm view` for:
-  - `@appspine/chatbot-contracts@0.1.1`;
-  - `@appspine/mcp-server@0.6.0`;
-  - `@appspine/audit-log@0.5.0`.
+Additional commands run on 2026-07-15:
+
+```bash
+npm whoami --registry=https://npm.pkg.github.com
+npm view @appspine/common version --registry=https://npm.pkg.github.com
+pnpm --filter @appspine/chatbot-contracts typecheck
+pnpm --filter @appspine/chatbot-contracts test
+pnpm --filter @appspine/chatbot-contracts build
+pnpm --filter @appspine/mcp-server typecheck
+pnpm --filter @appspine/mcp-server test
+pnpm --filter @appspine/mcp-server build
+pnpm --filter @appspine/audit-log typecheck
+pnpm --filter @appspine/audit-log test
+pnpm --filter @appspine/audit-log build
+pnpm lint
+pnpm --filter @appspine/chatbot-contracts pack --pack-destination <temp>
+pnpm --filter @appspine/mcp-server pack --pack-destination <temp>
+pnpm --filter @appspine/audit-log pack --pack-destination <temp>
+npm install <three local tarballs> <required peers>
+npx prisma generate
+node verify.cjs
+pnpm changeset publish
+npm view @appspine/chatbot-contracts version --registry=https://npm.pkg.github.com
+npm view @appspine/mcp-server version --registry=https://npm.pkg.github.com
+npm view @appspine/audit-log version --registry=https://npm.pkg.github.com
+```
+
+Clean consumer verification covered:
+
+- installing all three local tarballs in a temporary project;
+- installing required Nest, Express, Zod, Prisma, Reflect, and RxJS peers;
+- generating a minimal Prisma client;
+- loading `@appspine/chatbot-contracts` and validating a claim request;
+- loading `@appspine/mcp-server` and parsing Appspine MCP metadata;
+- executing an idempotent write once, replaying it without a second side
+  effect, and rejecting a conflicting request hash.
+
+Published versions verified in GitHub Packages:
+
+- `@appspine/chatbot-contracts@0.1.1`;
+- `@appspine/mcp-server@0.6.0`;
+- `@appspine/audit-log@0.5.0`.
+
+`changeset publish` created local git tags for the three published versions.
