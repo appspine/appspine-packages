@@ -87,7 +87,9 @@ async function loginAndSaveStorageState(browser: Browser, baseURL: string, user:
     );
   }
 
-  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+  const cookies = await context.cookies(baseURL);
+  const authCookie = cookies.find((cookie) => cookie.name === 'auth_token');
+  expect(authCookie?.value).toBeTruthy();
   await context.storageState({ path: resolve(user.storageStatePath) });
   await page.close();
   await context.close();

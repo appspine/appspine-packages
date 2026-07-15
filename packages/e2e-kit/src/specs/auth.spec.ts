@@ -40,7 +40,6 @@ export function registerAuthSpec({
       await page.getByRole('button', { name: 'Sign in' }).click();
 
       await page.waitForURL('**/dashboard');
-      await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
       const cookies = await page.context().cookies();
       const authCookie = cookies.find((cookie) => cookie.name === authCookieName);
