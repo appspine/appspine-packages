@@ -22,16 +22,23 @@ import { Label } from '../ui/label.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
 import type { CreateApiKeyResult } from './actions-core.js';
 import { CreatedApiKeyReveal } from './created-api-key-reveal.js';
-import type { ApiKeyRoleOption, CreateApiKeyResponse, ServiceAccountOption } from './types.js';
+import type {
+  ApiKeyRoleOption,
+  ApiKeyScopeOption,
+  CreateApiKeyResponse,
+  ServiceAccountOption,
+} from './types.js';
 import { SCOPE_ACTIONS, SCOPE_RESOURCES } from './types.js';
 
 export function CreateApiKeyDialog({
   roles,
   serviceAccounts,
+  scopeOptions,
   createApiKeyAction,
 }: {
   roles: ApiKeyRoleOption[];
   serviceAccounts: ServiceAccountOption[];
+  scopeOptions?: ApiKeyScopeOption[];
   createApiKeyAction: (formData: FormData) => Promise<CreateApiKeyResult>;
 }) {
   const t = useTranslations('apiKeys');
@@ -59,6 +66,16 @@ export function CreateApiKeyDialog({
       setCreated(null);
     }
   }
+
+  const resolvedScopeOptions =
+    scopeOptions && scopeOptions.length > 0
+      ? scopeOptions
+      : SCOPE_RESOURCES.flatMap((resource) =>
+          SCOPE_ACTIONS.map((action) => ({
+            value: `${resource}:${action}`,
+            label: `${resource}:${action}`,
+          })),
+        );
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -101,17 +118,12 @@ export function CreateApiKeyDialog({
                     <Checkbox name="scopes" value="*" />
                     {t('fullAccess')}
                   </Label>
-                  {SCOPE_RESOURCES.map((resource) =>
-                    SCOPE_ACTIONS.map((action) => (
-                      <Label
-                        key={`${resource}:${action}`}
-                        className="flex items-center gap-2 font-normal"
-                      >
-                        <Checkbox name="scopes" value={`${resource}:${action}`} />
-                        {resource}:{action}
-                      </Label>
-                    )),
-                  )}
+                  {resolvedScopeOptions.map((scope) => (
+                    <Label key={scope.value} className="flex items-center gap-2 font-normal">
+                      <Checkbox name="scopes" value={scope.value} />
+                      {scope.label}
+                    </Label>
+                  ))}
                 </div>
               </Field>
               <Field>

@@ -1,5 +1,13 @@
 # @appspine/frontend-shell
 
+## 0.4.2
+
+### Patch Changes
+
+- Expose app-specific API key scopes in the shared admin dialog by accepting scope
+  options from `/metadata/schema`, while keeping the existing fallback list for
+  apps that have not wired metadata-backed scopes yet.
+
 ## 0.4.1
 
 ### Patch Changes
