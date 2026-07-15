@@ -23,7 +23,11 @@ export function ApiKeysTable({
   serviceAccounts: ServiceAccountOption[];
   sortField: string | undefined;
   sortOrder: SortOrder | undefined;
-  LinkComponent: React.ComponentType<any>;
+  LinkComponent: React.ComponentType<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
   buildSortHref: (field: ApiKeySortField, order: SortOrder) => string;
   t: (key: string) => string;
   setApiKeyActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;

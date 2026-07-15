@@ -116,7 +116,10 @@ describe('McpController', () => {
       { getToolCount: vi.fn() } as never,
     );
 
-    await controller.handlePost(createRequest({ ...baseApiKeyUser, actingUserId: 'service-user-1' }), createResponse());
+    await controller.handlePost(
+      createRequest({ ...baseApiKeyUser, actingUserId: 'service-user-1' }),
+      createResponse(),
+    );
 
     expect(contexts[0]?.workflowId).toBeNull();
   });

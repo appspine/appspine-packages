@@ -1,3 +1,4 @@
+import type { PrismaService } from '@appspine/common';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RolesService } from './roles.service';
@@ -47,7 +48,7 @@ describe('RolesService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new RolesService(prismaMock as any);
+    service = new RolesService(prismaMock as unknown as PrismaService);
   });
 
   describe('create', () => {

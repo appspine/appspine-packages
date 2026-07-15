@@ -26,7 +26,11 @@ export function UsersTable({
   currentUserId: string | undefined;
   sortField: string | undefined;
   sortOrder: SortOrder | undefined;
-  LinkComponent: React.ComponentType<any>;
+  LinkComponent: React.ComponentType<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
   buildSortHref: (field: UserSortField, order: SortOrder) => string;
   t: (key: string) => string;
   setUserActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;

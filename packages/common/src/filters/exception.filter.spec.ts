@@ -2,7 +2,13 @@ import { ArgumentsHost, BadRequestException, HttpException } from '@nestjs/commo
 import { describe, expect, it, vi } from 'vitest';
 import { GlobalExceptionFilter } from './exception.filter';
 
-function mockHost(req: any) {
+interface MockRequest {
+  url: string;
+  headers: Record<string, string>;
+  id?: string;
+}
+
+function mockHost(req: MockRequest) {
   const json = vi.fn();
   const status = vi.fn(() => ({ json }));
   const res = { status };

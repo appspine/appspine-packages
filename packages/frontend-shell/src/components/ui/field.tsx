@@ -71,7 +71,12 @@ function Field({
   orientation = 'vertical',
   ...props
 }: React.ComponentProps<'div'> & VariantProps<typeof fieldVariants>) {
+  // Intentionally a div, not <fieldset> — Field wraps a single label+input pair (grouping
+  // multiple related controls is FieldSet's job, above), and <fieldset>'s native
+  // disabled-cascades-to-children behavior would be a real behavior change here since callers
+  // can already pass `disabled` through {...props}.
   return (
+    // biome-ignore lint/a11y/useSemanticElements: see comment above the return statement.
     <div
       role="group"
       data-slot="field"
@@ -183,13 +188,15 @@ function FieldError({
 
     const uniqueErrors = [...new Map(errors.map((error) => [error?.message, error])).values()];
 
-    if (uniqueErrors?.length == 1) {
+    if (uniqueErrors?.length === 1) {
       return uniqueErrors[0]?.message;
     }
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map((error, index) => error?.message && <li key={index}>{error.message}</li>)}
+        {uniqueErrors.map(
+          (error) => error?.message && <li key={error.message}>{error.message}</li>,
+        )}
       </ul>
     );
   }, [children, errors]);

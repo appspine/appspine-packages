@@ -70,6 +70,7 @@ export function SidebarProvider({
         setInternalOpen(nextOpen);
       }
 
+      // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API is unsupported in Safari; this write-only cookie needs no cross-browser gap.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${nextOpen}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [open, setOpenProp],
