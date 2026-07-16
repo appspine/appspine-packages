@@ -25,10 +25,13 @@ export const KEY_PREFIX = 'an_live_';
 const PREFIX_DISPLAY_LENGTH = 16;
 const ALLOWED_SORT_FIELDS = ['name', 'createdAt', 'lastUsedAt', 'expiresAt'] as const;
 
-// resource:action, e.g. "users:read" — action is read/write/*, or the bare wildcard "*".
+// resource:action, e.g. "users:read" — action is read/write/call/*, or the bare wildcard
+// "*". "call" was added for dev_docs 025's mcp-gateway aggregator (gateway:call, the
+// call_tool meta-tool's requiredScopes) -- a forwarded tool invocation isn't itself a
+// read or a write on the gateway's own resources, so neither existing action word fit.
 // This is a format-only check; cross-referencing against the app's real scope catalog
 // is deferred until @appspine/metadata-schema exists (dev_docs/003).
-const SCOPE_PATTERN = /^[a-z0-9_-]+:(read|write|\*)$/;
+const SCOPE_PATTERN = /^[a-z0-9_-]+:(read|write|call|\*)$/;
 
 const API_KEY_SELECT = {
   id: true,

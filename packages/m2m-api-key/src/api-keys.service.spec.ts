@@ -109,3 +109,31 @@ describe('ApiKeysService acting user binding', () => {
     );
   });
 });
+
+describe('ApiKeysService scope validation', () => {
+  it('accepts a "call" scope (dev_docs 025 gateway:call for the mcp-gateway aggregator)', async () => {
+    const prisma = createPrismaMock(null);
+    const service = new ApiKeysService(prisma as never);
+
+    await expect(
+      service.create({
+        name: 'gateway',
+        roleId: role.id,
+        scopes: ['gateway:call'],
+      }),
+    ).resolves.toBeDefined();
+  });
+
+  it('still rejects an action word outside read/write/call/*', async () => {
+    const prisma = createPrismaMock(null);
+    const service = new ApiKeysService(prisma as never);
+
+    await expect(
+      service.create({
+        name: 'integration',
+        roleId: role.id,
+        scopes: ['users:delete'],
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+});
