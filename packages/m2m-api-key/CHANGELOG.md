@@ -1,5 +1,14 @@
 # @appspine/m2m-api-key
 
+## 2.1.1
+
+### Patch Changes
+
+- Republish of 2.1.0 -- that version was published with plain `npm publish` instead of
+  `pnpm publish`, so its `workspace:*` internal dependency ranges (`@appspine/auth`,
+  `@appspine/common`) were never rewritten to real semver and are unusable by external
+  consumers. No functional code changes from 2.1.0.
+
 ## 2.1.0
 
 ### Minor Changes
