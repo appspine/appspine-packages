@@ -1,5 +1,12 @@
 # @appspine/metadata-schema
 
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies [0907ff6]
+  - @appspine/m2m-api-key@2.1.0
+
 ## 0.2.5
 
 ### Patch Changes
