@@ -35,17 +35,21 @@ export type DmmfField = {
 export type DmmfModel = {
   name: string;
   dbName?: string | null;
-  fields: DmmfField[];
+  fields: readonly DmmfField[];
 };
 
 export type DmmfEnum = {
   name: string;
-  values: { name: string }[];
+  values: readonly { name: string }[];
 };
 
+/**
+ * Structurally compatible with `@prisma/client`'s `Prisma.dmmf.datamodel` (whose arrays are
+ * `ReadonlyDeep`), so callers can pass it straight through without casting.
+ */
 export type DomainEventDatamodel = {
-  models: DmmfModel[];
-  enums: DmmfEnum[];
+  models: readonly DmmfModel[];
+  enums: readonly DmmfEnum[];
 };
 
 type ExpectedField = {

@@ -1,5 +1,11 @@
 # @appspine/domain-events
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix `checkDomainEventSchemaDrift()`'s `DomainEventDatamodel`/`DmmfModel`/`DmmfEnum` types to accept readonly arrays, matching `@prisma/client`'s actual `Prisma.dmmf.datamodel` shape (`ReadonlyDeep`). Without this, passing the real DMMF failed to typecheck in a consuming app (found while wiring apps/approve's drift-check script in T-11010).
+
 ## 0.1.0
 
 ### Minor Changes
