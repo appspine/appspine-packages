@@ -1,6 +1,6 @@
 {
   "name": "@appspine/rbac",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": false,
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
     "@appspine/common": "workspace:*"
   },
   "peerDependencies": {
-    "@appspine/audit-log": "^0.4.0",
+    "@appspine/audit-log": "^0.4.1",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

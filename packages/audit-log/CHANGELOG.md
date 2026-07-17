@@ -1,5 +1,12 @@
 # @appspine/audit-log
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [33aa41f]
+  - @appspine/common@0.2.1
+
 ## 0.4.0
 
 ### Minor Changes

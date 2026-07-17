@@ -1,5 +1,12 @@
 # @appspine/mcp-server
 
+## 0.5.2
+
+### Patch Changes
+
+- @appspine/auth@2.0.1
+- @appspine/m2m-api-key@2.1.2
+
 ## 0.5.1
 
 ### Patch Changes

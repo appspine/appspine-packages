@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.4.3
+
+### Patch Changes
+
+- 33aa41f: Reduce domain-event dispatcher database work with bulk stale-lock reclamation and skip empty or duplicate delivery fan-out writes. Improve shared admin-table rendering by indexing service accounts once, tighten sortable-link component types, and align the pagination helper type with its existing default behavior.
+
 ## 0.4.2
 
 ### Patch Changes
