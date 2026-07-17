@@ -76,7 +76,10 @@ describe('DomainEventDispatcherService.tick', () => {
     const before = Date.now();
     await dispatcher.tick();
 
-    expect(counters.updateManyCalls).toBe(2);
+    // 2 batched reclaimStaleLocks calls (terminal + non-terminal groups) + one
+    // completeDelivery() updateMany per claimed delivery (stale, first, later, retry, dead,
+    // missing, ignored — 7), now that completions are guarded updateMany calls too.
+    expect(counters.updateManyCalls).toBe(9);
     expect(calls).toEqual(['stale', 'first', 'later']);
     expect(rows.find((row) => row.id === 'first')?.status).toBe(
       DomainEventDeliveryStatus.PROCESSED,
@@ -121,6 +124,36 @@ describe('DomainEventDispatcherService.tick', () => {
       DomainEventDeliveryStatus.IGNORED,
     );
     expect(rows.find((row) => row.id === 'ignored')?.lastError).toBe('subscription disabled');
+  });
+
+  it('does not overwrite a delivery whose status changed while its handler was in flight', async () => {
+    // Simulates a concurrent admin action (retry/ignore) racing an in-flight handler: by the
+    // time the handler resolves and the dispatcher tries to write its own completion status,
+    // the row is no longer PROCESSING, so the completeDelivery() guard must make that write a
+    // no-op instead of clobbering whatever the concurrent actor decided.
+    const rows = [createMockDeliveryRow('racing', 1n, 'ok')];
+    const registry = new DomainEventRegistry();
+    registry.on('submitted', {
+      key: 'ok',
+      handle: async () => {
+        const row = rows.find((candidate) => candidate.id === 'racing');
+        if (row) {
+          row.status = DomainEventDeliveryStatus.IGNORED;
+          row.lastError = 'ignored by admin';
+        }
+      },
+    });
+    const dispatcher = new DomainEventDispatcherService(
+      createMockDispatcherPrisma(rows) as never,
+      registry,
+      { autoStart: false },
+    );
+
+    await dispatcher.tick();
+
+    const row = rows.find((candidate) => candidate.id === 'racing');
+    expect(row?.status).toBe(DomainEventDeliveryStatus.IGNORED);
+    expect(row?.lastError).toBe('ignored by admin');
   });
 
   it('makes an overlapping tick a no-op while one is already in flight', async () => {

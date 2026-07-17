@@ -22,6 +22,13 @@ import {
 
 type ClaimedDelivery = DomainEventDeliveryRecord & { event: DomainEventRecord };
 
+type DeliveryCompletionData = Partial<
+  Pick<
+    DomainEventDeliveryRecord,
+    'status' | 'attempts' | 'nextAttemptAt' | 'lockedAt' | 'lockedBy' | 'lastError' | 'processedAt'
+  >
+>;
+
 type DispatcherTransactionClient = {
   $queryRaw<T>(query: TemplateStringsArray, ...values: unknown[]): Promise<T>;
   domainEventDelivery: {
@@ -178,42 +185,33 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
   private async processDelivery(delivery: ClaimedDelivery): Promise<void> {
     const handler = this.registry.resolve(delivery.handlerKey);
     if (!handler) {
-      await this.prisma.domainEventDelivery.update({
-        where: { id: delivery.id },
-        data: {
-          status: DomainEventDeliveryStatus.IGNORED,
-          processedAt: new Date(),
-          lastError: `No handler registered for ${delivery.handlerKey}`,
-          lockedAt: null,
-          lockedBy: null,
-        },
+      await this.completeDelivery(delivery.id, {
+        status: DomainEventDeliveryStatus.IGNORED,
+        processedAt: new Date(),
+        lastError: `No handler registered for ${delivery.handlerKey}`,
+        lockedAt: null,
+        lockedBy: null,
       });
       return;
     }
 
     try {
       await handler.handle({ event: delivery.event, delivery });
-      await this.prisma.domainEventDelivery.update({
-        where: { id: delivery.id },
-        data: {
-          status: DomainEventDeliveryStatus.PROCESSED,
-          processedAt: new Date(),
-          lockedAt: null,
-          lockedBy: null,
-          lastError: null,
-        },
+      await this.completeDelivery(delivery.id, {
+        status: DomainEventDeliveryStatus.PROCESSED,
+        processedAt: new Date(),
+        lockedAt: null,
+        lockedBy: null,
+        lastError: null,
       });
     } catch (error) {
       if (error instanceof DomainEventIgnoredError) {
-        await this.prisma.domainEventDelivery.update({
-          where: { id: delivery.id },
-          data: {
-            status: DomainEventDeliveryStatus.IGNORED,
-            processedAt: new Date(),
-            lastError: error.message,
-            lockedAt: null,
-            lockedBy: null,
-          },
+        await this.completeDelivery(delivery.id, {
+          status: DomainEventDeliveryStatus.IGNORED,
+          processedAt: new Date(),
+          lastError: error.message,
+          lockedAt: null,
+          lockedBy: null,
         });
         return;
       }
@@ -224,20 +222,26 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
   private async markFailed(delivery: DomainEventDeliveryRecord, error: unknown): Promise<void> {
     const nextAttempts = delivery.attempts + 1;
     const terminal = nextAttempts >= this.maxAttempts;
-    await this.prisma.domainEventDelivery.update({
-      where: { id: delivery.id },
-      data: {
-        status: terminal
-          ? DomainEventDeliveryStatus.DEAD_LETTER
-          : DomainEventDeliveryStatus.PENDING,
-        attempts: nextAttempts,
-        nextAttemptAt: terminal
-          ? null
-          : new Date(Date.now() + this.retryDelayMs(delivery.attempts)),
-        lastError: errorMessage(error),
-        lockedAt: null,
-        lockedBy: null,
-      },
+    await this.completeDelivery(delivery.id, {
+      status: terminal ? DomainEventDeliveryStatus.DEAD_LETTER : DomainEventDeliveryStatus.PENDING,
+      attempts: nextAttempts,
+      nextAttemptAt: terminal ? null : new Date(Date.now() + this.retryDelayMs(delivery.attempts)),
+      lastError: errorMessage(error),
+      lockedAt: null,
+      lockedBy: null,
+    });
+  }
+
+  /**
+   * Completes a delivery this worker claimed, guarded on it still being PROCESSING. If an
+   * admin action (retry/ignore) or another actor already moved it elsewhere while the handler
+   * was running, the guard makes this a no-op instead of clobbering that decision — the same
+   * atomic-update defense apps/approve's admin service uses for the other side of this race.
+   */
+  private async completeDelivery(id: string, data: DeliveryCompletionData): Promise<void> {
+    await this.prisma.domainEventDelivery.updateMany({
+      where: { id, status: DomainEventDeliveryStatus.PROCESSING },
+      data,
     });
   }
 

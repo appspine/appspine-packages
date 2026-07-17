@@ -110,7 +110,7 @@ export function createMockDeliveryRow(
 }
 
 type MockDeliveryWhere = {
-  id?: { in: string[] };
+  id?: string | { in: string[] };
   status?: DomainEventDeliveryStatus;
   attempts?: { gte?: number; lt?: number };
   lockedAt?: { lt: Date };
@@ -125,8 +125,16 @@ type MockDispatcherCounters = {
   updateManyCalls?: number;
 };
 
+// Every condition present in `where` must match — this used to short-circuit true on `id.in`
+// alone, silently ignoring any `status` (or other) condition passed alongside it in the same
+// where clause, which would have made a combined `{ id, status: PROCESSING }` guard (used to
+// close the completion-vs-admin-action race) untestable against this mock.
 function matchesWhere(row: MockDeliveryRow, where: MockDeliveryWhere): boolean {
-  if (where.id?.in) return where.id.in.includes(row.id);
+  if (where.id !== undefined) {
+    const matchesId =
+      typeof where.id === 'string' ? row.id === where.id : where.id.in.includes(row.id);
+    if (!matchesId) return false;
+  }
   if (where.status !== undefined) {
     if (row.status !== where.status) return false;
     if (where.lockedAt?.lt && !(row.lockedAt !== null && row.lockedAt < where.lockedAt.lt)) {
