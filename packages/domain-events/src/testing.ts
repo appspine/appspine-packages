@@ -109,15 +109,40 @@ export function createMockDeliveryRow(
   };
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: mock where-clauses mirror ad-hoc Prisma query shapes.
-function matchesWhere(row: MockDeliveryRow, where: any): boolean {
+type MockDeliveryWhere = {
+  id?: { in: string[] };
+  status?: DomainEventDeliveryStatus;
+  attempts?: { gte?: number; lt?: number };
+  lockedAt?: { lt: Date };
+};
+
+type MockDeliveryUpdateData = Omit<Partial<MockDeliveryRow>, 'attempts'> & {
+  attempts?: number | { increment: number };
+};
+
+type MockDispatcherCounters = {
+  transactions: number;
+  updateManyCalls?: number;
+};
+
+function matchesWhere(row: MockDeliveryRow, where: MockDeliveryWhere): boolean {
   if (where.id?.in) return where.id.in.includes(row.id);
   if (where.status !== undefined) {
     if (row.status !== where.status) return false;
-    if (where.lockedAt?.lt) return row.lockedAt !== null && row.lockedAt < where.lockedAt.lt;
-    return true;
+    if (where.lockedAt?.lt && !(row.lockedAt !== null && row.lockedAt < where.lockedAt.lt)) {
+      return false;
+    }
   }
+  if (where.attempts?.gte !== undefined && row.attempts < where.attempts.gte) return false;
+  if (where.attempts?.lt !== undefined && row.attempts >= where.attempts.lt) return false;
   return true;
+}
+
+function applyDeliveryUpdate(row: MockDeliveryRow, data: MockDeliveryUpdateData): void {
+  const { attempts, ...fields } = data;
+  Object.assign(row, fields);
+  if (typeof attempts === 'number') row.attempts = attempts;
+  if (typeof attempts === 'object') row.attempts += attempts.increment;
 }
 
 /**
@@ -127,12 +152,11 @@ function matchesWhere(row: MockDeliveryRow, where: any): boolean {
  */
 export function createMockDispatcherPrisma(
   rows: MockDeliveryRow[],
-  counters?: { transactions: number },
+  counters?: MockDispatcherCounters,
 ) {
   const stats = counters ?? { transactions: 0 };
 
-  // biome-ignore lint/suspicious/noExplicitAny: mock where-clauses mirror ad-hoc Prisma query shapes.
-  const findMany = async ({ where }: { where: any }) =>
+  const findMany = async ({ where }: { where: MockDeliveryWhere }) =>
     rows
       .filter((row) => matchesWhere(row, where))
       .sort((left, right) => Number(left.event.seq - right.event.seq));
@@ -140,17 +164,23 @@ export function createMockDispatcherPrisma(
   return {
     domainEventDelivery: {
       findMany,
-      update: async ({
+      update: async ({ where, data }: { where: { id: string }; data: MockDeliveryUpdateData }) => {
+        const row = rows.find((candidate) => candidate.id === where.id);
+        if (!row) throw new Error(`Missing row ${where.id}`);
+        applyDeliveryUpdate(row, data);
+        return row;
+      },
+      updateMany: async ({
         where,
         data,
       }: {
-        where: { id: string };
-        data: Partial<MockDeliveryRow>;
+        where: MockDeliveryWhere;
+        data: MockDeliveryUpdateData;
       }) => {
-        const row = rows.find((candidate) => candidate.id === where.id);
-        if (!row) throw new Error(`Missing row ${where.id}`);
-        Object.assign(row, data);
-        return row;
+        stats.updateManyCalls = (stats.updateManyCalls ?? 0) + 1;
+        const matchingRows = rows.filter((row) => matchesWhere(row, where));
+        for (const row of matchingRows) applyDeliveryUpdate(row, data);
+        return { count: matchingRows.length };
       },
     },
     $transaction: async (callback: (tx: unknown) => Promise<unknown>) => {

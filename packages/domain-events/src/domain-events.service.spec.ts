@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DomainEventRegistry } from './domain-event-registry';
 import { DomainEventsService } from './domain-events.service';
@@ -40,6 +40,7 @@ describe('DomainEventsService.record', () => {
 
   it('propagates a delivery-insert failure without swallowing it', async () => {
     const registry = new DomainEventRegistry();
+    registry.on('submitted', { key: 'audit-record', async handle() {} });
     const service = new DomainEventsService(registry);
     const { state, tx } = createMockDomainEventTx({ failDelivery: true });
 
@@ -61,6 +62,7 @@ describe('DomainEventsService.record', () => {
     const registry = new DomainEventRegistry();
     const service = new DomainEventsService(registry);
     const { state, tx } = createMockDomainEventTx();
+    const createMany = vi.spyOn(tx.domainEventDelivery, 'createMany');
 
     await service.record(tx as never, {
       aggregateType: 'ApprovalInstance',
@@ -71,5 +73,28 @@ describe('DomainEventsService.record', () => {
     });
 
     expect(state.deliveries).toHaveLength(0);
+    expect(createMany).not.toHaveBeenCalled();
+  });
+
+  it('deduplicates handler keys before writing deliveries', async () => {
+    const registry = new DomainEventRegistry();
+    registry.on('submitted', { key: 'audit-record', async handle() {} });
+    registry.registerHandlerKeyContributor(async () => ['audit-record', 'audit-record']);
+    const service = new DomainEventsService(registry);
+    const { tx } = createMockDomainEventTx();
+    const createMany = vi.spyOn(tx.domainEventDelivery, 'createMany');
+
+    await service.record(tx as never, {
+      aggregateType: 'ApprovalInstance',
+      aggregateId: 'instance-4',
+      eventType: 'submitted',
+      operation: DomainEventOperation.UPDATE,
+      changedFields: ['status'],
+    });
+
+    expect(createMany).toHaveBeenCalledWith({
+      data: [{ eventId: 'event-1', handlerKey: 'audit-record' }],
+      skipDuplicates: true,
+    });
   });
 });

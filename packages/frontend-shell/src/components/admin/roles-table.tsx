@@ -1,5 +1,8 @@
-import type * as React from 'react';
-import { SortableColumnHeader, type SortOrder } from '../sortable-column-header.js';
+import {
+  SortableColumnHeader,
+  type SortableLinkComponent,
+  type SortOrder,
+} from '../sortable-column-header.js';
 import { Badge } from '../ui/badge.js';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
 import { RoleRowActions } from './role-row-actions.js';
@@ -25,7 +28,7 @@ export function RolesTable({
   permissionOptions: readonly string[];
   sortField: string | undefined;
   sortOrder: SortOrder | undefined;
-  LinkComponent: React.ComponentType<any>;
+  LinkComponent: SortableLinkComponent;
   buildSortHref: (field: RoleSortField, order: SortOrder) => string;
   t: (key: string) => string;
   renderEnumLabel: (kind: 'PermissionPolicy' | 'Permission', value: string) => string;
@@ -56,10 +59,10 @@ export function RolesTable({
               <SortableColumnHeader<RoleSortField>
                 label={t('name')}
                 field="displayName"
-                currentSortField={sortField as RoleSortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead>{t('policy')}</TableHead>
@@ -68,20 +71,20 @@ export function RolesTable({
               <SortableColumnHeader<RoleSortField>
                 label={t('users')}
                 field="userCount"
-                currentSortField={sortField as RoleSortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead>
               <SortableColumnHeader<RoleSortField>
                 label={t('apiKeys')}
                 field="apiKeyCount"
-                currentSortField={sortField as RoleSortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead className="w-10" />

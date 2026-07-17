@@ -70,8 +70,7 @@ describe('pagination', () => {
     });
 
     it('should fall back to defaults if page/limit are missing', () => {
-      // We pass partial objects since the signature takes Pick<PaginationQuery, 'page' | 'limit'>
-      expect(toPrismaPage({} as any)).toEqual({ skip: 0, take: 20 });
+      expect(toPrismaPage({})).toEqual({ skip: 0, take: 20 });
     });
   });
 

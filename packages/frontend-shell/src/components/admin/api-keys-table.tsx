@@ -1,5 +1,8 @@
-import type * as React from 'react';
-import { SortableColumnHeader, type SortOrder } from '../sortable-column-header.js';
+import {
+  SortableColumnHeader,
+  type SortableLinkComponent,
+  type SortOrder,
+} from '../sortable-column-header.js';
 import { Badge } from '../ui/badge.js';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
 import { ApiKeyRowActions } from './api-key-row-actions.js';
@@ -23,7 +26,7 @@ export function ApiKeysTable({
   serviceAccounts: ServiceAccountOption[];
   sortField: string | undefined;
   sortOrder: SortOrder | undefined;
-  LinkComponent: React.ComponentType<any>;
+  LinkComponent: SortableLinkComponent;
   buildSortHref: (field: ApiKeySortField, order: SortOrder) => string;
   t: (key: string) => string;
   setApiKeyActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
@@ -33,6 +36,10 @@ export function ApiKeysTable({
     actingUserId: string | null,
   ) => Promise<{ error?: string }>;
 }) {
+  const serviceAccountEmailById = new Map(
+    serviceAccounts.map((account) => [account.id, account.email]),
+  );
+
   return (
     <div className="rounded-lg border">
       <Table>
@@ -42,10 +49,10 @@ export function ApiKeysTable({
               <SortableColumnHeader<ApiKeySortField>
                 label={t('name')}
                 field="name"
-                currentSortField={sortField as ApiKeySortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead>{t('key')}</TableHead>
@@ -57,10 +64,10 @@ export function ApiKeysTable({
               <SortableColumnHeader<ApiKeySortField>
                 label={t('lastUsed')}
                 field="lastUsedAt"
-                currentSortField={sortField as ApiKeySortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead className="w-10" />
@@ -82,8 +89,9 @@ export function ApiKeysTable({
               </TableCell>
               <TableCell>{apiKey.role.displayName}</TableCell>
               <TableCell>
-                {serviceAccounts.find((account) => account.id === apiKey.actingUserId)?.email ??
-                  t('actingUserNone')}
+                {(apiKey.actingUserId
+                  ? serviceAccountEmailById.get(apiKey.actingUserId)
+                  : undefined) ?? t('actingUserNone')}
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1">

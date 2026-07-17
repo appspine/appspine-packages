@@ -60,7 +60,7 @@ describe('DomainEventDispatcherService.tick', () => {
       missingHandler,
       ignored,
     ];
-    const counters = { transactions: 0 };
+    const counters = { transactions: 0, updateManyCalls: 0 };
     const dispatcher = new DomainEventDispatcherService(
       createMockDispatcherPrisma(rows, counters) as never,
       registry,
@@ -76,6 +76,7 @@ describe('DomainEventDispatcherService.tick', () => {
     const before = Date.now();
     await dispatcher.tick();
 
+    expect(counters.updateManyCalls).toBe(2);
     expect(calls).toEqual(['stale', 'first', 'later']);
     expect(rows.find((row) => row.id === 'first')?.status).toBe(
       DomainEventDeliveryStatus.PROCESSED,

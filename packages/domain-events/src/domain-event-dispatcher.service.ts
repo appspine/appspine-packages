@@ -22,6 +22,17 @@ import {
 
 type ClaimedDelivery = DomainEventDeliveryRecord & { event: DomainEventRecord };
 
+type DispatcherTransactionClient = {
+  $queryRaw<T>(query: TemplateStringsArray, ...values: unknown[]): Promise<T>;
+  domainEventDelivery: {
+    findMany(args: {
+      where: { id: { in: string[] } };
+      include: { event: true };
+      orderBy: { event: { seq: 'asc' } };
+    }): Promise<ClaimedDelivery[]>;
+  };
+};
+
 const STALE_LOCK_RECLAIMED_ERROR = 'Reclaimed after stale lock timeout';
 const STALE_LOCK_RECLAIMED_TERMINAL_ERROR =
   'Reclaimed after stale lock timeout: max attempts exceeded';
@@ -94,36 +105,42 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
 
   private async reclaimStaleLocks(): Promise<void> {
     const staleBefore = new Date(Date.now() - this.staleLockMs);
-    const stale: { id: string; attempts: number }[] =
-      await this.prisma.domainEventDelivery.findMany({
+    const terminalAttempt = this.maxAttempts - 1;
+
+    await Promise.all([
+      this.prisma.domainEventDelivery.updateMany({
         where: {
           status: DomainEventDeliveryStatus.PROCESSING,
           lockedAt: { lt: staleBefore },
+          attempts: { gte: terminalAttempt },
         },
-        select: { id: true, attempts: true },
-      });
-
-    for (const row of stale) {
-      const nextAttempts = row.attempts + 1;
-      const terminal = nextAttempts >= this.maxAttempts;
-      await this.prisma.domainEventDelivery.update({
-        where: { id: row.id },
         data: {
-          status: terminal
-            ? DomainEventDeliveryStatus.DEAD_LETTER
-            : DomainEventDeliveryStatus.PENDING,
-          attempts: nextAttempts,
+          status: DomainEventDeliveryStatus.DEAD_LETTER,
+          attempts: { increment: 1 },
           lockedAt: null,
           lockedBy: null,
-          lastError: terminal ? STALE_LOCK_RECLAIMED_TERMINAL_ERROR : STALE_LOCK_RECLAIMED_ERROR,
+          lastError: STALE_LOCK_RECLAIMED_TERMINAL_ERROR,
         },
-      });
-    }
+      }),
+      this.prisma.domainEventDelivery.updateMany({
+        where: {
+          status: DomainEventDeliveryStatus.PROCESSING,
+          lockedAt: { lt: staleBefore },
+          attempts: { lt: terminalAttempt },
+        },
+        data: {
+          status: DomainEventDeliveryStatus.PENDING,
+          attempts: { increment: 1 },
+          lockedAt: null,
+          lockedBy: null,
+          lastError: STALE_LOCK_RECLAIMED_ERROR,
+        },
+      }),
+    ]);
   }
 
   private async claimDueDeliveries(): Promise<ClaimedDelivery[]> {
-    // biome-ignore lint/suspicious/noExplicitAny: PrismaService wrapper does not expose the callback transaction type.
-    return this.prisma.$transaction(async (tx: any) => {
+    return this.prisma.$transaction(async (tx: DispatcherTransactionClient) => {
       // Physical table/column names below (domain_event_deliveries, domain_events, seq,
       // next_attempt_at, locked_at, locked_by) mirror the documented model pattern's @@map/@map
       // directives (see docs/prisma-model.md and schema-drift-check.ts). They are a

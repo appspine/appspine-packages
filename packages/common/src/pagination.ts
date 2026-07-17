@@ -24,7 +24,7 @@ export function paginate<T>(data: T[], total: number): PaginatedResult<T> {
   return { data, total };
 }
 
-export function toPrismaPage(query: Pick<PaginationQuery, 'page' | 'limit'>): {
+export function toPrismaPage(query: Partial<Pick<PaginationQuery, 'page' | 'limit'>>): {
   skip: number;
   take: number;
 } {

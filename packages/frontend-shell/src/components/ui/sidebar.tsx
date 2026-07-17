@@ -70,6 +70,7 @@ export function SidebarProvider({
         setInternalOpen(nextOpen);
       }
 
+      // biome-ignore lint/suspicious/noDocumentCookie: SSR reads this cookie and Cookie Store API support is not universal.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${nextOpen}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [open, setOpenProp],

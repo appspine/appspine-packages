@@ -47,7 +47,9 @@ describe('RolesService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new RolesService(prismaMock as any);
+    service = new RolesService(
+      prismaMock as unknown as ConstructorParameters<typeof RolesService>[0],
+    );
   });
 
   describe('create', () => {

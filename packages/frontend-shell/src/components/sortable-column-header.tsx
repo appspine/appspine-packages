@@ -4,16 +4,18 @@ import { Button } from './ui/button.js';
 
 export type SortOrder = 'ASC' | 'DESC';
 
+export type SortableLinkComponent = React.ComponentType<{
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}>;
+
 interface SortableColumnHeaderProps<TField extends string> {
   readonly label: string;
   readonly field: TField;
   readonly currentSortField?: string;
   readonly currentSortOrder?: SortOrder;
-  readonly LinkComponent: React.ComponentType<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
+  readonly LinkComponent: SortableLinkComponent;
   readonly buildSortHref: (field: TField, order: SortOrder) => string;
 }
 

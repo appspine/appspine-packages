@@ -30,15 +30,20 @@ export class DomainEventsService {
     const contributedKeys = await this.registry.contributeHandlerKeys(tx, {
       eventType: input.eventType,
     });
-    const handlerKeys = [...this.registry.matchingHandlerKeys(input.eventType), ...contributedKeys];
+    const handlerKeys = new Set([
+      ...this.registry.matchingHandlerKeys(input.eventType),
+      ...contributedKeys,
+    ]);
 
-    await tx.domainEventDelivery.createMany({
-      data: handlerKeys.map((handlerKey) => ({
-        eventId: event.id,
-        handlerKey,
-      })),
-      skipDuplicates: true,
-    });
+    if (handlerKeys.size > 0) {
+      await tx.domainEventDelivery.createMany({
+        data: [...handlerKeys].map((handlerKey) => ({
+          eventId: event.id,
+          handlerKey,
+        })),
+        skipDuplicates: true,
+      });
+    }
 
     return event;
   }

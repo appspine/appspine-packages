@@ -1,5 +1,8 @@
-import type * as React from 'react';
-import { SortableColumnHeader, type SortOrder } from '../sortable-column-header.js';
+import {
+  SortableColumnHeader,
+  type SortableLinkComponent,
+  type SortOrder,
+} from '../sortable-column-header.js';
 import { Badge } from '../ui/badge.js';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
 import type { UserRoleOption, UserRow } from './types.js';
@@ -26,7 +29,7 @@ export function UsersTable({
   currentUserId: string | undefined;
   sortField: string | undefined;
   sortOrder: SortOrder | undefined;
-  LinkComponent: React.ComponentType<any>;
+  LinkComponent: SortableLinkComponent;
   buildSortHref: (field: UserSortField, order: SortOrder) => string;
   t: (key: string) => string;
   setUserActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
@@ -46,20 +49,20 @@ export function UsersTable({
               <SortableColumnHeader<UserSortField>
                 label={t('email')}
                 field="email"
-                currentSortField={sortField as UserSortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead>
               <SortableColumnHeader<UserSortField>
                 label={t('name')}
                 field="name"
-                currentSortField={sortField as UserSortField}
+                currentSortField={sortField}
                 currentSortOrder={sortOrder}
                 LinkComponent={LinkComponent}
-                buildSortHref={(field, order) => buildSortHref(field, order)}
+                buildSortHref={buildSortHref}
               />
             </TableHead>
             <TableHead>{t('roles')}</TableHead>

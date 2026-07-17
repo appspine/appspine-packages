@@ -35,7 +35,7 @@ const mockUser = {
   createdAt: new Date(),
 };
 
-function createPrismaMock(deleteMock: any) {
+function createPrismaMock(deleteMock: ReturnType<typeof vi.fn>) {
   return {
     user: {
       findUnique: vi.fn().mockResolvedValue(mockUser),
@@ -44,11 +44,18 @@ function createPrismaMock(deleteMock: any) {
   };
 }
 
+function createUsersService(deleteMock: ReturnType<typeof vi.fn>) {
+  const prisma = createPrismaMock(deleteMock);
+  const service = new UsersService(
+    prisma as unknown as ConstructorParameters<typeof UsersService>[0],
+  );
+  return { prisma, service };
+}
+
 describe('UsersService.remove', () => {
   it('should successfully delete a user when no foreign key restriction exists', async () => {
     const deleteMock = vi.fn().mockResolvedValue(mockUser);
-    const prisma = createPrismaMock(deleteMock);
-    const service = new UsersService(prisma as any);
+    const { prisma, service } = createUsersService(deleteMock);
 
     await expect(service.remove('user-1')).resolves.not.toThrow();
     expect(prisma.user.findUnique).toHaveBeenCalledWith({
@@ -69,8 +76,7 @@ describe('UsersService.remove', () => {
       },
     );
     const deleteMock = vi.fn().mockRejectedValue(prismaError);
-    const prisma = createPrismaMock(deleteMock);
-    const service = new UsersService(prisma as any);
+    const { service } = createUsersService(deleteMock);
 
     await expect(service.remove('user-1')).rejects.toThrow(ConflictException);
     await expect(service.remove('user-1')).rejects.toThrow(
@@ -87,8 +93,7 @@ describe('UsersService.remove', () => {
       },
     );
     const deleteMock = vi.fn().mockRejectedValue(prismaError);
-    const prisma = createPrismaMock(deleteMock);
-    const service = new UsersService(prisma as any);
+    const { service } = createUsersService(deleteMock);
 
     await expect(service.remove('user-1')).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     await expect(service.remove('user-1')).rejects.toThrow(/depends on one or more records/);
@@ -97,8 +102,7 @@ describe('UsersService.remove', () => {
   it('should rethrow generic errors', async () => {
     const genericError = new Error('Database connection failed');
     const deleteMock = vi.fn().mockRejectedValue(genericError);
-    const prisma = createPrismaMock(deleteMock);
-    const service = new UsersService(prisma as any);
+    const { service } = createUsersService(deleteMock);
 
     await expect(service.remove('user-1')).rejects.toThrow('Database connection failed');
   });
