@@ -51,7 +51,9 @@ describe('DiscoveryPushService.onApplicationBootstrap', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     const [url, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
     expect(url).toBe('http://localhost:3070/discovery/push');
-    expect((init.headers as Record<string, string>)['x-discovery-push-token']).toBe('disc_push_abc');
+    expect((init.headers as Record<string, string>)['x-discovery-push-token']).toBe(
+      'disc_push_abc',
+    );
     const body = JSON.parse(init.body as string) as {
       toolCatalogSnapshot: unknown[];
       mcpEndpointUrl?: string;
@@ -68,6 +70,8 @@ describe('DiscoveryPushService.onApplicationBootstrap', () => {
     vi.mocked(fetch).mockRejectedValue(new Error('network down'));
 
     const registry = new McpToolRegistry();
-    await expect(new DiscoveryPushService(registry).onApplicationBootstrap()).resolves.toBeUndefined();
+    await expect(
+      new DiscoveryPushService(registry).onApplicationBootstrap(),
+    ).resolves.toBeUndefined();
   });
 });

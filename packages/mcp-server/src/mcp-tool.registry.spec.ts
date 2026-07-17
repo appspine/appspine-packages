@@ -115,8 +115,18 @@ describe('McpToolRegistry.getCatalogSnapshot', () => {
     const snapshot = registry.getCatalogSnapshot();
     expect(snapshot).toHaveLength(2);
     expect(snapshot).toEqual([
-      { name: 'wiki_list_pages', description: 'test', requiredScopes: ['pages:read'], readOnlyHint: true },
-      { name: 'wiki_create_page', description: 'test', requiredScopes: ['pages:create'], readOnlyHint: false },
+      {
+        name: 'wiki_list_pages',
+        description: 'test',
+        requiredScopes: ['pages:read'],
+        readOnlyHint: true,
+      },
+      {
+        name: 'wiki_create_page',
+        description: 'test',
+        requiredScopes: ['pages:create'],
+        readOnlyHint: false,
+      },
     ]);
   });
 
@@ -126,7 +136,12 @@ describe('McpToolRegistry.getCatalogSnapshot', () => {
     registry.registerTool(makeTool());
 
     expect(registry.getCatalogSnapshot()).toEqual([
-      { name: 'list_pages', description: 'test', requiredScopes: ['pages:read'], readOnlyHint: true },
+      {
+        name: 'list_pages',
+        description: 'test',
+        requiredScopes: ['pages:read'],
+        readOnlyHint: true,
+      },
     ]);
   });
 });
