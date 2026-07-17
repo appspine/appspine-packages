@@ -2,6 +2,11 @@
   "name": "@appspine/health-check",
   "version": "0.1.2",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appspine/appspine.git",
+    "directory": "packages/health-check"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },

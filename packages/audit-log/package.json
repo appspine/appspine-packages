@@ -2,6 +2,11 @@
   "name": "@appspine/audit-log",
   "version": "0.4.0",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appspine/appspine.git",
+    "directory": "packages/audit-log"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },

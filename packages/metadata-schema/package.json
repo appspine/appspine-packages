@@ -2,6 +2,11 @@
   "name": "@appspine/metadata-schema",
   "version": "0.2.6",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appspine/appspine.git",
+    "directory": "packages/metadata-schema"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
