@@ -1,5 +1,18 @@
 # @appspine/domain-events
 
+## 0.2.1
+
+### Patch Changes
+
+- Fix `DomainEventsAdminModule.forRoot()`: `JwtOrApiKeyGuard` (used in the controller's
+  `@UseGuards()`) needs `ApiKeyGuard` resolvable within the dynamic module's own scope even
+  though `@appspine/m2m-api-key`'s `ApiKeysModule` is `@Global()` — a globally-registered
+  module's exports aren't automatically visible to a dynamically-constructed module's own
+  guard instantiation. Discovered via a real NestJS bootstrap failure
+  (`UnknownDependenciesException`) while wiring this into `apps/approve` (dev_docs 028
+  T-11230), not caught by the unit tests added in T-11210 since those never actually
+  bootstrap a Nest application.
+
 ## 0.2.0
 
 ### Minor Changes

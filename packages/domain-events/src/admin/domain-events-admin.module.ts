@@ -1,3 +1,4 @@
+import { ApiKeysModule } from '@appspine/m2m-api-key';
 import { type DynamicModule, Module, type ModuleMetadata } from '@nestjs/common';
 
 import { DomainEventsAdminController } from './domain-events-admin.controller';
@@ -29,7 +30,12 @@ export class DomainEventsAdminModule {
   static forRoot(registryModule: ModuleImport): DynamicModule {
     return {
       module: DomainEventsAdminModule,
-      imports: [registryModule],
+      // ApiKeysModule/AuthModule are both @Global() (their exports, e.g. ApiKeyGuard/JwtAuthGuard,
+      // are visible everywhere once registered anywhere in the app) — but a dynamically-built
+      // module's own controller still needs its guard classes' constructor deps resolvable within
+      // ITS OWN module scope, so ApiKeysModule is imported explicitly here too (redundant with the
+      // app's own top-level import, but harmless — Nest modules are singletons in the container).
+      imports: [registryModule, ApiKeysModule],
       controllers: [DomainEventsAdminController],
       providers: [DomainEventsAdminService],
     };
