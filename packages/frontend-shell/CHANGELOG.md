@@ -1,5 +1,22 @@
 # @appspine/frontend-shell
 
+## 0.5.2
+
+### Patch Changes
+
+- Fix `DomainEventDeliveriesPanel`: it's a Client Component, but was taking `t`/`renderEnumLabel`
+  (plain functions) as props from Server Component callers — React Server Components reject
+  passing plain functions (as opposed to `"use server"` Server Actions) across that boundary,
+  which crashed the page at runtime ("Functions cannot be passed directly to Client
+  Components..."). It now calls `useTranslations('domainEvents')`/`useTranslations('enums')`
+  itself, matching `RoleRowActions`/`ApiKeyRowActions`'s existing pattern in this same
+  directory. `DomainEventsTable`'s own `t`/`renderEnumLabel` props are unaffected — it's a
+  Server Component and no longer forwards them into the nested `DomainEventDeliveriesPanel`.
+
+  Found via real browser testing while wiring this into apps/approve (dev_docs 028 T-11230) —
+  not caught by T-11220's typecheck/build-only verification, since this is a runtime RSC
+  serialization error, not a type error.
+
 ## 0.5.1
 
 ### Patch Changes

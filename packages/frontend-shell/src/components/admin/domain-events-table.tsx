@@ -82,8 +82,6 @@ export function DomainEventsTable({
                 <DomainEventDeliveriesPanel
                   compact
                   deliveries={event.deliveries}
-                  t={t}
-                  renderEnumLabel={renderEnumLabel}
                   retryDeliveryAction={retryDeliveryAction}
                   ignoreDeliveryAction={ignoreDeliveryAction}
                 />

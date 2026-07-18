@@ -3,11 +3,12 @@
 import { RotateCcw, ShieldOff } from 'lucide-react';
 import { useState, useTransition } from 'react';
 
+import { useTranslations } from '../../i18n/index.js';
 import { Badge } from '../ui/badge.js';
 import { Button } from '../ui/button.js';
 import { FieldError } from '../ui/field.js';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
-import type { DomainEventDeliveryRow, DomainEventEnumKind } from './types.js';
+import type { DomainEventDeliveryRow } from './types.js';
 
 /**
  * Shared retry/ignore delivery UI (dev_docs 028 §3.4), generalized from `apps/approve`'s
@@ -21,22 +22,26 @@ import type { DomainEventDeliveryRow, DomainEventEnumKind } from './types.js';
  * `<form action>` binding — this matches the existing `RoleRowActions`/`ApiKeyRowActions`
  * client-component convention in this same directory (pending state + inline error display),
  * rather than approve's original raw server-action-bound-to-form pattern.
+ *
+ * Calls `useTranslations()` itself instead of taking `t`/`renderEnumLabel` as props — this is
+ * a Client Component, and React Server Components reject plain functions (as opposed to
+ * "use server" Server Actions) passed down from a Server Component parent. `RoleRowActions`
+ * in this same directory hits the identical constraint and resolves it the same way.
  */
 export function DomainEventDeliveriesPanel({
   deliveries,
-  t,
-  renderEnumLabel,
   retryDeliveryAction,
   ignoreDeliveryAction,
   compact = false,
 }: {
   deliveries: DomainEventDeliveryRow[];
-  t: (key: string) => string;
-  renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
   retryDeliveryAction: (id: string) => Promise<{ error?: string }>;
   ignoreDeliveryAction: (id: string) => Promise<{ error?: string }>;
   compact?: boolean;
 }) {
+  const t = useTranslations('domainEvents');
+  const tEnums = useTranslations('enums');
+  const renderStatus = (value: string) => tEnums(`DomainEventDeliveryStatus.${value}`);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +68,7 @@ export function DomainEventDeliveriesPanel({
         {deliveries.map((delivery) => (
           <div key={delivery.id} className="flex flex-wrap items-center gap-2">
             <Badge variant={delivery.status === 'DEAD_LETTER' ? 'destructive' : 'outline'}>
-              {renderEnumLabel('DomainEventDeliveryStatus', delivery.status)}
+              {renderStatus(delivery.status)}
             </Badge>
             <span className="font-mono text-muted-foreground text-xs">{delivery.handlerKey}</span>
             <span className="text-muted-foreground text-xs">
@@ -120,7 +125,7 @@ export function DomainEventDeliveriesPanel({
                 <TableCell className="font-mono text-xs">{delivery.handlerKey}</TableCell>
                 <TableCell>
                   <Badge variant={delivery.status === 'DEAD_LETTER' ? 'destructive' : 'outline'}>
-                    {renderEnumLabel('DomainEventDeliveryStatus', delivery.status)}
+                    {renderStatus(delivery.status)}
                   </Badge>
                 </TableCell>
                 <TableCell>{delivery.attempts}</TableCell>
