@@ -21,6 +21,10 @@
     "./testing": {
       "types": "./dist/testing.d.ts",
       "default": "./dist/testing.js"
+    },
+    "./admin": {
+      "types": "./dist/admin.d.ts",
+      "default": "./dist/admin.js"
     }
   },
   "scripts": {
@@ -30,12 +34,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/common": "workspace:*"
+    "@appspine/common": "workspace:*",
+    "@appspine/m2m-api-key": "workspace:*",
+    "@appspine/rbac": "workspace:*",
+    "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
-    "@prisma/client": "^6.2.0"
+    "@prisma/client": "^6.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@nestjs/common": "^11.0.5",
@@ -43,6 +51,7 @@
     "@prisma/client": "^6.2.0",
     "@types/node": "^22.10.0",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod": "^4.4.3"
   }
 }

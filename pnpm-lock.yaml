@@ -143,6 +143,15 @@ importers:
       '@appspine/common':
         specifier: workspace:*
         version: link:../common
+      '@appspine/m2m-api-key':
+        specifier: workspace:*
+        version: link:../m2m-api-key
+      '@appspine/rbac':
+        specifier: workspace:*
+        version: link:../rbac
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
     devDependencies:
       '@nestjs/common':
         specifier: ^11.0.5
@@ -162,6 +171,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.6(@types/node@22.20.0)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
 
   packages/e2e-kit:
     devDependencies:

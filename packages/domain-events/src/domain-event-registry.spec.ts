@@ -71,4 +71,34 @@ describe('DomainEventRegistry', () => {
     const registry = new DomainEventRegistry();
     expect(await registry.contributeHandlerKeys(null, { eventType: 'submitted' })).toEqual([]);
   });
+
+  it('describes registered subscribers, prefixes, and contributor count', () => {
+    const registry = new DomainEventRegistry();
+    registry.describeSubscriber({
+      key: 'audit-record',
+      eventTypes: ['submitted', 'approved'],
+      description: 'Writes an audit log row.',
+    });
+    registry.registerPrefix('webhook.post:', (handlerKey) => noopHandler(handlerKey));
+    registry.registerHandlerKeyContributor(async () => []);
+
+    expect(registry.describe()).toEqual({
+      subscribers: [
+        {
+          key: 'audit-record',
+          eventTypes: ['submitted', 'approved'],
+          description: 'Writes an audit log row.',
+        },
+      ],
+      dataDrivenPrefixes: ['webhook.post:'],
+      hasHandlerKeyContributors: true,
+    });
+  });
+
+  it('rejects describing the same subscriber key twice', () => {
+    const registry = new DomainEventRegistry();
+    const descriptor = { key: 'audit-record', eventTypes: ['submitted'], description: 'x' };
+    registry.describeSubscriber(descriptor);
+    expect(() => registry.describeSubscriber(descriptor)).toThrow(/already described/);
+  });
 });

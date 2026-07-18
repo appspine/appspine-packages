@@ -133,3 +133,28 @@ export const DEFAULT_DISPATCHER_OPTIONS: Required<DomainEventDispatcherOptions> 
 };
 
 export const DOMAIN_EVENT_DISPATCHER_OPTIONS = 'DOMAIN_EVENT_DISPATCHER_OPTIONS';
+
+/** Metadata carried by `@DomainEventSubscriber(...)`, validated against the handler instance at registration time. */
+export type DomainEventSubscriberOptions = {
+  /** One or more event types this handler subscribes to (e.g. audit-record subscribes to 7). */
+  eventType: string | string[];
+  /** Must equal the decorated handler's own `handler.key` — checked by `registerDomainEventSubscribers()`, not the decorator itself. */
+  key: string;
+  /** Non-empty rationale for why this subscription exists. Shown in the admin catalog view. */
+  description: string;
+};
+
+/** Introspection-facing shape returned by `DomainEventRegistry.describe()` — `eventType` normalized to an always-array `eventTypes`, unlike the decorator's `string | string[]` input convenience. */
+export type DomainEventSubscriberDescriptor = {
+  eventTypes: string[];
+  key: string;
+  description: string;
+};
+
+export type DomainEventRegistryDescription = {
+  subscribers: DomainEventSubscriberDescriptor[];
+  /** Prefixes registered via `registerPrefix()` — existence-only, since prefix resolvers have no per-key description. */
+  dataDrivenPrefixes: string[];
+  /** Whether any `registerHandlerKeyContributor()` is registered — existence-only, for the same reason. */
+  hasHandlerKeyContributors: boolean;
+};

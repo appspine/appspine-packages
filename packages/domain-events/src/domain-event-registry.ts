@@ -1,4 +1,9 @@
-import type { DomainEventDeliveryRecord, DomainEventRecord } from './types';
+import type {
+  DomainEventDeliveryRecord,
+  DomainEventRecord,
+  DomainEventRegistryDescription,
+  DomainEventSubscriberDescriptor,
+} from './types';
 
 export type DomainEventHandlerInput = {
   event: DomainEventRecord;
@@ -29,6 +34,7 @@ export class DomainEventRegistry {
   >();
   private readonly handlersByKey = new Map<string, DomainEventHandler>();
   private readonly handlerKeyContributors: HandlerKeyContributor[] = [];
+  private readonly subscriberDescriptors = new Map<string, DomainEventSubscriberDescriptor>();
 
   on(eventType: string, handler: DomainEventHandler): void {
     this.assertValidHandlerKey(handler.key);
@@ -84,6 +90,32 @@ export class DomainEventRegistry {
     }
 
     return null;
+  }
+
+  /**
+   * Records introspection metadata for a code-registered subscriber. Called once per handler
+   * instance by `registerDomainEventSubscribers()`, separately from the per-event-type `on()`
+   * calls it also makes, since one descriptor can cover many event types.
+   */
+  describeSubscriber(descriptor: DomainEventSubscriberDescriptor): void {
+    const existing = this.subscriberDescriptors.get(descriptor.key);
+    if (existing) {
+      throw new Error(`Domain event subscriber already described for key: ${descriptor.key}`);
+    }
+    this.subscriberDescriptors.set(descriptor.key, descriptor);
+  }
+
+  /**
+   * Introspection snapshot for admin/catalog surfaces. Data-driven routing (prefixes and
+   * handler-key contributors) is reported by existence only — those are operations-time
+   * decisions with no per-key description to show.
+   */
+  describe(): DomainEventRegistryDescription {
+    return {
+      subscribers: [...this.subscriberDescriptors.values()],
+      dataDrivenPrefixes: [...this.prefixResolvers.keys()],
+      hasHandlerKeyContributors: this.handlerKeyContributors.length > 0,
+    };
   }
 
   private assertValidHandlerKey(handlerKey: string): void {

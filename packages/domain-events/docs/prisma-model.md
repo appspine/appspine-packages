@@ -73,6 +73,9 @@ model DomainEventDelivery {
 
   @@unique([eventId, handlerKey])
   @@index([status, nextAttemptAt])
+  /// Supports the admin catalog's per-subscriber delivery stats query (dev_docs 028 §3.3),
+  /// which filters by handlerKey and windows by createdAt.
+  @@index([handlerKey, createdAt])
   @@map("domain_event_deliveries")
 }
 
