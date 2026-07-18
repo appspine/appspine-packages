@@ -1,5 +1,17 @@
 # @appspine/domain-events
 
+## 0.2.0
+
+### Minor Changes
+
+- Add declarative domain-event subscriptions (`@DomainEventSubscriber` decorator,
+  `registerDomainEventSubscribers()`, `DomainEventRegistry.describe()`), a shared
+  `@appspine/domain-events/admin` NestJS module (catalog + list/detail + retry/ignore
+  endpoints, shipped as a second package entry point so lightweight consumers never pull
+  in the auth guard chain), and matching `@appspine/frontend-shell` admin components
+  (`DomainEventsTable`, `DomainEventDetailPanel`, `DomainEventDeliveriesPanel`,
+  `DomainEventCatalogTable`).
+
 ## 0.1.2
 
 ### Patch Changes
