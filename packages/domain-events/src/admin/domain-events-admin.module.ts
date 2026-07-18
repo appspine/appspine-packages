@@ -1,3 +1,4 @@
+import { AuthModule } from '@appspine/auth';
 import { ApiKeysModule } from '@appspine/m2m-api-key';
 import { type DynamicModule, Module, type ModuleMetadata } from '@nestjs/common';
 
@@ -30,12 +31,18 @@ export class DomainEventsAdminModule {
   static forRoot(registryModule: ModuleImport): DynamicModule {
     return {
       module: DomainEventsAdminModule,
-      // ApiKeysModule/AuthModule are both @Global() (their exports, e.g. ApiKeyGuard/JwtAuthGuard,
-      // are visible everywhere once registered anywhere in the app) — but a dynamically-built
-      // module's own controller still needs its guard classes' constructor deps resolvable within
-      // ITS OWN module scope, so ApiKeysModule is imported explicitly here too (redundant with the
-      // app's own top-level import, but harmless — Nest modules are singletons in the container).
-      imports: [registryModule, ApiKeysModule],
+      // JwtOrApiKeyGuard (@UseGuards() on the controller) is itself a provider owned by
+      // ApiKeysModule, and Nest resolves an enhancer referenced by class through the module
+      // that declares it — so JwtOrApiKeyGuard's OWN constructor deps (ApiKeyGuard from
+      // ApiKeysModule, JwtAuthGuard from AuthModule) must be visible to ApiKeysModule's
+      // resolution, not just to DomainEventsAdminModule. @Global() only helps a *consuming*
+      // module inject another global module's exports — it does not make ApiKeysModule itself
+      // able to see AuthModule's exports, since ApiKeysModule never imports AuthModule on its
+      // own. Importing both here (redundant with the app's own top-level imports, but the
+      // Nest DI container treats a module class as a singleton regardless of how many places
+      // list it) is what actually fixes it — found via a real Nest bootstrap failure, not
+      // caught by unit tests that never construct an application.
+      imports: [registryModule, ApiKeysModule, AuthModule],
       controllers: [DomainEventsAdminController],
       providers: [DomainEventsAdminService],
     };

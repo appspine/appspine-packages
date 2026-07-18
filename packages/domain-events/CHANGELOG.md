@@ -1,5 +1,21 @@
 # @appspine/domain-events
 
+## 0.2.2
+
+### Patch Changes
+
+- Fix `DomainEventsAdminModule.forRoot()` again: `JwtOrApiKeyGuard` (referenced by class in
+  `@UseGuards()`) is itself a provider owned by `@appspine/m2m-api-key`'s `ApiKeysModule`, and
+  Nest resolves an enhancer referenced by class through the module that declares it — so
+  `JwtOrApiKeyGuard`'s own constructor deps must be visible to `ApiKeysModule`'s resolution
+  scope, not just to the consuming `DomainEventsAdminModule`. `ApiKeyGuard` (also owned by
+  `ApiKeysModule`) resolved fine after the previous patch, but `JwtAuthGuard` (owned by
+  `@appspine/auth`'s `AuthModule`) still failed, because `ApiKeysModule` itself never imports
+  `AuthModule` — `@Global()` makes a module's exports available to other modules' own
+  constructor injection, it does not make one global module see another's exports on its own.
+  `forRoot()` now imports `AuthModule` too, and the package gains `@appspine/auth` as a direct
+  dependency (already a transitive dependency of `@appspine/m2m-api-key`/`@appspine/rbac`).
+
 ## 0.2.1
 
 ### Patch Changes

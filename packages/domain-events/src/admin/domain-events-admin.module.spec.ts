@@ -25,6 +25,9 @@ vi.mock('@appspine/m2m-api-key', () => ({
     (..._scopes: string[]) =>
     () => {},
 }));
+vi.mock('@appspine/auth', () => ({
+  AuthModule: class FakeAuthModule {},
+}));
 vi.mock('@appspine/rbac', () => ({
   PermissionGuard: class {},
   RequirePermissions:
@@ -32,6 +35,7 @@ vi.mock('@appspine/rbac', () => ({
     () => {},
 }));
 
+import { AuthModule } from '@appspine/auth';
 import { ApiKeysModule } from '@appspine/m2m-api-key';
 
 import { DomainEventsAdminController } from './domain-events-admin.controller';
@@ -44,7 +48,7 @@ describe('DomainEventsAdminModule.forRoot', () => {
     const dynamic = DomainEventsAdminModule.forRoot(FakeRegistryModule);
 
     expect(dynamic.module).toBe(DomainEventsAdminModule);
-    expect(dynamic.imports).toEqual([FakeRegistryModule, ApiKeysModule]);
+    expect(dynamic.imports).toEqual([FakeRegistryModule, ApiKeysModule, AuthModule]);
     expect(dynamic.controllers).toEqual([DomainEventsAdminController]);
     expect(dynamic.providers).toEqual([DomainEventsAdminService]);
   });

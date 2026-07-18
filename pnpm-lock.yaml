@@ -140,6 +140,9 @@ importers:
 
   packages/domain-events:
     dependencies:
+      '@appspine/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@appspine/common':
         specifier: workspace:*
         version: link:../common
