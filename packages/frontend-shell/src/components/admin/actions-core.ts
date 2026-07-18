@@ -237,3 +237,33 @@ export async function deleteApiKeyRequest(
   }
   return {};
 }
+
+// ==========================================
+// Domain Events Actions
+// ==========================================
+
+export async function retryDomainEventDeliveryRequest(
+  apiFetch: ApiFetchLike,
+  isApiError: (e: unknown) => e is { message: string },
+  id: string,
+): Promise<ActionResult> {
+  try {
+    await apiFetch(`/domain-events/deliveries/${id}/retry`, { method: 'POST' });
+  } catch (err) {
+    return { error: isApiError(err) ? err.message : 'Failed to retry delivery' };
+  }
+  return {};
+}
+
+export async function ignoreDomainEventDeliveryRequest(
+  apiFetch: ApiFetchLike,
+  isApiError: (e: unknown) => e is { message: string },
+  id: string,
+): Promise<ActionResult> {
+  try {
+    await apiFetch(`/domain-events/deliveries/${id}/ignore`, { method: 'POST' });
+  } catch (err) {
+    return { error: isApiError(err) ? err.message : 'Failed to ignore delivery' };
+  }
+  return {};
+}

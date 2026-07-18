@@ -1,5 +1,13 @@
 # @appspine/frontend-shell
 
+## 0.5.1
+
+### Patch Changes
+
+- Add `retryDomainEventDeliveryRequest`/`ignoreDomainEventDeliveryRequest` to
+  `actions-core.ts`, matching the existing roles/users/api-keys action-wrapper convention,
+  for apps wiring up `DomainEventDeliveriesPanel`'s retry/ignore action props.
+
 ## 0.5.0
 
 ### Minor Changes
