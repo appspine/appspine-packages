@@ -1,5 +1,11 @@
 # @appspine/domain-events
 
+## 0.2.3
+
+### Patch Changes
+
+- edc32a1: Fix domain event admin review findings: restrict retry/ignore mutations to dead-letter deliveries, add an optional admin audit hook, split unresolved delivery keys from data-driven catalog entries, make date upper bounds inclusive by day, strengthen schema/subscriber drift checks, and surface unresolved catalog rows in the shared frontend table.
+
 ## 0.2.2
 
 ### Patch Changes
