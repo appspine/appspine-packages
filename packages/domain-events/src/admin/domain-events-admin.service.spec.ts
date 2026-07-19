@@ -2,10 +2,9 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
 // @appspine/common's PrismaService resolves @prisma/client from the consuming app's cwd at
-// import time (see its prisma-client.ts) — this package has no generated client of its own, so
+// import time (see its prisma-client.ts). This package has no generated client of its own, so
 // importing the real module (even via importOriginal, which still evaluates it) fails under
-// test. Re-implement the two symbols this service actually uses instead — same class of fix
-// domain-event-dispatcher.service.spec.ts already applies for PrismaService alone.
+// test. Re-implement the two symbols this service actually uses instead.
 vi.mock('@appspine/common', () => ({
   PrismaService: class {},
   toPrismaPage: (query: { page: number; limit: number }) => ({
@@ -17,7 +16,7 @@ vi.mock('@appspine/common', () => ({
 import { DomainEventRegistry } from '../domain-event-registry';
 import { DomainEventsAdminService } from './domain-events-admin.service';
 
-// biome-ignore lint/suspicious/noExplicitAny: PrismaService is itself untyped by design (see the service's own comment)
+// biome-ignore lint/suspicious/noExplicitAny: PrismaService is itself untyped by design.
 function makePrismaMock(overrides: Record<string, any> = {}) {
   return {
     domainEvent: {
@@ -44,6 +43,7 @@ describe('DomainEventsAdminService.getCatalog', () => {
       description: 'x',
     });
     registry.describeSubscriber({ key: 'never-fired', eventTypes: ['approved'], description: 'y' });
+    registry.registerPrefix('webhook.post:', () => null);
 
     const prisma = makePrismaMock({
       domainEventDelivery: {
@@ -51,6 +51,7 @@ describe('DomainEventsAdminService.getCatalog', () => {
           { handlerKey: 'audit-record', status: 'PROCESSED', _count: { _all: 5 } },
           { handlerKey: 'audit-record', status: 'DEAD_LETTER', _count: { _all: 1 } },
           { handlerKey: 'webhook.post:sub-1', status: 'PROCESSED', _count: { _all: 2 } },
+          { handlerKey: 'orphan-handler', status: 'DEAD_LETTER', _count: { _all: 1 } },
         ]),
         update: vi.fn(),
         findUnique: vi.fn(),
@@ -71,6 +72,14 @@ describe('DomainEventsAdminService.getCatalog', () => {
           processedAt: new Date('2026-01-02'),
           nextAttemptAt: null,
           createdAt: new Date('2026-01-02'),
+        },
+        {
+          handlerKey: 'orphan-handler',
+          status: 'DEAD_LETTER',
+          lastError: 'missing handler',
+          processedAt: null,
+          nextAttemptAt: null,
+          createdAt: new Date('2026-01-03'),
         },
       ]),
     });
@@ -117,24 +126,44 @@ describe('DomainEventsAdminService.getCatalog', () => {
         lastAttemptAt: new Date('2026-01-02'),
       },
     ]);
+    expect(catalog.unresolvedDeliveries).toEqual([
+      {
+        handlerKey: 'orphan-handler',
+        total: 1,
+        processed: 0,
+        deadLetter: 1,
+        lastStatus: 'DEAD_LETTER',
+        lastError: 'missing handler',
+        lastAttemptAt: new Date('2026-01-03'),
+      },
+    ]);
     expect(catalog.statsWindowDays).toBe(30);
-    expect(catalog.dataDrivenPrefixes).toEqual([]);
+    expect(catalog.dataDrivenPrefixes).toEqual(['webhook.post:']);
     expect(catalog.hasHandlerKeyContributors).toBe(false);
   });
 });
 
 describe('DomainEventsAdminService retry/ignore', () => {
-  it('guards the update to non-PROCESSING rows and resets retry fields', async () => {
+  it('guards retry to DEAD_LETTER rows, resets retry fields, and calls the audit hook', async () => {
+    const before = { id: 'd1', status: 'DEAD_LETTER' };
+    const after = { id: 'd1', status: 'PENDING' };
     const update = vi.fn().mockResolvedValue({ id: 'd1', status: 'PENDING' });
+    const findUnique = vi.fn().mockResolvedValue(before);
+    const auditHook = { record: vi.fn().mockResolvedValue(undefined) };
     const prisma = makePrismaMock({
-      domainEventDelivery: { groupBy: vi.fn(), update, findUnique: vi.fn() },
+      domainEventDelivery: { groupBy: vi.fn(), update, findUnique },
     });
-    const service = new DomainEventsAdminService(prisma as never, new DomainEventRegistry());
+    const service = new DomainEventsAdminService(
+      prisma as never,
+      new DomainEventRegistry(),
+      auditHook,
+    );
+    update.mockResolvedValue(after);
 
-    await service.retryDelivery('d1');
+    await service.retryDelivery('d1', { sub: 'admin-1', email: 'admin@example.com' });
 
     expect(update).toHaveBeenCalledWith({
-      where: { id: 'd1', status: { not: 'PROCESSING' } },
+      where: { id: 'd1', status: 'DEAD_LETTER' },
       data: expect.objectContaining({
         status: 'PENDING',
         lockedAt: null,
@@ -142,9 +171,15 @@ describe('DomainEventsAdminService retry/ignore', () => {
         processedAt: null,
       }),
     });
+    expect(auditHook.record).toHaveBeenCalledWith({
+      action: 'RETRY_DELIVERY',
+      actor: { sub: 'admin-1', email: 'admin@example.com' },
+      deliveryBefore: before,
+      deliveryAfter: after,
+    });
   });
 
-  it('throws ConflictException when the delivery is currently PROCESSING', async () => {
+  it('throws ConflictException when the delivery is not DEAD_LETTER', async () => {
     const update = vi.fn().mockRejectedValue({ code: 'P2025' });
     const findUnique = vi.fn().mockResolvedValue({ id: 'd1' });
     const prisma = makePrismaMock({
@@ -152,7 +187,9 @@ describe('DomainEventsAdminService retry/ignore', () => {
     });
     const service = new DomainEventsAdminService(prisma as never, new DomainEventRegistry());
 
-    await expect(service.retryDelivery('d1')).rejects.toThrow(ConflictException);
+    await expect(service.retryDelivery('d1', { sub: 'admin-1' })).rejects.toThrow(
+      ConflictException,
+    );
   });
 
   it('throws NotFoundException when the delivery does not exist at all', async () => {
@@ -163,7 +200,9 @@ describe('DomainEventsAdminService retry/ignore', () => {
     });
     const service = new DomainEventsAdminService(prisma as never, new DomainEventRegistry());
 
-    await expect(service.ignoreDelivery('missing')).rejects.toThrow(NotFoundException);
+    await expect(service.ignoreDelivery('missing', { sub: 'admin-1' })).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // See domain-events-admin.controller.spec.ts for why both @appspine/common and
-// @appspine/m2m-api-key/@appspine/rbac need mocking here.
+// @appspine/m2m-api-key/@appspine/auth need mocking here.
 vi.mock('@appspine/common', async () => {
   const { z } = await import('zod');
   return {
@@ -26,12 +26,10 @@ vi.mock('@appspine/m2m-api-key', () => ({
     () => {},
 }));
 vi.mock('@appspine/auth', () => ({
+  AdminGuard: class {},
   AuthModule: class FakeAuthModule {},
-}));
-vi.mock('@appspine/rbac', () => ({
-  PermissionGuard: class {},
-  RequirePermissions:
-    (..._perms: string[]) =>
+  CurrentUser:
+    (..._args: unknown[]) =>
     () => {},
 }));
 

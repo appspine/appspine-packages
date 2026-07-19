@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 // See domain-events-admin.service.spec.ts — @appspine/common's PrismaService eagerly resolves
 // @prisma/client from cwd at import time. Mocking @appspine/common alone isn't enough here:
-// @appspine/m2m-api-key/@appspine/rbac ship pre-compiled CommonJS dist output that `require()`s
+// @appspine/m2m-api-key/@appspine/auth ship pre-compiled CommonJS dist output that `require()`s
 // @appspine/common natively, bypassing vitest's mock interception (which only intercepts imports
 // vitest itself transforms, i.e. this package's own TS source) — so those two packages must be
 // mocked at their own boundary too, or their compiled code still reaches the real, crashing module.
@@ -28,10 +28,10 @@ vi.mock('@appspine/m2m-api-key', () => ({
     (..._scopes: string[]) =>
     () => {},
 }));
-vi.mock('@appspine/rbac', () => ({
-  PermissionGuard: class {},
-  RequirePermissions:
-    (..._perms: string[]) =>
+vi.mock('@appspine/auth', () => ({
+  AdminGuard: class {},
+  CurrentUser:
+    (..._args: unknown[]) =>
     () => {},
 }));
 
@@ -64,6 +64,7 @@ describe('DomainEventsAdminController delegation', () => {
       ignoreDelivery: vi.fn().mockResolvedValue('ignored'),
     };
     const controller = new DomainEventsAdminController(service as never);
+    const actor = { sub: 'admin-1', email: 'admin@example.com' };
 
     await expect(controller.getCatalog()).resolves.toBe('catalog');
 
@@ -74,10 +75,10 @@ describe('DomainEventsAdminController delegation', () => {
     await expect(controller.findOne('id1')).resolves.toBe('one');
     expect(service.findOne).toHaveBeenCalledWith('id1');
 
-    await expect(controller.retryDelivery('d1')).resolves.toBe('retried');
-    expect(service.retryDelivery).toHaveBeenCalledWith('d1');
+    await expect(controller.retryDelivery('d1', actor)).resolves.toBe('retried');
+    expect(service.retryDelivery).toHaveBeenCalledWith('d1', actor);
 
-    await expect(controller.ignoreDelivery('d1')).resolves.toBe('ignored');
-    expect(service.ignoreDelivery).toHaveBeenCalledWith('d1');
+    await expect(controller.ignoreDelivery('d1', actor)).resolves.toBe('ignored');
+    expect(service.ignoreDelivery).toHaveBeenCalledWith('d1', actor);
   });
 });

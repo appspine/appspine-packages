@@ -37,7 +37,6 @@
     "@appspine/auth": "workspace:*",
     "@appspine/common": "workspace:*",
     "@appspine/m2m-api-key": "workspace:*",
-    "@appspine/rbac": "workspace:*",
     "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {

@@ -149,9 +149,6 @@ importers:
       '@appspine/m2m-api-key':
         specifier: workspace:*
         version: link:../m2m-api-key
-      '@appspine/rbac':
-        specifier: workspace:*
-        version: link:../rbac
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2

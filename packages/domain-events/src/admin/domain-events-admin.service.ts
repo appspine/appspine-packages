@@ -1,10 +1,17 @@
 import { PrismaService, toPrismaPage } from '@appspine/common';
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, Optional } from '@nestjs/common';
 
 import { DomainEventRegistry } from '../domain-event-registry';
-import { DomainEventDeliveryStatus } from '../types';
+import { type DomainEventDeliveryRecord, DomainEventDeliveryStatus } from '../types';
 import type { DomainEventAdminListQuery } from './dto/domain-event-admin.dto';
-import type { DomainEventCatalogResponse, DomainEventDeliveryStats } from './types';
+import {
+  DOMAIN_EVENTS_ADMIN_AUDIT_HOOK,
+  type DomainEventCatalogResponse,
+  type DomainEventDeliveryStats,
+  type DomainEventsAdminActor,
+  type DomainEventsAdminAuditAction,
+  type DomainEventsAdminAuditHook,
+} from './types';
 
 const STATS_WINDOW_DAYS = 30;
 
@@ -26,31 +33,16 @@ function isRecordNotFoundError(error: unknown): boolean {
   );
 }
 
-/**
- * Generalized from `apps/approve`'s bespoke `domain-events-admin.service.ts` (dev_docs 028 §3.3).
- * Only operates on the generic `DomainEvent`/`DomainEventDelivery` fields and `DomainEventRegistry`
- * introspection — no app-specific event semantics. Injects `PrismaService` directly (not a
- * hand-rolled structural client type) because `PrismaService` (`@appspine/common`) already resolves
- * the consuming app's own generated `@prisma/client` at runtime and is untyped by design for
- * exactly this reason (see `packages/common/src/prisma/prisma-client.ts`).
- */
 @Injectable()
 export class DomainEventsAdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly registry: DomainEventRegistry,
+    @Optional()
+    @Inject(DOMAIN_EVENTS_ADMIN_AUDIT_HOOK)
+    private readonly auditHook?: DomainEventsAdminAuditHook,
   ) {}
 
-  /**
-   * `registry.describe()`'s code-registered subscribers, LEFT JOINed with each handler key's
-   * delivery stats (zero-filled when a subscriber has no deliveries yet — "defined but never
-   * fired" must still show, not disappear). Handler keys with deliveries but no `describe()`
-   * entry are data-driven (e.g. `webhook.post:<id>`) and reported separately in
-   * `dataDrivenDeliveries` so they aren't invisible on the one screen meant for human oversight.
-   * Stats are windowed to the last `STATS_WINDOW_DAYS` days — an unbounded groupBy over the full
-   * table would degrade as `domain_event_deliveries` grows; the `(handlerKey, createdAt)` index
-   * (docs/prisma-model.md) serves both the windowed aggregate and the latest-row lookup below.
-   */
   async getCatalog(): Promise<DomainEventCatalogResponse> {
     const description = this.registry.describe();
     const windowStart = new Date(Date.now() - STATS_WINDOW_DAYS * 24 * 60 * 60 * 1000);
@@ -112,12 +104,20 @@ export class DomainEventsAdminService {
     }
 
     const subscriberKeys = new Set(description.subscribers.map((subscriber) => subscriber.key));
+    const isDataDrivenKey = (handlerKey: string) =>
+      description.dataDrivenPrefixes.some((prefix) => handlerKey.startsWith(prefix));
     const subscribers = description.subscribers.map((subscriber) => ({
       ...subscriber,
       stats: statsByKey.get(subscriber.key) ?? emptyStats(),
     }));
-    const dataDrivenDeliveries = [...statsByKey.entries()]
-      .filter(([handlerKey]) => !subscriberKeys.has(handlerKey))
+    const undescribedDeliveries = [...statsByKey.entries()].filter(
+      ([handlerKey]) => !subscriberKeys.has(handlerKey),
+    );
+    const dataDrivenDeliveries = undescribedDeliveries
+      .filter(([handlerKey]) => isDataDrivenKey(handlerKey))
+      .map(([handlerKey, stats]) => ({ handlerKey, ...stats }));
+    const unresolvedDeliveries = undescribedDeliveries
+      .filter(([handlerKey]) => !isDataDrivenKey(handlerKey))
       .map(([handlerKey, stats]) => ({ handlerKey, ...stats }));
 
     return {
@@ -125,6 +125,7 @@ export class DomainEventsAdminService {
       dataDrivenPrefixes: description.dataDrivenPrefixes,
       hasHandlerKeyContributors: description.hasHandlerKeyContributors,
       dataDrivenDeliveries,
+      unresolvedDeliveries,
       statsWindowDays: STATS_WINDOW_DAYS,
     };
   }
@@ -154,8 +155,8 @@ export class DomainEventsAdminService {
     return serializeDomainEvent(event);
   }
 
-  async retryDelivery(id: string) {
-    return this.updateDeliveryIfNotInFlight(id, {
+  async retryDelivery(id: string, actor: DomainEventsAdminActor) {
+    return this.updateDeadLetterDelivery(id, actor, 'RETRY_DELIVERY', {
       status: DomainEventDeliveryStatus.PENDING,
       nextAttemptAt: new Date(),
       lockedAt: null,
@@ -164,8 +165,8 @@ export class DomainEventsAdminService {
     });
   }
 
-  async ignoreDelivery(id: string) {
-    return this.updateDeliveryIfNotInFlight(id, {
+  async ignoreDelivery(id: string, actor: DomainEventsAdminActor) {
+    return this.updateDeadLetterDelivery(id, actor, 'IGNORE_DELIVERY', {
       status: DomainEventDeliveryStatus.IGNORED,
       lockedAt: null,
       lockedBy: null,
@@ -173,26 +174,30 @@ export class DomainEventsAdminService {
     });
   }
 
-  /**
-   * Atomic guarded update: the status filter in the WHERE clause (not a separate read-then-write)
-   * excludes PROCESSING rows, so an admin action can never unlock a delivery the dispatcher is
-   * handling right now — the same defense `DomainEventDispatcherService.completeDelivery()` uses
-   * from the other side of this race.
-   */
-  private async updateDeliveryIfNotInFlight(id: string, data: Record<string, unknown>) {
+  private async updateDeadLetterDelivery(
+    id: string,
+    actor: DomainEventsAdminActor,
+    action: DomainEventsAdminAuditAction,
+    data: Record<string, unknown>,
+  ) {
+    const before = await this.prisma.domainEventDelivery.findUnique({ where: { id } });
+    if (!before) throw new NotFoundException('Domain event delivery not found');
+
     try {
-      return await this.prisma.domainEventDelivery.update({
-        where: { id, status: { not: DomainEventDeliveryStatus.PROCESSING } },
+      const after = await this.prisma.domainEventDelivery.update({
+        where: { id, status: DomainEventDeliveryStatus.DEAD_LETTER },
         data,
       });
+      await this.auditHook?.record({
+        action,
+        actor,
+        deliveryBefore: before as DomainEventDeliveryRecord,
+        deliveryAfter: after as DomainEventDeliveryRecord,
+      });
+      return after;
     } catch (error) {
       if (isRecordNotFoundError(error)) {
-        const exists = await this.prisma.domainEventDelivery.findUnique({
-          where: { id },
-          select: { id: true },
-        });
-        if (!exists) throw new NotFoundException('Domain event delivery not found');
-        throw new ConflictException('Delivery is being processed right now — try again shortly.');
+        throw new ConflictException('Only dead-lettered deliveries can be retried or ignored.');
       }
       throw error;
     }
@@ -204,13 +209,20 @@ export class DomainEventsAdminService {
       aggregateId: query.aggregateId,
       createdAt:
         query.createdFrom || query.createdTo
-          ? { gte: query.createdFrom, lte: query.createdTo }
+          ? { gte: query.createdFrom, lt: endExclusive(query.createdTo) }
           : undefined,
     };
   }
 }
 
-/** Deliveries pass through unchanged; only the bigint seq needs a JSON-safe form (002 BigInt discipline). */
+function endExclusive(date: Date | undefined): Date | undefined {
+  if (!date) return undefined;
+  const next = new Date(date);
+  next.setUTCDate(next.getUTCDate() + 1);
+  return next;
+}
+
+/** Deliveries pass through unchanged; only the bigint seq needs a JSON-safe form. */
 function serializeDomainEvent<T extends { seq: bigint }>(event: T) {
   return { ...event, seq: event.seq.toString() };
 }

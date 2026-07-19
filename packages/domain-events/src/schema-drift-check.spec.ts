@@ -9,8 +9,25 @@ function conformingDatamodel(): DomainEventDatamodel {
         name: 'DomainEvent',
         dbName: 'domain_events',
         fields: [
-          { name: 'id', kind: 'scalar', type: 'String', isRequired: true, isList: false },
-          { name: 'seq', kind: 'scalar', type: 'BigInt', isRequired: true, isList: false },
+          {
+            name: 'id',
+            kind: 'scalar',
+            type: 'String',
+            isRequired: true,
+            isList: false,
+            isId: true,
+            hasDefaultValue: true,
+            default: { name: 'cuid', args: [1] },
+          },
+          {
+            name: 'seq',
+            kind: 'scalar',
+            type: 'BigInt',
+            isRequired: true,
+            isList: false,
+            hasDefaultValue: true,
+            default: { name: 'autoincrement', args: [] },
+          },
           {
             name: 'aggregateType',
             kind: 'scalar',
@@ -49,6 +66,8 @@ function conformingDatamodel(): DomainEventDatamodel {
             isRequired: true,
             isList: false,
             dbName: 'schema_version',
+            hasDefaultValue: true,
+            default: 1,
           },
           {
             name: 'actorUserId',
@@ -92,14 +111,34 @@ function conformingDatamodel(): DomainEventDatamodel {
             isRequired: true,
             isList: false,
             dbName: 'created_at',
+            hasDefaultValue: true,
+            default: { name: 'now', args: [] },
+          },
+          {
+            name: 'deliveries',
+            kind: 'object',
+            type: 'DomainEventDelivery',
+            isRequired: true,
+            isList: true,
           },
         ],
       },
       {
         name: 'DomainEventDelivery',
         dbName: 'domain_event_deliveries',
+        uniqueFields: [['eventId', 'handlerKey']],
+        uniqueIndexes: [{ fields: ['eventId', 'handlerKey'] }],
         fields: [
-          { name: 'id', kind: 'scalar', type: 'String', isRequired: true, isList: false },
+          {
+            name: 'id',
+            kind: 'scalar',
+            type: 'String',
+            isRequired: true,
+            isList: false,
+            isId: true,
+            hasDefaultValue: true,
+            default: { name: 'cuid', args: [1] },
+          },
           {
             name: 'eventId',
             kind: 'scalar',
@@ -107,6 +146,16 @@ function conformingDatamodel(): DomainEventDatamodel {
             isRequired: true,
             isList: false,
             dbName: 'event_id',
+          },
+          {
+            name: 'event',
+            kind: 'object',
+            type: 'DomainEvent',
+            isRequired: true,
+            isList: false,
+            relationName: 'DomainEventToDomainEventDelivery',
+            relationFromFields: ['eventId'],
+            relationToFields: ['id'],
           },
           {
             name: 'handlerKey',
@@ -122,8 +171,18 @@ function conformingDatamodel(): DomainEventDatamodel {
             type: 'DomainEventDeliveryStatus',
             isRequired: true,
             isList: false,
+            hasDefaultValue: true,
+            default: 'PENDING',
           },
-          { name: 'attempts', kind: 'scalar', type: 'Int', isRequired: true, isList: false },
+          {
+            name: 'attempts',
+            kind: 'scalar',
+            type: 'Int',
+            isRequired: true,
+            isList: false,
+            hasDefaultValue: true,
+            default: 0,
+          },
           {
             name: 'nextAttemptAt',
             kind: 'scalar',
@@ -171,6 +230,8 @@ function conformingDatamodel(): DomainEventDatamodel {
             isRequired: true,
             isList: false,
             dbName: 'created_at',
+            hasDefaultValue: true,
+            default: { name: 'now', args: [] },
           },
         ],
       },
@@ -249,6 +310,46 @@ describe('checkDomainEventSchemaDrift', () => {
 
     expect(checkDomainEventSchemaDrift(datamodel)).toContain(
       'model DomainEvent.eventType is optional, expected required',
+    );
+  });
+
+  it('reports a missing id/default contract', () => {
+    const datamodel = conformingDatamodel();
+    const model = datamodel.models.find((candidate) => candidate.name === 'DomainEvent');
+    const field = model?.fields.find((candidate) => candidate.name === 'id');
+    if (!field) throw new Error('fixture missing id');
+    field.isId = false;
+    field.default = undefined;
+
+    expect(checkDomainEventSchemaDrift(datamodel)).toEqual(
+      expect.arrayContaining([
+        'model DomainEvent.id isId=false, expected true',
+        'model DomainEvent.id default is undefined, expected cuid',
+      ]),
+    );
+  });
+
+  it('reports a missing delivery uniqueness contract', () => {
+    const datamodel = conformingDatamodel();
+    const model = datamodel.models.find((candidate) => candidate.name === 'DomainEventDelivery');
+    if (!model) throw new Error('fixture missing DomainEventDelivery');
+    model.uniqueFields = [];
+    model.uniqueIndexes = [];
+
+    expect(checkDomainEventSchemaDrift(datamodel)).toContain(
+      'model DomainEventDelivery is missing @@unique([eventId, handlerKey])',
+    );
+  });
+
+  it('reports a missing delivery relation contract', () => {
+    const datamodel = conformingDatamodel();
+    const model = datamodel.models.find((candidate) => candidate.name === 'DomainEventDelivery');
+    const field = model?.fields.find((candidate) => candidate.name === 'event');
+    if (!field) throw new Error('fixture missing event relation');
+    field.relationFromFields = [];
+
+    expect(checkDomainEventSchemaDrift(datamodel)).toContain(
+      'model DomainEventDelivery.event relationFromFields is [], expected [eventId]',
     );
   });
 

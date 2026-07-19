@@ -79,6 +79,9 @@ when T-11230 lands.
 | `catalog.dataDrivenTitle` | Data-driven deliveries | 資料驅動的投遞 |
 | `catalog.dataDrivenSubtitle` | Handler keys resolved at runtime (e.g. webhook subscriptions) — not code-registered, so they have no description. | 執行期才解析出來的 handler key(例如 webhook 訂閱)——不是程式碼註冊的訂閱,所以沒有說明文字。 |
 | `catalog.emptyDataDriven` | No data-driven deliveries in this window. | 這段時間內沒有資料驅動的投遞紀錄。 |
+| `catalog.unresolvedTitle` | Unresolved deliveries | 未解析的投遞 |
+| `catalog.unresolvedSubtitle` | Delivery keys that are neither code-registered nor covered by a data-driven prefix. These usually indicate stale rows or missing wiring. | 既不是程式碼註冊、也不符合資料驅動前綴的 delivery key。通常代表舊資料或接線遺漏。 |
+| `catalog.emptyUnresolved` | No unresolved deliveries in this window. | 這段時間內沒有未解析的投遞紀錄。 |
 
 ## `enums.DomainEventOperation.*` / `enums.DomainEventDeliveryStatus.*`
 

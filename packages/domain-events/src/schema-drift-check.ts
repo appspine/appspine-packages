@@ -30,12 +30,20 @@ export type DmmfField = {
   isRequired: boolean;
   isList: boolean;
   dbName?: string | null;
+  isId?: boolean;
+  hasDefaultValue?: boolean;
+  default?: unknown;
+  relationName?: string;
+  relationFromFields?: readonly string[];
+  relationToFields?: readonly string[];
 };
 
 export type DmmfModel = {
   name: string;
   dbName?: string | null;
   fields: readonly DmmfField[];
+  uniqueFields?: readonly (readonly string[])[];
+  uniqueIndexes?: readonly { fields: readonly string[] }[];
 };
 
 export type DmmfEnum = {
@@ -54,18 +62,23 @@ export type DomainEventDatamodel = {
 
 type ExpectedField = {
   name: string;
-  kind: 'scalar' | 'enum';
+  kind: 'scalar' | 'enum' | 'object';
   type: string;
   optional?: boolean;
   isList?: boolean;
   /** Physical column name. Omit when the field has no `@map` (physical name equals `name`). */
   column?: string;
+  isId?: boolean;
+  default?: ExpectedDefault;
+  relationFromFields?: string[];
+  relationToFields?: string[];
 };
 
 type ExpectedModel = {
   name: string;
   table: string;
   fields: ExpectedField[];
+  uniqueFields?: string[][];
 };
 
 type ExpectedEnum = {
@@ -73,18 +86,20 @@ type ExpectedEnum = {
   values: string[];
 };
 
+type ExpectedDefault = string | number | { name: string };
+
 const EXPECTED_MODELS: ExpectedModel[] = [
   {
     name: 'DomainEvent',
     table: 'domain_events',
     fields: [
-      { name: 'id', kind: 'scalar', type: 'String' },
-      { name: 'seq', kind: 'scalar', type: 'BigInt' },
+      { name: 'id', kind: 'scalar', type: 'String', isId: true, default: { name: 'cuid' } },
+      { name: 'seq', kind: 'scalar', type: 'BigInt', default: { name: 'autoincrement' } },
       { name: 'aggregateType', kind: 'scalar', type: 'String', column: 'aggregate_type' },
       { name: 'aggregateId', kind: 'scalar', type: 'String', column: 'aggregate_id' },
       { name: 'eventType', kind: 'scalar', type: 'String', column: 'event_type' },
       { name: 'operation', kind: 'enum', type: 'DomainEventOperation' },
-      { name: 'schemaVersion', kind: 'scalar', type: 'Int', column: 'schema_version' },
+      { name: 'schemaVersion', kind: 'scalar', type: 'Int', column: 'schema_version', default: 1 },
       {
         name: 'actorUserId',
         kind: 'scalar',
@@ -110,18 +125,33 @@ const EXPECTED_MODELS: ExpectedModel[] = [
         column: 'changed_fields',
       },
       { name: 'metadata', kind: 'scalar', type: 'Json', optional: true },
-      { name: 'createdAt', kind: 'scalar', type: 'DateTime', column: 'created_at' },
+      {
+        name: 'createdAt',
+        kind: 'scalar',
+        type: 'DateTime',
+        column: 'created_at',
+        default: { name: 'now' },
+      },
+      { name: 'deliveries', kind: 'object', type: 'DomainEventDelivery', isList: true },
     ],
   },
   {
     name: 'DomainEventDelivery',
     table: 'domain_event_deliveries',
+    uniqueFields: [['eventId', 'handlerKey']],
     fields: [
-      { name: 'id', kind: 'scalar', type: 'String' },
+      { name: 'id', kind: 'scalar', type: 'String', isId: true, default: { name: 'cuid' } },
       { name: 'eventId', kind: 'scalar', type: 'String', column: 'event_id' },
+      {
+        name: 'event',
+        kind: 'object',
+        type: 'DomainEvent',
+        relationFromFields: ['eventId'],
+        relationToFields: ['id'],
+      },
       { name: 'handlerKey', kind: 'scalar', type: 'String', column: 'handler_key' },
-      { name: 'status', kind: 'enum', type: 'DomainEventDeliveryStatus' },
-      { name: 'attempts', kind: 'scalar', type: 'Int' },
+      { name: 'status', kind: 'enum', type: 'DomainEventDeliveryStatus', default: 'PENDING' },
+      { name: 'attempts', kind: 'scalar', type: 'Int', default: 0 },
       {
         name: 'nextAttemptAt',
         kind: 'scalar',
@@ -139,7 +169,13 @@ const EXPECTED_MODELS: ExpectedModel[] = [
         optional: true,
         column: 'processed_at',
       },
-      { name: 'createdAt', kind: 'scalar', type: 'DateTime', column: 'created_at' },
+      {
+        name: 'createdAt',
+        kind: 'scalar',
+        type: 'DateTime',
+        column: 'created_at',
+        default: { name: 'now' },
+      },
     ],
   },
 ];
@@ -176,6 +212,14 @@ export function checkDomainEventSchemaDrift(datamodel: DomainEventDatamodel): st
       );
     }
 
+    for (const expectedUnique of expectedModel.uniqueFields ?? []) {
+      if (!hasUniqueFields(model, expectedUnique)) {
+        issues.push(
+          `model ${expectedModel.name} is missing @@unique([${expectedUnique.join(', ')}])`,
+        );
+      }
+    }
+
     for (const expectedField of expectedModel.fields) {
       const field = model.fields.find((candidate) => candidate.name === expectedField.name);
       if (!field) {
@@ -210,6 +254,30 @@ export function checkDomainEventSchemaDrift(datamodel: DomainEventDatamodel): st
           `model ${expectedModel.name}.${expectedField.name} maps to column "${actualColumn}", expected "${expectedColumn}"`,
         );
       }
+
+      if ((field.isId ?? false) !== (expectedField.isId ?? false)) {
+        issues.push(
+          `model ${expectedModel.name}.${expectedField.name} isId=${field.isId ?? false}, expected ${expectedField.isId ?? false}`,
+        );
+      }
+
+      if (!defaultMatches(field.default, expectedField.default)) {
+        issues.push(
+          `model ${expectedModel.name}.${expectedField.name} default is ${formatDefault(field.default)}, expected ${formatDefault(expectedField.default)}`,
+        );
+      }
+
+      if (!sameStringArray(field.relationFromFields, expectedField.relationFromFields)) {
+        issues.push(
+          `model ${expectedModel.name}.${expectedField.name} relationFromFields is ${formatStringArray(field.relationFromFields)}, expected ${formatStringArray(expectedField.relationFromFields)}`,
+        );
+      }
+
+      if (!sameStringArray(field.relationToFields, expectedField.relationToFields)) {
+        issues.push(
+          `model ${expectedModel.name}.${expectedField.name} relationToFields is ${formatStringArray(field.relationToFields)}, expected ${formatStringArray(expectedField.relationToFields)}`,
+        );
+      }
     }
   }
 
@@ -228,4 +296,46 @@ export function checkDomainEventSchemaDrift(datamodel: DomainEventDatamodel): st
   }
 
   return issues;
+}
+
+function hasUniqueFields(model: DmmfModel, expectedFields: string[]): boolean {
+  const matches = (fields: readonly string[]) => sameStringArray(fields, expectedFields);
+  return (
+    model.uniqueFields?.some(matches) === true ||
+    model.uniqueIndexes?.some((index) => matches(index.fields)) === true
+  );
+}
+
+function defaultMatches(actual: unknown, expected: ExpectedDefault | undefined): boolean {
+  if (expected === undefined) return actual === undefined;
+  if (typeof expected !== 'object') return actual === expected;
+  return (
+    typeof actual === 'object' &&
+    actual !== null &&
+    (actual as { name?: unknown }).name === expected.name
+  );
+}
+
+function sameStringArray(
+  actual: readonly string[] | undefined,
+  expected: readonly string[] | undefined,
+): boolean {
+  const normalizedActual = actual ?? [];
+  const normalizedExpected = expected ?? [];
+  return (
+    normalizedActual.length === normalizedExpected.length &&
+    normalizedActual.every((value, index) => value === normalizedExpected[index])
+  );
+}
+
+function formatDefault(value: unknown): string {
+  if (value === undefined) return 'undefined';
+  if (typeof value === 'object' && value !== null && 'name' in value) {
+    return String((value as { name: unknown }).name);
+  }
+  return JSON.stringify(value);
+}
+
+function formatStringArray(value: readonly string[] | undefined): string {
+  return `[${(value ?? []).join(', ')}]`;
 }

@@ -177,6 +177,10 @@ export interface DomainEventCatalogDataDrivenRow extends DomainEventDeliveryStat
   handlerKey: string;
 }
 
+export interface DomainEventCatalogUnresolvedRow extends DomainEventDeliveryStatsRow {
+  handlerKey: string;
+}
+
 // Mirrors @appspine/domain-events' DomainEventCatalogResponse shape
 // (GET /domain-events/catalog — packages/domain-events/src/admin/types.ts).
 export interface DomainEventCatalogView {
@@ -184,5 +188,6 @@ export interface DomainEventCatalogView {
   dataDrivenPrefixes: string[];
   hasHandlerKeyContributors: boolean;
   dataDrivenDeliveries: DomainEventCatalogDataDrivenRow[];
+  unresolvedDeliveries: DomainEventCatalogUnresolvedRow[];
   statsWindowDays: number;
 }

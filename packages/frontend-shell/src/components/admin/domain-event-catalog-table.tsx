@@ -19,10 +19,12 @@ export function DomainEventCatalogTable({
   t: (key: string) => string;
   renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
 }) {
+  const unresolvedDeliveries = catalog.unresolvedDeliveries ?? [];
   const showDataDrivenSection =
     catalog.dataDrivenPrefixes.length > 0 ||
     catalog.hasHandlerKeyContributors ||
     catalog.dataDrivenDeliveries.length > 0;
+  const showUnresolvedSection = unresolvedDeliveries.length > 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -130,6 +132,64 @@ export function DomainEventCatalogTable({
                   </TableRow>
                 )}
                 {catalog.dataDrivenDeliveries.map((entry) => (
+                  <TableRow key={entry.handlerKey}>
+                    <TableCell className="font-mono text-xs">{entry.handlerKey}</TableCell>
+                    <TableCell>{entry.total}</TableCell>
+                    <TableCell>{entry.processed}</TableCell>
+                    <TableCell>
+                      {entry.deadLetter > 0 ? (
+                        <Badge variant="destructive">{entry.deadLetter}</Badge>
+                      ) : (
+                        entry.deadLetter
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {entry.lastStatus ? (
+                        <Badge
+                          variant={entry.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'}
+                        >
+                          {renderEnumLabel('DomainEventDeliveryStatus', entry.lastStatus)}
+                        </Badge>
+                      ) : (
+                        '-'
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-sm">
+                      {entry.lastAttemptAt ? new Date(entry.lastAttemptAt).toLocaleString() : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
+      )}
+
+      {showUnresolvedSection && (
+        <section className="flex flex-col gap-2">
+          <h2 className="font-semibold text-base">{t('catalog.unresolvedTitle')}</h2>
+          <p className="text-muted-foreground text-sm">{t('catalog.unresolvedSubtitle')}</p>
+          <div className="overflow-x-auto rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('catalog.columns.handlerKey')}</TableHead>
+                  <TableHead>{t('catalog.columns.total')}</TableHead>
+                  <TableHead>{t('catalog.columns.processed')}</TableHead>
+                  <TableHead>{t('catalog.columns.deadLetter')}</TableHead>
+                  <TableHead>{t('catalog.columns.lastStatus')}</TableHead>
+                  <TableHead>{t('catalog.columns.lastAttemptAt')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {unresolvedDeliveries.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      {t('catalog.emptyUnresolved')}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {unresolvedDeliveries.map((entry) => (
                   <TableRow key={entry.handlerKey}>
                     <TableCell className="font-mono text-xs">{entry.handlerKey}</TableCell>
                     <TableCell>{entry.total}</TableCell>
