@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { JwtPayload } from '../decorators/current-user.decorator';
+import { resolveJwtSecret } from '../jwt-secret.util';
 
 /** Validates the HS256 token this app itself signs at login/register (AUTH_MODE=local). */
 @Injectable()
@@ -9,7 +10,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'jwt-local') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_SECRET ?? 'dev-secret',
+      secretOrKey: resolveJwtSecret(),
       algorithms: ['HS256'],
     });
   }

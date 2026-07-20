@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import jwt, { type JwtHeader } from 'jsonwebtoken';
 import jwksClient, { type JwksClient } from 'jwks-rsa';
 import type { JwtPayload, JwtUser } from './decorators/current-user.decorator';
+import { resolveJwtSecret } from './jwt-secret.util';
 import { buildUserContext } from './user-context.util';
 
 @Injectable()
@@ -52,9 +53,13 @@ export class JwtVerifierService {
   }
 
   private async verifyLocalJwtToken(token: string): Promise<JwtUser> {
+    // Resolved outside the try/catch: a missing JWT_SECRET is a config error and must
+    // propagate as-is, not get swallowed into a generic "Invalid JWT" 401.
+    const secret = resolveJwtSecret();
+
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: process.env.JWT_SECRET ?? 'dev-secret',
+        secret,
         algorithms: ['HS256'],
       });
 

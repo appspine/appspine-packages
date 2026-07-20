@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AdminGuard } from './guards/admin.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { resolveJwtSecret } from './jwt-secret.util';
 import { JwtVerifierService } from './jwt-verifier.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { OidcStrategy } from './strategies/oidc.strategy';
@@ -21,7 +22,7 @@ const ActiveStrategy = process.env.AUTH_MODE === 'oidc' ? OidcStrategy : LocalSt
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'dev-secret',
+      secret: resolveJwtSecret(),
       signOptions: {
         expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as JwtSignOptions['expiresIn'],
       },
