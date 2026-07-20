@@ -1,5 +1,19 @@
 # @appspine/domain-events
 
+## 1.0.0
+
+### Minor Changes
+
+- cc3b30a: Add shared domain-event webhook payload, redaction, signature, and posting helpers.
+
+### Patch Changes
+
+- cc3b30a: Standardize internal Appspine package references on peer dependencies with workspace dev dependencies.
+- Updated dependencies [cc3b30a]
+- Updated dependencies [cc3b30a]
+  - @appspine/m2m-api-key@3.0.0
+  - @appspine/auth@3.0.0
+
 ## 0.2.4
 
 ### Patch Changes

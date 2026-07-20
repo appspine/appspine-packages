@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.6.0
+
+### Minor Changes
+
+- cc3b30a: Export the shared select primitive, preference layout/theme helpers, and a parameterized header breadcrumb component.
+
 ## 0.5.3
 
 ### Patch Changes

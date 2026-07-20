@@ -1,5 +1,15 @@
 # @appspine/audit-log
 
+## 0.5.0
+
+### Minor Changes
+
+- cc3b30a: Add shared audit metadata and fire-and-forget audit recording helpers, then use them from API key and role controllers.
+
+### Patch Changes
+
+- cc3b30a: Standardize internal Appspine package references on peer dependencies with workspace dev dependencies.
+
 ## 0.4.1
 
 ### Patch Changes

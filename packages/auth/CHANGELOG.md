@@ -1,5 +1,14 @@
 # @appspine/auth
 
+## 3.0.0
+
+### Patch Changes
+
+- cc3b30a: Standardize internal Appspine package references on peer dependencies with workspace dev dependencies.
+- Updated dependencies [cc3b30a]
+- Updated dependencies [cc3b30a]
+  - @appspine/audit-log@0.5.0
+
 ## 2.0.2
 
 ### Patch Changes

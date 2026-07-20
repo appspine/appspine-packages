@@ -1,5 +1,15 @@
 # @appspine/m2m-api-key
 
+## 3.0.0
+
+### Patch Changes
+
+- cc3b30a: Add shared audit metadata and fire-and-forget audit recording helpers, then use them from API key and role controllers.
+- Updated dependencies [cc3b30a]
+- Updated dependencies [cc3b30a]
+  - @appspine/audit-log@0.5.0
+  - @appspine/auth@3.0.0
+
 ## 2.1.3
 
 ### Patch Changes
