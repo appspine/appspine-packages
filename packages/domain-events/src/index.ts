@@ -6,3 +6,4 @@ export * from './domain-event-subscriber.decorator';
 export * from './domain-events.service';
 export * from './schema-drift-check';
 export * from './types';
+export * from './webhook';

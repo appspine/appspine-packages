@@ -26,15 +26,14 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@appspine/common": "workspace:*"
-  },
   "peerDependencies": {
+    "@appspine/common": "^0.2.1",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0"
   },
   "devDependencies": {
+    "@appspine/common": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

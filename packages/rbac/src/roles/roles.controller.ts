@@ -1,4 +1,4 @@
-import { AuditLogService } from '@appspine/audit-log';
+import { AuditLogService, recordAuditSafely } from '@appspine/audit-log';
 import { AdminGuard, CurrentUser, JwtAuthGuard } from '@appspine/auth';
 import {
   AuditAction,
@@ -49,16 +49,14 @@ export class RolesController {
     action: AuditAction,
     actor: { sub: string; email?: string },
   ) {
-    void this.auditLogService
-      .record({
-        entityType: 'Role',
-        entityId,
-        action,
-        actorId: actor.sub,
-        actorEmail: actor.email ?? `api-key:${actor.sub}`,
-        appName: process.env.APP_NAME ?? 'appspine-app-template',
-      })
-      .catch((err: unknown) => this.logger.warn(`Failed to record audit log: ${String(err)}`));
+    recordAuditSafely({
+      auditLogService: this.auditLogService,
+      entityType: 'Role',
+      entityId,
+      action,
+      actor,
+      logger: this.logger,
+    });
   }
 
   @Get()
