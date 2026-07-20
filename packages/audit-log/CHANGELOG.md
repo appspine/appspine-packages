@@ -1,5 +1,11 @@
 # @appspine/audit-log
 
+## 0.5.1
+
+### Patch Changes
+
+- Republish shared audit metadata helpers for app migrations.
+
 ## 0.5.0
 
 ### Minor Changes
