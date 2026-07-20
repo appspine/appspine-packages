@@ -1,5 +1,13 @@
 # @appspine/mcp-server
 
+## 0.5.3
+
+### Patch Changes
+
+- Updated dependencies [6545ac2]
+  - @appspine/auth@2.0.2
+  - @appspine/m2m-api-key@2.1.3
+
 ## 0.5.2
 
 ### Patch Changes
