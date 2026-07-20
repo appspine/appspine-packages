@@ -49,7 +49,7 @@ export function registerM2mApiKeySpec({
   apiURL,
   roleOptionName,
   protectedEndpoint = '/metadata/schema',
-  restrictedScope = 'users:read',
+  restrictedScope,
   wildcardScope = '* (full access)',
   apiKeyValueLocator = '.break-all.rounded-md.border.bg-muted',
 }: RegisterM2mApiKeySpecOptions) {
@@ -57,20 +57,11 @@ export function registerM2mApiKeySpec({
     test('enforces API key scopes on metadata schema access', async ({ adminPage, request }) => {
       await adminPage.goto(`${baseURL}/dashboard/api-keys`);
 
-      const restrictedKey = await createApiKeyFromUi(adminPage, {
-        name: `restricted-${Date.now()}`,
-        roleOptionName,
-        scopes: [restrictedScope],
-        apiKeyValueLocator,
-      });
-
-      const restrictedResponse = await request.get(`${apiURL}${protectedEndpoint}`, {
-        headers: {
-          'x-api-key': restrictedKey,
-        },
-      });
-      expect(restrictedResponse.status()).toBe(403);
-
+      // Create the wildcard key first: metadata-schema's availableScopes is derived from
+      // each app's own Prisma models (@appspine/metadata-schema's deriveScopes, which also
+      // excludes anything documented `@internal` -- e.g. User), so there is no fixed
+      // "users:read"-style scope string guaranteed to exist across every app. Discover a
+      // real one from this app's own schema response instead of hardcoding a guess.
       const wildcardKey = await createApiKeyFromUi(adminPage, {
         name: `wildcard-${Date.now()}`,
         roleOptionName,
@@ -87,10 +78,32 @@ export function registerM2mApiKeySpec({
 
       const schema = (await allowedResponse.json()) as {
         models?: unknown[];
-        availableScopes?: unknown[];
+        availableScopes?: string[];
       };
       expect(Array.isArray(schema.models)).toBeTruthy();
       expect(Array.isArray(schema.availableScopes)).toBeTruthy();
+
+      const discoveredScope = restrictedScope ?? schema.availableScopes?.find((scope) => !scope.endsWith(':*'));
+      if (!discoveredScope) {
+        throw new Error(
+          'registerM2mApiKeySpec: no non-wildcard scope available to test restriction against -- ' +
+            'pass an explicit restrictedScope, or expose at least one non-@internal model through metadata-schema.',
+        );
+      }
+
+      const restrictedKey = await createApiKeyFromUi(adminPage, {
+        name: `restricted-${Date.now()}`,
+        roleOptionName,
+        scopes: [discoveredScope],
+        apiKeyValueLocator,
+      });
+
+      const restrictedResponse = await request.get(`${apiURL}${protectedEndpoint}`, {
+        headers: {
+          'x-api-key': restrictedKey,
+        },
+      });
+      expect(restrictedResponse.status()).toBe(403);
     });
   });
 }
