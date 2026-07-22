@@ -57,7 +57,15 @@ export class MasterDataReconciliationService implements OnModuleInit, OnModuleDe
     this.running = true;
     try {
       for (const entity of this.options.entities) {
-        await reconcileEntity(entity.model, await entity.listFetcher(), (item) => ({
+        const sourceItems = await entity.listFetcher();
+        if (sourceItems.length === 0) {
+          this.logger.warn(
+            `listFetcher for "${entity.name}" returned an empty list; skipping the delete-sweep for ` +
+              'this reconciliation pass to avoid wiping the Mirror on a transient/partial fetch ' +
+              '(see reconcileEntity).',
+          );
+        }
+        await reconcileEntity(entity.model, sourceItems, (item) => ({
           ...entity.mapper(item),
           seq: item.seq,
           syncedAt: new Date(),
@@ -95,6 +103,16 @@ export async function reconcileEntity<TMirror extends MirrorRecord>(
       update: data,
     });
     upserted += 1;
+  }
+
+  // Guard: an empty source list almost always means a transient/partial fetch problem
+  // (listFetcher resolved with [] instead of throwing) rather than the master-data app
+  // genuinely having zero records left. Skip the delete-sweep in that case so a flaky
+  // fetch can't silently wipe every local Mirror row; a real deletion is still caught by
+  // the webhook-driven delete event path, and the next successful reconciliation pass
+  // will still catch anything actually missed.
+  if (sourceItems.length === 0 && existing.length > 0) {
+    return { upserted, deleted: 0, skipped };
   }
 
   for (const row of existing) {

@@ -68,4 +68,22 @@ describe('reconcileEntity', () => {
     expect(rows.get('unit-2')?.name).toBe('HR');
     expect(rows.has('unit-removed')).toBe(false);
   });
+
+  it('skips the delete-sweep when the source list is empty, instead of wiping every Mirror row', async () => {
+    const oldSyncedAt = new Date('2026-07-21T00:00:00.000Z');
+    const { model, rows } = createModel([
+      { sourceId: 'unit-1', name: 'Finance', seq: 1n, syncedAt: oldSyncedAt },
+      { sourceId: 'unit-2', name: 'HR', seq: 1n, syncedAt: oldSyncedAt },
+    ]);
+
+    const result = await reconcileEntity(model, [], (item) => ({
+      sourceId: item.sourceId,
+      name: String(item.payload.name),
+      seq: item.seq,
+      syncedAt: new Date('2026-07-22T00:00:00.000Z'),
+    }));
+
+    expect(result).toEqual({ upserted: 0, deleted: 0, skipped: 0 });
+    expect(rows.size).toBe(2);
+  });
 });
