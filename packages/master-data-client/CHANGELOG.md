@@ -1,5 +1,11 @@
 # @appspine/master-data-client
 
+## 0.1.2
+
+### Patch Changes
+
+- 4947b0b: Skip the reconciliation delete-sweep when `listFetcher` resolves with an empty list, instead of wiping every local Mirror row on a transient/partial fetch.
+
 ## 0.1.1
 
 ### Minor Changes
