@@ -11,6 +11,11 @@ model User {
   password  String?
   /// Display name shown in UI; optional.
   name      String?
+  /// Cross-app link key for looking up this person's canonical record in apps/org (Enterprise
+  /// Master Data). Null for accounts with no corresponding org record (service accounts,
+  /// contractors not yet onboarded in apps/org, etc.) — a null value must not be treated as
+  /// an error, only as "no org context available for this account".
+  employeeNumber String? @unique @map("employee_number")
   /// Soft-disable without deleting — preserves audit history.
   isActive  Boolean  @default(true) @map("is_active")
   /// Marks a dedicated machine/integration account (not a real person's login).
