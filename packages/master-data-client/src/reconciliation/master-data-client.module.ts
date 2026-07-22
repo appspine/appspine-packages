@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import type { MasterDataClientModuleOptions } from '../types';
+import type { MasterDataClientModuleAsyncOptions, MasterDataClientModuleOptions } from '../types';
 import {
   MASTER_DATA_CLIENT_OPTIONS,
   MasterDataReconciliationService,
@@ -21,6 +21,29 @@ export class MasterDataClientModule {
             autoStart: options.autoStart ?? true,
             entities: options.entities,
           },
+        },
+        MasterDataReconciliationService,
+      ],
+      exports: [MasterDataReconciliationService],
+    };
+  }
+
+  static forRootAsync(options: MasterDataClientModuleAsyncOptions): DynamicModule {
+    return {
+      module: MasterDataClientModule,
+      imports: options.imports as never[] | undefined,
+      providers: [
+        {
+          provide: MASTER_DATA_CLIENT_OPTIONS,
+          useFactory: async (...args: never[]) => {
+            const resolved = await options.useFactory(...args);
+            return {
+              intervalMs: resolved.intervalMs ?? DEFAULT_INTERVAL_MS,
+              autoStart: resolved.autoStart ?? true,
+              entities: resolved.entities,
+            };
+          },
+          inject: options.inject as never[] | undefined,
         },
         MasterDataReconciliationService,
       ],

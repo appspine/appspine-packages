@@ -65,3 +65,11 @@ export type MasterDataClientModuleOptions = {
   autoStart?: boolean;
   entities: MasterDataReconciliationEntity<Record<string, unknown>, MirrorRecord>[];
 };
+
+export type MasterDataClientModuleAsyncOptions = {
+  imports?: unknown[];
+  inject?: unknown[];
+  useFactory: (
+    ...args: never[]
+  ) => MasterDataClientModuleOptions | Promise<MasterDataClientModuleOptions>;
+};

@@ -36,6 +36,10 @@ export function createMasterDataSyncHandler<
   return {
     async handle(event) {
       if (deletedEventTypes.has(event.eventType)) {
+        const existing = await model.findUnique({ where: { sourceId: event.aggregateId } });
+        if (!existing || toComparableSeq(existing.seq) >= toComparableSeq(event.seq)) {
+          return 'skipped';
+        }
         try {
           await model.delete({ where: { sourceId: event.aggregateId } });
         } catch (error) {

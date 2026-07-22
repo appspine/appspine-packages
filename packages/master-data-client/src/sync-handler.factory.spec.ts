@@ -135,4 +135,24 @@ describe('createMasterDataSyncHandler', () => {
       handler.handle({ aggregateId: 'missing', eventType: 'OrgUnitDeleted', seq: 11n }),
     ).resolves.toBe('skipped');
   });
+
+  it('skips stale delete events for newer mirror rows', async () => {
+    const { model, rows } = createModel([
+      { sourceId: 'unit-1', name: 'Newer', seq: 10n, syncedAt: fixedNow },
+    ]);
+    const handler = createMasterDataSyncHandler(
+      model,
+      (payload) => ({
+        sourceId: String(payload.id),
+        name: String(payload.name),
+        syncedAt: fixedNow,
+      }),
+      { changedEventTypes: 'OrgUnitChanged', deletedEventTypes: 'OrgUnitDeleted' },
+    );
+
+    await expect(
+      handler.handle({ aggregateId: 'unit-1', eventType: 'OrgUnitDeleted', seq: 9n }),
+    ).resolves.toBe('skipped');
+    expect(rows.has('unit-1')).toBe(true);
+  });
 });
