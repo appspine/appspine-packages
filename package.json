@@ -8,6 +8,7 @@
     "test": "pnpm -r run test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
+    "check:changeset-discipline": "node scripts/check-changeset-discipline.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm -r run build && changeset publish"

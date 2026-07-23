@@ -24,6 +24,14 @@ jobs:
 
       - run: pnpm lint
 
+      # Catches a version hand-edited in a package's package.json without a matching
+      # CHANGELOG.md entry — i.e. bypassing `changeset version` / the changesets/action
+      # release PR. See scripts/check-changeset-discipline.mjs for why this exists.
+      - run: node scripts/check-changeset-discipline.mjs origin/main
+        if: github.event_name == 'pull_request'
+      - run: node scripts/check-changeset-discipline.mjs HEAD^
+        if: github.event_name == 'push'
+
       # pnpm's --filter "...[ref]" selects packages changed since main PLUS their
       # dependencies (so a changed package's deps are available to build/typecheck
       # against), skipping unrelated @appspine/* packages. build must run before
