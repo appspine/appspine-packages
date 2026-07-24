@@ -1,5 +1,15 @@
 # @appspine/auth
 
+## 3.1.0
+
+### Minor Changes
+
+- 70c7586: Add a nullable, unique `employeeNumber` field to the `User` model — the
+  cross-app link key consuming apps use to look up their canonical person
+  record in `apps/org` (Enterprise Master Data). Backward compatible: existing
+  rows default to `null`, and apps that don't need org context can ignore the
+  field entirely.
+
 ## 3.0.0
 
 ### Patch Changes
