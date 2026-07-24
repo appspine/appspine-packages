@@ -32,22 +32,17 @@ jobs:
       - run: node scripts/check-changeset-discipline.mjs HEAD^
         if: github.event_name == 'push'
 
-      # pnpm's --filter "...[ref]" selects packages changed since main PLUS their
-      # dependencies (so a changed package's deps are available to build/typecheck
-      # against), skipping unrelated @appspine/* packages. build must run before
-      # typecheck/test: each package's tsc resolves workspace deps via their built
-      # dist/*.d.ts, not TS project references, so a fresh checkout with no dist/
-      # yet fails typecheck on any cross-package import otherwise.
-      - run: pnpm --filter "...[origin/main]" run build
-        if: github.event_name == 'pull_request'
-      - run: pnpm --filter "...[origin/main]" run typecheck
-        if: github.event_name == 'pull_request'
-      - run: pnpm --filter "...[origin/main]" run test
-        if: github.event_name == 'pull_request'
-
+      # Always build/typecheck/test the full workspace (all 13 packages, ~90s), not a
+      # pnpm --filter "...[ref]"-scoped subset. That filter's "include dependencies of
+      # changed packages" walk does not pick up workspace deps declared only in
+      # devDependencies (our peerDependencies + devDependencies pattern for e.g.
+      # @appspine/common, see Z05-template-common-singleton-override.md) — so a changed
+      # package could build before its unbuilt dependency, racing on dist/*.d.ts and
+      # failing with "Cannot find module". Confirmed working full-workspace below;
+      # don't reintroduce a --filter shortcut without re-verifying that gap is closed.
+      # build must run before typecheck/test: each package's tsc resolves workspace
+      # deps via their built dist/*.d.ts, not TS project references, so a fresh
+      # checkout with no dist/ yet fails typecheck on any cross-package import.
       - run: pnpm run build
-        if: github.event_name == 'push'
       - run: pnpm run typecheck
-        if: github.event_name == 'push'
       - run: pnpm run test
-        if: github.event_name == 'push'
