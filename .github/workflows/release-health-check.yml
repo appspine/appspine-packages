@@ -1,0 +1,124 @@
+name: Release Health Check
+
+# Watches for the class of failure that let PR #5 sit stuck for 4 days with
+# nobody noticing: workflow runs silently stuck on `action_required`, main's
+# CI silently red, or a Version Packages PR silently sitting unmerged. None
+# of these show up unless someone happens to open the Actions tab — this
+# turns "silently broken" into "an open issue", which shows up in repo
+# notifications instead of requiring anyone to go looking.
+#
+# See dev_docs/framework/Z25-release-pipeline-approval-gate-and-race.md for
+# the incident this was built in response to.
+
+on:
+  schedule:
+    - cron: "0 1 * * *" # 01:00 UTC daily (09:00 Asia/Taipei)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const problems = [];
+            const now = Date.now();
+
+            // 1. Workflow runs stuck on action_required in the last 7 days.
+            const { data: runsData } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+            const stuck = runsData.workflow_runs.filter(
+              (r) => r.conclusion === "action_required" && new Date(r.created_at).getTime() >= sevenDaysAgo
+            );
+            const stuckBranches = [...new Set(stuck.map((r) => r.head_branch))];
+            if (stuckBranches.length > 0) {
+              const latestPerBranch = stuckBranches.map((branch) => stuck.find((r) => r.head_branch === branch));
+              const list = latestPerBranch
+                .map((r) => `- [${r.name} on \`${r.head_branch}\`](${r.html_url}) — needs approval in the Actions tab (${r.created_at})`)
+                .join("\n");
+              problems.push(`**${stuckBranches.length} branch(es) have workflow runs stuck on \`action_required\`:**\n${list}`);
+            }
+
+            // 2. Latest CI run on main.
+            const { data: mainRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: "main",
+              event: "push",
+              per_page: 10,
+            });
+            const latestMainCi = mainRuns.workflow_runs.find((r) => r.name === "CI");
+            if (latestMainCi && latestMainCi.conclusion === "failure") {
+              problems.push(`**\`main\`'s latest CI run failed:** [${latestMainCi.html_url}](${latestMainCi.html_url}) (${latestMainCi.created_at})`);
+            }
+
+            // 3. Version Packages PR open more than 3 days.
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              head: `${context.repo.owner}:changeset-release/main`,
+            });
+            const threeDaysAgo = now - 3 * 24 * 60 * 60 * 1000;
+            const stalePrs = prs.filter((pr) => new Date(pr.created_at).getTime() < threeDaysAgo);
+            if (stalePrs.length > 0) {
+              const list = stalePrs.map((pr) => `- [#${pr.number} ${pr.title}](${pr.html_url}) opened ${pr.created_at}`).join("\n");
+              problems.push(`**Version Packages PR open more than 3 days:**\n${list}`);
+            }
+
+            const issueTitle = "⚠️ Release pipeline health check failed";
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+            });
+            const existingIssue = openIssues.find((i) => i.title === issueTitle && !i.pull_request);
+
+            if (problems.length === 0) {
+              if (existingIssue) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingIssue.number,
+                  body: "All checks passed again, closing.",
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingIssue.number,
+                  state: "closed",
+                });
+              }
+              console.log("Release pipeline health check: all clear.");
+              return;
+            }
+
+            const body =
+              problems.join("\n\n") +
+              `\n\n---\n_Checked at ${new Date().toISOString()} by [release-health-check.yml](../actions/workflows/release-health-check.yml)._`;
+
+            if (existingIssue) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body,
+              });
+            }
