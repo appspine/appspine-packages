@@ -83,7 +83,8 @@ export function registerM2mApiKeySpec({
       expect(Array.isArray(schema.models)).toBeTruthy();
       expect(Array.isArray(schema.availableScopes)).toBeTruthy();
 
-      const discoveredScope = restrictedScope ?? schema.availableScopes?.find((scope) => !scope.endsWith(':*'));
+      const discoveredScope =
+        restrictedScope ?? schema.availableScopes?.find((scope) => !scope.endsWith(':*'));
       if (!discoveredScope) {
         throw new Error(
           'registerM2mApiKeySpec: no non-wildcard scope available to test restriction against -- ' +
