@@ -10,16 +10,16 @@ import {
 } from '@playwright/test';
 
 export interface AuthUserConfig {
-  readonly email: string;
+  /** Keycloak username (not the app-side email — see dev-infra/README.md's test user
+   * table). Identity is JIT-provisioned/matched locally by the token's email claim,
+   * there is no separate "register" step under OIDC-only auth. */
+  readonly username: string;
   readonly password: string;
-  readonly name?: string;
   readonly storageStatePath: string;
-  readonly createViaRegisterApi?: boolean;
 }
 
 interface CreateAuthFixturesOptions {
   readonly baseURL: string;
-  readonly apiURL: string;
   readonly admin: AuthUserConfig;
   readonly user?: AuthUserConfig;
 }
@@ -35,55 +35,33 @@ async function ensureAuthDirectory(storageStatePath: string) {
   await mkdir(dirname(resolve(storageStatePath)), { recursive: true });
 }
 
-async function ensureRegisteredUser(apiURL: string, user: AuthUserConfig) {
-  const response = await fetch(`${apiURL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: user.email,
-      password: user.password,
-      name: user.name,
-    }),
-  });
-
-  if (response.ok) {
-    return;
-  }
-
-  if (response.status === 400 || response.status === 409) {
-    const body = (await response.json().catch(() => null)) as { message?: string } | null;
-    if (
-      body?.message?.includes('already exists') ||
-      body?.message?.includes('already registered')
-    ) {
-      return;
-    }
-  }
-
-  throw new Error(`Failed to ensure registered user ${user.email}: HTTP ${response.status}`);
-}
-
 async function loginAndSaveStorageState(browser: Browser, baseURL: string, user: AuthUserConfig) {
   await ensureAuthDirectory(user.storageStatePath);
 
   const context = await browser.newContext();
-  // Force English so this fixture's English-language locators (getByLabel('Email'), etc.)
-  // work regardless of the app's default locale (e.g. appspine-app-template defaults to
-  // zh-TW). Saved into storageState below, so it carries over into adminContext/userContext too.
+  // Force English so this fixture's English-language locators (getByRole('button', {
+  // name: 'Sign in with Keycloak' }), etc.) work regardless of the app's default locale
+  // (e.g. appspine-app-template defaults to zh-TW). Saved into storageState below, so it
+  // carries over into adminContext/userContext too.
   await context.addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
   const page = await context.newPage();
   await page.goto(`${baseURL}/login`);
-  await page.getByLabel('Email').fill(user.email);
-  await page.getByLabel('Password').fill(user.password);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByRole('button', { name: 'Sign in with Keycloak' }).click();
+
+  // Cross-origin redirect to the dev Keycloak's own login page (dev-infra/README.md).
+  await page.waitForURL('**/protocol/openid-connect/auth**');
+  await page.getByLabel('Username or email').fill(user.username);
+  await page.getByLabel('Password', { exact: true }).fill(user.password);
+  await page.getByRole('button', { name: 'Sign In' }).click();
 
   try {
     await page.waitForURL('**/dashboard');
   } catch (error) {
     throw new Error(
-      `Login timed out for ${user.email} — the account may not be registered/seeded, or the login form/redirect no longer matches this fixture's assumptions. Original error: ${(error as Error).message}`,
+      `Login timed out for ${user.username} — Keycloak may have denied this identity access ` +
+        `to this app's client (dev-infra/README.md's per-client access restriction — check ` +
+        `the identity is in the right group), or the login form/redirect no longer matches ` +
+        `this fixture's assumptions. Original error: ${(error as Error).message}`,
     );
   }
 
@@ -93,28 +71,19 @@ async function loginAndSaveStorageState(browser: Browser, baseURL: string, user:
   await context.close();
 }
 
-async function ensureStorageState(
-  browser: Browser,
-  baseURL: string,
-  apiURL: string,
-  user?: AuthUserConfig,
-) {
+async function ensureStorageState(browser: Browser, baseURL: string, user?: AuthUserConfig) {
   if (!user) {
     return undefined;
-  }
-
-  if (user.createViaRegisterApi) {
-    await ensureRegisteredUser(apiURL, user);
   }
 
   await loginAndSaveStorageState(browser, baseURL, user);
   return resolve(user.storageStatePath);
 }
 
-export function createAuthFixtures({ baseURL, apiURL, admin, user }: CreateAuthFixturesOptions) {
+export function createAuthFixtures({ baseURL, admin, user }: CreateAuthFixturesOptions) {
   return base.extend<AuthFixtures>({
     adminContext: async ({ browser }, use) => {
-      const storageState = await ensureStorageState(browser, baseURL, apiURL, admin);
+      const storageState = await ensureStorageState(browser, baseURL, admin);
       const context = await browser.newContext({ storageState });
       await use(context);
       await context.close();
@@ -125,7 +94,7 @@ export function createAuthFixtures({ baseURL, apiURL, admin, user }: CreateAuthF
       await page.close();
     },
     userContext: async ({ browser }, use) => {
-      const storageState = await ensureStorageState(browser, baseURL, apiURL, user);
+      const storageState = await ensureStorageState(browser, baseURL, user);
       const context = await browser.newContext({ storageState });
       await use(context);
       await context.close();

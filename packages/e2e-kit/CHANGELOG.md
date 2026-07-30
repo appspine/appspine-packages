@@ -1,5 +1,28 @@
 # @appspine/e2e-kit
 
+## 1.0.0
+
+### Major Changes
+
+- Migrate the auth fixture and auth spec to OIDC login (dev_docs/framework/035) — local
+  `/auth/register`/`/auth/login` no longer exist.
+
+  Breaking changes:
+
+  - `AuthUserConfig` is now `{ username, password, storageStatePath }` (was `{ email,
+password, name?, storageStatePath, createViaRegisterApi? }`). `username`/`password`
+    are Keycloak dev-realm credentials (dev-infra/README.md), not app-side email/password.
+  - `createAuthFixtures` no longer takes `apiURL` — registration is gone, there is nothing
+    left in the fixture that calls the backend directly.
+  - `registerAuthSpec` now takes `{ baseURL, jitUser: { username, password, expectedEmail } }`
+    instead of `{ baseURL, apiURL, authCookieName? }`, and asserts against the account
+    menu's visible email instead of extracting an `auth_token` cookie and replaying it as
+    a Bearer token — next-auth's session cookie is an encrypted JWE, not a token the
+    backend accepts directly, so that extraction technique no longer applies.
+
+  `rbac.spec.ts` and `m2m-api-key.spec.ts` are unaffected — they only depend on the
+  `adminPage`/`userPage` fixtures, not the credential shape directly.
+
 ## 0.1.3
 
 ### Patch Changes
