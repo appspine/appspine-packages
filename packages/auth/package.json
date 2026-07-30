@@ -1,6 +1,6 @@
 {
   "name": "@appspine/auth",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "private": false,
   "repository": {
     "type": "git",
@@ -38,7 +38,6 @@
     "@appspine/common": "^0.2.1",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
-    "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.2.0",
     "zod": "^4.4.3"
@@ -48,7 +47,6 @@
     "@appspine/common": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
-    "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.2.0",
     "@types/bcrypt": "^5.0.2",

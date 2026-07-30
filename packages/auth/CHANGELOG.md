@@ -1,5 +1,15 @@
 # @appspine/auth
 
+## 4.0.1
+
+### Patch Changes
+
+- Remove `JwtModule`/`JWT_SECRET` local-auth infra (dev_docs/framework/035 T-12645). OIDC is
+  now the sole auth strategy across all apps, and nothing in the package read the registered
+  `JwtModule`/`resolveJwtSecret()` outside the local login/register flow removed in T-12510 —
+  deleted both, and dropped the now-unused `@nestjs/jwt` peer dependency. `bcrypt` stays: it's
+  still used by `POST /users`'s optional break-glass account password.
+
 ## 4.0.0
 
 ### Major Changes

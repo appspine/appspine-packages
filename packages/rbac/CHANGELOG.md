@@ -1,5 +1,12 @@
 # @appspine/rbac
 
+## 3.0.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @appspine/auth@4.0.1
+
 ## 3.0.2
 
 ### Patch Changes
