@@ -52,6 +52,25 @@ function createUsersService(deleteMock: ReturnType<typeof vi.fn>) {
   return { prisma, service };
 }
 
+function createUsersServiceForCreate(options: {
+  findUniqueUser?: ReturnType<typeof vi.fn>;
+  createUser?: ReturnType<typeof vi.fn>;
+}) {
+  const prisma = {
+    user: {
+      findUnique: options.findUniqueUser ?? vi.fn().mockResolvedValue(null),
+      create: options.createUser ?? vi.fn().mockResolvedValue(mockUser),
+    },
+    role: {
+      findUnique: vi.fn().mockResolvedValue({ id: 'role-user' }),
+    },
+  };
+  const service = new UsersService(
+    prisma as unknown as ConstructorParameters<typeof UsersService>[0],
+  );
+  return { prisma, service };
+}
+
 describe('UsersService.remove', () => {
   it('should successfully delete a user when no foreign key restriction exists', async () => {
     const deleteMock = vi.fn().mockResolvedValue(mockUser);
@@ -105,5 +124,63 @@ describe('UsersService.remove', () => {
     const { service } = createUsersService(deleteMock);
 
     await expect(service.remove('user-1')).rejects.toThrow('Database connection failed');
+  });
+});
+
+describe('UsersService.create', () => {
+  it('creates a user with the default role when no roleIds are given', async () => {
+    const { prisma, service } = createUsersServiceForCreate({});
+
+    await service.create({ email: 'newcomer@example.com', name: 'Newcomer' });
+
+    expect(prisma.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          email: 'newcomer@example.com',
+          userRoles: { create: [{ roleId: 'role-user' }] },
+        }),
+      }),
+    );
+  });
+
+  it('throws ConflictException without hitting the DB when the pre-check finds an existing email', async () => {
+    const createUser = vi.fn();
+    const { service } = createUsersServiceForCreate({
+      findUniqueUser: vi.fn().mockResolvedValue(mockUser),
+      createUser,
+    });
+
+    await expect(service.create({ email: 'test@example.com' })).rejects.toThrow(ConflictException);
+    expect(createUser).not.toHaveBeenCalled();
+  });
+
+  it('converts a Prisma P2002 unique-constraint error from a concurrent create into ConflictException', async () => {
+    // The pre-check (findUnique) passes for both racing callers; only the DB's own
+    // unique constraint on email catches the loser, as a P2002 rather than the
+    // pre-check's ConflictException. Callers (e.g. JIT provisioning) must see the same
+    // exception type either way.
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      'Unique constraint failed on the fields: (`email`)',
+      { code: 'P2002', clientVersion: '6.2.0' },
+    );
+    const { service } = createUsersServiceForCreate({
+      createUser: vi.fn().mockRejectedValue(prismaError),
+    });
+
+    await expect(service.create({ email: 'racer@example.com' })).rejects.toThrow(ConflictException);
+  });
+
+  it('rethrows other Prisma errors from create (e.g. a role FK failure)', async () => {
+    const prismaError = new Prisma.PrismaClientKnownRequestError(
+      'Foreign key constraint failed on the field: `UserRole_roleId_fkey (index)`',
+      { code: 'P2003', clientVersion: '6.2.0' },
+    );
+    const { service } = createUsersServiceForCreate({
+      createUser: vi.fn().mockRejectedValue(prismaError),
+    });
+
+    await expect(service.create({ email: 'newcomer@example.com' })).rejects.toThrow(
+      Prisma.PrismaClientKnownRequestError,
+    );
   });
 });

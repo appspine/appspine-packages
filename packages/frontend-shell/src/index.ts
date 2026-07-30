@@ -1,5 +1,4 @@
 export * from './components/admin/actions-core.js';
-export * from './components/auth/login-button.js';
 export * from './components/admin/api-key-row-actions.js';
 export * from './components/admin/api-keys-table.js';
 export * from './components/admin/create-api-key-dialog.js';
@@ -15,6 +14,7 @@ export * from './components/admin/roles-table.js';
 export * from './components/admin/types.js';
 export * from './components/admin/user-row-actions.js';
 export * from './components/admin/users-table.js';
+export * from './components/auth/login-button.js';
 export * from './components/date-picker.js';
 export * from './components/date-range-picker.js';
 export * from './components/date-time-picker.js';

@@ -4,6 +4,12 @@ import jwt from 'jsonwebtoken';
 import { describe, expect, it, vi } from 'vitest';
 import { JwtVerifierService } from './jwt-verifier.service';
 
+// The constructor now requires these to be set (fails closed if either is missing —
+// see the OidcStrategy/JwtVerifierService boot-time checks) so every test in this file
+// needs them present regardless of which describe block it lives in.
+process.env.OIDC_ISSUER = 'https://issuer.example';
+process.env.OIDC_AUDIENCE = 'test-client';
+
 function createService(
   findUnique: (...args: never[]) => unknown = async () => null,
   create: (...args: never[]) => unknown = async () => {},
@@ -26,6 +32,8 @@ describe('JwtVerifierService', () => {
     const token = jwt.sign({ email: 'user@example.com' }, privateKey, {
       algorithm: 'RS256',
       keyid: 'key-1',
+      issuer: process.env.OIDC_ISSUER,
+      audience: process.env.OIDC_AUDIENCE,
     });
     const service = createService(async () => ({
       id: 'user-1',
@@ -105,6 +113,14 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     await expect(
       service.buildOidcJwtUser({ email: 'newcomer@example.com', name: 'Newcomer' }),
     ).resolves.toMatchObject({ sub: 'user-new' });
+  });
+
+  it('rejects a token whose email_verified claim is explicitly false', async () => {
+    const service = createService();
+
+    await expect(
+      service.buildOidcJwtUser({ email: 'unverified@example.com', email_verified: false }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('does not call create when a local User already exists', async () => {

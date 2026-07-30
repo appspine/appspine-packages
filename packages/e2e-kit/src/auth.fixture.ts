@@ -22,6 +22,13 @@ interface CreateAuthFixturesOptions {
   readonly baseURL: string;
   readonly admin: AuthUserConfig;
   readonly user?: AuthUserConfig;
+  /** Accessible name of the login page's sign-in button. Every app currently uses the
+   * same English copy for this (`LoginButton`'s `label` prop, translated as
+   * "Sign in with Keycloak" in every app's en.json), and this fixture forces English via
+   * a locale cookie regardless of the app's default locale — but an app whose en catalog
+   * ever uses different wording would otherwise break this fixture with an opaque
+   * timeout. Override here instead of forking the fixture. */
+  readonly signInButtonName?: string;
 }
 
 export interface AuthFixtures {
@@ -35,18 +42,23 @@ async function ensureAuthDirectory(storageStatePath: string) {
   await mkdir(dirname(resolve(storageStatePath)), { recursive: true });
 }
 
-async function loginAndSaveStorageState(browser: Browser, baseURL: string, user: AuthUserConfig) {
+async function loginAndSaveStorageState(
+  browser: Browser,
+  baseURL: string,
+  user: AuthUserConfig,
+  signInButtonName: string,
+) {
   await ensureAuthDirectory(user.storageStatePath);
 
   const context = await browser.newContext();
   // Force English so this fixture's English-language locators (getByRole('button', {
-  // name: 'Sign in with Keycloak' }), etc.) work regardless of the app's default locale
+  // name: signInButtonName }), etc.) work regardless of the app's default locale
   // (e.g. appspine-app-template defaults to zh-TW). Saved into storageState below, so it
   // carries over into adminContext/userContext too.
   await context.addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
   const page = await context.newPage();
   await page.goto(`${baseURL}/login`);
-  await page.getByRole('button', { name: 'Sign in with Keycloak' }).click();
+  await page.getByRole('button', { name: signInButtonName }).click();
 
   // Cross-origin redirect to the dev Keycloak's own login page (dev-infra/README.md).
   await page.waitForURL('**/protocol/openid-connect/auth**');
@@ -71,19 +83,29 @@ async function loginAndSaveStorageState(browser: Browser, baseURL: string, user:
   await context.close();
 }
 
-async function ensureStorageState(browser: Browser, baseURL: string, user?: AuthUserConfig) {
+async function ensureStorageState(
+  browser: Browser,
+  baseURL: string,
+  signInButtonName: string,
+  user?: AuthUserConfig,
+) {
   if (!user) {
     return undefined;
   }
 
-  await loginAndSaveStorageState(browser, baseURL, user);
+  await loginAndSaveStorageState(browser, baseURL, user, signInButtonName);
   return resolve(user.storageStatePath);
 }
 
-export function createAuthFixtures({ baseURL, admin, user }: CreateAuthFixturesOptions) {
+export function createAuthFixtures({
+  baseURL,
+  admin,
+  user,
+  signInButtonName = 'Sign in with Keycloak',
+}: CreateAuthFixturesOptions) {
   return base.extend<AuthFixtures>({
     adminContext: async ({ browser }, use) => {
-      const storageState = await ensureStorageState(browser, baseURL, admin);
+      const storageState = await ensureStorageState(browser, baseURL, signInButtonName, admin);
       const context = await browser.newContext({ storageState });
       await use(context);
       await context.close();
@@ -94,7 +116,7 @@ export function createAuthFixtures({ baseURL, admin, user }: CreateAuthFixturesO
       await page.close();
     },
     userContext: async ({ browser }, use) => {
-      const storageState = await ensureStorageState(browser, baseURL, user);
+      const storageState = await ensureStorageState(browser, baseURL, signInButtonName, user);
       const context = await browser.newContext({ storageState });
       await use(context);
       await context.close();

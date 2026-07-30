@@ -1,5 +1,15 @@
 # @appspine/auth
 
+## 4.0.2
+
+### Patch Changes
+
+- Fix three issues surfaced by a post-completion security review of the 035 OIDC-only auth migration:
+
+  - `OidcStrategy` and `JwtVerifierService` now throw at construction (fail fast at boot) if `OIDC_ISSUER`/`OIDC_AUDIENCE` (and `OIDC_JWKS_URL` for `OidcStrategy`) are unset. Previously `jsonwebtoken`/`passport-jwt` silently skip the issuer/audience check when either option is `undefined` — combined with JIT provisioning removing the "a local User must already exist" safety net, an unset `OIDC_AUDIENCE` would have let a token minted for any client in the same Keycloak realm auto-provision into the app.
+  - `buildOidcJwtUser` now rejects a token whose `email_verified` claim is explicitly `false`, since identity is keyed purely on the email claim.
+  - `UsersService.create()` now converts a Prisma `P2002` unique-constraint violation (the DB-level race two truly concurrent JIT-provisioning calls for the same new email can hit) into the same `ConflictException` the pre-check `findUnique` path already throws — previously only the pre-check path was normalized, so a genuine concurrent race surfaced as an unhandled 500 instead of the intended "re-fetch and continue" recovery in `JwtVerifierService.provisionOidcUser`.
+
 ## 4.0.1
 
 ### Patch Changes

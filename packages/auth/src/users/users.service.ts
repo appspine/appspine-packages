@@ -75,19 +75,34 @@ export class UsersService {
       data.roleIds && data.roleIds.length > 0 ? data.roleIds : [await this.resolveDefaultRoleId()];
 
     const { email, password, name, isServiceAccount } = data;
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        password,
-        name,
-        isServiceAccount,
-        userRoles: {
-          create: roleIds.map((roleId) => ({ roleId })),
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email,
+          password,
+          name,
+          isServiceAccount,
+          userRoles: {
+            create: roleIds.map((roleId) => ({ roleId })),
+          },
         },
-      },
-      select: PUBLIC_FIELDS,
-    });
-    return mapUser(user);
+        select: PUBLIC_FIELDS,
+      });
+      return mapUser(user);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        (error as { code?: string }).code === 'P2002'
+      ) {
+        // Two concurrent callers (e.g. JIT provisioning racing on the same OIDC
+        // identity's first login) both pass the findUnique pre-check above and reach
+        // this create() — the loser hits the DB's unique constraint on email instead of
+        // the pre-check. Normalize both paths to the same exception so callers (e.g.
+        // JwtVerifierService.provisionOidcUser) only need to handle one case.
+        throw new ConflictException('Email already registered');
+      }
+      throw error;
+    }
   }
 
   /** Includes role + permissions — needed to sign the JWT at login. */

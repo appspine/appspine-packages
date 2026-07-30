@@ -1,5 +1,12 @@
 # @appspine/m2m-api-key
 
+## 3.0.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @appspine/auth@4.0.2
+
 ## 3.0.3
 
 ### Patch Changes

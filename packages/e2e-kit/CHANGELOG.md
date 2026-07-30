@@ -1,5 +1,11 @@
 # @appspine/e2e-kit
 
+## 1.0.1
+
+### Patch Changes
+
+- `createAuthFixtures`/`registerAuthSpec` now accept an optional `signInButtonName` (defaults to the current hardcoded `'Sign in with Keycloak'`) instead of hardcoding it, and the JIT-provisioned account's email assertion now matches by plain string instead of an unescaped `RegExp` — a `+`-tagged email address (or any other regex-special character) previously threw `Invalid regular expression: Nothing to repeat` instead of matching.
+
 ## 1.0.0
 
 ### Major Changes

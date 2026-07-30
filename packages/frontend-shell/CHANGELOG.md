@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.8.0
+
+### Minor Changes
+
+- `LoginButton`'s `label`/`pendingLabel` props are now required instead of defaulting to hardcoded English text — every consumer already passed its own translated copy, but the defaults meant a future app that forgot to would silently render English regardless of locale. A failure in `onSignIn` other than next-auth's own redirect (e.g. a network failure reaching the IdP) is now caught and surfaces an error message instead of silently resetting the button to idle with no explanation (`unstable_rethrow`'s underlying digest check is reimplemented inline rather than imported, since this package's `moduleResolution: NodeNext` can't resolve `next/navigation` against Next.js's own empty `exports` map).
+
 ## 0.7.0
 
 ### Minor Changes
