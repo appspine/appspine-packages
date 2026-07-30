@@ -1,5 +1,29 @@
 # @appspine/auth
 
+## 4.0.0
+
+### Major Changes
+
+- Local auth is retired — OIDC is now the sole identity source (dev_docs/framework/035).
+
+  Breaking changes:
+
+  - Removed `/auth/register` and `/auth/login` endpoints, `LocalStrategy`, and the
+    `registerSchema`/`loginSchema`/`RegisterDto`/`LoginDto` exports. `AuthController` now
+    only exposes `GET /auth/me`.
+  - `JwtAuthGuard` always uses the OIDC passport strategy (`jwt-oidc`); `AUTH_MODE` no
+    longer changes which strategy is registered.
+  - `JwtVerifierService.verifyJwtToken` always verifies against the configured OIDC JWKS.
+    `OIDC_JWKS_URL`/`OIDC_ISSUER`/`OIDC_AUDIENCE` must be set for the app to boot.
+
+  Non-breaking additions:
+
+  - `JwtVerifierService.buildOidcJwtUser` now does JIT (just-in-time) provisioning: the
+    first OIDC login for an email with no local `User` auto-creates one with the default
+    `USER` role, instead of rejecting with 401.
+  - `UsersService.create()` and `POST /users` (`createUserSchema`) no longer require a
+    `password` — nullable in the schema, optional in the API.
+
 ## 3.1.0
 
 ### Minor Changes

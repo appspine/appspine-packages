@@ -5,8 +5,6 @@ export * from './auth.module';
 export * from './constants';
 // Decorators
 export * from './decorators/current-user.decorator';
-// Dto
-export * from './dto/auth.dto';
 
 // Guards
 export * from './guards/admin.guard';
@@ -14,7 +12,6 @@ export * from './guards/jwt-auth.guard';
 export * from './jwt-verifier.service';
 
 // Strategies
-export * from './strategies/local.strategy';
 export * from './strategies/oidc.strategy';
 export * from './user-context.util';
 export * from './user-identity.util';

@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const createUserSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  // Optional under OIDC-only auth (dev_docs/framework/035) — this endpoint no longer
+  // requires a password. Kept in the schema for callers that still pass one (e.g. a
+  // deliberately password-protected break-glass account); the value is hashed if present.
+  password: z.string().min(8).optional(),
   name: z.string().optional(),
   isServiceAccount: z.boolean().optional(),
   roleIds: z.array(z.string()).optional(),

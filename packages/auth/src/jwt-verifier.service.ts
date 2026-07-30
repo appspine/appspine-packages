@@ -1,11 +1,10 @@
 import { PrismaService } from '@appspine/common';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import jwt, { type JwtHeader } from 'jsonwebtoken';
 import jwksClient, { type JwksClient } from 'jwks-rsa';
-import type { JwtPayload, JwtUser } from './decorators/current-user.decorator';
-import { resolveJwtSecret } from './jwt-secret.util';
+import type { JwtUser } from './decorators/current-user.decorator';
 import { buildUserContext } from './user-context.util';
+import { UsersService } from './users/users.service';
 
 @Injectable()
 export class JwtVerifierService {
@@ -13,13 +12,14 @@ export class JwtVerifierService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
-  async verifyJwtToken(token: string): Promise<JwtUser> {
-    return process.env.AUTH_MODE === 'oidc'
-      ? this.verifyOidcJwtToken(token)
-      : this.verifyLocalJwtToken(token);
+  // OIDC is the sole identity source (dev_docs/framework/035) — kept as its own public
+  // method since consumers outside Passport's guard flow (e.g. WebSocket handshakes)
+  // call this directly to verify a bearer token.
+  verifyJwtToken(token: string): Promise<JwtUser> {
+    return this.verifyOidcJwtToken(token);
   }
 
   async buildOidcJwtUser(payload: Record<string, unknown>): Promise<JwtUser> {
@@ -28,11 +28,10 @@ export class JwtVerifierService {
       throw new UnauthorizedException('OIDC token is missing an email claim');
     }
 
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      include: { userRoles: { include: { role: { include: { permissions: true } } } } },
-    });
-    if (!user?.isActive) {
+    const user =
+      (await this.findOidcUser(email)) ??
+      (await this.provisionOidcUser(email, payload.name as string | undefined));
+    if (!user.isActive) {
       throw new UnauthorizedException('No active local account for this OIDC identity');
     }
 
@@ -52,29 +51,34 @@ export class JwtVerifierService {
     };
   }
 
-  private async verifyLocalJwtToken(token: string): Promise<JwtUser> {
-    // Resolved outside the try/catch: a missing JWT_SECRET is a config error and must
-    // propagate as-is, not get swallowed into a generic "Invalid JWT" 401.
-    const secret = resolveJwtSecret();
+  private findOidcUser(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      include: { userRoles: { include: { role: { include: { permissions: true } } } } },
+    });
+  }
 
+  // First OIDC login for an email with no local User: create one on the fly (plan 035 §2.3,
+  // §4.2). No domain whitelist here — a validated OIDC token means the IdP already vouched
+  // for this identity; access is gated per-client on the IdP side instead.
+  private async provisionOidcUser(email: string, name: string | undefined) {
     try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret,
-        algorithms: ['HS256'],
-      });
-
-      return {
-        sub: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        roleName: payload.roleName,
-        roleNames: payload.roleNames ?? [],
-        permissionPolicy: payload.permissionPolicy ?? 'DENY_ALL',
-        permissions: payload.permissions ?? [],
-      };
-    } catch {
-      throw new UnauthorizedException('Invalid JWT');
+      await this.usersService.create({ email, name });
+    } catch (error) {
+      // Concurrent first logins for the same email race on UsersService.create()'s
+      // findUnique-then-create check (not a DB unique constraint) — the loser sees
+      // ConflictException, not a Prisma P2002. Re-fetch the row the winner just created
+      // instead of treating this as a real failure.
+      if (!(error instanceof ConflictException)) {
+        throw error;
+      }
     }
+
+    const user = await this.findOidcUser(email);
+    if (!user) {
+      throw new UnauthorizedException('Failed to provision OIDC account');
+    }
+    return user;
   }
 
   private async verifyOidcJwtToken(token: string): Promise<JwtUser> {

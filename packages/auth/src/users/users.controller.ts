@@ -70,8 +70,8 @@ export class UsersController {
     @Body(new ZodValidationPipe(createUserSchema)) dto: CreateUserDto,
     @CurrentUser() actor: { sub: string; email?: string },
   ) {
-    const hashed = await bcrypt.hash(dto.password, 12);
-    const user = await this.usersService.create({ ...dto, password: hashed });
+    const password = dto.password ? await bcrypt.hash(dto.password, 12) : undefined;
+    const user = await this.usersService.create({ ...dto, password });
     this.recordAudit(user.id, AuditAction.CREATE, actor);
     return user;
   }

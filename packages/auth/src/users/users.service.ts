@@ -63,7 +63,7 @@ export class UsersService {
 
   async create(data: {
     email: string;
-    password: string;
+    password?: string;
     name?: string;
     isServiceAccount?: boolean;
     roleIds?: string[];

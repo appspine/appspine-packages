@@ -6,17 +6,13 @@ import { AdminGuard } from './guards/admin.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { resolveJwtSecret } from './jwt-secret.util';
 import { JwtVerifierService } from './jwt-verifier.service';
-import { LocalStrategy } from './strategies/local.strategy';
 import { OidcStrategy } from './strategies/oidc.strategy';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 
-// Only the strategy matching AUTH_MODE is registered. OidcStrategy's constructor
-// eagerly validates OIDC_JWKS_URL (jwks-rsa throws synchronously if it's empty), so
-// unconditionally registering both would crash app boot under AUTH_MODE=local
-// whenever OIDC_JWKS_URL isn't set — the common case.
-const ActiveStrategy = process.env.AUTH_MODE === 'oidc' ? OidcStrategy : LocalStrategy;
-
+// JwtModule/JWT_SECRET are local-auth-only infra now that OidcStrategy is the sole
+// strategy (dev_docs/framework/035) — kept registered until T-12645 confirms no other
+// consumer needs them (dev_docs/framework/035-task-breakdown.md T-12645).
 @Global()
 @Module({
   imports: [
@@ -29,7 +25,7 @@ const ActiveStrategy = process.env.AUTH_MODE === 'oidc' ? OidcStrategy : LocalSt
     }),
   ],
   controllers: [AuthController, UsersController],
-  providers: [UsersService, JwtVerifierService, ActiveStrategy, JwtAuthGuard, AdminGuard],
+  providers: [UsersService, JwtVerifierService, OidcStrategy, JwtAuthGuard, AdminGuard],
   exports: [UsersService, JwtVerifierService, JwtAuthGuard, AdminGuard],
 })
 export class AuthModule {}
