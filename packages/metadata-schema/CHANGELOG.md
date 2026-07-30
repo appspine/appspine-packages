@@ -1,5 +1,11 @@
 # @appspine/metadata-schema
 
+## 0.2.11
+
+### Patch Changes
+
+- @appspine/m2m-api-key@3.0.2
+
 ## 0.2.10
 
 ### Patch Changes
