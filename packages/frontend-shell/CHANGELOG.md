@@ -1,5 +1,15 @@
 # @appspine/frontend-shell
 
+## 0.7.0
+
+### Minor Changes
+
+- Add `LoginButton` component and `mapAuthErrorKey` helper for the OIDC redirect-style
+  login flow (dev_docs/framework/035 §4.1, T-12550). Extracted from `apps/mcp-gateway`'s
+  pilot next-auth integration after validating it in-browser — each app still owns its own
+  next-auth config and translated copy; this only shares the loading/error presentation
+  shape around `signIn()`.
+
 ## 0.6.1
 
 ### Patch Changes

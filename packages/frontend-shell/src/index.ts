@@ -1,4 +1,5 @@
 export * from './components/admin/actions-core.js';
+export * from './components/auth/login-button.js';
 export * from './components/admin/api-key-row-actions.js';
 export * from './components/admin/api-keys-table.js';
 export * from './components/admin/create-api-key-dialog.js';
@@ -53,6 +54,7 @@ export * from './components/ui/table.js';
 export * from './components/ui/tooltip.js';
 export * from './hooks/use-mobile.js';
 export * from './i18n/index.js';
+export * from './lib/auth-error.js';
 export * from './lib/preferences/layout-utils.js';
 export * from './lib/preferences/theme-utils.js';
 export * from './lib/utils.js';
