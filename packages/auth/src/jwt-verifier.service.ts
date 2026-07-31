@@ -1,13 +1,15 @@
 import { PrismaService } from '@appspine/common';
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import jwt, { type JwtHeader } from 'jsonwebtoken';
 import jwksClient, { type JwksClient } from 'jwks-rsa';
+import { SYSTEM_ADMIN_ROLE } from './constants';
 import type { JwtUser } from './decorators/current-user.decorator';
 import { buildUserContext } from './user-context.util';
 import { UsersService } from './users/users.service';
 
 @Injectable()
 export class JwtVerifierService {
+  private readonly logger = new Logger(JwtVerifierService.name);
   private oidcClient: JwksClient | null = null;
 
   constructor(
@@ -62,7 +64,7 @@ export class JwtVerifierService {
       sub: user.id,
       email: user.email,
       name: user.name,
-      roleName: roleNames.includes('ADMIN') ? 'ADMIN' : (roleNames[0] ?? ''),
+      roleName: roleNames.includes(SYSTEM_ADMIN_ROLE) ? SYSTEM_ADMIN_ROLE : (roleNames[0] ?? ''),
       roleNames,
       permissionPolicy,
       permissions,
@@ -114,6 +116,12 @@ export class JwtVerifierService {
         throw error;
       }
 
+      // getOidcSigningKey() makes a network call to the IdP's JWKS endpoint — an outage,
+      // DNS failure, or rate-limit rejection (jwksRequestsPerMinute: 5, see
+      // getOidcClient()) lands here indistinguishable from a forged/expired token unless
+      // logged. Without this, a Keycloak outage presents as "every user's token is
+      // suddenly invalid" with zero server-side trace.
+      this.logger.warn(`OIDC token verification failed: ${errorMessage(error)}`);
       throw new UnauthorizedException('Invalid JWT');
     }
   }
@@ -173,4 +181,8 @@ export class JwtVerifierService {
       );
     });
   }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

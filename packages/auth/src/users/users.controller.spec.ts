@@ -12,6 +12,7 @@ vi.mock('@appspine/common', () => ({
 }));
 vi.mock('@appspine/audit-log', () => ({
   AuditLogService: class {},
+  recordAuditSafely: vi.fn(),
 }));
 
 // vi.mock calls above are hoisted above this static import by vitest's transform, so

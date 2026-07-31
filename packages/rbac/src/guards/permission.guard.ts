@@ -1,4 +1,5 @@
 import { SYSTEM_ADMIN_ROLE } from '@appspine/auth';
+import { PermissionPolicy } from '@appspine/common';
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';
 
@@ -21,10 +22,13 @@ export class PermissionGuard implements CanActivate {
     if (user.roleNames?.includes(SYSTEM_ADMIN_ROLE)) return true;
 
     // 2. ALLOW_ALL policy bypasses
-    if (user.permissionPolicy === 'ALLOW_ALL') return true;
+    if (user.permissionPolicy === PermissionPolicy.ALLOW_ALL) return true;
 
     // 3. READ_ALL policy: auto-pass any *_READ permission
-    if (user.permissionPolicy === 'READ_ALL' && required.some((p) => p.endsWith('_READ'))) {
+    if (
+      user.permissionPolicy === PermissionPolicy.READ_ALL &&
+      required.some((p) => p.endsWith('_READ'))
+    ) {
       return true;
     }
 

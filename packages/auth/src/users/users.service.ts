@@ -105,24 +105,6 @@ export class UsersService {
     }
   }
 
-  /** Includes role + permissions — needed to sign the JWT at login. */
-  findByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              include: {
-                permissions: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
   async findAll(query: PaginationQuery) {
     const { skip, take } = toPrismaPage(query);
     const orderBy = toPrismaOrderBy(query, SORTABLE, { createdAt: 'asc' });

@@ -142,18 +142,33 @@ export class RolesService {
     return this.mapRole(role);
   }
 
-  async update(id: string, dto: UpdateRoleDto) {
-    const role = await this.prisma.role.findUnique({ where: { id } });
-    if (!role) throw new NotFoundException('Role not found');
-
-    if (dto.permissions !== undefined && role.name === SYSTEM_ADMIN_ROLE) {
+  // Shared by update() and replacePermissions() so a fix to the guard (which permissions
+  // editing means for ADMIN) or the delete+recreate statements only needs to happen once —
+  // these two methods used to duplicate both wholesale.
+  private assertPermissionsEditable(role: { name: string }): void {
+    if (role.name === SYSTEM_ADMIN_ROLE) {
       throw new BadRequestException(
         'ADMIN permissions are managed via guard bypass and cannot be set here',
       );
     }
+  }
+
+  private buildReplacePermissionsStatements(id: string, permissions: string[]) {
+    return [
+      this.prisma.rolePermission.deleteMany({ where: { roleId: id } }),
+      this.prisma.rolePermission.createMany({
+        data: permissions.map((p) => ({ roleId: id, permission: p })),
+      }),
+    ] as const;
+  }
+
+  async update(id: string, dto: UpdateRoleDto) {
+    const role = await this.prisma.role.findUnique({ where: { id } });
+    if (!role) throw new NotFoundException('Role not found');
 
     if (dto.permissions !== undefined) {
-      // Atomic update: metadata + permission replacement in one transaction
+      this.assertPermissionsEditable(role);
+      // Atomic update: metadata + permission replacement in one transaction.
       await this.prisma.$transaction([
         this.prisma.role.update({
           where: { id },
@@ -162,10 +177,7 @@ export class RolesService {
             ...(dto.permissionPolicy !== undefined && { permissionPolicy: dto.permissionPolicy }),
           },
         }),
-        this.prisma.rolePermission.deleteMany({ where: { roleId: id } }),
-        this.prisma.rolePermission.createMany({
-          data: dto.permissions.map((p) => ({ roleId: id, permission: p })),
-        }),
+        ...this.buildReplacePermissionsStatements(id, dto.permissions),
       ]);
       return this.findOne(id);
     }
@@ -183,18 +195,9 @@ export class RolesService {
   async replacePermissions(id: string, dto: ReplacePermissionsDto) {
     const role = await this.prisma.role.findUnique({ where: { id } });
     if (!role) throw new NotFoundException('Role not found');
-    if (role.name === SYSTEM_ADMIN_ROLE) {
-      throw new BadRequestException(
-        'ADMIN permissions are managed via guard bypass and cannot be set here',
-      );
-    }
+    this.assertPermissionsEditable(role);
 
-    await this.prisma.$transaction([
-      this.prisma.rolePermission.deleteMany({ where: { roleId: id } }),
-      this.prisma.rolePermission.createMany({
-        data: dto.permissions.map((p) => ({ roleId: id, permission: p })),
-      }),
-    ]);
+    await this.prisma.$transaction(this.buildReplacePermissionsStatements(id, dto.permissions));
     return this.findOne(id);
   }
 

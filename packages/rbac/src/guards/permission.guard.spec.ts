@@ -7,6 +7,14 @@ vi.mock('@appspine/auth', () => ({
   SYSTEM_ADMIN_ROLE: 'SYSTEM_ADMIN',
 }));
 
+vi.mock('@appspine/common', () => ({
+  PermissionPolicy: {
+    DENY_ALL: 'DENY_ALL',
+    ALLOW_ALL: 'ALLOW_ALL',
+    READ_ALL: 'READ_ALL',
+  },
+}));
+
 const SYSTEM_ADMIN_ROLE = 'SYSTEM_ADMIN';
 
 function mockCtx(opts: {
