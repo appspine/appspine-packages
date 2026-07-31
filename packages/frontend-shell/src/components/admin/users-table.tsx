@@ -10,7 +10,7 @@ import { UserRowActions } from './user-row-actions.js';
 
 type UserSortField = 'email' | 'name';
 
-export function UsersTable({
+export function UsersTable<TKey extends string = string>({
   users,
   roles,
   currentUserId,
@@ -31,7 +31,7 @@ export function UsersTable({
   sortOrder: SortOrder | undefined;
   LinkComponent: SortableLinkComponent;
   buildSortHref: (field: UserSortField, order: SortOrder) => string;
-  t: (key: string) => string;
+  t: (key: TKey) => string;
   setUserActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
   setUserServiceAccountAction: (
     id: string,
@@ -47,7 +47,7 @@ export function UsersTable({
           <TableRow>
             <TableHead>
               <SortableColumnHeader<UserSortField>
-                label={t('email')}
+                label={t('email' as TKey)}
                 field="email"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -57,7 +57,7 @@ export function UsersTable({
             </TableHead>
             <TableHead>
               <SortableColumnHeader<UserSortField>
-                label={t('name')}
+                label={t('name' as TKey)}
                 field="name"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -65,9 +65,9 @@ export function UsersTable({
                 buildSortHref={buildSortHref}
               />
             </TableHead>
-            <TableHead>{t('roles')}</TableHead>
-            <TableHead>{t('status')}</TableHead>
-            <TableHead>{t('serviceAccount')}</TableHead>
+            <TableHead>{t('roles' as TKey)}</TableHead>
+            <TableHead>{t('status' as TKey)}</TableHead>
+            <TableHead>{t('serviceAccount' as TKey)}</TableHead>
             <TableHead className="w-10" />
           </TableRow>
         </TableHeader>
@@ -75,7 +75,7 @@ export function UsersTable({
           {users.length === 0 && (
             <TableRow>
               <TableCell colSpan={6} className="text-center text-muted-foreground">
-                {t('noUsers')}
+                {t('noUsers' as TKey)}
               </TableCell>
             </TableRow>
           )}
@@ -94,11 +94,13 @@ export function UsersTable({
               </TableCell>
               <TableCell>
                 <Badge variant={user.isActive ? 'default' : 'outline'}>
-                  {user.isActive ? t('active') : t('inactive')}
+                  {user.isActive ? t('active' as TKey) : t('inactive' as TKey)}
                 </Badge>
               </TableCell>
               <TableCell>
-                {user.isServiceAccount && <Badge variant="secondary">{t('serviceAccount')}</Badge>}
+                {user.isServiceAccount && (
+                  <Badge variant="secondary">{t('serviceAccount' as TKey)}</Badge>
+                )}
               </TableCell>
               <TableCell>
                 <UserRowActions

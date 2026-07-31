@@ -8,20 +8,20 @@ import type { DomainEventEnumKind, DomainEventRow } from './types.js';
  * compact per-row view and this page's full view share one implementation), composed alongside
  * this panel by the app's own page.
  */
-export function DomainEventDetailPanel({
+export function DomainEventDetailPanel<TKey extends string = string>({
   event,
   t,
   renderEnumLabel,
 }: {
   event: DomainEventRow;
-  t: (key: string) => string;
+  t: (key: TKey) => string;
   renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
 }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h1 className="font-bold text-2xl tracking-tight">
-          {t('detail.title').replace('{seq}', event.seq)}
+          {t('detail.title' as TKey).replace('{seq}', event.seq)}
         </h1>
         <p className="text-muted-foreground text-sm">
           {event.aggregateType} / <span className="font-mono">{event.aggregateId}</span>
@@ -29,16 +29,19 @@ export function DomainEventDetailPanel({
       </div>
 
       <section className="grid gap-3 md:grid-cols-3">
-        <Info label={t('columns.event')} value={event.eventType} />
+        <Info label={t('columns.event' as TKey)} value={event.eventType} />
         <Info
-          label={t('columns.operation')}
+          label={t('columns.operation' as TKey)}
           value={renderEnumLabel('DomainEventOperation', event.operation)}
         />
-        <Info label={t('columns.createdAt')} value={new Date(event.createdAt).toLocaleString()} />
+        <Info
+          label={t('columns.createdAt' as TKey)}
+          value={new Date(event.createdAt).toLocaleString()}
+        />
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="font-semibold text-base">{t('columns.changedFields')}</h2>
+        <h2 className="font-semibold text-base">{t('columns.changedFields' as TKey)}</h2>
         <div className="flex flex-wrap gap-1">
           {event.changedFields.map((field) => (
             <Badge key={field} variant="secondary">
@@ -48,12 +51,11 @@ export function DomainEventDetailPanel({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <JsonPanel title={t('detail.before')} value={event.before} />
-        <JsonPanel title={t('detail.after')} value={event.after} />
+      <section className="grid gap-4 md:grid-cols-3">
+        <JsonPanel title={t('detail.before' as TKey)} value={event.before} />
+        <JsonPanel title={t('detail.after' as TKey)} value={event.after} />
+        <JsonPanel title={t('detail.metadata' as TKey)} value={event.metadata} />
       </section>
-
-      <JsonPanel title={t('detail.metadata')} value={event.metadata} />
     </div>
   );
 }

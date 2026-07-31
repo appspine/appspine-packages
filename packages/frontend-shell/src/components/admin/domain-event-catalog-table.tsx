@@ -10,13 +10,13 @@ import type { DomainEventCatalogView, DomainEventEnumKind } from './types.js';
  * with no `describe()` entry (e.g. `webhook.post:<id>`) — those must not be invisible here just
  * because they're operations-time routing rather than a code-registered subscription.
  */
-export function DomainEventCatalogTable({
+export function DomainEventCatalogTable<TKey extends string = string>({
   catalog,
   t,
   renderEnumLabel,
 }: {
   catalog: DomainEventCatalogView;
-  t: (key: string) => string;
+  t: (key: TKey) => string;
   renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
 }) {
   const unresolvedDeliveries = catalog.unresolvedDeliveries ?? [];
@@ -29,9 +29,9 @@ export function DomainEventCatalogTable({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="font-bold text-2xl tracking-tight">{t('catalog.title')}</h1>
+        <h1 className="font-bold text-2xl tracking-tight">{t('catalog.title' as TKey)}</h1>
         <p className="text-muted-foreground text-sm">
-          {t('catalog.subtitle').replace('{days}', String(catalog.statsWindowDays))}
+          {t('catalog.subtitle' as TKey).replace('{days}', String(catalog.statsWindowDays))}
         </p>
       </div>
 
@@ -40,21 +40,21 @@ export function DomainEventCatalogTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('catalog.columns.key')}</TableHead>
-                <TableHead>{t('catalog.columns.eventTypes')}</TableHead>
-                <TableHead>{t('catalog.columns.description')}</TableHead>
-                <TableHead>{t('catalog.columns.total')}</TableHead>
-                <TableHead>{t('catalog.columns.processed')}</TableHead>
-                <TableHead>{t('catalog.columns.deadLetter')}</TableHead>
-                <TableHead>{t('catalog.columns.lastStatus')}</TableHead>
-                <TableHead>{t('catalog.columns.lastAttemptAt')}</TableHead>
+                <TableHead>{t('catalog.columns.key' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.eventTypes' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.description' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.total' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.processed' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.deadLetter' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.lastStatus' as TKey)}</TableHead>
+                <TableHead>{t('catalog.columns.lastAttemptAt' as TKey)}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {catalog.subscribers.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center text-muted-foreground">
-                    {t('catalog.emptySubscribers')}
+                    {t('catalog.emptySubscribers' as TKey)}
                   </TableCell>
                 </TableRow>
               )}
@@ -91,7 +91,7 @@ export function DomainEventCatalogTable({
                       </Badge>
                     ) : (
                       <span className="text-muted-foreground text-xs">
-                        {t('catalog.neverFired')}
+                        {t('catalog.neverFired' as TKey)}
                       </span>
                     )}
                   </TableCell>
@@ -109,25 +109,25 @@ export function DomainEventCatalogTable({
 
       {showDataDrivenSection && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-base">{t('catalog.dataDrivenTitle')}</h2>
-          <p className="text-muted-foreground text-sm">{t('catalog.dataDrivenSubtitle')}</p>
+          <h2 className="font-semibold text-base">{t('catalog.dataDrivenTitle' as TKey)}</h2>
+          <p className="text-muted-foreground text-sm">{t('catalog.dataDrivenSubtitle' as TKey)}</p>
           <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('catalog.columns.handlerKey')}</TableHead>
-                  <TableHead>{t('catalog.columns.total')}</TableHead>
-                  <TableHead>{t('catalog.columns.processed')}</TableHead>
-                  <TableHead>{t('catalog.columns.deadLetter')}</TableHead>
-                  <TableHead>{t('catalog.columns.lastStatus')}</TableHead>
-                  <TableHead>{t('catalog.columns.lastAttemptAt')}</TableHead>
+                  <TableHead>{t('catalog.columns.handlerKey' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.total' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.processed' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.deadLetter' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.lastStatus' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.lastAttemptAt' as TKey)}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {catalog.dataDrivenDeliveries.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-muted-foreground">
-                      {t('catalog.emptyDataDriven')}
+                      {t('catalog.emptyDataDriven' as TKey)}
                     </TableCell>
                   </TableRow>
                 )}
@@ -167,25 +167,25 @@ export function DomainEventCatalogTable({
 
       {showUnresolvedSection && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-base">{t('catalog.unresolvedTitle')}</h2>
-          <p className="text-muted-foreground text-sm">{t('catalog.unresolvedSubtitle')}</p>
+          <h2 className="font-semibold text-base">{t('catalog.unresolvedTitle' as TKey)}</h2>
+          <p className="text-muted-foreground text-sm">{t('catalog.unresolvedSubtitle' as TKey)}</p>
           <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('catalog.columns.handlerKey')}</TableHead>
-                  <TableHead>{t('catalog.columns.total')}</TableHead>
-                  <TableHead>{t('catalog.columns.processed')}</TableHead>
-                  <TableHead>{t('catalog.columns.deadLetter')}</TableHead>
-                  <TableHead>{t('catalog.columns.lastStatus')}</TableHead>
-                  <TableHead>{t('catalog.columns.lastAttemptAt')}</TableHead>
+                  <TableHead>{t('catalog.columns.handlerKey' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.total' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.processed' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.deadLetter' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.lastStatus' as TKey)}</TableHead>
+                  <TableHead>{t('catalog.columns.lastAttemptAt' as TKey)}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {unresolvedDeliveries.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-muted-foreground">
-                      {t('catalog.emptyUnresolved')}
+                      {t('catalog.emptyUnresolved' as TKey)}
                     </TableCell>
                   </TableRow>
                 )}

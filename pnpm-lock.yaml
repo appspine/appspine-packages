@@ -185,9 +185,6 @@ importers:
 
   packages/frontend-shell:
     dependencies:
-      next:
-        specifier: ^16.2.9
-        version: 16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       tailwindcss:
         specifier: ^4.1.5
         version: 4.3.2
@@ -213,6 +210,9 @@ importers:
       lucide-react:
         specifier: ^1.22.0
         version: 1.22.0(react@19.2.7)
+      next:
+        specifier: ^16.2.9
+        version: 16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       radix-ui:
         specifier: ^1.6.0
         version: 1.6.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
