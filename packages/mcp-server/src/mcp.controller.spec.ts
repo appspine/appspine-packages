@@ -11,6 +11,13 @@ vi.mock('@appspine/m2m-api-key', () => ({
   ApiKeyGuard: class {},
 }));
 
+vi.mock('@appspine/audit-log', () => ({
+  extractWorkflowId: (headers: Record<string, unknown>) => {
+    const value = headers['x-appspine-workflow-id'];
+    return typeof value === 'string' && value.length > 0 ? value : null;
+  },
+}));
+
 vi.mock('@modelcontextprotocol/sdk/server/streamableHttp.js', () => ({
   StreamableHTTPServerTransport: vi.fn().mockImplementation(() => ({
     handleRequest,

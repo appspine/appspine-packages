@@ -308,6 +308,9 @@ importers:
 
   packages/mcp-server:
     dependencies:
+      '@appspine/audit-log':
+        specifier: workspace:*
+        version: link:../audit-log
       '@appspine/auth':
         specifier: workspace:*
         version: link:../auth
