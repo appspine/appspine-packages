@@ -1,12 +1,6 @@
 import { AuditAction } from '@appspine/common';
-
 import type { AuditLogService } from './audit-log.service';
-
-export type AuditRecordActor = {
-  sub: string;
-  email?: string | null;
-  isApiKey?: boolean;
-};
+import type { AuditActor } from './audit-meta';
 
 export type AuditWarningLogger = {
   warn(message: string): void;
@@ -17,7 +11,7 @@ export interface RecordAuditSafelyInput {
   entityType: string;
   entityId: string;
   action: AuditAction;
-  actor: AuditRecordActor;
+  actor: AuditActor;
   appName?: string;
   logger?: AuditWarningLogger;
 }
