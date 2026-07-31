@@ -1,6 +1,6 @@
 {
   "name": "@appspine/auth",
-  "version": "4.0.2",
+  "version": "5.0.0",
   "private": false,
   "repository": {
     "type": "git",
@@ -34,8 +34,8 @@
     "passport-jwt": "^4.0.1"
   },
   "peerDependencies": {
-    "@appspine/audit-log": "^0.5.0",
-    "@appspine/common": "^0.2.1",
+    "@appspine/audit-log": "^1.0.0",
+    "@appspine/common": "^0.3.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/passport": "^11.0.5",
