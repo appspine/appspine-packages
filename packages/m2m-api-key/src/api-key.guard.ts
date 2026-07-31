@@ -7,12 +7,15 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { ApiKeyRateLimiter } from './api-key-rate-limiter';
 import { KEY_PREFIX } from './api-keys.service';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
+  private readonly logger = new Logger(ApiKeyGuard.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly rateLimiter: ApiKeyRateLimiter,
@@ -58,7 +61,7 @@ export class ApiKeyGuard implements CanActivate {
     // Fire-and-forget lastUsedAt update
     this.prisma.apiKey
       .update({ where: { id: apiKey.id }, data: { lastUsedAt: now } })
-      .catch((e: unknown) => console.error('[ApiKeyGuard] lastUsedAt update failed:', e));
+      .catch((e: unknown) => this.logger.error(`lastUsedAt update failed: ${errorMessage(e)}`));
 
     const actingUserId = apiKey.actingUser?.isActive ? apiKey.actingUser.id : null;
 
@@ -72,4 +75,8 @@ export class ApiKeyGuard implements CanActivate {
 
     return true;
   }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

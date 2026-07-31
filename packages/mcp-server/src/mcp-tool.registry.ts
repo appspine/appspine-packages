@@ -1,16 +1,6 @@
+import { matchScope } from '@appspine/m2m-api-key';
 import { Injectable, Logger } from '@nestjs/common';
 import type { McpCallContext, McpToolDefinition } from './types';
-
-export function matchScope(grantedScopes: string[], requiredScope: string): boolean {
-  if (grantedScopes.includes('*')) return true;
-  const [reqModule, reqAction] = requiredScope.split(':');
-  return grantedScopes.some((g) => {
-    if (g === '*') return true;
-    const [gModule, gAction] = g.split(':');
-    if (gModule !== reqModule) return false;
-    return gAction === '*' || gAction === reqAction;
-  });
-}
 
 // Cross-app tool naming prefix (dev_docs 002 "跨 app 統一的 app 前綴", dev_docs 023 §2.2) —
 // only `[a-zA-Z0-9_-]` is allowed because the prefixed name must also satisfy MCP tool-calling

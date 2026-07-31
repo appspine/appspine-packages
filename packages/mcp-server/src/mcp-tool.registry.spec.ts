@@ -1,4 +1,18 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@appspine/m2m-api-key', () => ({
+  matchScope: (grantedScopes: string[], requiredScope: string) => {
+    if (grantedScopes.includes('*')) return true;
+    const [reqModule, reqAction] = requiredScope.split(':');
+    return grantedScopes.some((g) => {
+      if (g === '*') return true;
+      const [gModule, gAction] = g.split(':');
+      if (gModule !== reqModule) return false;
+      return gAction === '*' || gAction === reqAction;
+    });
+  },
+}));
+
 import {
   classifyToolAsReadOnly,
   getConfiguredToolPrefix,
