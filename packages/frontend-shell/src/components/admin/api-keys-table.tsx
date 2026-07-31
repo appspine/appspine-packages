@@ -10,7 +10,21 @@ import type { ApiKeyRow, ServiceAccountOption } from './types.js';
 
 type ApiKeySortField = 'name' | 'lastUsedAt';
 
-export function ApiKeysTable<TKey extends string = string>({
+type ApiKeysTableKey =
+  | 'actingUser'
+  | 'actingUserNone'
+  | 'active'
+  | 'inactive'
+  | 'key'
+  | 'lastUsed'
+  | 'name'
+  | 'never'
+  | 'noApiKeys'
+  | 'role'
+  | 'scopes'
+  | 'status';
+
+export function ApiKeysTable({
   apiKeys,
   serviceAccounts,
   sortField,
@@ -28,7 +42,7 @@ export function ApiKeysTable<TKey extends string = string>({
   sortOrder: SortOrder | undefined;
   LinkComponent: SortableLinkComponent;
   buildSortHref: (field: ApiKeySortField, order: SortOrder) => string;
-  t: (key: TKey) => string;
+  t: (key: ApiKeysTableKey) => string;
   setApiKeyActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
   deleteApiKeyAction: (id: string) => Promise<{ error?: string }>;
   updateApiKeyActingUserAction: (
@@ -47,7 +61,7 @@ export function ApiKeysTable<TKey extends string = string>({
           <TableRow>
             <TableHead>
               <SortableColumnHeader<ApiKeySortField>
-                label={t('name' as TKey)}
+                label={t('name')}
                 field="name"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -55,14 +69,14 @@ export function ApiKeysTable<TKey extends string = string>({
                 buildSortHref={buildSortHref}
               />
             </TableHead>
-            <TableHead>{t('key' as TKey)}</TableHead>
-            <TableHead>{t('role' as TKey)}</TableHead>
-            <TableHead>{t('actingUser' as TKey)}</TableHead>
-            <TableHead>{t('scopes' as TKey)}</TableHead>
-            <TableHead>{t('status' as TKey)}</TableHead>
+            <TableHead>{t('key')}</TableHead>
+            <TableHead>{t('role')}</TableHead>
+            <TableHead>{t('actingUser')}</TableHead>
+            <TableHead>{t('scopes')}</TableHead>
+            <TableHead>{t('status')}</TableHead>
             <TableHead>
               <SortableColumnHeader<ApiKeySortField>
-                label={t('lastUsed' as TKey)}
+                label={t('lastUsed')}
                 field="lastUsedAt"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -77,7 +91,7 @@ export function ApiKeysTable<TKey extends string = string>({
           {apiKeys.length === 0 && (
             <TableRow>
               <TableCell colSpan={8} className="text-center text-muted-foreground">
-                {t('noApiKeys' as TKey)}
+                {t('noApiKeys')}
               </TableCell>
             </TableRow>
           )}
@@ -91,7 +105,7 @@ export function ApiKeysTable<TKey extends string = string>({
               <TableCell>
                 {(apiKey.actingUserId
                   ? serviceAccountEmailById.get(apiKey.actingUserId)
-                  : undefined) ?? t('actingUserNone' as TKey)}
+                  : undefined) ?? t('actingUserNone')}
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1">
@@ -104,13 +118,11 @@ export function ApiKeysTable<TKey extends string = string>({
               </TableCell>
               <TableCell>
                 <Badge variant={apiKey.isActive ? 'default' : 'outline'}>
-                  {apiKey.isActive ? t('active' as TKey) : t('inactive' as TKey)}
+                  {apiKey.isActive ? t('active') : t('inactive')}
                 </Badge>
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">
-                {apiKey.lastUsedAt
-                  ? new Date(apiKey.lastUsedAt).toLocaleString()
-                  : t('never' as TKey)}
+                {apiKey.lastUsedAt ? new Date(apiKey.lastUsedAt).toLocaleString() : t('never')}
               </TableCell>
               <TableCell>
                 <ApiKeyRowActions

@@ -9,7 +9,16 @@ import type { DomainEventEnumKind, DomainEventRow } from './types.js';
  * ordered by `seq desc` server-side (matches `DomainEventsAdminService.findAll()`) — no sortable
  * columns needed here, unlike UsersTable/RolesTable.
  */
-export function DomainEventsTable<TKey extends string = string>({
+type DomainEventsTableKey =
+  | 'columns.aggregate'
+  | 'columns.changedFields'
+  | 'columns.createdAt'
+  | 'columns.deliveries'
+  | 'columns.event'
+  | 'columns.seq'
+  | 'empty';
+
+export function DomainEventsTable({
   events,
   t,
   renderEnumLabel,
@@ -19,7 +28,7 @@ export function DomainEventsTable<TKey extends string = string>({
   ignoreDeliveryAction,
 }: {
   events: DomainEventRow[];
-  t: (key: TKey) => string;
+  t: (key: DomainEventsTableKey) => string;
   renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
   LinkComponent: SortableLinkComponent;
   buildDetailHref: (id: string) => string;
@@ -31,19 +40,19 @@ export function DomainEventsTable<TKey extends string = string>({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('columns.seq' as TKey)}</TableHead>
-            <TableHead>{t('columns.event' as TKey)}</TableHead>
-            <TableHead>{t('columns.aggregate' as TKey)}</TableHead>
-            <TableHead>{t('columns.changedFields' as TKey)}</TableHead>
-            <TableHead>{t('columns.deliveries' as TKey)}</TableHead>
-            <TableHead>{t('columns.createdAt' as TKey)}</TableHead>
+            <TableHead>{t('columns.seq')}</TableHead>
+            <TableHead>{t('columns.event')}</TableHead>
+            <TableHead>{t('columns.aggregate')}</TableHead>
+            <TableHead>{t('columns.changedFields')}</TableHead>
+            <TableHead>{t('columns.deliveries')}</TableHead>
+            <TableHead>{t('columns.createdAt')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {events.length === 0 && (
             <TableRow>
               <TableCell colSpan={6} className="text-center text-muted-foreground">
-                {t('empty' as TKey)}
+                {t('empty')}
               </TableCell>
             </TableRow>
           )}

@@ -10,7 +10,17 @@ import type { RoleRow } from './types.js';
 
 type RoleSortField = 'displayName' | 'userCount' | 'apiKeyCount';
 
-export function RolesTable<TKey extends string = string>({
+type RolesTableKey =
+  | 'apiKeys'
+  | 'name'
+  | 'noRoles'
+  | 'permissions'
+  | 'policy'
+  | 'systemBadge'
+  | 'systemRoleDeleteWarning'
+  | 'users';
+
+export function RolesTable({
   roles,
   policyOptions,
   permissionOptions,
@@ -30,7 +40,7 @@ export function RolesTable<TKey extends string = string>({
   sortOrder: SortOrder | undefined;
   LinkComponent: SortableLinkComponent;
   buildSortHref: (field: RoleSortField, order: SortOrder) => string;
-  t: (key: TKey) => string;
+  t: (key: RolesTableKey) => string;
   renderEnumLabel: (kind: 'PermissionPolicy' | 'Permission', value: string) => string;
   updateRoleAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
   deleteRoleAction: (id: string) => Promise<{ error?: string }>;
@@ -57,7 +67,7 @@ export function RolesTable<TKey extends string = string>({
           <TableRow>
             <TableHead>
               <SortableColumnHeader<RoleSortField>
-                label={t('name' as TKey)}
+                label={t('name')}
                 field="displayName"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -65,11 +75,11 @@ export function RolesTable<TKey extends string = string>({
                 buildSortHref={buildSortHref}
               />
             </TableHead>
-            <TableHead>{t('policy' as TKey)}</TableHead>
-            <TableHead>{t('permissions' as TKey)}</TableHead>
+            <TableHead>{t('policy')}</TableHead>
+            <TableHead>{t('permissions')}</TableHead>
             <TableHead>
               <SortableColumnHeader<RoleSortField>
-                label={t('users' as TKey)}
+                label={t('users')}
                 field="userCount"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -79,7 +89,7 @@ export function RolesTable<TKey extends string = string>({
             </TableHead>
             <TableHead>
               <SortableColumnHeader<RoleSortField>
-                label={t('apiKeys' as TKey)}
+                label={t('apiKeys')}
                 field="apiKeyCount"
                 currentSortField={sortField}
                 currentSortOrder={sortOrder}
@@ -94,7 +104,7 @@ export function RolesTable<TKey extends string = string>({
           {roles.length === 0 && (
             <TableRow>
               <TableCell colSpan={6} className="text-center text-muted-foreground">
-                {t('noRoles' as TKey)}
+                {t('noRoles')}
               </TableCell>
             </TableRow>
           )}
@@ -104,8 +114,8 @@ export function RolesTable<TKey extends string = string>({
                 <div className="flex items-center gap-2">
                   {role.displayName}
                   {role.isSystem && (
-                    <Badge variant="outline" title={t('systemRoleDeleteWarning' as TKey)}>
-                      {t('systemBadge' as TKey)}
+                    <Badge variant="outline" title={t('systemRoleDeleteWarning')}>
+                      {t('systemBadge')}
                     </Badge>
                   )}
                 </div>

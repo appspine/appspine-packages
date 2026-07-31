@@ -1,5 +1,37 @@
 # @appspine/frontend-shell
 
+## 0.10.0
+
+### Minor Changes
+
+- Replace the generic `<TKey extends string = string>` on the 6 shared admin table
+  components (`RolesTable`, `UsersTable`, `ApiKeysTable`, `DomainEventsTable`,
+  `DomainEventCatalogTable`, `DomainEventDetailPanel`) with each component's actual literal
+  key union, and remove the internal `as TKey` assertions those keys were hidden behind. The
+  0.9.0 generic design was type-safety-neutral in practice — the `= string` default let an
+  unmigrated consumer keep passing `(key: string) => string` and still compile, and the
+  internal assertions meant a typo'd or renamed translation key inside the component itself
+  wouldn't be caught either. Consumers whose scoped translation function's key type doesn't
+  structurally satisfy the new literal union will now see a real compile error instead of
+  silently compiling.
+
+  Also removes `buildAllMessages()` (dead export, zero callers anywhere in the workspace) and
+  `sidebar.tsx`'s hand-rolled `document.cookie` write (now goes through this same package's
+  `setClientCookie`, added in 0.9.0, instead of duplicating the max-age logic).
+
+## 0.9.0
+
+### Minor Changes
+
+- Retroactive changelog entry (036 remediation, 2026-07-31) — this version was published
+  (`0f588f3`) without a changeset, so this entry was missing until now. It shipped: generic
+  `<TKey extends string = string>` types on the 6 shared admin table components (`RolesTable`,
+  `UsersTable`, `ApiKeysTable`, `DomainEventsTable`, `DomainEventCatalogTable`,
+  `DomainEventDetailPanel`), replacing their `t: (key: string) => string` prop that forced
+  every consumer into an `as any`/cast workaround; and consolidation of `cookie.client.ts`,
+  `theme-boot.tsx` (`ThemeBootScript`), and a new parameterized `createApiFetch` factory,
+  previously duplicated verbatim across all 9 repos.
+
 ## 0.8.0
 
 ### Minor Changes
