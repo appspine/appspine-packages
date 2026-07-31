@@ -1,3 +1,4 @@
+import type { PrismaDmmfDatamodel } from '@appspine/common';
 import { Prisma } from '@appspine/common';
 import { Injectable } from '@nestjs/common';
 
@@ -40,29 +41,28 @@ export interface SchemaMeta {
   availableScopes: string[];
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Prisma.dmmf shape isn't exposed in @prisma/client's public types
-type AnyDMMF = any;
-
 @Injectable()
 export class MetaService {
   buildMeta(): SchemaMeta {
-    const { models, enums } = Prisma.dmmf.datamodel as AnyDMMF;
+    // Prisma.dmmf's shape isn't exposed in @prisma/client's public types, so this cast is the
+    // one place that bridges to it; everything downstream is properly typed.
+    const { models, enums } = Prisma.dmmf.datamodel as unknown as PrismaDmmfDatamodel;
 
-    const modelsMeta: ModelMeta[] = models.map((m: AnyDMMF) => ({
+    const modelsMeta: ModelMeta[] = models.map((m) => ({
       name: m.name,
       dbTable: m.dbName ?? m.name.toLowerCase(),
       documentation: m.documentation,
       fields: m.fields
-        .filter((f: AnyDMMF) => f.kind !== 'object')
-        .map((f: AnyDMMF) => ({
+        .filter((f) => f.kind !== 'object')
+        .map((f) => ({
           name: f.name,
           type: f.type,
           kind: f.kind,
           isRequired: f.isRequired,
-          isUnique: f.isUnique,
-          isId: f.isId,
+          isUnique: f.isUnique ?? false,
+          isId: f.isId ?? false,
           isList: f.isList,
-          hasDefault: f.hasDefaultValue,
+          hasDefault: f.hasDefaultValue ?? false,
           default: f.default,
           documentation: f.documentation,
         })),
@@ -71,25 +71,16 @@ export class MetaService {
     return {
       generatedAt: new Date().toISOString(),
       models: modelsMeta,
-      enums: enums.map((e: AnyDMMF) => ({
+      enums: enums.map((e) => ({
         name: e.name,
         documentation: e.documentation,
-        values: e.values.map((v: AnyDMMF) => ({
+        values: e.values.map((v) => ({
           name: v.name,
           documentation: v.documentation,
         })),
       })),
       availableScopes: this.deriveScopes(modelsMeta),
     };
-  }
-
-  getAvailableScopes(): string[] {
-    return this.deriveScopes(
-      (Prisma.dmmf.datamodel as AnyDMMF).models.map((m: AnyDMMF) => ({
-        dbTable: m.dbName ?? m.name.toLowerCase(),
-        documentation: m.documentation,
-      })),
-    );
   }
 
   private deriveScopes(models: Pick<ModelMeta, 'dbTable' | 'documentation'>[]): string[] {

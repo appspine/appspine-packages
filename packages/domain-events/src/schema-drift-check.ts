@@ -23,42 +23,17 @@
  * ```
  */
 
-export type DmmfField = {
-  name: string;
-  kind: string;
-  type: string;
-  isRequired: boolean;
-  isList: boolean;
-  dbName?: string | null;
-  isId?: boolean;
-  hasDefaultValue?: boolean;
-  default?: unknown;
-  relationName?: string;
-  relationFromFields?: readonly string[];
-  relationToFields?: readonly string[];
-};
+import type { DmmfEnum, DmmfField, DmmfModel, PrismaDmmfDatamodel } from '@appspine/common';
 
-export type DmmfModel = {
-  name: string;
-  dbName?: string | null;
-  fields: readonly DmmfField[];
-  uniqueFields?: readonly (readonly string[])[];
-  uniqueIndexes?: readonly { fields: readonly string[] }[];
-};
-
-export type DmmfEnum = {
-  name: string;
-  values: readonly { name: string }[];
-};
+export type { DmmfEnum, DmmfField, DmmfModel };
 
 /**
  * Structurally compatible with `@prisma/client`'s `Prisma.dmmf.datamodel` (whose arrays are
- * `ReadonlyDeep`), so callers can pass it straight through without casting.
+ * `ReadonlyDeep`), so callers can pass it straight through without casting. An alias of
+ * `@appspine/common`'s `PrismaDmmfDatamodel`, kept under this package's own established name
+ * since it's part of this package's public API (see the usage example above).
  */
-export type DomainEventDatamodel = {
-  models: readonly DmmfModel[];
-  enums: readonly DmmfEnum[];
-};
+export type DomainEventDatamodel = PrismaDmmfDatamodel;
 
 type ExpectedField = {
   name: string;

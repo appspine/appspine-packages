@@ -1,7 +1,6 @@
-// Filters
-
 // Enums
 export * from './enums';
+// Filters
 export * from './filters/exception.filter';
 // Logging
 export * from './logging/logging.module';
@@ -13,3 +12,4 @@ export * from './prisma/prisma.module';
 export * from './prisma/prisma.service';
 // Prisma
 export * from './prisma/prisma-client';
+export * from './prisma/prisma-dmmf-types';

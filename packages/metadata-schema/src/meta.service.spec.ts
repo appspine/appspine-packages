@@ -103,7 +103,7 @@ describe('MetaService', () => {
       { name: 'Comment', fields: [] },
     ];
 
-    expect(new MetaService().getAvailableScopes()).toEqual([
+    expect(new MetaService().buildMeta().availableScopes).toEqual([
       'wiki_pages:read',
       'wiki_pages:write',
       'wiki_pages:*',
