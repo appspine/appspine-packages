@@ -6,16 +6,6 @@ export const locales = ['zh-TW', 'en'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'zh-TW';
 
-export function buildAllMessages<T extends Record<string, Record<string, string>>>(
-  en: T,
-  zhTW: T,
-): Record<Locale, T> {
-  return {
-    en,
-    'zh-TW': zhTW,
-  };
-}
-
 interface I18nContextType {
   readonly locale: Locale;
   readonly messages: Record<string, Record<string, string>>;

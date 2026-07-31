@@ -6,6 +6,7 @@ import { Slot } from 'radix-ui';
 import * as React from 'react';
 
 import { useIsMobile } from '../../hooks/use-mobile.js';
+import { setClientCookie } from '../../lib/cookie.client.js';
 import { cn } from '../../lib/utils.js';
 import { Button } from './button.js';
 import { Input } from './input.js';
@@ -15,7 +16,7 @@ import { Skeleton } from './skeleton.js';
 import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip.js';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+const SIDEBAR_COOKIE_MAX_AGE_DAYS = 7;
 const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
@@ -70,8 +71,7 @@ export function SidebarProvider({
         setInternalOpen(nextOpen);
       }
 
-      // biome-ignore lint/suspicious/noDocumentCookie: SSR reads this cookie and Cookie Store API support is not universal.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${nextOpen}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      setClientCookie(SIDEBAR_COOKIE_NAME, String(nextOpen), SIDEBAR_COOKIE_MAX_AGE_DAYS);
     },
     [open, setOpenProp],
   );
