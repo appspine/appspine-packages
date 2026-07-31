@@ -68,7 +68,11 @@ export function createMasterDataSyncHandler<
       }
 
       const mapped = mapper(payload, event);
-      const data = { ...mapped, seq: event.seq, syncedAt: now() } as unknown as TMirror;
+      // TMirror is a generic bound to MirrorRecord, so TS can't prove this reconstruction
+      // (Omit<TMirror, 'seq' | 'syncedAt'> plus those two fields back) equals TMirror for an
+      // arbitrary subtype — the cast is narrower now than before: `syncedAt` is a declared,
+      // typed field on TMirror rather than a silently-injected one the type didn't know about.
+      const data = { ...mapped, seq: event.seq, syncedAt: now() } as TMirror;
 
       await model.upsert({
         where: { sourceId: event.aggregateId },

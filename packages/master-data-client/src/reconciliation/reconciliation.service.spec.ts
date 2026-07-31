@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { Logger } from '@nestjs/common';
+import { describe, expect, it, vi } from 'vitest';
 import type { MirrorRecord } from '../types';
 import { reconcileEntity } from './reconciliation.service';
+
+const silentLogger = new Logger('reconcileEntity.spec');
 
 type OrgMirror = MirrorRecord & {
   name: string;
@@ -50,6 +53,7 @@ describe('reconcileEntity', () => {
     ]);
 
     const result = await reconcileEntity(
+      'org',
       model,
       [
         { sourceId: 'unit-1', seq: 2n, payload: { name: 'Finance' } },
@@ -61,6 +65,7 @@ describe('reconcileEntity', () => {
         seq: item.seq,
         syncedAt: new Date('2026-07-22T00:00:00.000Z'),
       }),
+      silentLogger,
     );
 
     expect(result).toEqual({ upserted: 2, deleted: 1, skipped: 0 });
@@ -76,14 +81,50 @@ describe('reconcileEntity', () => {
       { sourceId: 'unit-2', name: 'HR', seq: 1n, syncedAt: oldSyncedAt },
     ]);
 
-    const result = await reconcileEntity(model, [], (item) => ({
-      sourceId: item.sourceId,
-      name: String(item.payload.name),
-      seq: item.seq,
-      syncedAt: new Date('2026-07-22T00:00:00.000Z'),
-    }));
+    const warnSpy = vi.spyOn(silentLogger, 'warn').mockImplementation(() => undefined);
+
+    const result = await reconcileEntity(
+      'org',
+      model,
+      [],
+      (item) => ({
+        sourceId: item.sourceId,
+        name: String(item.payload.name),
+        seq: item.seq,
+        syncedAt: new Date('2026-07-22T00:00:00.000Z'),
+      }),
+      silentLogger,
+    );
 
     expect(result).toEqual({ upserted: 0, deleted: 0, skipped: 0 });
     expect(rows.size).toBe(2);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy.mock.calls[0][0]).toContain('"org"');
+
+    warnSpy.mockRestore();
+  });
+
+  it('does not warn when the source list and the Mirror are both empty (a no-op, not a skip)', async () => {
+    const { model, rows } = createModel([]);
+    const warnSpy = vi.spyOn(silentLogger, 'warn').mockImplementation(() => undefined);
+
+    const result = await reconcileEntity(
+      'org',
+      model,
+      [],
+      (item) => ({
+        sourceId: item.sourceId,
+        name: String(item.payload.name),
+        seq: item.seq,
+        syncedAt: new Date('2026-07-22T00:00:00.000Z'),
+      }),
+      silentLogger,
+    );
+
+    expect(result).toEqual({ upserted: 0, deleted: 0, skipped: 0 });
+    expect(rows.size).toBe(0);
+    expect(warnSpy).not.toHaveBeenCalled();
+
+    warnSpy.mockRestore();
   });
 });

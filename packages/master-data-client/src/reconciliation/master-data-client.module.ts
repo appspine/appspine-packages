@@ -31,11 +31,12 @@ export class MasterDataClientModule {
   static forRootAsync(options: MasterDataClientModuleAsyncOptions): DynamicModule {
     return {
       module: MasterDataClientModule,
-      imports: options.imports as never[] | undefined,
+      imports: options.imports,
       providers: [
         {
           provide: MASTER_DATA_CLIENT_OPTIONS,
-          useFactory: async (...args: never[]) => {
+          // biome-ignore lint/suspicious/noExplicitAny: matches options.useFactory's signature (see MasterDataClientModuleAsyncOptions.inject).
+          useFactory: async (...args: any[]) => {
             const resolved = await options.useFactory(...args);
             return {
               intervalMs: resolved.intervalMs ?? DEFAULT_INTERVAL_MS,
@@ -43,7 +44,7 @@ export class MasterDataClientModule {
               entities: resolved.entities,
             };
           },
-          inject: options.inject as never[] | undefined,
+          inject: options.inject,
         },
         MasterDataReconciliationService,
       ],

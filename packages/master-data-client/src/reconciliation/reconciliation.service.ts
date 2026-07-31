@@ -56,33 +56,46 @@ export class MasterDataReconciliationService implements OnModuleInit, OnModuleDe
     }
     this.running = true;
     try {
+      // Each entity is reconciled independently — one entity's listFetcher() failing (a
+      // transient/partial fetch against the master-data app) must not skip every other
+      // entity for the rest of this pass. A shared listFetcher backend means "the next
+      // pass will catch it" (reconcileEntity's own delete-sweep guard) doesn't hold if the
+      // failure recurs across passes; per-entity isolation at least keeps unrelated
+      // entities converging.
       for (const entity of this.options.entities) {
-        const sourceItems = await entity.listFetcher();
-        if (sourceItems.length === 0) {
-          this.logger.warn(
-            `listFetcher for "${entity.name}" returned an empty list; skipping the delete-sweep for ` +
-              'this reconciliation pass to avoid wiping the Mirror on a transient/partial fetch ' +
-              '(see reconcileEntity).',
+        try {
+          const sourceItems = await entity.listFetcher();
+          await reconcileEntity(
+            entity.name,
+            entity.model,
+            sourceItems,
+            (item) => ({
+              ...entity.mapper(item),
+              seq: item.seq,
+              syncedAt: new Date(),
+            }),
+            this.logger,
           );
+        } catch (error) {
+          this.logger.error(`Reconciliation failed for "${entity.name}": ${errorMessage(error)}`);
         }
-        await reconcileEntity(entity.model, sourceItems, (item) => ({
-          ...entity.mapper(item),
-          seq: item.seq,
-          syncedAt: new Date(),
-        }));
       }
-    } catch (error) {
-      this.logger.error(error);
     } finally {
       this.running = false;
     }
   }
 }
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function reconcileEntity<TMirror extends MirrorRecord>(
+  name: string,
   model: ReconciliationMirrorModel<TMirror>,
   sourceItems: MasterDataListItem<Record<string, unknown>>[],
   mapSourceItem: (item: MasterDataListItem<Record<string, unknown>>) => TMirror,
+  logger: Logger,
 ): Promise<{ upserted: number; deleted: number; skipped: number }> {
   const existing = await model.findMany();
   const sourceIds = new Set(sourceItems.map((item) => item.sourceId));
@@ -110,8 +123,14 @@ export async function reconcileEntity<TMirror extends MirrorRecord>(
   // genuinely having zero records left. Skip the delete-sweep in that case so a flaky
   // fetch can't silently wipe every local Mirror row; a real deletion is still caught by
   // the webhook-driven delete event path, and the next successful reconciliation pass
-  // will still catch anything actually missed.
+  // will still catch anything actually missed. Only warn when the guard actually does
+  // something — an empty source list against an already-empty Mirror isn't a skip, it's
+  // a no-op, and logging it as a skip would be misleading.
   if (sourceItems.length === 0 && existing.length > 0) {
+    logger.warn(
+      `listFetcher for "${name}" returned an empty list; skipping the delete-sweep for this ` +
+        'reconciliation pass to avoid wiping the Mirror on a transient/partial fetch.',
+    );
     return { upserted, deleted: 0, skipped };
   }
 
