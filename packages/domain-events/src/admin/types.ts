@@ -39,14 +39,17 @@ export type DomainEventCatalogSubscriberEntry = DomainEventSubscriberDescriptor 
   stats: DomainEventDeliveryStats;
 };
 
-/** A handler key with deliveries but no `describe()` entry — data-driven routing (e.g. `webhook.post:<id>`). */
-export type DomainEventCatalogDataDrivenEntry = DomainEventDeliveryStats & {
+/**
+ * A handler key with deliveries but no `describe()` entry. Two distinct causes share this same
+ * shape: data-driven routing (e.g. `webhook.post:<id>`, expected — see `dataDrivenPrefixes`) and
+ * a genuinely unresolved handler key (unexpected — no registered subscriber or prefix claims it).
+ */
+export type DomainEventCatalogHandlerKeyEntry = DomainEventDeliveryStats & {
   handlerKey: string;
 };
 
-export type DomainEventCatalogUnresolvedEntry = DomainEventDeliveryStats & {
-  handlerKey: string;
-};
+export type DomainEventCatalogDataDrivenEntry = DomainEventCatalogHandlerKeyEntry;
+export type DomainEventCatalogUnresolvedEntry = DomainEventCatalogHandlerKeyEntry;
 
 export type DomainEventCatalogResponse = {
   subscribers: DomainEventCatalogSubscriberEntry[];

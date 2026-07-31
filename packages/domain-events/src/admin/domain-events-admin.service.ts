@@ -1,6 +1,6 @@
 import { PrismaService, toPrismaPage } from '@appspine/common';
 import { ConflictException, Inject, Injectable, NotFoundException, Optional } from '@nestjs/common';
-
+import type { DeliveryCompletionData } from '../domain-event-dispatcher.service';
 import { DomainEventRegistry } from '../domain-event-registry';
 import { type DomainEventDeliveryRecord, DomainEventDeliveryStatus } from '../types';
 import type { DomainEventAdminListQuery } from './dto/domain-event-admin.dto';
@@ -178,7 +178,7 @@ export class DomainEventsAdminService {
     id: string,
     actor: DomainEventsAdminActor,
     action: DomainEventsAdminAuditAction,
-    data: Record<string, unknown>,
+    data: DeliveryCompletionData,
   ) {
     const before = await this.prisma.domainEventDelivery.findUnique({ where: { id } });
     if (!before) throw new NotFoundException('Domain event delivery not found');
@@ -215,11 +215,20 @@ export class DomainEventsAdminService {
   }
 }
 
+/**
+ * `createdTo` is schema-typed as a full datetime (`z.coerce.date()`, domain-event-admin.dto.ts),
+ * but this filter is meant to be day-inclusive (an admin picking "up to 2026-07-31" expects the
+ * whole day of the 31st included). Truncating to the start of the given day before advancing to
+ * the next day makes that true regardless of what time-of-day component the caller passed —
+ * naively adding 24h to the raw timestamp would instead silently exclude the rest of that day
+ * whenever a non-midnight time was given.
+ */
 function endExclusive(date: Date | undefined): Date | undefined {
   if (!date) return undefined;
-  const next = new Date(date);
-  next.setUTCDate(next.getUTCDate() + 1);
-  return next;
+  const startOfNextDay = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1),
+  );
+  return startOfNextDay;
 }
 
 /** Deliveries pass through unchanged; only the bigint seq needs a JSON-safe form. */

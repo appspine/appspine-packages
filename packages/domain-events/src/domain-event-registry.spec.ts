@@ -22,6 +22,14 @@ describe('DomainEventRegistry', () => {
     expect(registry.resolve('unknown')).toBeNull();
   });
 
+  it('falls through to a later matching prefix when an earlier one returns null', () => {
+    const registry = new DomainEventRegistry();
+    registry.registerPrefix('webhook.post:legacy-', () => null);
+    registry.registerPrefix('webhook.post:', (handlerKey) => noopHandler(handlerKey));
+
+    expect(registry.resolve('webhook.post:legacy-sub-1')?.key).toBe('webhook.post:legacy-sub-1');
+  });
+
   it('rejects a duplicate handler key for the same event type', () => {
     const registry = new DomainEventRegistry();
     const handler = noopHandler('audit-record');

@@ -236,4 +236,26 @@ describe('DomainEventsAdminService findOne/findAll', () => {
     const list = await service.findAll({ page: 1, limit: 20 } as never);
     expect(list.data[0].seq).toBe('42');
   });
+
+  it('makes createdTo day-inclusive regardless of its time-of-day component', async () => {
+    const findMany = vi.fn().mockResolvedValue([]);
+    const prisma = makePrismaMock({
+      domainEvent: { findMany, count: vi.fn().mockResolvedValue(0), findUnique: vi.fn() },
+    });
+    const service = new DomainEventsAdminService(prisma as never, new DomainEventRegistry());
+
+    await service.findAll({
+      page: 1,
+      limit: 20,
+      createdTo: new Date('2026-07-31T15:30:00.000Z'),
+    } as never);
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          createdAt: expect.objectContaining({ lt: new Date('2026-08-01T00:00:00.000Z') }),
+        }),
+      }),
+    );
+  });
 });

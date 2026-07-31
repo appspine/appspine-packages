@@ -28,4 +28,9 @@ describe('diffChangedFields', () => {
   it('reports a field removed in after as changed', () => {
     expect(diffChangedFields({ id: 'a', optional: 'x' }, { id: 'a' })).toEqual(['optional']);
   });
+
+  it('does not throw on a bigint field (e.g. a Prisma seq column) and compares it by value', () => {
+    expect(diffChangedFields({ id: 'a', seq: 1n }, { id: 'a', seq: 1n })).toEqual([]);
+    expect(diffChangedFields({ id: 'a', seq: 1n }, { id: 'a', seq: 2n })).toEqual(['seq']);
+  });
 });

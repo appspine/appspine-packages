@@ -25,6 +25,12 @@ function sortJson(value: unknown): unknown {
     return value.toISOString();
   }
 
+  // JSON.stringify throws a TypeError on a raw bigint (e.g. a Prisma BigInt column like `seq`);
+  // stringify it the same way serializeDomainEvent() does for API responses.
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+
   if (Array.isArray(value)) {
     return value.map((item) => sortJson(item));
   }

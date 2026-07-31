@@ -22,7 +22,7 @@ import {
 
 type ClaimedDelivery = DomainEventDeliveryRecord & { event: DomainEventRecord };
 
-type DeliveryCompletionData = Partial<
+export type DeliveryCompletionData = Partial<
   Pick<
     DomainEventDeliveryRecord,
     'status' | 'attempts' | 'nextAttemptAt' | 'lockedAt' | 'lockedBy' | 'lastError' | 'processedAt'

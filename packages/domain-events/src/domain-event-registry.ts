@@ -86,7 +86,9 @@ export class DomainEventRegistry {
     if (exact) return exact;
 
     for (const [prefix, resolve] of this.prefixResolvers) {
-      if (handlerKey.startsWith(prefix)) return resolve(handlerKey);
+      if (!handlerKey.startsWith(prefix)) continue;
+      const resolved = resolve(handlerKey);
+      if (resolved) return resolved;
     }
 
     return null;
