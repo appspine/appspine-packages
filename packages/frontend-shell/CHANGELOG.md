@@ -1,5 +1,20 @@
 # @appspine/frontend-shell
 
+## 0.11.0
+
+### Minor Changes
+
+- `useTranslations()` now returns a properly typed translate function instead of `(key: string) => string`. Consuming apps opt in by augmenting the new exported `FrontendShellMessages` interface via TypeScript declaration merging:
+
+  ```ts
+  import type { Messages } from "@/i18n/messages";
+  declare module "@appspine/frontend-shell" {
+    interface FrontendShellMessages extends Messages {}
+  }
+  ```
+
+  Apps that don't augment it keep the previous untyped behavior — fully backward compatible, no existing call sites need to change.
+
 ## 0.10.0
 
 ### Minor Changes
