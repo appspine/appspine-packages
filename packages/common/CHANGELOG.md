@@ -1,5 +1,11 @@
 # @appspine/common
 
+## 0.3.1
+
+### Patch Changes
+
+- Second audit round fixes: `GlobalExceptionFilter` now logs every caught exception (error level with stack for 5xx, debug for 4xx) instead of silently discarding it — previously a 500 left zero server-side trace beyond the generic access-log line. `frontend-shell`'s `actions-core.ts` duplicated try/catch/fallback boilerplate across 13 functions, now collapsed into a shared `runAction()` helper. `DatePicker`'s trigger button no longer hardcodes `zh-TW` when formatting the displayed date — it now follows the app's actual resolved locale. `ThemeBootOptions`' `persistence`/`defaults` are now typed against the real preference keys instead of `Record<string, string>`. Added the package's first test suite, covering previously-untested pure utilities (`auth-error.ts`, `api-client.ts`, `date-only.ts`, `utils.ts`, `theme-utils.ts`).
+
 ## 0.3.0
 
 ### Minor Changes
