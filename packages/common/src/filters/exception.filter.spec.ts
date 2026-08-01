@@ -1,5 +1,5 @@
-import { type ArgumentsHost, BadRequestException, HttpException } from '@nestjs/common';
-import { describe, expect, it, vi } from 'vitest';
+import { type ArgumentsHost, BadRequestException, HttpException, Logger } from '@nestjs/common';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GlobalExceptionFilter } from './exception.filter';
 
 type MockRequest = {
@@ -147,5 +147,37 @@ describe('GlobalExceptionFilter', () => {
     const timestamp = json.mock.calls[0][0].timestamp;
     expect(timestamp).toBeDefined();
     expect(new Date(timestamp).toISOString()).toBe(timestamp);
+  });
+
+  describe('logging', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('logs a 500 at error level with the exception stack, so it is not lost once the response is sent', () => {
+      const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+      const req = { url: '/test-path', headers: {} };
+      const { host } = mockHost(req);
+      const exception = new Error('database boom');
+
+      filter.catch(exception, host);
+
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+      const [message, stack] = errorSpy.mock.calls[0] as [string, string];
+      expect(message).toContain('database boom');
+      expect(stack).toBe(exception.stack);
+    });
+
+    it('does not log a 4xx at error level (expected client errors, not a lost bug)', () => {
+      const errorSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+      const debugSpy = vi.spyOn(Logger.prototype, 'debug').mockImplementation(() => undefined);
+      const req = { url: '/test-path', headers: {} };
+      const { host } = mockHost(req);
+
+      filter.catch(new BadRequestException('bad thing'), host);
+
+      expect(errorSpy).not.toHaveBeenCalled();
+      expect(debugSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });
