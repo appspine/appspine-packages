@@ -4,10 +4,13 @@ import { enUS, zhTW } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
 
 import { useLocale } from '../i18n/index.js';
+import { formatDateOnly, parseDateOnly } from '../lib/date-only.js';
 import { cn } from '../lib/utils.js';
 import { Button } from './ui/button.js';
 import { Calendar } from './ui/calendar.js';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover.js';
+
+export { formatDateOnly, parseDateOnly } from '../lib/date-only.js';
 
 export function useDateFnsLocale() {
   const locale = useLocale();
@@ -23,21 +26,6 @@ interface DatePickerProps {
   className?: string;
 }
 
-export function parseDateOnly(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
-  const [y, m, d] = value.slice(0, 10).split('-').map(Number);
-  if (!y || !m || !d) return undefined;
-  // Use noon to avoid DST / timezone edge cases flipping the day
-  return new Date(y, m - 1, d, 12);
-}
-
-export function formatDateOnly(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
 export function DatePicker({
   value,
   onChange,
@@ -46,6 +34,7 @@ export function DatePicker({
   className,
 }: DatePickerProps) {
   const selected = parseDateOnly(value);
+  const locale = useLocale();
   const dateFnsLocale = useDateFnsLocale();
 
   return (
@@ -61,7 +50,7 @@ export function DatePicker({
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {selected ? selected.toLocaleDateString('zh-TW') : placeholder}
+          {selected ? selected.toLocaleDateString(locale) : placeholder}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

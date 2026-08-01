@@ -9,12 +9,10 @@
 // @ts-expect-error -- Next.js script component type resolution
 import Script from 'next/script';
 
-export interface ThemeBootOptions {
-  persistence?: Record<string, string>;
-  defaults?: Record<string, string>;
-}
+/** How a preference value is read: a cookie set client-side, one set server-side, or localStorage. */
+export type PreferencePersistenceMode = 'client-cookie' | 'server-cookie' | 'localStorage';
 
-export const DEFAULT_PREFERENCE_PERSISTENCE = {
+export const DEFAULT_PREFERENCE_PERSISTENCE: Record<string, PreferencePersistenceMode> = {
   theme_mode: 'client-cookie',
   theme_preset: 'client-cookie',
   font: 'client-cookie',
@@ -33,6 +31,14 @@ export const DEFAULT_PREFERENCE_DEFAULTS = {
   sidebar_variant: 'inset',
   sidebar_collapsible: 'icon',
 };
+
+/** The set of preference keys this boot script reads — kept in sync via `keyof typeof` below. */
+export type PreferenceKey = keyof typeof DEFAULT_PREFERENCE_DEFAULTS;
+
+export interface ThemeBootOptions {
+  persistence?: Partial<Record<PreferenceKey, PreferencePersistenceMode>>;
+  defaults?: Partial<Record<PreferenceKey, string>>;
+}
 
 export function ThemeBootScript({
   persistence: customPersistence,

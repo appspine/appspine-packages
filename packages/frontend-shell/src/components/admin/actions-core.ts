@@ -10,6 +10,28 @@ export interface CreateApiKeyResult extends ActionResult {
   created?: CreateApiKeyResponse;
 }
 
+/**
+ * Every action below is a try/apiFetch/catch-with-a-fallback-message shape that differed only in
+ * the request itself and the fallback text. Centralizing it here means a call site can't forget
+ * the catch (as one previously did — see JwtVerifierService's swallowed-error fix earlier this
+ * audit round) and keeps each action to just its request body.
+ */
+async function runAction<T extends ActionResult>(
+  isApiError: (e: unknown) => e is { message: string },
+  fallbackMessage: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    // T is constrained to ActionResult; every concrete T used here only adds optional fields on
+    // top of `error` (e.g. CreateApiKeyResult's `created?`), so an ActionResult-shaped object is
+    // runtime-safe for all of them — TS can't prove that generically for an arbitrary T, hence
+    // the cast.
+    return { error: isApiError(err) ? err.message : fallbackMessage } as T;
+  }
+}
+
 // ==========================================
 // Users Actions
 // ==========================================
@@ -20,7 +42,7 @@ export async function createUserRequest(
   formData: FormData,
 ): Promise<ActionResult> {
   const roleIds = formData.getAll('roleIds').map(String);
-  try {
+  return runAction(isApiError, 'Failed to create user', async () => {
     await apiFetch('/users', {
       method: 'POST',
       body: JSON.stringify({
@@ -31,10 +53,8 @@ export async function createUserRequest(
         roleIds: roleIds.length > 0 ? roleIds : undefined,
       }),
     });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to create user' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function setUserServiceAccountRequest(
@@ -43,15 +63,13 @@ export async function setUserServiceAccountRequest(
   id: string,
   isServiceAccount: boolean,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to update user', async () => {
     await apiFetch(`/users/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ isServiceAccount }),
     });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to update user' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function setUserActiveRequest(
@@ -60,15 +78,13 @@ export async function setUserActiveRequest(
   id: string,
   isActive: boolean,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to update user', async () => {
     await apiFetch(`/users/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ isActive }),
     });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to update user' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function updateUserRolesRequest(
@@ -78,15 +94,13 @@ export async function updateUserRolesRequest(
   formData: FormData,
 ): Promise<ActionResult> {
   const roleIds = formData.getAll('roleIds').map(String);
-  try {
+  return runAction(isApiError, 'Failed to update roles', async () => {
     await apiFetch(`/users/${id}/roles`, {
       method: 'PUT',
       body: JSON.stringify({ roleIds }),
     });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to update roles' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function deleteUserRequest(
@@ -94,12 +108,10 @@ export async function deleteUserRequest(
   isApiError: (e: unknown) => e is { message: string },
   id: string,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to delete user', async () => {
     await apiFetch(`/users/${id}`, { method: 'DELETE' });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to delete user' };
-  }
-  return {};
+    return {};
+  });
 }
 
 // ==========================================
@@ -111,7 +123,7 @@ export async function createRoleRequest(
   isApiError: (e: unknown) => e is { message: string },
   formData: FormData,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to create role', async () => {
     await apiFetch('/roles', {
       method: 'POST',
       body: JSON.stringify({
@@ -121,10 +133,8 @@ export async function createRoleRequest(
         permissions: formData.getAll('permissions').map(String),
       }),
     });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to create role' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function updateRoleRequest(
@@ -140,12 +150,10 @@ export async function updateRoleRequest(
   if (formData.get('editablePermissions') === 'true') {
     body.permissions = formData.getAll('permissions').map(String);
   }
-  try {
+  return runAction(isApiError, 'Failed to update role', async () => {
     await apiFetch(`/roles/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to update role' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function deleteRoleRequest(
@@ -153,12 +161,10 @@ export async function deleteRoleRequest(
   isApiError: (e: unknown) => e is { message: string },
   id: string,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to delete role', async () => {
     await apiFetch(`/roles/${id}`, { method: 'DELETE' });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to delete role' };
-  }
-  return {};
+    return {};
+  });
 }
 
 // ==========================================
@@ -176,7 +182,7 @@ export async function createApiKeyRequest(
   const actingUserId =
     actingUserIdRaw && actingUserIdRaw !== '__none' ? String(actingUserIdRaw) : undefined;
 
-  try {
+  return runAction<CreateApiKeyResult>(isApiError, 'Failed to create API key', async () => {
     const created = await apiFetch<CreateApiKeyResponse>('/api-keys', {
       method: 'POST',
       body: JSON.stringify({
@@ -189,9 +195,7 @@ export async function createApiKeyRequest(
       }),
     });
     return { created };
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to create API key' };
-  }
+  });
 }
 
 export async function updateApiKeyActingUserRequest(
@@ -200,15 +204,13 @@ export async function updateApiKeyActingUserRequest(
   id: string,
   actingUserId: string | null,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to update acting user', async () => {
     await apiFetch(`/api-keys/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ actingUserId }),
     });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to update acting user' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function setApiKeyActiveRequest(
@@ -217,12 +219,10 @@ export async function setApiKeyActiveRequest(
   id: string,
   isActive: boolean,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to update API key', async () => {
     await apiFetch(`/api-keys/${id}`, { method: 'PATCH', body: JSON.stringify({ isActive }) });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to update API key' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function deleteApiKeyRequest(
@@ -230,12 +230,10 @@ export async function deleteApiKeyRequest(
   isApiError: (e: unknown) => e is { message: string },
   id: string,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to delete API key', async () => {
     await apiFetch(`/api-keys/${id}`, { method: 'DELETE' });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to delete API key' };
-  }
-  return {};
+    return {};
+  });
 }
 
 // ==========================================
@@ -247,12 +245,10 @@ export async function retryDomainEventDeliveryRequest(
   isApiError: (e: unknown) => e is { message: string },
   id: string,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to retry delivery', async () => {
     await apiFetch(`/domain-events/deliveries/${id}/retry`, { method: 'POST' });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to retry delivery' };
-  }
-  return {};
+    return {};
+  });
 }
 
 export async function ignoreDomainEventDeliveryRequest(
@@ -260,10 +256,8 @@ export async function ignoreDomainEventDeliveryRequest(
   isApiError: (e: unknown) => e is { message: string },
   id: string,
 ): Promise<ActionResult> {
-  try {
+  return runAction(isApiError, 'Failed to ignore delivery', async () => {
     await apiFetch(`/domain-events/deliveries/${id}/ignore`, { method: 'POST' });
-  } catch (err) {
-    return { error: isApiError(err) ? err.message : 'Failed to ignore delivery' };
-  }
-  return {};
+    return {};
+  });
 }
