@@ -1,9 +1,17 @@
 import { extractWorkflowId } from '@appspine/audit-log';
 import type { ApiKeyUser } from '@appspine/auth';
 import { ApiKeyGuard } from '@appspine/m2m-api-key';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import {
+  hostHeaderValidation,
+  originValidation,
+  toNodeHandler,
+  type NodeIncomingMessageLike,
+  type NodeServerResponseLike,
+} from '@modelcontextprotocol/node';
+import type { AuthInfo } from '@modelcontextprotocol/server';
 import { Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { McpService } from './mcp.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
@@ -31,16 +39,40 @@ export class McpController {
       workflowId: extractWorkflowId(req.headers as Record<string, unknown>),
     };
 
-    const server = this.mcpService.createServer(ctx);
-    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    if (!hostHeaderValidation(readAllowedHostnames('MCP_ALLOWED_HOSTNAMES'))(
+      req as unknown as IncomingMessage,
+      res as unknown as ServerResponse,
+    )) {
+      return;
+    }
+
+    if (!originValidation(readAllowedHostnames('MCP_ALLOWED_ORIGIN_HOSTNAMES'))(
+      req as unknown as IncomingMessage,
+      res as unknown as ServerResponse,
+    )) {
+      return;
+    }
+
+    const authInfo: AuthInfo = {
+      token: 'appspine-api-key',
+      clientId: ctx.sub,
+      scopes: ctx.scopes,
+      extra: { mcpCallContext: ctx },
+    };
+    (req as Request & { auth?: AuthInfo }).auth = authInfo;
+
+    const handler = this.mcpService.createHandler(ctx);
+    const nodeHandler = toNodeHandler(handler);
 
     res.on('close', () => {
-      void transport.close();
-      void server.close();
+      void handler.close();
     });
 
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body as unknown);
+    await nodeHandler(
+      req as unknown as NodeIncomingMessageLike,
+      res as unknown as NodeServerResponseLike,
+      req.body as unknown,
+    );
   }
 
   // The optional `challenge` echo lets the 023 discovery service (§2.1) verify control of an
@@ -60,4 +92,15 @@ export class McpController {
       ...(challenge !== undefined ? { challenge } : {}),
     };
   }
+}
+
+const DEFAULT_MCP_ALLOWED_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
+
+function readAllowedHostnames(variableName: string): string[] {
+  const configured = process.env[variableName]
+    ?.split(',')
+    .map((hostname) => hostname.trim())
+    .filter((hostname) => hostname.length > 0);
+
+  return configured && configured.length > 0 ? configured : DEFAULT_MCP_ALLOWED_HOSTNAMES;
 }

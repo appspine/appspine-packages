@@ -4,8 +4,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { McpController } from './mcp.controller';
 import type { McpCallContext } from './types';
 
-const handleRequest = vi.fn().mockResolvedValue(undefined);
-const closeTransport = vi.fn().mockResolvedValue(undefined);
+const { nodeHandler } = vi.hoisted(() => ({
+  nodeHandler: vi.fn().mockResolvedValue(undefined),
+}));
 
 vi.mock('@appspine/m2m-api-key', () => ({
   ApiKeyGuard: class {},
@@ -18,11 +19,10 @@ vi.mock('@appspine/audit-log', () => ({
   },
 }));
 
-vi.mock('@modelcontextprotocol/sdk/server/streamableHttp.js', () => ({
-  StreamableHTTPServerTransport: vi.fn().mockImplementation(() => ({
-    handleRequest,
-    close: closeTransport,
-  })),
+vi.mock('@modelcontextprotocol/node', () => ({
+  hostHeaderValidation: vi.fn(() => () => true),
+  originValidation: vi.fn(() => () => true),
+  toNodeHandler: vi.fn(() => nodeHandler),
 }));
 
 const baseApiKeyUser = {
@@ -49,15 +49,11 @@ describe('McpController', () => {
 
   it('forwards the bound acting user and API key id into the MCP call context', async () => {
     const contexts: McpCallContext[] = [];
-    const server = {
-      connect: vi.fn().mockResolvedValue(undefined),
-      close: vi.fn().mockResolvedValue(undefined),
-    };
     const controller = new McpController(
       {
-        createServer: vi.fn((ctx: McpCallContext) => {
+        createHandler: vi.fn((ctx: McpCallContext) => {
           contexts.push(ctx);
-          return server;
+          return { close: vi.fn().mockResolvedValue(undefined) };
         }),
       } as never,
       { getToolCount: vi.fn() } as never,
@@ -82,15 +78,11 @@ describe('McpController', () => {
 
   it('extracts workflowId from the X-Appspine-Workflow-Id header (023 §2.5)', async () => {
     const contexts: McpCallContext[] = [];
-    const server = {
-      connect: vi.fn().mockResolvedValue(undefined),
-      close: vi.fn().mockResolvedValue(undefined),
-    };
     const controller = new McpController(
       {
-        createServer: vi.fn((ctx: McpCallContext) => {
+        createHandler: vi.fn((ctx: McpCallContext) => {
           contexts.push(ctx);
-          return server;
+          return { close: vi.fn().mockResolvedValue(undefined) };
         }),
       } as never,
       { getToolCount: vi.fn() } as never,
@@ -109,15 +101,11 @@ describe('McpController', () => {
 
   it('leaves workflowId null when the header is absent (023 §2.5 "可選/非強制")', async () => {
     const contexts: McpCallContext[] = [];
-    const server = {
-      connect: vi.fn().mockResolvedValue(undefined),
-      close: vi.fn().mockResolvedValue(undefined),
-    };
     const controller = new McpController(
       {
-        createServer: vi.fn((ctx: McpCallContext) => {
+        createHandler: vi.fn((ctx: McpCallContext) => {
           contexts.push(ctx);
-          return server;
+          return { close: vi.fn().mockResolvedValue(undefined) };
         }),
       } as never,
       { getToolCount: vi.fn() } as never,
@@ -133,15 +121,11 @@ describe('McpController', () => {
 
   it('forwards null when the API key has no active bound acting user', async () => {
     const contexts: McpCallContext[] = [];
-    const server = {
-      connect: vi.fn().mockResolvedValue(undefined),
-      close: vi.fn().mockResolvedValue(undefined),
-    };
     const controller = new McpController(
       {
-        createServer: vi.fn((ctx: McpCallContext) => {
+        createHandler: vi.fn((ctx: McpCallContext) => {
           contexts.push(ctx);
-          return server;
+          return { close: vi.fn().mockResolvedValue(undefined) };
         }),
       } as never,
       { getToolCount: vi.fn() } as never,

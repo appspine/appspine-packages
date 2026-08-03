@@ -29,7 +29,8 @@
     "@appspine/audit-log": "workspace:*",
     "@appspine/auth": "workspace:*",
     "@appspine/m2m-api-key": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.5",

@@ -1,4 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { createMcpHandler, McpServer, type AuthInfo } from '@modelcontextprotocol/server';
 import { Injectable } from '@nestjs/common';
 import { classifyToolAsReadOnly, McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
@@ -6,6 +6,13 @@ import type { McpCallContext } from './types';
 @Injectable()
 export class McpService {
   constructor(private readonly registry: McpToolRegistry) {}
+
+  createHandler(ctx: McpCallContext) {
+    return createMcpHandler(({ authInfo }) => {
+      const authenticatedContext = getContextFromAuthInfo(authInfo);
+      return this.createServer(authenticatedContext ?? ctx);
+    });
+  }
 
   createServer(ctx: McpCallContext): McpServer {
     const server = new McpServer({
@@ -41,8 +48,15 @@ export class McpService {
               return { isError: true, content: [{ type: 'text' as const, text: msg }] };
             }
 
+            const text = JSON.stringify(result) ?? String(result);
+            const structuredContent =
+              result !== null && typeof result === 'object' && !Array.isArray(result)
+                ? (result as Record<string, unknown>)
+                : undefined;
+
             return {
-              content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+              content: [{ type: 'text' as const, text }],
+              ...(structuredContent !== undefined ? { structuredContent } : {}),
             };
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -54,4 +68,23 @@ export class McpService {
 
     return server;
   }
+}
+
+function getContextFromAuthInfo(authInfo: AuthInfo | undefined): McpCallContext | undefined {
+  const candidate = authInfo?.extra?.mcpCallContext;
+  if (!candidate || typeof candidate !== 'object') return undefined;
+
+  const context = candidate as Partial<McpCallContext>;
+  if (
+    !Array.isArray(context.scopes) ||
+    typeof context.isApiKey !== 'boolean' ||
+    !Array.isArray(context.roleNames) ||
+    (typeof context.actingUserId !== 'string' && context.actingUserId !== null) ||
+    typeof context.sub !== 'string' ||
+    (typeof context.workflowId !== 'string' && context.workflowId !== null)
+  ) {
+    return undefined;
+  }
+
+  return context as McpCallContext;
 }
