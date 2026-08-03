@@ -1,6 +1,13 @@
-import { createServer } from 'node:http';
 import { strict as assert } from 'node:assert';
-import { handler, nodeHandler, sseHandler, sseNodeHandler, strictHandler, strictNodeHandler } from './server.ts';
+import { createServer } from 'node:http';
+import {
+  handler,
+  nodeHandler,
+  sseHandler,
+  sseNodeHandler,
+  strictHandler,
+  strictNodeHandler,
+} from './server.ts';
 
 const legacyVersion = '2025-11-25';
 const modernVersion = '2026-07-28';
@@ -39,7 +46,8 @@ async function post(path: string, body: unknown, headers: Record<string, string>
 
 async function readJsonRpc(response: Response) {
   const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.startsWith('text/event-stream')) return response.json() as Promise<Record<string, unknown>>;
+  if (!contentType.startsWith('text/event-stream'))
+    return response.json() as Promise<Record<string, unknown>>;
 
   const text = await response.text();
   const data = text
@@ -67,36 +75,41 @@ try {
     { 'MCP-Protocol-Version': legacyVersion },
   );
   assert.equal(legacyInitialize.status, 200);
-  const legacyInitializeBody = (await readJsonRpc(legacyInitialize)) as { result?: { protocolVersion?: string } };
+  const legacyInitializeBody = (await readJsonRpc(legacyInitialize)) as {
+    result?: { protocolVersion?: string };
+  };
   assert.equal(legacyInitializeBody.result?.protocolVersion, legacyVersion);
 
-  const legacyTools = await post(
-    '/mcp',
-    jsonRpcRequest('tools/list', {}, 2),
-    { 'MCP-Protocol-Version': legacyVersion },
-  );
+  const legacyTools = await post('/mcp', jsonRpcRequest('tools/list', {}, 2), {
+    'MCP-Protocol-Version': legacyVersion,
+  });
   assert.equal(legacyTools.status, 200);
-  const legacyToolsBody = (await readJsonRpc(legacyTools)) as { result?: { tools?: Array<{ name: string }> } };
-  assert.equal(legacyToolsBody.result?.tools?.some((tool) => tool.name === 'echo'), true);
-
-  const modernTools = await post(
-    '/mcp',
-    jsonRpcRequest('tools/list', { _meta: modernMeta }, 3),
-    { 'MCP-Protocol-Version': modernVersion, 'Mcp-Method': 'tools/list' },
+  const legacyToolsBody = (await readJsonRpc(legacyTools)) as {
+    result?: { tools?: Array<{ name: string }> };
+  };
+  assert.equal(
+    legacyToolsBody.result?.tools?.some((tool) => tool.name === 'echo'),
+    true,
   );
+
+  const modernTools = await post('/mcp', jsonRpcRequest('tools/list', { _meta: modernMeta }, 3), {
+    'MCP-Protocol-Version': modernVersion,
+    'Mcp-Method': 'tools/list',
+  });
   assert.equal(modernTools.status, 200);
   const modernToolsBody = (await readJsonRpc(modernTools)) as {
     result?: { tools?: Array<{ name: string }>; ttlMs?: number; cacheScope?: string };
   };
-  assert.equal(modernToolsBody.result?.tools?.some((tool) => tool.name === 'echo'), true);
+  assert.equal(
+    modernToolsBody.result?.tools?.some((tool) => tool.name === 'echo'),
+    true,
+  );
   assert.equal(typeof modernToolsBody.result?.ttlMs, 'number');
   assert.equal(modernToolsBody.result?.cacheScope, 'private');
 
-  const modernHeaderWithoutEnvelope = await post(
-    '/mcp',
-    jsonRpcRequest('tools/list', {}, 7),
-    { 'MCP-Protocol-Version': modernVersion },
-  );
+  const modernHeaderWithoutEnvelope = await post('/mcp', jsonRpcRequest('tools/list', {}, 7), {
+    'MCP-Protocol-Version': modernVersion,
+  });
   assert.equal(modernHeaderWithoutEnvelope.status, 400);
   const modernHeaderWithoutEnvelopeBody = (await readJsonRpc(modernHeaderWithoutEnvelope)) as {
     error?: { code?: number };
@@ -109,7 +122,9 @@ try {
     { 'MCP-Protocol-Version': legacyVersion, 'Mcp-Method': 'tools/list' },
   );
   assert.equal(mismatchedHeader.status, 400);
-  const mismatchedHeaderBody = (await readJsonRpc(mismatchedHeader)) as { error?: { code?: number } };
+  const mismatchedHeaderBody = (await readJsonRpc(mismatchedHeader)) as {
+    error?: { code?: number };
+  };
   assert.equal(mismatchedHeaderBody.error?.code, -32020);
 
   const missingContentType = await fetch(`${endpoint}/mcp`, {
@@ -126,11 +141,9 @@ try {
   assert.match(sseTools.headers.get('content-type') ?? '', /^text\/event-stream/);
   assert.match(await sseTools.text(), /tools/);
 
-  const rejectedLegacy = await post(
-    '/strict',
-    jsonRpcRequest('tools/list', {}, 5),
-    { 'MCP-Protocol-Version': legacyVersion },
-  );
+  const rejectedLegacy = await post('/strict', jsonRpcRequest('tools/list', {}, 5), {
+    'MCP-Protocol-Version': legacyVersion,
+  });
   assert.equal(rejectedLegacy.status, 400);
 
   const directModern = await handler.fetch(
@@ -146,8 +159,12 @@ try {
   );
   assert.equal(directModern.status, 200);
 
-  console.log('MCP v2 smoke passed: protocol matrix, modern/legacy responses, validation ladder, strict rejection, and cleanup.');
+  console.log(
+    'MCP v2 smoke passed: protocol matrix, modern/legacy responses, validation ladder, strict rejection, and cleanup.',
+  );
 } finally {
   await Promise.all([handler.close(), strictHandler.close(), sseHandler.close()]);
-  await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
+  await new Promise<void>((resolve, reject) =>
+    server.close((error) => (error ? reject(error) : resolve())),
+  );
 }
