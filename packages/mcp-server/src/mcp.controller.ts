@@ -1,17 +1,17 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { extractWorkflowId } from '@appspine/audit-log';
 import type { ApiKeyUser } from '@appspine/auth';
 import { ApiKeyGuard } from '@appspine/m2m-api-key';
 import {
   hostHeaderValidation,
-  originValidation,
-  toNodeHandler,
   type NodeIncomingMessageLike,
   type NodeServerResponseLike,
+  originValidation,
+  toNodeHandler,
 } from '@modelcontextprotocol/node';
 import type { AuthInfo } from '@modelcontextprotocol/server';
 import { Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { IncomingMessage, ServerResponse } from 'node:http';
 import { McpService } from './mcp.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
@@ -39,17 +39,21 @@ export class McpController {
       workflowId: extractWorkflowId(req.headers as Record<string, unknown>),
     };
 
-    if (!hostHeaderValidation(readAllowedHostnames('MCP_ALLOWED_HOSTNAMES'))(
-      req as unknown as IncomingMessage,
-      res as unknown as ServerResponse,
-    )) {
+    if (
+      !hostHeaderValidation(readAllowedHostnames('MCP_ALLOWED_HOSTNAMES'))(
+        req as unknown as IncomingMessage,
+        res as unknown as ServerResponse,
+      )
+    ) {
       return;
     }
 
-    if (!originValidation(readAllowedHostnames('MCP_ALLOWED_ORIGIN_HOSTNAMES'))(
-      req as unknown as IncomingMessage,
-      res as unknown as ServerResponse,
-    )) {
+    if (
+      !originValidation(readAllowedHostnames('MCP_ALLOWED_ORIGIN_HOSTNAMES'))(
+        req as unknown as IncomingMessage,
+        res as unknown as ServerResponse,
+      )
+    ) {
       return;
     }
 

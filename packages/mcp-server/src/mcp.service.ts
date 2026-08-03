@@ -1,4 +1,4 @@
-import { createMcpHandler, McpServer, type AuthInfo } from '@modelcontextprotocol/server';
+import { type AuthInfo, createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { Injectable } from '@nestjs/common';
 import { classifyToolAsReadOnly, McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
