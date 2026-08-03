@@ -15,5 +15,7 @@
     "@appspine/metadata-schema": "0.2.15",
     "@appspine/rbac": "4.0.1"
   },
-  "changesets": ["mcp-spec-2026-07-28"]
+  "changesets": [
+    "mcp-2026-07-28-review-fixes"
+  ]
 }
