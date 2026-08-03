@@ -1,4 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/server';
+import { Logger } from '@nestjs/common';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@appspine/m2m-api-key', () => ({
@@ -86,5 +87,102 @@ describe('McpService.createServer readOnlyHint annotation', () => {
     new McpService(registry).createServer(ctx);
 
     expect(readOnlyHintOf(registerToolSpy.mock.calls, 'attach_and_read')).toBe(false);
+  });
+});
+
+function handlerOf(calls: Array<[string, unknown, ...unknown[]]>, toolName: string) {
+  const handler = calls.find((c) => c[0] === toolName)?.[2] as
+    | ((args: unknown) => Promise<{
+        content: Array<{ type: string; text?: string }>;
+        isError?: boolean;
+        structuredContent?: unknown;
+      }>)
+    | undefined;
+  if (!handler) throw new Error(`no handler registered for ${toolName}`);
+  return handler;
+}
+
+describe('McpService.createServer tool result shaping', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('exposes an array result as structuredContent, not just plain objects', async () => {
+    const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool');
+    const registry = new McpToolRegistry();
+    registry.registerTool(
+      makeTool({ name: 'list_items', handler: async () => [{ id: 'a' }, { id: 'b' }] }),
+    );
+    new McpService(registry).createServer(ctx);
+
+    const result = await handlerOf(registerToolSpy.mock.calls, 'list_items')({});
+    expect(result.structuredContent).toEqual([{ id: 'a' }, { id: 'b' }]);
+    expect(result.isError).toBeUndefined();
+  });
+
+  it('exposes a primitive result as structuredContent', async () => {
+    const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool');
+    const registry = new McpToolRegistry();
+    registry.registerTool(makeTool({ name: 'get_count', handler: async () => 42 }));
+    new McpService(registry).createServer(ctx);
+
+    const result = await handlerOf(registerToolSpy.mock.calls, 'get_count')({});
+    expect(result.structuredContent).toBe(42);
+    expect(result.content[0]?.text).toBe('42');
+  });
+
+  it('does not treat a business result containing a truthy `error` field as a tool failure', async () => {
+    // Regression: the old special-case for `'error' in result` discarded the rest of the
+    // result (including its own `error` string) and replaced it with a bare "Unknown error"
+    // text, even though the tool's own outputSchema could legitimately describe this shape.
+    const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool');
+    const registry = new McpToolRegistry();
+    registry.registerTool(
+      makeTool({
+        name: 'partial_sync',
+        handler: async () => ({ items: ['a', 'b'], error: 'one source timed out' }),
+      }),
+    );
+    new McpService(registry).createServer(ctx);
+
+    const result = await handlerOf(registerToolSpy.mock.calls, 'partial_sync')({});
+    expect(result.isError).toBeUndefined();
+    expect(result.structuredContent).toEqual({ items: ['a', 'b'], error: 'one source timed out' });
+  });
+
+  it('reports a void-returning tool as success with empty text, not the literal string "undefined"', async () => {
+    const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool');
+    const registry = new McpToolRegistry();
+    registry.registerTool(makeTool({ name: 'do_nothing', handler: async () => undefined }));
+    new McpService(registry).createServer(ctx);
+
+    const result = await handlerOf(registerToolSpy.mock.calls, 'do_nothing')({});
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0]?.text).toBe('');
+    expect(result.structuredContent).toBeUndefined();
+  });
+
+  it('logs a thrown handler error server-side in addition to returning it to the caller', async () => {
+    const registerToolSpy = vi.spyOn(McpServer.prototype, 'registerTool');
+    const loggerSpy = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const registry = new McpToolRegistry();
+    registry.registerTool(
+      makeTool({
+        name: 'boom',
+        handler: async () => {
+          throw new Error('connect ECONNREFUSED 10.0.3.14:5432');
+        },
+      }),
+    );
+    new McpService(registry).createServer(ctx);
+
+    const result = await handlerOf(registerToolSpy.mock.calls, 'boom')({});
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('ECONNREFUSED');
+    expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('boom'), expect.anything());
+    expect(loggerSpy).toHaveBeenCalledWith(
+      expect.stringContaining('ECONNREFUSED'),
+      expect.anything(),
+    );
   });
 });

@@ -59,4 +59,27 @@ describe('registerMcpToolsFromInstance', () => {
     expect(provider.lastCtx).toEqual(ctx);
     expect(result).toEqual({ actingUserId: 'service-user-1' });
   });
+
+  it('refuses to register a tool whose requiredScopes was omitted, rather than defaulting to fail-open', () => {
+    // TypeScript now makes requiredScopes a required field, but nothing stops a plain-JS
+    // caller or hand-crafted metadata from omitting it -- this is the runtime backstop for
+    // the same gap: a tool that forgot to declare scopes used to be silently callable by
+    // every API key regardless of what scopes it actually holds.
+    class UnscopedToolProvider {
+      async run() {
+        return {};
+      }
+    }
+    Reflect.defineMetadata(
+      'mcp:tool',
+      { name: 'unscoped_tool', description: 'test', inputSchema: z.object({}) },
+      UnscopedToolProvider.prototype,
+      'run',
+    );
+
+    const registry = new McpToolRegistry();
+    expect(() => registerMcpToolsFromInstance(new UnscopedToolProvider(), registry)).toThrow(
+      /unscoped_tool.*requiredScopes/,
+    );
+  });
 });

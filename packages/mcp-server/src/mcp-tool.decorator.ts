@@ -9,7 +9,10 @@ export interface McpToolOptions {
   description: string;
   inputSchema: ZodType;
   outputSchema?: ZodType;
-  requiredScopes?: string[];
+  /** Required, even for an intentionally public tool (pass `[]` explicitly) -- an omitted
+   * value used to default to `[]` silently, so a tool that simply forgot to declare its
+   * scopes was callable by every API key regardless of what scopes it actually holds. */
+  requiredScopes: string[];
 }
 
 export function McpTool(options: McpToolOptions): MethodDecorator {
@@ -28,12 +31,18 @@ export function registerMcpToolsFromInstance(instance: object, registry: McpTool
     const method = (instance as Record<string, unknown>)[key];
     if (typeof method !== 'function') continue;
 
+    if (!Array.isArray(options.requiredScopes)) {
+      throw new Error(
+        `@McpTool "${options.name}" must declare requiredScopes explicitly (pass [] for an intentionally public tool)`,
+      );
+    }
+
     registry.registerTool({
       name: options.name,
       description: options.description,
       inputSchema: options.inputSchema,
       outputSchema: options.outputSchema,
-      requiredScopes: options.requiredScopes ?? [],
+      requiredScopes: options.requiredScopes,
       handler: (args: unknown, ctx: McpCallContext) =>
         (method as (args: unknown, ctx: McpCallContext) => Promise<unknown>).call(
           instance,

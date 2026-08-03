@@ -1,17 +1,20 @@
-import { type AuthInfo, createMcpHandler, McpServer } from '@modelcontextprotocol/server';
-import { Injectable } from '@nestjs/common';
+import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
+import { Injectable, Logger } from '@nestjs/common';
 import { classifyToolAsReadOnly, McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
 
 @Injectable()
 export class McpService {
+  private readonly logger = new Logger(McpService.name);
+
   constructor(private readonly registry: McpToolRegistry) {}
 
+  // A fresh handler is created per HTTP request (mcp.controller.ts), each already closed
+  // over the ctx derived from that same request's auth -- there is no per-request authInfo
+  // to round-trip through the SDK's factory callback here, unlike the SDK's own intended
+  // usage of reusing one handler across many requests with differing authInfo.
   createHandler(ctx: McpCallContext) {
-    return createMcpHandler(({ authInfo }) => {
-      const authenticatedContext = getContextFromAuthInfo(authInfo);
-      return this.createServer(authenticatedContext ?? ctx);
-    });
+    return createMcpHandler(() => this.createServer(ctx));
   }
 
   createServer(ctx: McpCallContext): McpServer {
@@ -39,28 +42,30 @@ export class McpService {
           try {
             const result = await tool.handler(args, ctx);
 
-            if (
-              result !== null &&
-              typeof result === 'object' &&
-              'error' in result &&
-              (result as { error: unknown }).error
-            ) {
-              const msg = (result as { message?: string }).message ?? 'Unknown error';
-              return { isError: true, content: [{ type: 'text' as const, text: msg }] };
-            }
-
-            const text = JSON.stringify(result) ?? String(result);
-            const structuredContent =
-              result !== null && typeof result === 'object' && !Array.isArray(result)
-                ? (result as Record<string, unknown>)
-                : undefined;
+            // `structuredContent` is exposed for any serializable result (object, array, or
+            // primitive) -- not just plain objects. The v2 SDK's own wire codec
+            // (projectCallToolResult) wraps non-object structuredContent in `{ result: ... }`
+            // for eras that require it; restricting this to plain objects meant every tool
+            // declaring a non-object outputSchema (e.g. an array or string) failed
+            // `validateToolOutput`'s "no structured content was provided" check on every
+            // successful call.
+            const text = result === undefined ? '' : (JSON.stringify(result) ?? String(result));
 
             return {
               content: [{ type: 'text' as const, text }],
-              ...(structuredContent !== undefined ? { structuredContent } : {}),
+              ...(result !== undefined && result !== null ? { structuredContent: result } : {}),
             };
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
+            // The caller-facing message is unchanged here (many tools intentionally throw a
+            // descriptive validation error that the calling agent needs to see); what was
+            // missing is that this failure was otherwise invisible server-side, so an infra
+            // error (a stack trace, a DB host/user) reached an external API-key holder while
+            // this app's own logs and alerting never saw it at all.
+            this.logger.error(
+              `Tool ${tool.name} threw: ${msg}`,
+              err instanceof Error ? err.stack : undefined,
+            );
             return { isError: true, content: [{ type: 'text' as const, text: msg }] };
           }
         },
@@ -69,23 +74,4 @@ export class McpService {
 
     return server;
   }
-}
-
-function getContextFromAuthInfo(authInfo: AuthInfo | undefined): McpCallContext | undefined {
-  const candidate = authInfo?.extra?.mcpCallContext;
-  if (!candidate || typeof candidate !== 'object') return undefined;
-
-  const context = candidate as Partial<McpCallContext>;
-  if (
-    !Array.isArray(context.scopes) ||
-    typeof context.isApiKey !== 'boolean' ||
-    !Array.isArray(context.roleNames) ||
-    (typeof context.actingUserId !== 'string' && context.actingUserId !== null) ||
-    typeof context.sub !== 'string' ||
-    (typeof context.workflowId !== 'string' && context.workflowId !== null)
-  ) {
-    return undefined;
-  }
-
-  return context as McpCallContext;
 }
