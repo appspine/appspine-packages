@@ -1,5 +1,17 @@
 # @appspine/mcp-server
 
+## 0.6.0-mcp-2026-07-28.0
+
+### Minor Changes
+
+- 22e271a: Migrate the MCP server package to the 2026-07-28 protocol contract and MCP SDK v2.
+
+  The package now serves modern stateless requests through `createMcpHandler` and the Node
+  adapter while retaining legacy stateless compatibility during the transition period. Consumers
+  should deploy the compatible gateway before upgrading downstream apps and keep the legacy path
+  available until rollout verification is complete. The package also declares the Prisma runtime
+  peer required by its exported authentication and audit integration modules.
+
 ## 0.5.10
 
 ### Patch Changes
