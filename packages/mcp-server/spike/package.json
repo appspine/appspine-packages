@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit"
+    "build": "tsc --noEmit",
+    "smoke": "node --experimental-strip-types src/smoke.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/node": "2.0.0",

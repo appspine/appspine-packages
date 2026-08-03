@@ -10,6 +10,7 @@ then adapts it to Node with `toNodeHandler`.
 Run from this directory:
 
 ```text
-pnpm install
+pnpm install --ignore-scripts
 pnpm build
+pnpm smoke
 ```
