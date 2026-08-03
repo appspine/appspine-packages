@@ -339,6 +339,9 @@ importers:
       '@nestjs/core':
         specifier: ^11.0.5
         version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@prisma/client':
+        specifier: ^6.2.0
+        version: 6.19.3(typescript@5.9.3)
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
