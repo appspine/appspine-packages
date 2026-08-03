@@ -8,6 +8,7 @@ export interface McpToolOptions {
   name: string;
   description: string;
   inputSchema: ZodType;
+  outputSchema?: ZodType;
   requiredScopes?: string[];
 }
 
@@ -31,6 +32,7 @@ export function registerMcpToolsFromInstance(instance: object, registry: McpTool
       name: options.name,
       description: options.description,
       inputSchema: options.inputSchema,
+      outputSchema: options.outputSchema,
       requiredScopes: options.requiredScopes ?? [],
       handler: (args: unknown, ctx: McpCallContext) =>
         (method as (args: unknown, ctx: McpCallContext) => Promise<unknown>).call(

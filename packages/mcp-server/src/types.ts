@@ -21,6 +21,7 @@ export interface McpToolDefinition {
   name: string;
   description: string;
   inputSchema: ZodType;
+  outputSchema?: ZodType;
   requiredScopes: string[];
   handler: (args: unknown, ctx: McpCallContext) => Promise<unknown>;
 }
