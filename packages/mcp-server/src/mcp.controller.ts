@@ -94,13 +94,12 @@ export class McpController {
   }
 }
 
-const DEFAULT_MCP_ALLOWED_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];
-
 function readAllowedHostnames(variableName: string): string[] {
   const configured = process.env[variableName]
     ?.split(',')
     .map((hostname) => hostname.trim())
     .filter((hostname) => hostname.length > 0);
 
-  return configured && configured.length > 0 ? configured : DEFAULT_MCP_ALLOWED_HOSTNAMES;
+  // An absent allowlist must fail closed; deployment configuration owns the public host names.
+  return configured ?? [];
 }
