@@ -16,11 +16,11 @@ vi.mock('@appspine/m2m-api-key', () => ({
 
 import { McpTool, registerMcpToolsFromInstance } from './mcp-tool.decorator';
 import { McpToolRegistry } from './mcp-tool.registry';
-import type { McpCallContext } from './types';
+import type { McpToolCallContext } from './types';
 
 class FakeToolProvider {
   lastArgs: unknown;
-  lastCtx: McpCallContext | undefined;
+  lastCtx: McpToolCallContext | undefined;
 
   @McpTool({
     name: 'echo_acting_user',
@@ -28,7 +28,7 @@ class FakeToolProvider {
     inputSchema: z.object({}),
     requiredScopes: ['wiki-pages:read'],
   })
-  async echo(args: unknown, ctx: McpCallContext) {
+  async echo(args: unknown, ctx: McpToolCallContext) {
     this.lastArgs = args;
     this.lastCtx = ctx;
     return { actingUserId: ctx.actingUserId };
@@ -44,13 +44,14 @@ describe('registerMcpToolsFromInstance', () => {
     const tool = registry.getTool('echo_acting_user');
     expect(tool).toBeDefined();
 
-    const ctx: McpCallContext = {
+    const ctx: McpToolCallContext = {
       scopes: ['wiki-pages:read'],
       isApiKey: true,
       roleNames: [],
       actingUserId: 'service-user-1',
       sub: 'api-key-1',
       workflowId: null,
+      mrtr: { requestInput: async () => ({}) },
     };
 
     const result = await tool?.handler({ q: 'x' }, ctx);

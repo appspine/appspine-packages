@@ -92,14 +92,25 @@ describe('McpService.createServer readOnlyHint annotation', () => {
 
 function handlerOf(calls: Array<[string, unknown, ...unknown[]]>, toolName: string) {
   const handler = calls.find((c) => c[0] === toolName)?.[2] as
-    | ((args: unknown) => Promise<{
+    | ((
+        args: unknown,
+        sdkCtx: unknown,
+      ) => Promise<{
         content: Array<{ type: string; text?: string }>;
         isError?: boolean;
         structuredContent?: unknown;
+        resultType?: string;
+        requestState?: string;
       }>)
     | undefined;
   if (!handler) throw new Error(`no handler registered for ${toolName}`);
   return handler;
+}
+
+// Minimal stand-in for the SDK's ServerContext -- only what mcp.service.ts's registerTool
+// callback actually reads (mcpReq.requestState()/inputResponses) via buildMrtrContext.
+function fakeSdkCtx(requestState?: unknown, inputResponses?: Record<string, unknown>) {
+  return { mcpReq: { requestState: () => requestState, inputResponses } };
 }
 
 describe('McpService.createServer tool result shaping', () => {
@@ -115,7 +126,7 @@ describe('McpService.createServer tool result shaping', () => {
     );
     new McpService(registry).createServer(ctx);
 
-    const result = await handlerOf(registerToolSpy.mock.calls, 'list_items')({});
+    const result = await handlerOf(registerToolSpy.mock.calls, 'list_items')({}, fakeSdkCtx());
     expect(result.structuredContent).toEqual([{ id: 'a' }, { id: 'b' }]);
     expect(result.isError).toBeUndefined();
   });
@@ -126,7 +137,7 @@ describe('McpService.createServer tool result shaping', () => {
     registry.registerTool(makeTool({ name: 'get_count', handler: async () => 42 }));
     new McpService(registry).createServer(ctx);
 
-    const result = await handlerOf(registerToolSpy.mock.calls, 'get_count')({});
+    const result = await handlerOf(registerToolSpy.mock.calls, 'get_count')({}, fakeSdkCtx());
     expect(result.structuredContent).toBe(42);
     expect(result.content[0]?.text).toBe('42');
   });
@@ -145,7 +156,7 @@ describe('McpService.createServer tool result shaping', () => {
     );
     new McpService(registry).createServer(ctx);
 
-    const result = await handlerOf(registerToolSpy.mock.calls, 'partial_sync')({});
+    const result = await handlerOf(registerToolSpy.mock.calls, 'partial_sync')({}, fakeSdkCtx());
     expect(result.isError).toBeUndefined();
     expect(result.structuredContent).toEqual({ items: ['a', 'b'], error: 'one source timed out' });
   });
@@ -156,7 +167,7 @@ describe('McpService.createServer tool result shaping', () => {
     registry.registerTool(makeTool({ name: 'do_nothing', handler: async () => undefined }));
     new McpService(registry).createServer(ctx);
 
-    const result = await handlerOf(registerToolSpy.mock.calls, 'do_nothing')({});
+    const result = await handlerOf(registerToolSpy.mock.calls, 'do_nothing')({}, fakeSdkCtx());
     expect(result.isError).toBeUndefined();
     expect(result.content[0]?.text).toBe('');
     expect(result.structuredContent).toBeUndefined();
@@ -176,7 +187,7 @@ describe('McpService.createServer tool result shaping', () => {
     );
     new McpService(registry).createServer(ctx);
 
-    const result = await handlerOf(registerToolSpy.mock.calls, 'boom')({});
+    const result = await handlerOf(registerToolSpy.mock.calls, 'boom')({}, fakeSdkCtx());
     expect(result.isError).toBe(true);
     expect(result.content[0]?.text).toContain('ECONNREFUSED');
     expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('boom'), expect.anything());

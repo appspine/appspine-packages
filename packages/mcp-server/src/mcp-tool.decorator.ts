@@ -1,6 +1,6 @@
 import type { ZodType } from 'zod';
 import type { McpToolRegistry } from './mcp-tool.registry';
-import type { McpCallContext } from './types';
+import type { McpToolCallContext } from './types';
 
 export const MCP_TOOL_PROVIDERS = 'MCP_TOOL_PROVIDERS';
 
@@ -43,8 +43,8 @@ export function registerMcpToolsFromInstance(instance: object, registry: McpTool
       inputSchema: options.inputSchema,
       outputSchema: options.outputSchema,
       requiredScopes: options.requiredScopes,
-      handler: (args: unknown, ctx: McpCallContext) =>
-        (method as (args: unknown, ctx: McpCallContext) => Promise<unknown>).call(
+      handler: (args: unknown, ctx: McpToolCallContext) =>
+        (method as (args: unknown, ctx: McpToolCallContext) => Promise<unknown>).call(
           instance,
           args,
           ctx,

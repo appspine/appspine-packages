@@ -1,13 +1,27 @@
-import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
+import type { ServerContext } from '@modelcontextprotocol/server';
+import { createMcpHandler, isInputRequiredResult, McpServer } from '@modelcontextprotocol/server';
 import { Injectable, Logger } from '@nestjs/common';
 import { classifyToolAsReadOnly, McpToolRegistry } from './mcp-tool.registry';
-import type { McpCallContext } from './types';
+import {
+  createMcpRequestStateStore,
+  type McpMultiRoundStatePayload,
+  type McpRequestStateCodec,
+  readMcpRequestStateKey,
+} from './request-state';
+import type { McpCallContext, McpMultiRoundContext, McpToolCallContext } from './types';
 
 @Injectable()
 export class McpService {
   private readonly logger = new Logger(McpService.name);
+  // Key material only -- read once, principal-independent. The codec itself is built fresh
+  // per request in createServer() because its `bind` must close over that request's own
+  // ctx.sub (see McpRequestStateOptions.principal for why it can't be the SDK's own
+  // transport-level ctx.http.authInfo instead).
+  private readonly requestStateKey: Uint8Array | undefined;
 
-  constructor(private readonly registry: McpToolRegistry) {}
+  constructor(private readonly registry: McpToolRegistry) {
+    this.requestStateKey = readMcpRequestStateKey();
+  }
 
   // A fresh handler is created per HTTP request (mcp.controller.ts), each already closed
   // over the ctx derived from that same request's auth -- there is no per-request authInfo
@@ -18,10 +32,21 @@ export class McpService {
   }
 
   createServer(ctx: McpCallContext): McpServer {
-    const server = new McpServer({
-      name: process.env.npm_package_name ?? 'appspine-app',
-      version: process.env.npm_package_version ?? '1.0.0',
-    });
+    const requestStateCodec = this.requestStateKey
+      ? createMcpRequestStateStore({ key: this.requestStateKey, principal: ctx.sub })
+      : undefined;
+    const server = new McpServer(
+      {
+        name: process.env.npm_package_name ?? 'appspine-app',
+        version: process.env.npm_package_version ?? '1.0.0',
+      },
+      requestStateCodec
+        ? {
+            requestState: { verify: (state, sdkCtx) => requestStateCodec.verify(state, sdkCtx) },
+            inputRequired: { maxRounds: requestStateCodec.maxRounds },
+          }
+        : undefined,
+    );
 
     const tools = this.registry.listTools(ctx);
 
@@ -38,9 +63,19 @@ export class McpService {
           // (023 §3.5) — `requiredScopes` itself never leaves the server.
           annotations: { readOnlyHint: classifyToolAsReadOnly(tool.requiredScopes) },
         },
-        async (args: unknown) => {
+        async (args: unknown, sdkCtx: ServerContext) => {
+          const callCtx: McpToolCallContext = {
+            ...ctx,
+            mrtr: buildMrtrContext(requestStateCodec, sdkCtx),
+          };
           try {
-            const result = await tool.handler(args, ctx);
+            const result = await tool.handler(args, callCtx);
+
+            // A handler that called `ctx.mrtr.requestInput(...)` returns the SDK's own
+            // input_required shape directly -- pass it straight through the wire, bypassing
+            // the content/structuredContent wrapping below (which is only for a completed
+            // result), same as the SDK's own tools/call handler does for this discriminator.
+            if (isInputRequiredResult(result)) return result;
 
             // `structuredContent` is exposed for any serializable result (object, array, or
             // primitive) -- not just plain objects. The v2 SDK's own wire codec
@@ -74,4 +109,37 @@ export class McpService {
 
     return server;
   }
+}
+
+function buildMrtrContext(
+  requestStateCodec: McpRequestStateCodec | undefined,
+  sdkCtx: ServerContext,
+): McpMultiRoundContext {
+  // Already verified by the SDK (via the `requestState.verify` hook passed to McpServer)
+  // before this handler runs -- reading it here never re-checks integrity, it just reads
+  // the hook's decoded result. undefined when this call carried no requestState at all.
+  const resumedPayload = sdkCtx.mcpReq.requestState<McpMultiRoundStatePayload>();
+
+  return {
+    resumed:
+      resumedPayload !== undefined
+        ? {
+            data: resumedPayload.data,
+            round: resumedPayload.round,
+            inputResponses: sdkCtx.mcpReq.inputResponses ?? {},
+          }
+        : undefined,
+    async requestInput(inputRequests, data) {
+      if (!requestStateCodec) {
+        throw new Error(
+          'ctx.mrtr.requestInput requires MCP_REQUEST_STATE_KEY to be configured for this app',
+        );
+      }
+      const requestState =
+        resumedPayload !== undefined
+          ? await requestStateCodec.mintNextRound(data, resumedPayload.round, sdkCtx)
+          : await requestStateCodec.mint(data, sdkCtx);
+      return { resultType: 'input_required' as const, inputRequests, requestState };
+    },
+  };
 }
