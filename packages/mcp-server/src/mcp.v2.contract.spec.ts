@@ -17,6 +17,7 @@ import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext, McpToolDefinition } from './types';
 
 const MODERN_VERSION = '2026-07-28';
+const LEGACY_VERSION = '2025-11-25';
 const MODERN_META = {
   'io.modelcontextprotocol/protocolVersion': MODERN_VERSION,
   'io.modelcontextprotocol/clientCapabilities': {},
@@ -48,6 +49,18 @@ function modernRequest(method: string, params: Record<string, unknown>, id: numb
     method: 'POST',
     headers,
     body: JSON.stringify({ jsonrpc: '2.0', id, method, params: { ...params, _meta: MODERN_META } }),
+  });
+}
+
+function legacyRequest(method: string, params: Record<string, unknown>, id: number): Request {
+  return new Request('https://appspine.example.test/mcp', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/event-stream',
+      'Content-Type': 'application/json',
+      'MCP-Protocol-Version': LEGACY_VERSION,
+    },
+    body: JSON.stringify({ jsonrpc: '2.0', id, method, params }),
   });
 }
 
@@ -110,6 +123,56 @@ describe('McpService MCP v2 contract', () => {
         JSON.stringify({ answer: 'hello', apiKeyId: 'api-key-1' }),
       );
       expect(result.structuredContent).toEqual({ answer: 'hello', apiKeyId: 'api-key-1' });
+    } finally {
+      await handler.close();
+    }
+  });
+
+  it('serves legacy initialize/list/call and modern list on the same endpoint handler', async () => {
+    const registry = new McpToolRegistry();
+    registerEchoTool(registry);
+    const handler = new McpService(registry).createHandler(ctx);
+
+    try {
+      const initialize = await handler.fetch(
+        legacyRequest(
+          'initialize',
+          {
+            protocolVersion: LEGACY_VERSION,
+            capabilities: {},
+            clientInfo: { name: 'appspine-legacy-contract-test', version: '0.0.0' },
+          },
+          10,
+        ),
+      );
+      const initializeBody = await readJson(initialize);
+      expect((initializeBody.result as { protocolVersion?: string }).protocolVersion).toBe(
+        LEGACY_VERSION,
+      );
+
+      const legacyList = await handler.fetch(legacyRequest('tools/list', {}, 11));
+      const legacyListBody = await readJson(legacyList);
+      expect(
+        (legacyListBody.result as { tools?: Array<{ name: string }> }).tools?.some(
+          (tool) => tool.name === 'echo',
+        ),
+      ).toBe(true);
+
+      const legacyCall = await handler.fetch(
+        legacyRequest('tools/call', { name: 'echo', arguments: { message: 'legacy' } }, 12),
+      );
+      const legacyCallBody = await readJson(legacyCall);
+      expect(
+        (legacyCallBody.result as { content?: Array<{ text?: string }> }).content?.[0]?.text,
+      ).toBe(JSON.stringify({ answer: 'legacy', apiKeyId: 'api-key-1' }));
+
+      const modernList = await handler.fetch(modernRequest('tools/list', {}, 13));
+      const modernListBody = await readJson(modernList);
+      expect(
+        (modernListBody.result as { tools?: Array<{ name: string }> }).tools?.some(
+          (tool) => tool.name === 'echo',
+        ),
+      ).toBe(true);
     } finally {
       await handler.close();
     }
