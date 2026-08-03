@@ -1,6 +1,12 @@
 # @appspine/mcp-server
 
-## 0.6.0
+## 0.6.1
+
+Republished as `0.6.1`: `0.6.0` was already occupied on the registry by an unrelated,
+never-adopted pre-migration package (old `@modelcontextprotocol/sdk@^1.29.0`, published
+weeks before this migration and never referenced by any app's dist-tag or lockfile) --
+`changesets publish` correctly refused to overwrite it, so this content never actually
+reached the registry under `0.6.0` despite `package.json`/this changelog briefly saying so.
 
 ### Minor Changes
 
