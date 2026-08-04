@@ -1,5 +1,13 @@
 # @appspine/mcp-server
 
+## 0.6.2
+
+### Patch Changes
+
+- Updated dependencies [11fac40]
+  - @appspine/auth@6.0.0
+  - @appspine/m2m-api-key@4.0.2
+
 ## 0.6.1
 
 Republished as `0.6.1`: `0.6.0` was already occupied on the registry by an unrelated,

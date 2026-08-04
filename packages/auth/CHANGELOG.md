@@ -1,5 +1,11 @@
 # @appspine/auth
 
+## 6.0.0
+
+### Major Changes
+
+- 11fac40: Reject OIDC tokens whose authorized party (`azp`) claim is missing, invalid, or does not match the configured application audience.
+
 ## 5.0.0
 
 ### Patch Changes
