@@ -1,5 +1,5 @@
 import { generateKeyPairSync } from 'node:crypto';
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Logger, UnauthorizedException } from '@nestjs/common';
 import jwt from 'jsonwebtoken';
 import { describe, expect, it, vi } from 'vitest';
 import { JwtVerifierService } from './jwt-verifier.service';
@@ -94,7 +94,19 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     ['non-string', 123],
     ['mismatched', 'other-client'],
   ] as const)('rejects a token with an invalid azp claim (%s)', async (_case, azp) => {
-    const service = createService();
+    // Resolves an existing local user by design: if assertAuthorizedParty were ever
+    // deleted or weakened (e.g. to a truthy check), buildOidcJwtUser would otherwise
+    // still throw UnauthorizedException via a *different* path (JIT-provisioning
+    // failure against the default null findUnique mock), letting this test pass for
+    // the wrong reason. With a real user available, only the azp check itself can
+    // make this reject.
+    const service = createService(async () => ({
+      id: 'user-existing',
+      email: 'user@example.com',
+      name: 'User',
+      isActive: true,
+      userRoles: [],
+    }));
 
     await expect(service.buildOidcJwtUser({ email: 'user@example.com', azp })).rejects.toThrow(
       UnauthorizedException,
@@ -185,9 +197,36 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
   it('rejects a token whose email_verified claim is explicitly false', async () => {
     const service = createService();
 
+    // Needs a matching azp — without it, assertAuthorizedParty (which now runs first
+    // in buildOidcJwtUser) rejects before this claim is ever inspected, and the test
+    // would pass without exercising the email_verified guard at all.
     await expect(
-      service.buildOidcJwtUser({ email: 'unverified@example.com', email_verified: false }),
+      service.buildOidcJwtUser({
+        email: 'unverified@example.com',
+        email_verified: false,
+        azp: process.env.OIDC_AUDIENCE,
+      }),
     ).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('logs the expected and received azp on rejection, without leaking the token', async () => {
+    const warnSpy = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
+    const service = createService();
+
+    await expect(
+      service.buildOidcJwtUser({ email: 'user@example.com', azp: 'other-client' }),
+    ).rejects.toThrow(UnauthorizedException);
+
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    const [message] = warnSpy.mock.calls[0] as [string];
+    expect(message).toContain(process.env.OIDC_AUDIENCE as string);
+    expect(message).toContain('other-client');
+    // A JWT's base64url segments always start with "eyJ" (the encoded '{"' of its JSON
+    // header/payload) — asserting its absence is a proxy for "the log never carries the
+    // raw token".
+    expect(message).not.toMatch(/eyJ/);
+
+    warnSpy.mockRestore();
   });
 
   it('does not call create when a local User already exists', async () => {

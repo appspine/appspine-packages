@@ -191,13 +191,27 @@ export class JwtVerifierService {
   }
 
   private assertAuthorizedParty(payload: Record<string, unknown>): void {
-    if (typeof payload.azp !== 'string' || payload.azp.length === 0) {
-      this.logger.warn('OIDC token rejected: authorized party claim is missing or invalid');
+    // hasOwnProperty (not plain property access, and not Object.hasOwn — tsconfig.base's
+    // lib target predates ES2022) so a polluted Object.prototype.azp can't be read as if
+    // the token actually carried the claim.
+    // biome-ignore lint/suspicious/noPrototypeBuiltins: Object.hasOwn needs an ES2022 lib target this package doesn't have.
+    const azp = Object.prototype.hasOwnProperty.call(payload, 'azp') ? payload.azp : undefined;
+    const expected = process.env.OIDC_AUDIENCE;
+
+    if (typeof azp !== 'string' || azp.length === 0) {
+      // Logs the expected value and a safe representation of whatever was actually
+      // received (never the token itself) so a real cross-app replay is distinguishable
+      // from a local OIDC_AUDIENCE misconfiguration in the server-side trace.
+      this.logger.warn(
+        `OIDC token rejected: authorized party claim is missing or invalid (expected "${expected}", received ${JSON.stringify(azp)})`,
+      );
       throw new UnauthorizedException('OIDC token has an invalid authorized party claim');
     }
 
-    if (payload.azp !== process.env.OIDC_AUDIENCE) {
-      this.logger.warn('OIDC token rejected: authorized party does not match this application');
+    if (azp !== expected) {
+      this.logger.warn(
+        `OIDC token rejected: authorized party does not match this application (expected "${expected}", received "${azp}")`,
+      );
       throw new UnauthorizedException(
         'OIDC token authorized party does not match this application',
       );
