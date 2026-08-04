@@ -48,11 +48,26 @@ describe('OidcStrategy', () => {
     const jwtVerifierService = {
       buildOidcJwtUser: vi.fn().mockResolvedValue(jwtUser),
     };
-    const payload = { email: 'user@example.com' };
+    const payload = { email: 'user@example.com', azp: process.env.OIDC_AUDIENCE };
 
     await expect(new OidcStrategy(jwtVerifierService as never).validate(payload)).resolves.toBe(
       jwtUser,
     );
     expect(jwtVerifierService.buildOidcJwtUser).toHaveBeenCalledWith(payload);
+  });
+
+  it('propagates an authorized-party rejection from the shared user builder', async () => {
+    setValidEnv();
+    const rejection = new Error('OIDC token authorized party does not match this application');
+    const jwtVerifierService = {
+      buildOidcJwtUser: vi.fn().mockRejectedValue(rejection),
+    };
+
+    await expect(
+      new OidcStrategy(jwtVerifierService as never).validate({
+        email: 'user@example.com',
+        azp: 'other-client',
+      }),
+    ).rejects.toBe(rejection);
   });
 });

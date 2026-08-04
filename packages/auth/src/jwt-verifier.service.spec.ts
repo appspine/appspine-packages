@@ -29,12 +29,16 @@ describe('JwtVerifierService', () => {
   it('validates an OIDC token signature and attaches local RBAC context', async () => {
     process.env.OIDC_JWKS_URL = 'https://issuer.example/.well-known/jwks.json';
     const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
-    const token = jwt.sign({ email: 'user@example.com' }, privateKey, {
-      algorithm: 'RS256',
-      keyid: 'key-1',
-      issuer: process.env.OIDC_ISSUER,
-      audience: process.env.OIDC_AUDIENCE,
-    });
+    const token = jwt.sign(
+      { email: 'user@example.com', azp: process.env.OIDC_AUDIENCE },
+      privateKey,
+      {
+        algorithm: 'RS256',
+        keyid: 'key-1',
+        issuer: process.env.OIDC_ISSUER,
+        audience: process.env.OIDC_AUDIENCE,
+      },
+    );
     const service = createService(async () => ({
       id: 'user-1',
       email: 'user@example.com',
@@ -84,6 +88,64 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     userRoles: [{ role: { name: 'USER', permissionPolicy: 'DENY_ALL', permissions: [] } }],
   };
 
+  it.each([
+    ['missing', undefined],
+    ['empty', ''],
+    ['non-string', 123],
+    ['mismatched', 'other-client'],
+  ] as const)('rejects a token with an invalid azp claim (%s)', async (_case, azp) => {
+    const service = createService();
+
+    await expect(service.buildOidcJwtUser({ email: 'user@example.com', azp })).rejects.toThrow(
+      UnauthorizedException,
+    );
+  });
+
+  it('accepts a token with an azp claim matching the configured audience', async () => {
+    const service = createService(async () => ({
+      id: 'user-existing',
+      email: 'existing@example.com',
+      name: 'Existing',
+      isActive: true,
+      userRoles: [],
+    }));
+
+    await expect(
+      service.buildOidcJwtUser({
+        email: 'existing@example.com',
+        azp: process.env.OIDC_AUDIENCE,
+      }),
+    ).resolves.toMatchObject({ sub: 'user-existing' });
+  });
+
+  it('requires the existing audience check in addition to azp', async () => {
+    const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+    const token = jwt.sign(
+      { email: 'user@example.com', azp: process.env.OIDC_AUDIENCE },
+      privateKey,
+      {
+        algorithm: 'RS256',
+        keyid: 'key-1',
+        issuer: process.env.OIDC_ISSUER,
+        audience: 'other-audience',
+      },
+    );
+    const service = createService();
+
+    const verifyOidcSignature = (
+      service as unknown as {
+        verifyOidcSignature: (
+          token: string,
+          signingKey: string,
+        ) => Promise<Record<string, unknown>>;
+      }
+    ).verifyOidcSignature.bind(service);
+
+    await expect(
+      verifyOidcSignature(token, publicKey.export({ type: 'spki', format: 'pem' }).toString()),
+    ).rejects.toThrow();
+  });
+
   it('auto-creates a local User with default role when none exists locally', async () => {
     const findUnique = vi
       .fn()
@@ -95,6 +157,7 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     const result = await service.buildOidcJwtUser({
       email: 'newcomer@example.com',
       name: 'Newcomer',
+      azp: process.env.OIDC_AUDIENCE,
     });
 
     expect(create).toHaveBeenCalledWith({ email: 'newcomer@example.com', name: 'Newcomer' });
@@ -111,7 +174,11 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     const service = createService(findUnique, create);
 
     await expect(
-      service.buildOidcJwtUser({ email: 'newcomer@example.com', name: 'Newcomer' }),
+      service.buildOidcJwtUser({
+        email: 'newcomer@example.com',
+        name: 'Newcomer',
+        azp: process.env.OIDC_AUDIENCE,
+      }),
     ).resolves.toMatchObject({ sub: 'user-new' });
   });
 
@@ -134,7 +201,10 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     const create = vi.fn();
     const service = createService(findUnique, create);
 
-    await service.buildOidcJwtUser({ email: 'existing@example.com' });
+    await service.buildOidcJwtUser({
+      email: 'existing@example.com',
+      azp: process.env.OIDC_AUDIENCE,
+    });
 
     expect(create).not.toHaveBeenCalled();
     expect(findUnique).toHaveBeenCalledTimes(1);

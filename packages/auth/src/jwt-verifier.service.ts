@@ -35,6 +35,7 @@ export class JwtVerifierService {
   }
 
   async buildOidcJwtUser(payload: Record<string, unknown>): Promise<JwtUser> {
+    this.assertAuthorizedParty(payload);
     const email = payload.email as string | undefined;
     if (!email) {
       throw new UnauthorizedException('OIDC token is missing an email claim');
@@ -176,10 +177,31 @@ export class JwtVerifierService {
             return;
           }
 
+          try {
+            this.assertAuthorizedParty(payload);
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
           resolve(payload);
         },
       );
     });
+  }
+
+  private assertAuthorizedParty(payload: Record<string, unknown>): void {
+    if (typeof payload.azp !== 'string' || payload.azp.length === 0) {
+      this.logger.warn('OIDC token rejected: authorized party claim is missing or invalid');
+      throw new UnauthorizedException('OIDC token has an invalid authorized party claim');
+    }
+
+    if (payload.azp !== process.env.OIDC_AUDIENCE) {
+      this.logger.warn('OIDC token rejected: authorized party does not match this application');
+      throw new UnauthorizedException(
+        'OIDC token authorized party does not match this application',
+      );
+    }
   }
 }
 
