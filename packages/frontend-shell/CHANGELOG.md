@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.13.1
+
+### Patch Changes
+
+- 887c381: Harden notification target-path validation and schema drift checks, pause polling in initially hidden tabs, and align the notification bell with the shared shell header controls.
+
 ## 0.13.0
 
 ### Minor Changes
