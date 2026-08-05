@@ -7,7 +7,7 @@ This repository is a monorepo containing shared business-app framework packages 
 The monorepo contains the following packages located under `packages/`:
 
 - **`common` (`@appspine/common`)** — Core shared utilities. Includes the global exception filter (producing unified JSON error structures), Zod validation pipes, pagination helpers (`paginate`), generalized `PrismaModule` / `PrismaService` wrappers, and logging modules.
-- **`auth` (`@appspine/auth`)** — Session authentication and user management. Supports local credential authentication (bcrypt + HS256 JWT) or OIDC SSO (via Keycloak) depending on `AUTH_MODE` env var. Houses `AdminGuard` and user profile endpoints.
+- **`auth` (`@appspine/auth`)** — OIDC-only session authentication and user management for external identity providers such as Keycloak. Houses token verification, `AdminGuard`, and user profile endpoints; local credential authentication is retired.
 - **`rbac` (`@appspine/rbac`)** — Role-Based Access Control management. Contains Role/Permission CRUD controllers and database structures, as well as `PermissionGuard` and `@RequirePermissions` decorator for endpoint authorization.
 - **`m2m-api-key` (`@appspine/m2m-api-key`)** — Machine-to-machine API key authorization. Provides client key management, scope restrictions, rate-limiting, and guards like `ApiKeyGuard` or `JwtOrApiKeyGuard`.
 - **`audit-log` (`@appspine/audit-log`)** — Security and operation auditing. Writes audit entries locally to the system's `audit_logs` table for independent system auditing without centralized queues.
