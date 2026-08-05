@@ -3,7 +3,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export type NotificationCountResult = number | { count: number };
 
 export type NotificationPollingController = {
+  /**
+   * Opportunistic refresh used by the interval timer and visibility changes: coalesces into
+   * whatever request is already in flight rather than issuing a duplicate, since the background
+   * poll has no urgency requirement — eventual consistency is fine.
+   */
   refresh: () => Promise<void>;
+  /**
+   * Always issues a fresh request, bumping the sequence so any older in-flight response (from a
+   * concurrent `refresh()` or a prior `forceRefresh()`) is ignored when it lands. Use this after a
+   * mutation (mark-read, mark-all-read) where the caller specifically needs the server's current
+   * count, not whatever an in-progress background poll happens to return.
+   */
+  forceRefresh: () => Promise<void>;
   start: () => void;
   stop: () => void;
   setVisible: (visible: boolean) => void;
@@ -41,10 +53,9 @@ export function createNotificationPollingController(
   let active = false;
   let requestSequence = 0;
 
-  const refresh = async () => {
-    if (!active || !visible || inFlight) return inFlight;
+  const issueRequest = (): Promise<void> => {
     const sequence = ++requestSequence;
-    inFlight = Promise.resolve()
+    const promise: Promise<void> = Promise.resolve()
       .then(() => options.loadUnreadCount())
       .then((result) => {
         if (sequence !== requestSequence) return;
@@ -55,9 +66,22 @@ export function createNotificationPollingController(
         if (sequence === requestSequence) options.onError?.(error);
       })
       .finally(() => {
-        inFlight = undefined;
+        // Only the request that is still current clears `inFlight` — an older request's finally
+        // firing after a newer one started must not wipe out the newer request's in-flight marker.
+        if (inFlight === promise) inFlight = undefined;
       });
-    return inFlight;
+    inFlight = promise;
+    return promise;
+  };
+
+  const refresh = async () => {
+    if (!active || !visible) return;
+    await (inFlight ?? issueRequest());
+  };
+
+  const forceRefresh = async () => {
+    if (!active) return;
+    await issueRequest();
   };
 
   const start = () => {
@@ -80,7 +104,7 @@ export function createNotificationPollingController(
     if (visible && active && options.enabled !== false) void refresh();
   };
 
-  return { refresh, start, stop, setVisible };
+  return { refresh, forceRefresh, start, stop, setVisible };
 }
 
 export function useNotificationPolling(
@@ -92,9 +116,10 @@ export function useNotificationPolling(
   const mountedRef = useRef(true);
   const loadUnreadCountRef = useRef(options.loadUnreadCount);
   loadUnreadCountRef.current = options.loadUnreadCount;
-  // The controller owns the in-flight/sequence guards; `refresh()` below delegates to it instead
-  // of re-implementing its own unguarded fetch, or a manual refresh (e.g. after mark-read) could
-  // race a concurrent interval tick and let a stale response overwrite a newer count.
+  // The controller owns the in-flight/sequence guards; `refresh()` below delegates to
+  // `forceRefresh()` instead of re-implementing its own fetch, so a manual refresh (e.g. after
+  // mark-read) always reflects the mutation rather than piggybacking on — and resolving with the
+  // stale result of — a concurrent background poll that started before the mutation landed.
   const controllerRef = useRef<NotificationPollingController | null>(null);
 
   useEffect(() => {
@@ -131,7 +156,14 @@ export function useNotificationPolling(
   const refresh = useCallback(async () => {
     if (!mountedRef.current) return;
     setIsLoading(true);
-    await controllerRef.current?.refresh();
+    try {
+      await controllerRef.current?.forceRefresh();
+    } finally {
+      // Always clears isLoading — even if the controller no-op'd (unmounted/not yet started) or
+      // its onCount/onError callback never fires — so a bare setIsLoading(true) with no matching
+      // controller-driven reset can't latch the bell in a permanently "busy" state.
+      if (mountedRef.current) setIsLoading(false);
+    }
   }, []);
 
   return { count, isLoading, error, refresh };

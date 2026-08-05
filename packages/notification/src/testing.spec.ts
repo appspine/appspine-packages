@@ -139,6 +139,25 @@ describe('NotificationService', () => {
       await expect(service.markRead('id-1', '')).rejects.toBeInstanceOf(BadRequestException);
     });
 
+    it('rejects an oversized recipient/notification id on read/mutate paths, not just on write', async () => {
+      const { tx } = createMockNotificationTx();
+      const service = new NotificationService(tx as never);
+      const oversizedId = 'x'.repeat(NOTIFICATION_LIMITS.id + 1);
+
+      await expect(service.getInbox(oversizedId)).rejects.toBeInstanceOf(BadRequestException);
+      await expect(service.getUnreadCount(oversizedId)).rejects.toBeInstanceOf(BadRequestException);
+      await expect(service.markRead(oversizedId, 'user-1')).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(service.markRead('id-1', oversizedId)).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      await expect(service.markAllRead(oversizedId)).rejects.toBeInstanceOf(BadRequestException);
+      await expect(service.archive('id-1', oversizedId)).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+    });
+
     it('rejects out-of-range pagination with a 400 carrying structured issues', async () => {
       const { tx } = createMockNotificationTx();
       const service = new NotificationService(tx as never);

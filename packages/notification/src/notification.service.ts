@@ -202,6 +202,11 @@ function validateRecipient(value: string): string {
   const trimmed = value.trim();
   if (trimmed.length === 0)
     throw new BadRequestException('Notification id and recipientUserId must be non-empty');
+  if (trimmed.length > NOTIFICATION_LIMITS.id) {
+    throw new BadRequestException(
+      `Notification id and recipientUserId must be at most ${NOTIFICATION_LIMITS.id} characters`,
+    );
+  }
   return trimmed;
 }
 

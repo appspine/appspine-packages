@@ -195,34 +195,51 @@ export function checkNotificationSchemaDrift(
  *
  * Schema-side matches (`@@index`, `@updatedAt`) are scoped to the `model Notification { ... }`
  * block only — matching against the whole schema file would let an unrelated model's index or
- * `@updatedAt` field satisfy the check even when `Notification` itself is missing one.
+ * `@updatedAt` field satisfy the check even when `Notification` itself is missing one. Both the
+ * schema and migration text are comment-stripped first, so a commented-out `@@index`/model
+ * definition can't produce a false "present" reading.
  *
- * `notificationTableName`, when provided, scopes migration `CREATE INDEX ... ON "<table>"`
- * matches to that physical table so an index created for a different table in the same
- * migration text can't satisfy the contract. Omit it only when the caller has already isolated
- * migration text to statements that touch the notification table.
+ * If the `Notification` model block can't be found in `schemaText` at all, `indexes` and
+ * `updatedAtFields` come back `undefined` (not `[]`) — an empty array means "the block was found
+ * and genuinely has none," which is real drift; `undefined` means "couldn't check," which
+ * `checkNotificationSchemaDrift` reports as an explicit could-not-verify issue instead of
+ * misreporting drift that may not exist. `migrationIndexes` gets the same `undefined` treatment
+ * when no migration text is supplied.
+ *
+ * Migration indexes are computed by replaying `CREATE INDEX`/`DROP INDEX` statements in the order
+ * they appear (matching Postgres's own execution order for a concatenated, chronologically sorted
+ * migration history) and keeping only indexes still live at the end — a later migration that drops
+ * an index the contract requires is therefore still caught, not masked by an earlier CREATE.
+ *
+ * `notificationTableName`, when provided, scopes `CREATE INDEX ... ON "<table>"` matches (including
+ * schema-qualified forms like `"public"."<table>"`) to that physical table so an index created for
+ * a different table in the same migration text can't satisfy the contract. Omit it only when the
+ * caller has already isolated migration text to statements that touch the notification table.
  */
 export function parseNotificationSchemaMetadata(
   schemaText: string,
   migrationText = '',
   notificationTableName?: string,
 ): NotificationSchemaMetadata {
-  const modelBlock = extractModelBlock(schemaText, 'Notification') ?? '';
-  const indexes = [...modelBlock.matchAll(/@@index\s*\(\s*\[([^\]]+)\]/g)].map((match) => ({
-    fields: parseSchemaFields(match[1]),
-  }));
-  const createIndexPattern = notificationTableName
-    ? new RegExp(
-        `CREATE\\s+INDEX\\s+"[^"]+"\\s+ON\\s+"${escapeRegExp(notificationTableName)}"\\s*\\(([^)]+)\\)`,
-        'gi',
-      )
-    : /CREATE\s+INDEX\s+"[^"]+"\s+ON\s+"[^"]+"\s*\(([^)]+)\)/gi;
-  const migrationIndexes = [...migrationText.matchAll(createIndexPattern)].map((match) => ({
-    fields: parseMigrationFields(match[1]),
-  }));
-  const updatedAtFields = [...modelBlock.matchAll(/^\s*(\w+)\s+[^\n]*@updatedAt\b/gm)].map(
-    (match) => match[1],
-  );
+  const strippedSchema = stripLineComments(schemaText, ['//'], '"');
+  const modelBlock = extractModelBlock(strippedSchema, 'Notification');
+  const indexes =
+    modelBlock === null
+      ? undefined
+      : [...modelBlock.matchAll(/@@index\s*\(\s*\[([^\]]+)\]/g)].map((match) => ({
+          fields: parseSchemaFields(match[1]),
+        }));
+  const updatedAtFields =
+    modelBlock === null
+      ? undefined
+      : [...modelBlock.matchAll(/^\s*(\w+)\s+[^\n]*@updatedAt\b/gm)].map((match) => match[1]);
+
+  const strippedMigration = stripSqlComments(migrationText);
+  const migrationIndexes =
+    strippedMigration.trim() === ''
+      ? undefined
+      : computeLiveMigrationIndexes(strippedMigration, notificationTableName);
+
   return { indexes, migrationIndexes, updatedAtFields };
 }
 
@@ -243,8 +260,71 @@ function extractModelBlock(schemaText: string, modelName: string): string | null
   return null;
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/**
+ * Replays `CREATE INDEX`/`DROP INDEX` statements in textual order and returns only indexes still
+ * live afterward. Index names are unique per Postgres schema regardless of table, so a `DROP
+ * INDEX "name"` unambiguously removes whichever `CREATE INDEX "name"` this scan already recorded
+ * — including one recorded before table-scoping was known to matter — without needing the table
+ * name itself (Postgres's `DROP INDEX` syntax doesn't carry one).
+ */
+function computeLiveMigrationIndexes(
+  migrationText: string,
+  notificationTableName?: string,
+): NotificationIndexMetadata[] {
+  const tableRef = '(?:"[^"]+"\\s*\\.\\s*)?"([^"]+)"';
+  const statementPattern = new RegExp(
+    `CREATE\\s+INDEX\\s+"([^"]+)"\\s+ON\\s+${tableRef}\\s*\\(([^)]+)\\)` +
+      `|DROP\\s+INDEX\\s+(?:IF\\s+EXISTS\\s+)?${tableRef}`,
+    'gi',
+  );
+  const live = new Map<string, string[]>();
+  for (const match of migrationText.matchAll(statementPattern)) {
+    const [, createName, createTable, createFields, dropName] = match;
+    if (createName !== undefined) {
+      if (
+        notificationTableName &&
+        createTable.toLowerCase() !== notificationTableName.toLowerCase()
+      ) {
+        continue;
+      }
+      live.set(createName, parseMigrationFields(createFields));
+    } else if (dropName !== undefined) {
+      live.delete(dropName);
+    }
+  }
+  return [...live.values()].map((fields) => ({ fields }));
+}
+
+/**
+ * Strips `//`/`///` line comments outside of double-quoted strings — good enough for Prisma
+ * schema text, which has no block-comment syntax and no `//` inside its `@map("...")`-style
+ * string literals in practice.
+ */
+function stripLineComments(text: string, prefixes: string[], stringQuote: string): string {
+  return text
+    .split('\n')
+    .map((line) => stripLineCommentFromLine(line, prefixes, stringQuote))
+    .join('\n');
+}
+
+function stripLineCommentFromLine(line: string, prefixes: string[], stringQuote: string): string {
+  let inString = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === stringQuote) inString = !inString;
+    if (!inString) {
+      for (const prefix of prefixes) {
+        if (line.startsWith(prefix, i)) return line.slice(0, i);
+      }
+    }
+  }
+  return line;
+}
+
+/** Strips SQL block comments and `--` line comments outside of single-quoted strings. */
+function stripSqlComments(sql: string): string {
+  const withoutBlockComments = sql.replace(/\/\*[\s\S]*?\*\//g, ' ');
+  return stripLineComments(withoutBlockComments, ['--'], "'");
 }
 
 function parseSchemaFields(value: string): string[] {
@@ -254,11 +334,16 @@ function parseSchemaFields(value: string): string[] {
     .filter(Boolean);
 }
 
+/** Extracts the quoted column name, ignoring trailing sort modifiers like `DESC`/`NULLS LAST`. */
 function parseMigrationFields(value: string): string[] {
   return value
     .split(',')
-    .map((field) => field.trim().replace(/^"|"$/g, ''))
+    .map((field) => field.trim())
     .filter(Boolean)
+    .map((field) => {
+      const match = /^"([^"]+)"/.exec(field);
+      return match ? match[1] : field;
+    })
     .map(snakeToCamel);
 }
 

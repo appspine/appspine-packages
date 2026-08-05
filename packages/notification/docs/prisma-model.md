@@ -38,6 +38,19 @@ Select migration files by scanning their *content* for the notification table na
 filename convention — a later migration that alters the table without repeating a magic substring
 in its directory name must still be picked up and still fail the gate on real drift.
 
+To be precise about what each argument does, since the two are easy to conflate: `schemaText`'s
+`@@index`/`@updatedAt` are **always** scoped to the `model Notification { ... }` block, regardless
+of whether `notificationTableName` is supplied — an unrelated model elsewhere in the same schema
+file can never satisfy the check. `notificationTableName` only affects `migrationText` parsing: it
+scopes `CREATE INDEX ... ON "<table>"` matches (including schema-qualified `"public"."<table>"`
+forms) to that physical table, so a `CREATE INDEX` for a *different* table in the same migration
+text can't be mistaken for one of the notification table's indexes. Pass it whenever `migrationText`
+might contain statements for other tables (true for most real migration files); it's unnecessary
+only when the caller has already isolated migration text to statements touching just the
+notification table. Migration indexes are also computed as a chronological replay of
+`CREATE INDEX`/`DROP INDEX` — an index a later migration drops is correctly reported missing, not
+masked by an earlier `CREATE INDEX` still present in the concatenated text.
+
 ```prisma
 model Notification {
   id               String    @id @default(cuid())

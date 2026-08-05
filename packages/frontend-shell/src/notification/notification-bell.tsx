@@ -38,6 +38,9 @@ type RecentState = {
 };
 
 const EMPTY_RECENT: RecentState = { items: [], loading: false, error: null };
+// Bounds how long a click's deferred navigation waits on markRead before proceeding anyway — a
+// hung/slow request must not turn a notification into a permanently unclickable dead link.
+const MARK_READ_TIMEOUT_MS = 1500;
 
 export function NotificationBell({
   dataSource,
@@ -105,9 +108,10 @@ export function NotificationBell({
     }
   };
 
-  // `navigateHref`, when present, is followed only after the mark-read attempt settles (success
-  // or failure) — the caller has already preventDefault()-ed the native anchor navigation so a
-  // full-page unload can't abort the in-flight markRead request out from under it.
+  // `navigateHref`, when present, is followed only after the mark-read attempt settles or times
+  // out — the caller has already preventDefault()-ed the native anchor navigation so a full-page
+  // unload can't abort the in-flight markRead request out from under it, and a hung/slow request
+  // can't turn the notification into a permanently unclickable dead link either.
   const handleSelect = async (notification: NotificationSummary, navigateHref?: string) => {
     if (!notification.readAt) {
       const previous = displayItems;
@@ -115,12 +119,35 @@ export function NotificationBell({
         item.id === notification.id ? { ...item, readAt: new Date() } : item,
       );
       setOptimisticItems(next);
-      try {
-        await dataSource.markRead(notification.id);
-        await refreshCount();
-      } catch {
-        setOptimisticItems(previous);
-        setActionError(labels.markReadError);
+
+      const markReadSettled: Promise<'ok' | 'failed'> = dataSource.markRead(notification.id).then(
+        () => 'ok',
+        () => 'failed',
+      );
+      const reconcile = (outcome: 'ok' | 'failed') => {
+        if (outcome === 'failed') {
+          // Functional update: only roll back if this is still the optimistic state we set —
+          // a newer action in the meantime (e.g. marking a different item read) must not be
+          // clobbered by a late-arriving reconciliation from this one.
+          setOptimisticItems((current) => (current === next ? previous : current));
+          setActionError(labels.markReadError);
+        } else if (!navigateHref) {
+          // Refreshing the count is pointless when we're about to navigate away — the result
+          // will never be seen before unload.
+          void refreshCount();
+        }
+      };
+
+      const timedOut = new Promise<'timed-out'>((resolve) => {
+        setTimeout(() => resolve('timed-out'), MARK_READ_TIMEOUT_MS);
+      });
+      const outcome = await Promise.race([markReadSettled, timedOut]);
+      if (outcome === 'timed-out') {
+        // Stop waiting so navigation below can proceed, but keep reconciling in the background —
+        // a same-page click (no navigateHref) still needs the eventual real outcome applied.
+        void markReadSettled.then(reconcile);
+      } else {
+        reconcile(outcome);
       }
     }
     if (navigateHref) window.location.href = navigateHref;
@@ -288,9 +315,49 @@ function NotificationItem({
   // handleSelect settles keeps the notification's read state from being silently lost. Modifier
   // clicks (new tab/window) and middle-click leave the current page alive, so the native anchor
   // behavior is left untouched for those.
+  //
+  // The click event `handleAnchorClick` receives is NOT reliable for reading modifier keys: Radix
+  // menu items re-dispatch a synthetic `element.click()` from their own pointerup handler (so the
+  // press-on-trigger/release-on-item drag gesture still counts as a selection), and that
+  // synthetic click always reports `button: 0` with no modifier keys regardless of what was
+  // actually held. So the real gesture is captured on pointerdown instead — the earliest event
+  // that still reflects genuine input — and consumed exactly once per click.
+  const pointerModifiersRef = React.useRef<{
+    button: number;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
+    altKey: boolean;
+  } | null>(null);
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLAnchorElement>) => {
+    pointerModifiersRef.current = {
+      button: event.button,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
+      altKey: event.altKey,
+    };
+  };
+
   const handleAnchorClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    // Falls back to a plain-click reading when there's no captured pointerdown (keyboard
+    // activation via Enter/Space never fires one) — keyboard users get the deferred-navigation
+    // path, matching how a plain left click behaves.
+    const modifiers = pointerModifiersRef.current ?? {
+      button: 0,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      altKey: false,
+    };
+    pointerModifiersRef.current = null;
     const isPlainLeftClick =
-      event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+      modifiers.button === 0 &&
+      !modifiers.metaKey &&
+      !modifiers.ctrlKey &&
+      !modifiers.shiftKey &&
+      !modifiers.altKey;
     if (!isPlainLeftClick) {
       onSelect();
       return;
@@ -299,10 +366,22 @@ function NotificationItem({
     onSelect(href ?? undefined);
   };
 
+  // Middle-click opens a new tab/window via the browser's native handling and never fires a
+  // `click` event at all (only `auxclick`) — still mark the notification read for that gesture,
+  // without touching navigation.
+  const handleAuxClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.button === 1) onSelect();
+  };
+
   return (
     <DropdownMenuItem asChild className="min-h-14 cursor-pointer items-start whitespace-normal">
       {href ? (
-        <a href={href} onClick={handleAnchorClick}>
+        <a
+          href={href}
+          onPointerDown={handlePointerDown}
+          onClick={handleAnchorClick}
+          onAuxClick={handleAuxClick}
+        >
           {content}
         </a>
       ) : (

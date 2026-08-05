@@ -82,6 +82,61 @@ describe('createNotificationPollingController', () => {
     controller.stop();
   });
 
+  it('forceRefresh always issues a fresh request and its result supersedes a stale in-flight one', async () => {
+    vi.useFakeTimers();
+    const resolvers: Array<(value: number) => void> = [];
+    const load = vi.fn(
+      () =>
+        new Promise<number>((resolve) => {
+          resolvers.push(resolve);
+        }),
+    );
+    const onCount = vi.fn();
+    const controller = createNotificationPollingController({
+      loadUnreadCount: load,
+      intervalMs: 1000,
+      onCount,
+    });
+
+    controller.start();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(load).toHaveBeenCalledTimes(1);
+
+    const forced = controller.forceRefresh();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(load).toHaveBeenCalledTimes(2);
+
+    // The stale first request resolving after forceRefresh started must not overwrite state.
+    resolvers[0]?.(5);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(onCount).not.toHaveBeenCalledWith(5);
+
+    resolvers[1]?.(9);
+    await forced;
+    expect(onCount).toHaveBeenLastCalledWith(9);
+    controller.stop();
+  });
+
+  it('forceRefresh no-ops before start() and after stop(), never calling loadUnreadCount', async () => {
+    const load = vi.fn(async () => 5);
+    // enabled: false so start() doesn't also kick off its own initial refresh() — that request
+    // would already be scheduled as a microtask by the time stop() runs synchronously after it,
+    // and stop() only prevents the *result* from being applied, not the fetch from firing at all.
+    // Isolating to forceRefresh's own `!active` guard is the point of this test.
+    const controller = createNotificationPollingController({
+      loadUnreadCount: load,
+      enabled: false,
+    });
+
+    await controller.forceRefresh();
+    expect(load).not.toHaveBeenCalled();
+
+    controller.start();
+    controller.stop();
+    await controller.forceRefresh();
+    expect(load).not.toHaveBeenCalled();
+  });
+
   it('ignores late failures after stop', async () => {
     const onError = vi.fn();
     let reject: ((error: Error) => void) | undefined;
@@ -149,13 +204,13 @@ describe('useNotificationPolling', () => {
     });
   });
 
-  it('refresh() shares the controller in-flight guard instead of firing a duplicate overlapping request', async () => {
+  it("refresh() fetches fresh data instead of resolving with a concurrent background poll's stale response", async () => {
     vi.useFakeTimers();
-    let resolveFirst: ((value: number) => void) | undefined;
+    const resolvers: Array<(value: number) => void> = [];
     const loadUnreadCount = vi.fn(
       () =>
         new Promise<number>((resolve) => {
-          resolveFirst = resolve;
+          resolvers.push(resolve);
         }),
     );
     const getState = mountHook({ loadUnreadCount, intervalMs: 1000 });
@@ -166,21 +221,25 @@ describe('useNotificationPolling', () => {
     });
     expect(loadUnreadCount).toHaveBeenCalledTimes(1);
 
-    // A manual refresh() while a request is already in flight must not start a second one — this
-    // is exactly the "pile-up" behavior the standalone (pre-fix) refresh() implementation lacked.
+    // A manual refresh() (e.g. right after mark-all-read) must issue its own fresh request rather
+    // than piggyback on the in-flight background poll and resolve with its (potentially stale)
+    // result.
     let refreshPromise: Promise<void> | undefined;
-    act(() => {
+    await act(async () => {
       refreshPromise = getState().refresh();
+      await vi.advanceTimersByTimeAsync(0);
     });
-    expect(loadUnreadCount).toHaveBeenCalledTimes(1);
+    expect(loadUnreadCount).toHaveBeenCalledTimes(2);
+    expect(getState().isLoading).toBe(true);
 
     await act(async () => {
-      resolveFirst?.(7);
+      resolvers[0]?.(7); // the stale, pre-mutation background-poll response
+      resolvers[1]?.(0); // the fresh, post-mutation response
       await refreshPromise;
     });
 
-    expect(getState().count).toBe(7);
-    expect(loadUnreadCount).toHaveBeenCalledTimes(1);
+    expect(getState().count).toBe(0);
+    expect(getState().isLoading).toBe(false);
   });
 
   it('does not update state after unmount', async () => {

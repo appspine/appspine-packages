@@ -211,6 +211,126 @@ describe('checkNotificationSchemaDrift', () => {
     expect(unscoped.migrationIndexes).toHaveLength(2);
   });
 
+  it('does not let a commented-out @@index/model satisfy the check', () => {
+    const schemaText = `
+      // model Notification {
+      //   @@index([sourceApp, sourceEntityType, sourceEntityId])
+      // }
+
+      model Notification {
+        /// old shape kept for reference: { legacy: true }
+        updatedAt DateTime @updatedAt // was @default(now())
+        // @@index([recipientUserId, archivedAt, readAt, createdAt])
+        @@index([sourceApp, sourceEntityType, sourceEntityId])
+      }
+    `;
+    const metadata = parseNotificationSchemaMetadata(schemaText);
+    expect(metadata.indexes).toEqual([
+      { fields: ['sourceApp', 'sourceEntityType', 'sourceEntityId'] },
+    ]);
+    expect(metadata.updatedAtFields).toEqual(['updatedAt']);
+    const model = fixture().models[0];
+    model.indexes = undefined;
+    const issues = checkNotificationSchemaDrift({ ...fixture(), models: [model] }, metadata);
+    expect(issues).toContain(
+      'model Notification is missing @@index([recipientUserId, archivedAt, readAt, createdAt])',
+    );
+  });
+
+  it('does not let a dropped migration index satisfy the check, even though it was once created', () => {
+    const migrationText = `
+      CREATE INDEX "notifications_recipient_idx"
+        ON "notifications"("recipient_user_id", "archived_at", "read_at", "created_at");
+      CREATE INDEX "notifications_source_idx"
+        ON "notifications"("source_app", "source_entity_type", "source_entity_id");
+
+      -- a later migration drops the recipient index and never recreates it
+      DROP INDEX IF EXISTS "notifications_recipient_idx";
+    `;
+    const metadata = parseNotificationSchemaMetadata(
+      'model Notification {}',
+      migrationText,
+      'notifications',
+    );
+    expect(metadata.migrationIndexes).toEqual([
+      { fields: ['sourceApp', 'sourceEntityType', 'sourceEntityId'] },
+    ]);
+    const issues = checkNotificationSchemaDrift(fixture(), metadata);
+    expect(issues).toContain(
+      'notification migration is missing index ([recipientUserId, archivedAt, readAt, createdAt])',
+    );
+  });
+
+  it('replaces a dropped-and-recreated migration index rather than treating the drop as final', () => {
+    const migrationText = `
+      CREATE INDEX "notifications_recipient_idx"
+        ON "notifications"("recipient_user_id", "read_at", "archived_at", "created_at");
+      DROP INDEX IF EXISTS "notifications_recipient_idx";
+      CREATE INDEX "notifications_recipient_idx"
+        ON "notifications"("recipient_user_id", "archived_at", "read_at", "created_at");
+    `;
+    const metadata = parseNotificationSchemaMetadata(
+      'model Notification {}',
+      migrationText,
+      'notifications',
+    );
+    expect(metadata.migrationIndexes).toEqual([
+      { fields: ['recipientUserId', 'archivedAt', 'readAt', 'createdAt'] },
+    ]);
+  });
+
+  it('ignores a commented-out migration CREATE INDEX', () => {
+    const migrationText = `
+      -- CREATE INDEX "notifications_recipient_idx" ON "notifications"("recipient_user_id");
+      /* CREATE INDEX "notifications_other_idx" ON "notifications"("source_app"); */
+      CREATE INDEX "notifications_source_idx"
+        ON "notifications"("source_app", "source_entity_type", "source_entity_id");
+    `;
+    const metadata = parseNotificationSchemaMetadata(
+      'model Notification {}',
+      migrationText,
+      'notifications',
+    );
+    expect(metadata.migrationIndexes).toEqual([
+      { fields: ['sourceApp', 'sourceEntityType', 'sourceEntityId'] },
+    ]);
+  });
+
+  it('matches a schema-qualified table name and strips trailing sort modifiers', () => {
+    const migrationText = `
+      CREATE INDEX "notifications_source_idx"
+        ON "public"."notifications"("source_app" DESC, "source_entity_type", "source_entity_id" NULLS LAST);
+    `;
+    const metadata = parseNotificationSchemaMetadata(
+      'model Notification {}',
+      migrationText,
+      'notifications',
+    );
+    expect(metadata.migrationIndexes).toEqual([
+      { fields: ['sourceApp', 'sourceEntityType', 'sourceEntityId'] },
+    ]);
+  });
+
+  it('treats omitted migration text as unverifiable rather than reporting false drift', () => {
+    const metadata = parseNotificationSchemaMetadata(`
+      model Notification {
+        @@index([recipientUserId, archivedAt, readAt, createdAt])
+        @@index([sourceApp, sourceEntityType, sourceEntityId])
+      }
+    `);
+    expect(metadata.migrationIndexes).toBeUndefined();
+    const issues = checkNotificationSchemaDrift(fixture(), metadata);
+    expect(issues).not.toContain(
+      'notification migration is missing index ([recipientUserId, archivedAt, readAt, createdAt])',
+    );
+  });
+
+  it('reports could-not-verify instead of false drift when the Notification model block is absent from the given schema text', () => {
+    const metadata = parseNotificationSchemaMetadata('model SomeOtherModel { id String @id }');
+    expect(metadata.indexes).toBeUndefined();
+    expect(metadata.updatedAtFields).toBeUndefined();
+  });
+
   it('detects wrong type, nullability, column map, and default drift', () => {
     const model = fixture().models[0];
     model.fields = model.fields.map((field) => {
