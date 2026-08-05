@@ -29,6 +29,8 @@ export type DmmfModel = {
   fields: readonly DmmfField[];
   uniqueFields?: readonly (readonly string[])[];
   uniqueIndexes?: readonly { fields: readonly string[] }[];
+  /** Prisma 6's public DMMF omits non-unique indexes at runtime; schema-aware fixtures may provide them. */
+  indexes?: readonly { name?: string; fields: readonly string[] }[];
 };
 
 export type DmmfEnumValue = {

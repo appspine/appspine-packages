@@ -60,4 +60,7 @@ export * from './lib/cookie.client.js';
 export * from './lib/preferences/layout-utils.js';
 export * from './lib/preferences/theme-utils.js';
 export * from './lib/utils.js';
+export * from './notification/notification-bell.js';
+export * from './notification/types.js';
+export * from './notification/use-notification-polling.js';
 export * from './scripts/theme-boot.js';
