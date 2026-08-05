@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { checkNotificationSchemaDrift, type NotificationDatamodel } from './schema-drift-check';
+import {
+  checkNotificationSchemaDrift,
+  type NotificationDatamodel,
+  parseNotificationSchemaMetadata,
+} from './schema-drift-check';
 
 function fixture(): NotificationDatamodel {
   const scalar = (name: string, type: string, options: Record<string, unknown> = {}) => ({
@@ -96,5 +100,26 @@ describe('checkNotificationSchemaDrift', () => {
         'model Notification is missing field readAt',
       ]),
     );
+  });
+
+  it('parses schema and migration metadata and detects their drift', () => {
+    const metadata = parseNotificationSchemaMetadata(
+      `model Notification {
+        updatedAt DateTime @default(now()) @updatedAt
+        @@index([recipientUserId, archivedAt, readAt, createdAt])
+        @@index([sourceApp, sourceEntityType, sourceEntityId])
+      }`,
+      `CREATE INDEX "notifications_recipient_idx" ON "notifications"("recipient_user_id", "read_at", "archived_at", "created_at");`,
+    );
+    expect(metadata.updatedAtFields).toEqual(['updatedAt']);
+    const issues = checkNotificationSchemaDrift(fixture(), metadata);
+    expect(issues).toContain(
+      'notification migration is missing index ([recipientUserId, archivedAt, readAt, createdAt])',
+    );
+  });
+
+  it('requires updatedAt to remain managed by Prisma', () => {
+    const issues = checkNotificationSchemaDrift(fixture(), { updatedAtFields: [] });
+    expect(issues).toContain('model Notification.updatedAt must use @updatedAt');
   });
 });

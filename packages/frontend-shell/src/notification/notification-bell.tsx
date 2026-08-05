@@ -120,7 +120,6 @@ export function NotificationBell({
       <DropdownMenuTrigger asChild>
         <Button
           size="icon"
-          variant="ghost"
           aria-label={labels.ariaLabel}
           aria-busy={countLoading}
           className={cn('relative', className)}
@@ -137,8 +136,8 @@ export function NotificationBell({
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[min(22rem,calc(100vw-1rem))] p-1">
-        <div className="flex items-center justify-between gap-2 px-2 py-1.5">
+      <DropdownMenuContent align="end" className="w-[min(18rem,calc(100vw-1rem))] p-2.5">
+        <div className="flex items-center justify-between gap-2 px-1.5 py-1">
           <span className="font-medium text-sm">{labels.title}</span>
           <Button
             variant="ghost"

@@ -23,7 +23,7 @@ model Notification {
   readAt           DateTime? @map("read_at")
   archivedAt       DateTime? @map("archived_at")
   createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
 
   @@unique([recipientUserId, idempotencyKey])
   @@index([recipientUserId, archivedAt, readAt, createdAt])

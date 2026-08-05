@@ -129,6 +129,7 @@ export function useNotificationPolling(
       },
     });
     const onVisibilityChange = () => controller.setVisible(document.visibilityState === 'visible');
+    controller.setVisible(document.visibilityState === 'visible');
     controller.start();
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {

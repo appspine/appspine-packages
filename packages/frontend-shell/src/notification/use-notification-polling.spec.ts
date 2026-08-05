@@ -57,6 +57,25 @@ describe('createNotificationPollingController', () => {
     controller.stop();
   });
 
+  it('does not start a request when the page is already hidden', async () => {
+    vi.useFakeTimers();
+    const load = vi.fn(async () => 4);
+    const controller = createNotificationPollingController({
+      loadUnreadCount: load,
+      intervalMs: 1000,
+    });
+
+    controller.setVisible(false);
+    controller.start();
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(load).not.toHaveBeenCalled();
+
+    controller.setVisible(true);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(load).toHaveBeenCalledTimes(1);
+    controller.stop();
+  });
+
   it('ignores late failures after stop', async () => {
     const onError = vi.fn();
     let reject: ((error: Error) => void) | undefined;

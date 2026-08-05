@@ -20,7 +20,31 @@ export const targetPathSchema = z
   })
   .refine((value) => !/^[a-z][a-z\d+.-]*:/i.test(value), {
     message: 'targetPath must not contain an external URL scheme',
-  });
+  })
+  .refine(
+    (value) =>
+      !value.split('').some((character) => {
+        const code = character.charCodeAt(0);
+        return character === '\\' || code <= 0x1f || code === 0x7f;
+      }),
+    {
+      message: 'targetPath must not contain backslashes or control characters',
+    },
+  )
+  .refine(
+    (value) => {
+      try {
+        // Use a non-routable sentinel only to model how browsers resolve path-like hrefs.
+        const resolved = new URL(value, 'https://appspine.invalid');
+        return resolved.origin === 'https://appspine.invalid';
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: 'targetPath must resolve to the current app origin',
+    },
+  );
 
 export const createNotificationSchema = z.object({
   recipientUserId: boundedId,

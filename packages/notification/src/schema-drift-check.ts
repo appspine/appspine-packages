@@ -3,6 +3,16 @@ import type { DmmfField, DmmfModel, PrismaDmmfDatamodel } from '@appspine/common
 export type NotificationDatamodel = PrismaDmmfDatamodel;
 export type { DmmfField, DmmfModel };
 
+export type NotificationIndexMetadata = {
+  fields: readonly string[];
+};
+
+export type NotificationSchemaMetadata = {
+  indexes?: readonly NotificationIndexMetadata[];
+  migrationIndexes?: readonly NotificationIndexMetadata[];
+  updatedAtFields?: readonly string[];
+};
+
 type ExpectedField = {
   name: string;
   kind: 'scalar' | 'object';
@@ -76,7 +86,10 @@ const EXPECTED_FIELDS: ExpectedField[] = [
  * Checks the consumer's generated DMMF against the documented Notification model.
  * Physical table name and User back-relation field name are intentionally app-owned.
  */
-export function checkNotificationSchemaDrift(datamodel: NotificationDatamodel): string[] {
+export function checkNotificationSchemaDrift(
+  datamodel: NotificationDatamodel,
+  metadata?: NotificationSchemaMetadata,
+): string[] {
   const issues: string[] = [];
   const model = datamodel.models.find((candidate) => candidate.name === 'Notification');
   if (!model) return ['model Notification not found'];
@@ -133,20 +146,73 @@ export function checkNotificationSchemaDrift(datamodel: NotificationDatamodel): 
     }
   }
 
-  // Prisma 6's public DMMF currently omits non-unique indexes. When a caller supplies the
-  // optional `indexes` metadata (for example, a schema-aware CI fixture), enforce both indexes;
-  // otherwise the database migration check remains responsible for verifying them.
-  if (model.indexes) {
-    const expectedIndex = ['recipientUserId', 'archivedAt', 'readAt', 'createdAt'];
-    if (!model.indexes.some((index) => sameStringArray(index.fields, expectedIndex))) {
-      issues.push(`model Notification is missing @@index([${expectedIndex.join(', ')}])`);
-    }
-    const sourceIndex = ['sourceApp', 'sourceEntityType', 'sourceEntityId'];
-    if (!model.indexes.some((index) => sameStringArray(index.fields, sourceIndex))) {
-      issues.push(`model Notification is missing @@index([${sourceIndex.join(', ')}])`);
+  // Prisma 6's public DMMF omits non-unique indexes. Consumers therefore pass schema and
+  // migration metadata parsed from their checked-in Prisma files so this gate runs in CI too.
+  const indexes = metadata?.indexes ?? model.indexes;
+  if (indexes) {
+    for (const expectedIndex of [
+      ['recipientUserId', 'archivedAt', 'readAt', 'createdAt'],
+      ['sourceApp', 'sourceEntityType', 'sourceEntityId'],
+    ]) {
+      if (!indexes.some((index) => sameStringArray(index.fields, expectedIndex))) {
+        issues.push(`model Notification is missing @@index([${expectedIndex.join(', ')}])`);
+      }
     }
   }
+  if (metadata?.migrationIndexes) {
+    for (const expectedIndex of [
+      ['recipientUserId', 'archivedAt', 'readAt', 'createdAt'],
+      ['sourceApp', 'sourceEntityType', 'sourceEntityId'],
+    ]) {
+      if (
+        !metadata.migrationIndexes.some((index) => sameStringArray(index.fields, expectedIndex))
+      ) {
+        issues.push(`notification migration is missing index ([${expectedIndex.join(', ')}])`);
+      }
+    }
+  }
+  if (metadata?.updatedAtFields && !metadata.updatedAtFields.includes('updatedAt')) {
+    issues.push('model Notification.updatedAt must use @updatedAt');
+  }
   return issues;
+}
+
+/** Parses the contract-relevant pieces of a consumer-owned Prisma schema and migration. */
+export function parseNotificationSchemaMetadata(
+  schemaText: string,
+  migrationText = '',
+): NotificationSchemaMetadata {
+  const indexes = [...schemaText.matchAll(/@@index\s*\(\s*\[([^\]]+)\]/g)].map((match) => ({
+    fields: parseSchemaFields(match[1]),
+  }));
+  const migrationIndexes = [
+    ...migrationText.matchAll(/CREATE\s+INDEX\s+"[^"]+"\s+ON\s+"[^"]+"\s*\(([^)]+)\)/gi),
+  ].map((match) => ({
+    fields: parseMigrationFields(match[1]),
+  }));
+  const updatedAtFields = [...schemaText.matchAll(/^\s*(\w+)\s+[^\n]*@updatedAt\b/gm)].map(
+    (match) => match[1],
+  );
+  return { indexes, migrationIndexes, updatedAtFields };
+}
+
+function parseSchemaFields(value: string): string[] {
+  return value
+    .split(',')
+    .map((field) => field.trim())
+    .filter(Boolean);
+}
+
+function parseMigrationFields(value: string): string[] {
+  return value
+    .split(',')
+    .map((field) => field.trim().replace(/^"|"$/g, ''))
+    .filter(Boolean)
+    .map(snakeToCamel);
+}
+
+function snakeToCamel(value: string): string {
+  return value.replace(/_([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 }
 
 function hasUniqueFields(model: DmmfModel, expected: string[]): boolean {
