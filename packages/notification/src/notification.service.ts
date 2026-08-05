@@ -1,7 +1,12 @@
 import { PrismaService } from '@appspine/common';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import type { ZodType } from 'zod';
 
-import { DEFAULT_NOTIFICATION_LIMIT, DEFAULT_NOTIFICATION_PAGE } from './constants';
+import {
+  DEFAULT_NOTIFICATION_LIMIT,
+  DEFAULT_NOTIFICATION_PAGE,
+  NOTIFICATION_LIMITS,
+} from './constants';
 import type {
   CreateNotificationInput,
   NotificationCreateData,
@@ -12,7 +17,11 @@ import type {
   NotificationServiceOptions,
   NotificationTxClient,
 } from './types';
-import { createNotificationSchema, notificationQuerySchema } from './validation';
+import {
+  createNotificationSchema,
+  notificationQuerySchema,
+  type ValidatedCreateNotificationInput,
+} from './validation';
 
 @Injectable()
 export class NotificationService {
@@ -22,7 +31,7 @@ export class NotificationService {
     input: CreateNotificationInput,
     options?: NotificationServiceOptions,
   ): Promise<NotificationRecord> {
-    const validated = createNotificationSchema.parse(input);
+    const validated = parseOrThrow(createNotificationSchema, input);
     const delegate = this.delegate(options?.tx);
     const data = toCreateData(validated);
 
@@ -43,7 +52,12 @@ export class NotificationService {
     inputs: CreateNotificationInput[],
     options?: NotificationServiceOptions,
   ): Promise<NotificationRecord[]> {
-    const validated = inputs.map((input) => createNotificationSchema.parse(input));
+    if (inputs.length > NOTIFICATION_LIMITS.notifyManyBatch) {
+      throw new BadRequestException(
+        `notifyMany accepts at most ${NOTIFICATION_LIMITS.notifyManyBatch} inputs per call, received ${inputs.length}`,
+      );
+    }
+    const validated = inputs.map((input) => parseOrThrow(createNotificationSchema, input));
     if (validated.length === 0) return [];
 
     const delegate = this.delegate(options?.tx);
@@ -69,14 +83,18 @@ export class NotificationService {
     });
   }
 
-  async getInbox(recipientUserId: string, query?: NotificationQuery): Promise<NotificationPage> {
+  async getInbox(
+    recipientUserId: string,
+    query?: NotificationQuery,
+    options?: NotificationServiceOptions,
+  ): Promise<NotificationPage> {
     const owner = validateRecipient(recipientUserId);
-    const { page, limit } = notificationQuerySchema.parse({
+    const { page, limit } = parseOrThrow(notificationQuerySchema, {
       page: query?.page ?? DEFAULT_NOTIFICATION_PAGE,
       limit: query?.limit ?? DEFAULT_NOTIFICATION_LIMIT,
     });
     const where = { recipientUserId: owner, archivedAt: null } as const;
-    const delegate = this.delegate();
+    const delegate = this.delegate(options?.tx);
     const [data, total] = await Promise.all([
       delegate.findMany({
         where,
@@ -89,18 +107,25 @@ export class NotificationService {
     return { data, total, page, limit };
   }
 
-  async getUnreadCount(recipientUserId: string): Promise<{ count: number }> {
+  async getUnreadCount(
+    recipientUserId: string,
+    options?: NotificationServiceOptions,
+  ): Promise<{ count: number }> {
     const owner = validateRecipient(recipientUserId);
-    const count = await this.delegate().count({
+    const count = await this.delegate(options?.tx).count({
       where: { recipientUserId: owner, readAt: null, archivedAt: null },
     });
     return { count };
   }
 
-  async markRead(notificationId: string, recipientUserId: string): Promise<NotificationRecord> {
+  async markRead(
+    notificationId: string,
+    recipientUserId: string,
+    options?: NotificationServiceOptions,
+  ): Promise<NotificationRecord> {
     const id = validateRecipient(notificationId);
     const owner = validateRecipient(recipientUserId);
-    const delegate = this.delegate();
+    const delegate = this.delegate(options?.tx);
     await delegate.updateMany({
       where: { id, recipientUserId: owner, readAt: null },
       data: { readAt: new Date() },
@@ -108,18 +133,25 @@ export class NotificationService {
     return this.findOwnedOrThrow(delegate, id, owner);
   }
 
-  async markAllRead(recipientUserId: string): Promise<{ count: number }> {
+  async markAllRead(
+    recipientUserId: string,
+    options?: NotificationServiceOptions,
+  ): Promise<{ count: number }> {
     const owner = validateRecipient(recipientUserId);
-    return this.delegate().updateMany({
+    return this.delegate(options?.tx).updateMany({
       where: { recipientUserId: owner, readAt: null, archivedAt: null },
       data: { readAt: new Date() },
     });
   }
 
-  async archive(notificationId: string, recipientUserId: string): Promise<NotificationRecord> {
+  async archive(
+    notificationId: string,
+    recipientUserId: string,
+    options?: NotificationServiceOptions,
+  ): Promise<NotificationRecord> {
     const id = validateRecipient(notificationId);
     const owner = validateRecipient(recipientUserId);
-    const delegate = this.delegate();
+    const delegate = this.delegate(options?.tx);
     await delegate.updateMany({
       where: { id, recipientUserId: owner, archivedAt: null },
       data: { archivedAt: new Date() },
@@ -142,28 +174,34 @@ export class NotificationService {
   }
 }
 
-function toCreateData(input: CreateNotificationInput): NotificationCreateData {
-  const parsed = createNotificationSchema.parse(input);
+function toCreateData(input: ValidatedCreateNotificationInput): NotificationCreateData {
   return {
-    recipientUserId: parsed.recipientUserId,
-    idempotencyKey: parsed.idempotencyKey,
-    type: parsed.type,
-    category: parsed.category ?? null,
-    severity: parsed.severity,
-    title: parsed.title,
-    body: parsed.body ?? null,
-    sourceApp: parsed.sourceApp,
-    sourceEventId: parsed.sourceEventId ?? null,
-    sourceEntityType: parsed.sourceEntityType ?? null,
-    sourceEntityId: parsed.sourceEntityId ?? null,
-    targetPath: parsed.targetPath ?? null,
+    recipientUserId: input.recipientUserId,
+    idempotencyKey: input.idempotencyKey,
+    type: input.type,
+    category: input.category ?? null,
+    severity: input.severity,
+    title: input.title,
+    body: input.body ?? null,
+    sourceApp: input.sourceApp,
+    sourceEventId: input.sourceEventId ?? null,
+    sourceEntityType: input.sourceEntityType ?? null,
+    sourceEntityId: input.sourceEntityId ?? null,
+    targetPath: input.targetPath ?? null,
   };
+}
+
+/** Mirrors ZodValidationPipe's convention so callers see a 400 with structured issues, not a 500. */
+function parseOrThrow<T>(schema: ZodType<T>, value: unknown): T {
+  const result = schema.safeParse(value);
+  if (!result.success) throw new BadRequestException(result.error.issues);
+  return result.data;
 }
 
 function validateRecipient(value: string): string {
   const trimmed = value.trim();
   if (trimmed.length === 0)
-    throw new Error('Notification id and recipientUserId must be non-empty');
+    throw new BadRequestException('Notification id and recipientUserId must be non-empty');
   return trimmed;
 }
 

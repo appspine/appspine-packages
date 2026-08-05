@@ -56,6 +56,7 @@ export function NotificationBell({
   const {
     count,
     isLoading: countLoading,
+    error: pollingError,
     refresh: refreshCount,
   } = useNotificationPolling({
     loadUnreadCount: dataSource.loadUnreadCount,
@@ -64,6 +65,11 @@ export function NotificationBell({
   });
   const displayItems = optimisticItems ?? recent.items;
   const displayCount = Math.max(0, count);
+  // If the unread-count poll is failing, `count` is stale/unusable, so fall back to the recent
+  // list (which loads independently) to decide whether "mark all read" should be actionable —
+  // otherwise a persistent polling failure permanently disables it with no way to recover.
+  const hasUnreadItems = displayItems.some((item) => !item.readAt);
+  const canMarkAllRead = pollingError ? hasUnreadItems : displayCount > 0;
 
   const loadRecent = React.useCallback(async () => {
     setRecent((previous) => ({ ...previous, loading: true, error: null }));
@@ -83,7 +89,7 @@ export function NotificationBell({
   };
 
   const handleMarkAllRead = async () => {
-    if (markingAll || displayCount === 0) return;
+    if (markingAll || !canMarkAllRead) return;
     const previous = displayItems;
     setMarkingAll(true);
     setActionError(null);
@@ -99,20 +105,25 @@ export function NotificationBell({
     }
   };
 
-  const handleSelect = async (notification: NotificationSummary) => {
-    if (notification.readAt) return;
-    const previous = displayItems;
-    const next = previous.map((item) =>
-      item.id === notification.id ? { ...item, readAt: new Date() } : item,
-    );
-    setOptimisticItems(next);
-    try {
-      await dataSource.markRead(notification.id);
-      await refreshCount();
-    } catch {
-      setOptimisticItems(previous);
-      setActionError(labels.markReadError);
+  // `navigateHref`, when present, is followed only after the mark-read attempt settles (success
+  // or failure) — the caller has already preventDefault()-ed the native anchor navigation so a
+  // full-page unload can't abort the in-flight markRead request out from under it.
+  const handleSelect = async (notification: NotificationSummary, navigateHref?: string) => {
+    if (!notification.readAt) {
+      const previous = displayItems;
+      const next = previous.map((item) =>
+        item.id === notification.id ? { ...item, readAt: new Date() } : item,
+      );
+      setOptimisticItems(next);
+      try {
+        await dataSource.markRead(notification.id);
+        await refreshCount();
+      } catch {
+        setOptimisticItems(previous);
+        setActionError(labels.markReadError);
+      }
     }
+    if (navigateHref) window.location.href = navigateHref;
   };
 
   return (
@@ -143,12 +154,25 @@ export function NotificationBell({
             variant="ghost"
             size="sm"
             className="h-auto min-h-7 shrink-0 px-2 text-xs"
-            disabled={markingAll || displayCount === 0}
+            disabled={markingAll || !canMarkAllRead}
             onClick={() => void handleMarkAllRead()}
           >
             {markingAll ? labels.retrying : labels.markAllRead}
           </Button>
         </div>
+        {Boolean(pollingError) && (
+          <div className="mx-1 mb-1 flex items-center justify-between gap-2 rounded-md bg-destructive/10 px-2 py-1.5 text-destructive text-xs">
+            <span role="status">{labels.error}</span>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => void refreshCount()}
+              aria-label={labels.retry}
+            >
+              <RefreshCw aria-hidden="true" />
+            </Button>
+          </div>
+        )}
         {actionError && (
           <div className="mx-1 mb-1 flex items-center justify-between gap-2 rounded-md bg-destructive/10 px-2 py-1.5 text-destructive text-xs">
             <span role="status">{actionError}</span>
@@ -188,7 +212,7 @@ export function NotificationBell({
                 labels={labels}
                 href={dataSource.resolveHref(notification)}
                 renderTypeIcon={renderTypeIcon}
-                onSelect={() => void handleSelect(notification)}
+                onSelect={(navigateHref) => void handleSelect(notification, navigateHref)}
               />
             ))}
           </div>
@@ -209,7 +233,7 @@ function NotificationItem({
   labels: NotificationLabels;
   href: string | null;
   renderTypeIcon?: NotificationIconRenderer;
-  onSelect: () => void;
+  onSelect: (navigateHref?: string) => void;
 }) {
   const read = Boolean(notification.readAt);
   const timestamp =
@@ -259,14 +283,30 @@ function NotificationItem({
     </div>
   );
 
+  // A plain left click would otherwise start the browser's full-page navigation immediately,
+  // aborting the in-flight markRead fetch before it lands. Deferring navigation until after
+  // handleSelect settles keeps the notification's read state from being silently lost. Modifier
+  // clicks (new tab/window) and middle-click leave the current page alive, so the native anchor
+  // behavior is left untouched for those.
+  const handleAnchorClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const isPlainLeftClick =
+      event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+    if (!isPlainLeftClick) {
+      onSelect();
+      return;
+    }
+    event.preventDefault();
+    onSelect(href ?? undefined);
+  };
+
   return (
     <DropdownMenuItem asChild className="min-h-14 cursor-pointer items-start whitespace-normal">
       {href ? (
-        <a href={href} onClick={onSelect}>
+        <a href={href} onClick={handleAnchorClick}>
           {content}
         </a>
       ) : (
-        <button type="button" onClick={onSelect} className="w-full text-left">
+        <button type="button" onClick={() => onSelect()} className="w-full text-left">
           {content}
         </button>
       )}

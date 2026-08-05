@@ -92,23 +92,10 @@ export function useNotificationPolling(
   const mountedRef = useRef(true);
   const loadUnreadCountRef = useRef(options.loadUnreadCount);
   loadUnreadCountRef.current = options.loadUnreadCount;
-
-  const refresh = useCallback(async () => {
-    if (!mountedRef.current) return;
-    setIsLoading(true);
-    try {
-      const result = await loadUnreadCountRef.current();
-      if (!mountedRef.current) return;
-      const next = typeof result === 'number' ? result : result.count;
-      setCount(Math.max(0, Number.isFinite(next) ? next : 0));
-      setError(null);
-    } catch (nextError) {
-      if (!mountedRef.current) return;
-      setError(nextError);
-    } finally {
-      if (mountedRef.current) setIsLoading(false);
-    }
-  }, []);
+  // The controller owns the in-flight/sequence guards; `refresh()` below delegates to it instead
+  // of re-implementing its own unguarded fetch, or a manual refresh (e.g. after mark-read) could
+  // race a concurrent interval tick and let a stale response overwrite a newer count.
+  const controllerRef = useRef<NotificationPollingController | null>(null);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -128,16 +115,24 @@ export function useNotificationPolling(
         setIsLoading(false);
       },
     });
+    controllerRef.current = controller;
     const onVisibilityChange = () => controller.setVisible(document.visibilityState === 'visible');
     controller.setVisible(document.visibilityState === 'visible');
     controller.start();
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       mountedRef.current = false;
+      controllerRef.current = null;
       controller.stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [options.enabled, options.intervalMs]);
+
+  const refresh = useCallback(async () => {
+    if (!mountedRef.current) return;
+    setIsLoading(true);
+    await controllerRef.current?.refresh();
+  }, []);
 
   return { count, isLoading, error, refresh };
 }

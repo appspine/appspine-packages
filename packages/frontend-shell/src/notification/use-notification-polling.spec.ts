@@ -1,6 +1,12 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+// @vitest-environment jsdom
+import { act, createElement } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { createNotificationPollingController } from './use-notification-polling.js';
+import {
+  createNotificationPollingController,
+  useNotificationPolling,
+} from './use-notification-polling.js';
 
 describe('createNotificationPollingController', () => {
   afterEach(() => {
@@ -92,5 +98,113 @@ describe('createNotificationPollingController', () => {
     reject?.(new Error('stale'));
     await Promise.resolve();
     expect(onError).not.toHaveBeenCalled();
+  });
+});
+
+describe('useNotificationPolling', () => {
+  beforeAll(() => {
+    (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+  });
+
+  let container: HTMLDivElement | undefined;
+  let root: Root | undefined;
+
+  afterEach(() => {
+    if (root) act(() => root?.unmount());
+    container?.remove();
+    container = undefined;
+    root = undefined;
+    vi.useRealTimers();
+  });
+
+  function mountHook(options: Parameters<typeof useNotificationPolling>[0]) {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    let latest!: ReturnType<typeof useNotificationPolling>;
+    function Harness() {
+      latest = useNotificationPolling(options);
+      return null;
+    }
+    act(() => {
+      root?.render(createElement(Harness));
+    });
+    return () => latest;
+  }
+
+  it('exposes the hydrated initial count without a loading flash', async () => {
+    vi.useFakeTimers();
+    const getState = mountHook({
+      loadUnreadCount: vi.fn(async () => 9),
+      initialUnreadCount: 4,
+      intervalMs: 1000,
+    });
+    expect(getState().count).toBe(4);
+    expect(getState().isLoading).toBe(false);
+
+    // Let the mount-time poll settle inside act() so its state update doesn't leak into a later
+    // test unwrapped.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+  });
+
+  it('refresh() shares the controller in-flight guard instead of firing a duplicate overlapping request', async () => {
+    vi.useFakeTimers();
+    let resolveFirst: ((value: number) => void) | undefined;
+    const loadUnreadCount = vi.fn(
+      () =>
+        new Promise<number>((resolve) => {
+          resolveFirst = resolve;
+        }),
+    );
+    const getState = mountHook({ loadUnreadCount, intervalMs: 1000 });
+
+    // The initial mount-time poll is now in flight (unresolved).
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(loadUnreadCount).toHaveBeenCalledTimes(1);
+
+    // A manual refresh() while a request is already in flight must not start a second one — this
+    // is exactly the "pile-up" behavior the standalone (pre-fix) refresh() implementation lacked.
+    let refreshPromise: Promise<void> | undefined;
+    act(() => {
+      refreshPromise = getState().refresh();
+    });
+    expect(loadUnreadCount).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveFirst?.(7);
+      await refreshPromise;
+    });
+
+    expect(getState().count).toBe(7);
+    expect(loadUnreadCount).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not update state after unmount', async () => {
+    vi.useFakeTimers();
+    let resolveCount: ((value: number) => void) | undefined;
+    const loadUnreadCount = vi.fn(
+      () =>
+        new Promise<number>((resolve) => {
+          resolveCount = resolve;
+        }),
+    );
+    mountHook({ loadUnreadCount, intervalMs: 1000 });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    act(() => root?.unmount());
+    root = undefined;
+
+    // Resolving after unmount must not throw or trigger a React "set state on unmounted
+    // component" warning; if it did, this would fail the test via an uncaught rejection/warning.
+    await act(async () => {
+      resolveCount?.(3);
+      await Promise.resolve();
+    });
   });
 });

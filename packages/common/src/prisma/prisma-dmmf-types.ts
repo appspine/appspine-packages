@@ -14,6 +14,7 @@ export type DmmfField = {
   dbName?: string | null;
   isId?: boolean;
   isUnique?: boolean;
+  isUpdatedAt?: boolean;
   hasDefaultValue?: boolean;
   default?: unknown;
   documentation?: string;

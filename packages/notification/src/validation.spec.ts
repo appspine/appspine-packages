@@ -17,4 +17,18 @@ describe('targetPathSchema', () => {
   ])('rejects unsafe path %j', (path) => {
     expect(() => targetPathSchema.parse(path)).toThrow();
   });
+
+  // These are the exact open-redirect vectors the contract names (§4.3 targetPath validation);
+  // a future refactor of targetPathSchema must not silently drop any of these refinements.
+  it.each([
+    '//evil.com',
+    '///evil.com',
+    'http://evil.com',
+    'https://evil.com',
+    'HTTP://evil.com',
+    'javascript:alert(1)',
+    'data:text/html,evil',
+  ])('rejects open-redirect vector %j', (path) => {
+    expect(() => targetPathSchema.parse(path)).toThrow();
+  });
 });

@@ -9,11 +9,16 @@ import type {
 
 export type MockNotificationState = {
   rows: NotificationRecord[];
-  transactions: number;
 };
 
+/**
+ * Creates an isolated mock notification store. Tests that need to prove a caller-provided `tx`
+ * is actually used (rather than the service silently falling back to its injected client) must
+ * call this twice and pass one store as the constructor's `PrismaService` and the other as
+ * `options.tx` — a single shared store makes that distinction unobservable.
+ */
 export function createMockNotificationTx(initialRows: NotificationRecord[] = []) {
-  const state: MockNotificationState = { rows: [...initialRows], transactions: 0 };
+  const state: MockNotificationState = { rows: [...initialRows] };
   const tx = createDelegate(state);
   return { state, tx: { notification: tx } };
 }

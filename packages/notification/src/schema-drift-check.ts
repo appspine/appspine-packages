@@ -20,6 +20,7 @@ type ExpectedField = {
   optional?: boolean;
   column?: string;
   isId?: boolean;
+  isUpdatedAt?: boolean;
   default?: string | number | { name: string };
   relationFromFields?: string[];
   relationToFields?: string[];
@@ -79,6 +80,7 @@ const EXPECTED_FIELDS: ExpectedField[] = [
     type: 'DateTime',
     column: 'updated_at',
     default: { name: 'now' },
+    isUpdatedAt: true,
   },
 ];
 
@@ -129,6 +131,11 @@ export function checkNotificationSchemaDrift(
         `model Notification.${expected.name} isId=${field.isId ?? false}, expected ${expected.isId ?? false}`,
       );
     }
+    if ((field.isUpdatedAt ?? false) !== (expected.isUpdatedAt ?? false)) {
+      issues.push(
+        `model Notification.${expected.name} isUpdatedAt=${field.isUpdatedAt ?? false}, expected ${expected.isUpdatedAt ?? false}`,
+      );
+    }
     if (!defaultMatches(field.default, expected.default)) {
       issues.push(
         `model Notification.${expected.name} default is ${formatDefault(field.default)}, expected ${formatDefault(expected.default)}`,
@@ -148,8 +155,14 @@ export function checkNotificationSchemaDrift(
 
   // Prisma 6's public DMMF omits non-unique indexes. Consumers therefore pass schema and
   // migration metadata parsed from their checked-in Prisma files so this gate runs in CI too.
+  // `undefined` here means "could not verify" and must fail loud, not be treated as "no drift".
   const indexes = metadata?.indexes ?? model.indexes;
-  if (indexes) {
+  if (indexes === undefined) {
+    issues.push(
+      'model Notification indexes could not be verified: pass schema metadata from ' +
+        'parseNotificationSchemaMetadata() (Prisma 6 omits non-unique indexes from the runtime DMMF)',
+    );
+  } else {
     for (const expectedIndex of [
       ['recipientUserId', 'archivedAt', 'readAt', 'createdAt'],
       ['sourceApp', 'sourceEntityType', 'sourceEntityId'],
@@ -177,23 +190,61 @@ export function checkNotificationSchemaDrift(
   return issues;
 }
 
-/** Parses the contract-relevant pieces of a consumer-owned Prisma schema and migration. */
+/**
+ * Parses the contract-relevant pieces of a consumer-owned Prisma schema and migration.
+ *
+ * Schema-side matches (`@@index`, `@updatedAt`) are scoped to the `model Notification { ... }`
+ * block only — matching against the whole schema file would let an unrelated model's index or
+ * `@updatedAt` field satisfy the check even when `Notification` itself is missing one.
+ *
+ * `notificationTableName`, when provided, scopes migration `CREATE INDEX ... ON "<table>"`
+ * matches to that physical table so an index created for a different table in the same
+ * migration text can't satisfy the contract. Omit it only when the caller has already isolated
+ * migration text to statements that touch the notification table.
+ */
 export function parseNotificationSchemaMetadata(
   schemaText: string,
   migrationText = '',
+  notificationTableName?: string,
 ): NotificationSchemaMetadata {
-  const indexes = [...schemaText.matchAll(/@@index\s*\(\s*\[([^\]]+)\]/g)].map((match) => ({
+  const modelBlock = extractModelBlock(schemaText, 'Notification') ?? '';
+  const indexes = [...modelBlock.matchAll(/@@index\s*\(\s*\[([^\]]+)\]/g)].map((match) => ({
     fields: parseSchemaFields(match[1]),
   }));
-  const migrationIndexes = [
-    ...migrationText.matchAll(/CREATE\s+INDEX\s+"[^"]+"\s+ON\s+"[^"]+"\s*\(([^)]+)\)/gi),
-  ].map((match) => ({
+  const createIndexPattern = notificationTableName
+    ? new RegExp(
+        `CREATE\\s+INDEX\\s+"[^"]+"\\s+ON\\s+"${escapeRegExp(notificationTableName)}"\\s*\\(([^)]+)\\)`,
+        'gi',
+      )
+    : /CREATE\s+INDEX\s+"[^"]+"\s+ON\s+"[^"]+"\s*\(([^)]+)\)/gi;
+  const migrationIndexes = [...migrationText.matchAll(createIndexPattern)].map((match) => ({
     fields: parseMigrationFields(match[1]),
   }));
-  const updatedAtFields = [...schemaText.matchAll(/^\s*(\w+)\s+[^\n]*@updatedAt\b/gm)].map(
+  const updatedAtFields = [...modelBlock.matchAll(/^\s*(\w+)\s+[^\n]*@updatedAt\b/gm)].map(
     (match) => match[1],
   );
   return { indexes, migrationIndexes, updatedAtFields };
+}
+
+/** Extracts a `model <name> { ... }` block via balanced-brace matching, or null if not found. */
+function extractModelBlock(schemaText: string, modelName: string): string | null {
+  const startPattern = new RegExp(`\\bmodel\\s+${modelName}\\s*\\{`);
+  const startMatch = startPattern.exec(schemaText);
+  if (!startMatch) return null;
+  const openBraceIndex = startMatch.index + startMatch[0].length - 1;
+  let depth = 0;
+  for (let i = openBraceIndex; i < schemaText.length; i++) {
+    if (schemaText[i] === '{') depth++;
+    else if (schemaText[i] === '}') {
+      depth--;
+      if (depth === 0) return schemaText.slice(openBraceIndex, i + 1);
+    }
+  }
+  return null;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function parseSchemaFields(value: string): string[] {
