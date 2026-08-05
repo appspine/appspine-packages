@@ -1,5 +1,14 @@
 # @appspine/rbac
 
+## 4.0.4
+
+### Patch Changes
+
+- Updated dependencies [7c9e928]
+  - @appspine/common@0.3.2
+  - @appspine/audit-log@1.0.0
+  - @appspine/auth@6.0.1
+
 ## 4.0.3
 
 ### Patch Changes

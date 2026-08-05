@@ -38,8 +38,8 @@
   },
   "peerDependencies": {
     "@appspine/auth": "^6.0.1",
-    "@appspine/common": "^0.3.1",
-    "@appspine/m2m-api-key": "^4.0.3",
+    "@appspine/common": "^0.3.2",
+    "@appspine/m2m-api-key": "^4.0.4",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
