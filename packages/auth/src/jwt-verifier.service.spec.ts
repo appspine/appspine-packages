@@ -249,3 +249,86 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     expect(findUnique).toHaveBeenCalledTimes(1);
   });
 });
+
+// 042-oidc-delegation-package-plan.md §9 reconstruction boundary: buildOidcJwtUser() must
+// remain assertAuthorizedParty() + a call into these new methods, with no way to reach the
+// mapping logic that skips the azp check. See also the "no bypass" test at the bottom.
+describe('JwtVerifierService.mapVerifiedIdentityToLocalPrincipal / findLocalPrincipalByVerifiedEmail', () => {
+  const existingUser = {
+    id: 'user-existing',
+    email: 'existing@example.com',
+    name: 'Existing',
+    isActive: true,
+    userRoles: [{ role: { name: 'USER', permissionPolicy: 'DENY_ALL', permissions: [] } }],
+  };
+
+  it('mapVerifiedIdentityToLocalPrincipal JIT-provisions when no local user exists', async () => {
+    const findUnique = vi
+      .fn()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ ...existingUser, id: 'user-new', email: 'new@example.com' });
+    const create = vi.fn().mockResolvedValue({ id: 'user-new' });
+    const service = createService(findUnique, create);
+
+    const result = await service.mapVerifiedIdentityToLocalPrincipal('new@example.com', 'New');
+
+    expect(create).toHaveBeenCalledWith({ email: 'new@example.com', name: 'New' });
+    expect(result.sub).toBe('user-new');
+  });
+
+  it('mapVerifiedIdentityToLocalPrincipal rejects an inactive local user', async () => {
+    const service = createService(async () => ({ ...existingUser, isActive: false }));
+    await expect(
+      service.mapVerifiedIdentityToLocalPrincipal('existing@example.com', 'Existing'),
+    ).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('findLocalPrincipalByVerifiedEmail returns the principal for an active local user', async () => {
+    const service = createService(async () => existingUser);
+    const result = await service.findLocalPrincipalByVerifiedEmail('existing@example.com');
+    expect(result?.sub).toBe('user-existing');
+  });
+
+  it('findLocalPrincipalByVerifiedEmail returns null (not an exception) when no local user exists', async () => {
+    const create = vi.fn();
+    const service = createService(async () => null, create);
+    const result = await service.findLocalPrincipalByVerifiedEmail('nobody@example.com');
+    expect(result).toBeNull();
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('findLocalPrincipalByVerifiedEmail returns null for an inactive local user (not distinguishable from not-found)', async () => {
+    const service = createService(async () => ({ ...existingUser, isActive: false }));
+    const result = await service.findLocalPrincipalByVerifiedEmail('existing@example.com');
+    expect(result).toBeNull();
+  });
+
+  it('findLocalPrincipalByVerifiedEmail never provisions a User row under any circumstance', async () => {
+    const create = vi.fn();
+    const service = createService(async () => null, create);
+    await service.findLocalPrincipalByVerifiedEmail('nobody@example.com').catch(() => {});
+    expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe('JwtVerifierService.buildOidcJwtUser cannot skip assertAuthorizedParty', () => {
+  it('has arity 1 (no optional second parameter that could disable the azp check)', () => {
+    // A `skipAuthorizedParty?: boolean`-style parameter is the exact anti-pattern the 042
+    // plan calls out — this test pins the function signature so one can't be added silently.
+    expect(JwtVerifierService.prototype.buildOidcJwtUser.length).toBe(1);
+  });
+
+  it('rejects even a fully-valid, well-formed token when azp is absent', async () => {
+    const service = createService(async () => ({
+      id: 'user-existing',
+      email: 'user@example.com',
+      name: 'User',
+      isActive: true,
+      userRoles: [],
+    }));
+    // No azp claim at all — every other claim is exactly what a successful call needs.
+    await expect(
+      service.buildOidcJwtUser({ email: 'user@example.com', email_verified: true }),
+    ).rejects.toThrow(UnauthorizedException);
+  });
+});

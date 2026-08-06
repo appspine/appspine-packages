@@ -49,14 +49,48 @@ export class JwtVerifierService {
       throw new UnauthorizedException('OIDC token email is not verified');
     }
 
-    const user =
-      (await this.findOidcUser(email)) ??
-      (await this.provisionOidcUser(email, payload.name as string | undefined));
+    return this.mapVerifiedIdentityToLocalPrincipal(email, payload.name as string | undefined);
+  }
+
+  /**
+   * Maps an already-verified OIDC identity (caller has already confirmed `email` is
+   * present and `email_verified !== false`) to a local principal, JIT-provisioning a User
+   * row if none exists yet. Contains no `azp`/authorized-party logic — callers own that
+   * check (see `buildOidcJwtUser` above and `DelegatedPrincipalMapperService`'s `'jit'`
+   * path in packages/auth/src/delegated, which also has its own upstream verification).
+   */
+  async mapVerifiedIdentityToLocalPrincipal(
+    email: string,
+    name: string | undefined,
+  ): Promise<JwtUser> {
+    const user = (await this.findOidcUser(email)) ?? (await this.provisionOidcUser(email, name));
     if (!user.isActive) {
       throw new UnauthorizedException('No active local account for this OIDC identity');
     }
+    return this.buildJwtUserFromLocalUser(user);
+  }
 
-    const roles = user.userRoles.map((userRole: { role: unknown }) => userRole.role);
+  /**
+   * Find-only lookup for an already-verified OIDC identity — never provisions a User row.
+   * Returns `null` for both "no User with this email" and "User exists but inactive"; the
+   * delegated (`provisioning: 'never'`) path collapses both into one opaque error so this
+   * can't be used to probe which emails have a local account (see plan §9/§13).
+   */
+  async findLocalPrincipalByVerifiedEmail(email: string): Promise<JwtUser | null> {
+    const user = await this.findOidcUser(email);
+    if (!user?.isActive) {
+      return null;
+    }
+    return this.buildJwtUserFromLocalUser(user);
+  }
+
+  private buildJwtUserFromLocalUser(user: {
+    id: string;
+    email: string;
+    name: string | null;
+    userRoles: { role: unknown }[];
+  }): JwtUser {
+    const roles = user.userRoles.map((userRole) => userRole.role);
     const { roleNames, permissionPolicy, permissions } = buildUserContext(
       roles as Parameters<typeof buildUserContext>[0],
     );
