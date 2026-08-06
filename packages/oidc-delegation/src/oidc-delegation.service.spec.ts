@@ -19,8 +19,13 @@ function fakeJwt(payload: Record<string, unknown>): string {
 const baseOptions: OidcDelegationModuleOptions = {
   provider: 'keycloak',
   tokenEndpoint: 'https://keycloak.invalid/token',
+  // Deliberately distinct, mirroring real usage: wiki-delegation performs the exchange call,
+  // but subject tokens are issued to end users by wiki, the login client — see T-17000's
+  // integration finding (plan §2 decision 4 / §17.2 gate 8) that caught this exact
+  // distinction being conflated.
   sourceClientId: 'wiki-delegation',
   sourceClientSecret: 'secret',
+  subjectTokenIssuerClientId: 'wiki',
   policies: {
     submit: {
       targetAudience: 'approve',
@@ -30,7 +35,7 @@ const baseOptions: OidcDelegationModuleOptions = {
   },
 };
 
-const validSubjectToken = fakeJwt({ azp: 'wiki-delegation', sub: 'user-1' });
+const validSubjectToken = fakeJwt({ azp: 'wiki', sub: 'user-1' });
 
 describe('OidcDelegationService', () => {
   it('exchanges successfully through the fake provider (deterministic contract suite)', async () => {
@@ -72,6 +77,21 @@ describe('OidcDelegationService', () => {
 
     await expect(
       service.exchange({ subjectToken: foreignToken, policy: 'submit' }),
+    ).rejects.toMatchObject({ category: 'invalid_subject_token' });
+    expect(provider.calls).toHaveLength(0);
+  });
+
+  it('regression: rejects a subject token whose azp is the exchange client itself, not the issuer client', async () => {
+    // Caught live by T-17000 against real Keycloak: the sanity check must compare against
+    // subjectTokenIssuerClientId ('wiki'), not sourceClientId ('wiki-delegation') — the
+    // dedicated exchange-only client never itself issues subject tokens to anyone, so
+    // comparing against it makes every real exchange fail closed.
+    const provider = createSuccessFixture();
+    const service = new OidcDelegationService(baseOptions, { provider, logger: { log: vi.fn() } });
+    const tokenFromExchangeClient = fakeJwt({ azp: 'wiki-delegation', sub: 'user-1' });
+
+    await expect(
+      service.exchange({ subjectToken: tokenFromExchangeClient, policy: 'submit' }),
     ).rejects.toMatchObject({ category: 'invalid_subject_token' });
     expect(provider.calls).toHaveLength(0);
   });

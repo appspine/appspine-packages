@@ -11,7 +11,7 @@
 // being usable as a token-laundering oracle for a caller-supplied bearer.
 export function assertSubjectTokenBelongsToSourceClient(
   subjectToken: string,
-  sourceClientId: string,
+  expectedIssuerClientId: string,
 ): void {
   const payload = decodeJwtPayload(subjectToken);
   const claimant = typeof payload.azp === 'string' ? payload.azp : payload.client_id;
@@ -21,8 +21,8 @@ export function assertSubjectTokenBelongsToSourceClient(
       'subject token has no azp or client_id claim identifying its issuing client',
     );
   }
-  if (claimant !== sourceClientId) {
-    throw new SubjectTokenSanityCheckError('subject token was not issued to this source client');
+  if (claimant !== expectedIssuerClientId) {
+    throw new SubjectTokenSanityCheckError('subject token was not issued by the expected client');
   }
 }
 

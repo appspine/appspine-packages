@@ -22,8 +22,22 @@ export type DelegationPolicyConfig = {
 export type OidcDelegationModuleOptions = {
   provider: 'keycloak';
   tokenEndpoint: string;
+  /** The confidential client that performs the Token Exchange call itself (e.g.
+   * `wiki-delegation`) — authenticates to the provider with `sourceClientSecret`. Per plan
+   * §2 decision 4, this is deliberately a dedicated exchange-only client, distinct from
+   * whichever client actually issues subject tokens to this app's users (see
+   * `subjectTokenIssuerClientId`). */
   sourceClientId: string;
   sourceClientSecret: string;
+  /**
+   * The client id this app's users actually log into and receive subject tokens from
+   * (e.g. `wiki`) — almost always *different* from `sourceClientId` when using a dedicated
+   * delegation client. The mandatory outbound sanity check (see plan §2 decision 13/§8)
+   * verifies the subject token's `azp`/`client_id` equals *this* value, not
+   * `sourceClientId` — getting this wrong makes every real exchange fail closed, since a
+   * dedicated exchange-only client never itself issues subject tokens to anyone.
+   */
+  subjectTokenIssuerClientId: string;
   /** Outbound HTTP request timeout in milliseconds. Default 5000. */
   requestTimeoutMs?: number;
   /**

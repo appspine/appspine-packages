@@ -42,8 +42,14 @@ import { OidcDelegationModule } from '@appspine/oidc-delegation';
       // The confidential client this app uses to *initiate* exchanges. This should be a
       // dedicated delegation-only client (no login capability), not your app's own OIDC
       // login client — see the plan doc §2 decision 4 for why.
-      sourceClientId: process.env.OIDC_DELEGATION_CLIENT_ID,
+      sourceClientId: process.env.OIDC_DELEGATION_CLIENT_ID, // e.g. 'wiki-delegation'
       sourceClientSecret: process.env.OIDC_DELEGATION_CLIENT_SECRET,
+      // The client your app's users actually log into and receive access tokens from —
+      // almost always DIFFERENT from sourceClientId above. Required so the mandatory
+      // outbound sanity check (see "Security model" below) knows what a legitimate subject
+      // token looks like; getting this wrong makes every real exchange fail closed, since
+      // the dedicated exchange-only client above never itself issues tokens to anyone.
+      subjectTokenIssuerClientId: process.env.OIDC_LOGIN_CLIENT_ID, // e.g. 'wiki'
       requestTimeoutMs: 5000, // optional, default 5000
       maxExchangesPerMinutePerPolicy: 60, // optional, default 60 — see "Outbound throttling" below
       policies: {
@@ -104,8 +110,10 @@ whose `.calls` array records every exchange attempt, for asserting on what was a
   is the entire public input surface.
 - **The subject token must be this request's own, already-verified bearer.** Before any
   provider call, this package decodes (not verifies) the subject token and rejects it if its
-  `azp`/`client_id` claim doesn't match this app's own `sourceClientId`. This is a mandatory
-  control, not optional defense-in-depth — real testing against Keycloak (see the plan doc's
+  `azp`/`client_id` claim doesn't match this app's configured `subjectTokenIssuerClientId`
+  (**not** `sourceClientId` — those are deliberately different clients, see "Configure"
+  above). This is a mandatory control, not optional defense-in-depth — real testing against
+  Keycloak (see the plan doc's
   T-16610 evidence) found that Keycloak's own audience-based protection does **not** reliably
   stop a token issued by a *different* app from being exchanged, once that app's own token
   audience has been widened by unrelated realm configuration. This package's own check is what
@@ -175,6 +183,6 @@ package also assumes the network between your app and the target app is trusted 
 
 - Accept `sourceApp`, a raw audience, or raw scopes as call-site parameters.
 - Exchange a token whose `azp`/`client_id` doesn't match this app's configured
-  `sourceClientId`.
+  `subjectTokenIssuerClientId`.
 - Return a response that includes a refresh token.
 - Retry a failed exchange internally, or exceed the configured per-policy rate limit.

@@ -26,11 +26,11 @@ export class OidcDelegationService implements OidcDelegationClient {
   private readonly throttle: OutboundThrottle;
   private readonly securityLog: SecurityEventLog;
   private readonly logger: OidcDelegationLogger;
-  private readonly sourceClientId: string;
+  private readonly subjectTokenIssuerClientId: string;
 
   constructor(options: OidcDelegationModuleOptions, deps: OidcDelegationServiceDeps = {}) {
     this.policyRegistry = new PolicyRegistry(options.policies);
-    this.sourceClientId = options.sourceClientId;
+    this.subjectTokenIssuerClientId = options.subjectTokenIssuerClientId;
     this.logger = deps.logger ?? new ConsoleOidcDelegationLogger();
     this.provider =
       deps.provider ??
@@ -53,7 +53,10 @@ export class OidcDelegationService implements OidcDelegationClient {
       const policy = this.policyRegistry.resolve(input.policy);
 
       try {
-        assertSubjectTokenBelongsToSourceClient(input.subjectToken, this.sourceClientId);
+        assertSubjectTokenBelongsToSourceClient(
+          input.subjectToken,
+          this.subjectTokenIssuerClientId,
+        );
       } catch {
         // Not a copy of the underlying decode error's message — see subject-token-sanity-check.ts,
         // this must never end up describing token contents in a log line.
