@@ -1,5 +1,13 @@
 # @appspine/domain-events
 
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [85ef582]
+  - @appspine/auth@6.2.0
+  - @appspine/m2m-api-key@4.0.6
+
 ## 6.0.0
 
 ### Patch Changes

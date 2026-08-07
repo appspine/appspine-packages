@@ -1,6 +1,6 @@
 {
   "name": "@appspine/domain-events",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": false,
   "repository": {
     "type": "git",
@@ -37,9 +37,9 @@
     "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {
-    "@appspine/auth": "^6.1.0",
+    "@appspine/auth": "^6.2.0",
     "@appspine/common": "^0.3.2",
-    "@appspine/m2m-api-key": "^4.0.5",
+    "@appspine/m2m-api-key": "^4.0.6",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
