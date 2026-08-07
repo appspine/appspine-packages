@@ -68,7 +68,7 @@ function isBlockedAddress(address: string): boolean {
   const normalized = address.toLowerCase().replace(/^\[|\]$/gu, '');
   if (isIP(normalized) === 4) {
     const [a, b, c, d] = normalized.split('.').map(Number);
-    const value = (((a * 256) + b) * 256 + c) * 256 + d;
+    const value = ((a * 256 + b) * 256 + c) * 256 + d;
     const inRange = (start: number, end: number) => value >= start && value <= end;
     return (
       a === 0 ||

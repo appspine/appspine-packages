@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { sha256Digest } from '@appspine/integration-contracts';
+import { describe, expect, it } from 'vitest';
 
 import { DomainEventTerminalError } from './domain-event-errors';
 import {
@@ -31,14 +30,18 @@ const envelope = {
 function createReceiptDatabase(
   initial: IntegrationEventReceiptRecord[] = [],
 ): IntegrationReceiptDatabaseClient {
-  const receipts = new Map(initial.map((receipt) => [`${receipt.sourceApp}:${receipt.eventId}`, receipt]));
+  const receipts = new Map(
+    initial.map((receipt) => [`${receipt.sourceApp}:${receipt.eventId}`, receipt]),
+  );
   const model = (store: Map<string, IntegrationEventReceiptRecord>) => ({
     integrationEventReceipt: {
       findUnique: async ({
         where,
       }: {
         where: { sourceApp_eventId: { sourceApp: string; eventId: string } };
-      }) => store.get(`${where.sourceApp_eventId.sourceApp}:${where.sourceApp_eventId.eventId}`) ?? null,
+      }) =>
+        store.get(`${where.sourceApp_eventId.sourceApp}:${where.sourceApp_eventId.eventId}`) ??
+        null,
       create: async ({
         data,
       }: {
@@ -166,9 +169,9 @@ describe('withIntegrationEventReceipt', () => {
         createdAt: new Date(),
       },
     ]);
-    await expect(withIntegrationEventReceipt(db, envelope, async () => undefined)).rejects.toBeInstanceOf(
-      DomainEventTerminalError,
-    );
+    await expect(
+      withIntegrationEventReceipt(db, envelope, async () => undefined),
+    ).rejects.toBeInstanceOf(DomainEventTerminalError);
   });
 
   it('fails closed when an event id is reused for another pinned contract', async () => {
@@ -197,7 +200,7 @@ describe('withIntegrationEventReceipt', () => {
     await expect(
       withIntegrationEventReceipt(
         db,
-        { ...envelope, payloadDigest: 'sha256:' + '0'.repeat(64) },
+        { ...envelope, payloadDigest: `sha256:${'0'.repeat(64)}` },
         async () => undefined,
       ),
     ).rejects.toThrow('payload digest mismatch');

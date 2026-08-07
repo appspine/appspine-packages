@@ -39,15 +39,19 @@ export class DomainEventsService {
         bindingId: integration.bindingId,
         bindingVersion: integration.bindingVersion,
       });
-      if (!contract) throw new Error('Integration event contract is not registered in the runtime snapshot');
+      if (!contract)
+        throw new Error('Integration event contract is not registered in the runtime snapshot');
       const payloadSchema = contract.payloadSchema;
       if (!payloadSchema) throw new Error('Integration event contract has no payload schema');
       if (
         (input.integrationPayloadSchema &&
           canonicalJson(input.integrationPayloadSchema) !== canonicalJson(payloadSchema)) ||
-        (integration.payloadSchema && canonicalJson(integration.payloadSchema) !== canonicalJson(payloadSchema))
+        (integration.payloadSchema &&
+          canonicalJson(integration.payloadSchema) !== canonicalJson(payloadSchema))
       )
-        throw new Error('Integration event payload schema does not match the pinned runtime contract');
+        throw new Error(
+          'Integration event payload schema does not match the pinned runtime contract',
+        );
       assertJsonSchema(integration.payload, payloadSchema, { mode: 'strict' });
       integration = freezeIntegrationMetadata({
         ...integration,

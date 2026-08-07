@@ -1,7 +1,12 @@
 {
   "name": "@appspine/auth",
   "version": "6.2.1",
-  "files": ["dist", "prisma", "README.md", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "prisma",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "private": false,
   "repository": {
     "type": "git",

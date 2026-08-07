@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
 import type { JsonSchema } from '@appspine/integration-contracts';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DomainEventRegistry } from './domain-event-registry';
 import { DomainEventsService } from './domain-events.service';

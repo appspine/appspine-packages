@@ -1,4 +1,4 @@
-import { sha256Digest, type ExternalEventEnvelope } from '@appspine/integration-contracts';
+import { type ExternalEventEnvelope, sha256Digest } from '@appspine/integration-contracts';
 import { DomainEventTerminalError } from './domain-event-errors';
 
 export type IntegrationEventReceiptRecord = {
@@ -42,7 +42,9 @@ export async function withIntegrationEventReceipt<T>(
   process: (tx: IntegrationReceiptTxClient) => Promise<T>,
 ): Promise<IntegrationReceiptResult & { result?: T }> {
   if (sha256Digest(envelope.payload) !== envelope.payloadDigest)
-    throw new DomainEventTerminalError(`Integration event payload digest mismatch for ${envelope.eventId}`);
+    throw new DomainEventTerminalError(
+      `Integration event payload digest mismatch for ${envelope.eventId}`,
+    );
   try {
     return await db.$transaction(async (tx) => {
       const existing = await findReceipt(tx, envelope);

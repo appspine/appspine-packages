@@ -73,7 +73,10 @@ export class KeycloakTokenExchangeProvider implements TokenExchangeProvider {
       json = responseText ? JSON.parse(responseText) : undefined;
     } catch {
       if (!response.ok && response.status >= 500)
-        throw new OidcDelegationError('provider_unavailable', `provider returned ${response.status}`);
+        throw new OidcDelegationError(
+          'provider_unavailable',
+          `provider returned ${response.status}`,
+        );
       throw new OidcDelegationError(
         'malformed_provider_response',
         'token exchange response was not valid JSON',

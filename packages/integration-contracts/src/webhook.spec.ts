@@ -8,7 +8,7 @@ describe('Webhook Protocol v2', () => {
     sourceApp: 'approve',
     capabilityId: 'approve.knowledge-document-change-approved',
     capabilityVersion: '1.0.0',
-    capabilityDigest: 'sha256:' + '0'.repeat(64),
+    capabilityDigest: `sha256:${'0'.repeat(64)}`,
     bindingId: 'approve-to-wiki.knowledge-document-change-approved',
     bindingVersion: '1.0.0',
     method: 'POST',
@@ -35,7 +35,7 @@ describe('Webhook Protocol v2', () => {
           sourceApp: base.sourceApp,
           capabilityId: base.capabilityId,
           capabilityVersion: base.capabilityVersion,
-          capabilityDigest: 'sha256:' + '0'.repeat(64),
+          capabilityDigest: `sha256:${'0'.repeat(64)}`,
           bindingId: base.bindingId,
           bindingVersion: base.bindingVersion,
         }),
@@ -53,7 +53,7 @@ describe('Webhook Protocol v2', () => {
         body: base.body,
         headers,
         now: new Date(base.timestamp),
-        keyResolver: () => ({ ...base, capabilityDigest: 'sha256:' + '0'.repeat(64) }),
+        keyResolver: () => ({ ...base, capabilityDigest: `sha256:${'0'.repeat(64)}` }),
       }),
     ).toThrow('binding metadata');
   });
@@ -77,7 +77,7 @@ describe('Webhook Protocol v2', () => {
         body: base.body,
         headers,
         now: new Date(base.timestamp),
-        keyResolver: () => ({ ...base, capabilityDigest: undefined } as never),
+        keyResolver: () => ({ ...base, capabilityDigest: undefined }) as never,
       }),
     ).toThrow('pinned capability digest');
   });

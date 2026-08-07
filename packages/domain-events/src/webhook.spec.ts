@@ -1,10 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
-
 import {
   buildExternalEventEnvelope,
   buildWebhookV2Headers,
   canonicalJson,
 } from '@appspine/integration-contracts';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DomainEventOperation, type DomainEventRecord } from './types';
 import {
@@ -139,13 +138,13 @@ describe('postDomainEventWebhookV2 destination policy', () => {
         event: event({
           integrationCapabilityId: 'fixture.capability',
           integrationCapabilityVersion: '1.0.0',
-          integrationCapabilityDigest: 'sha256:' + '0'.repeat(64),
+          integrationCapabilityDigest: `sha256:${'0'.repeat(64)}`,
           integrationBindingId: 'fixture.binding',
           integrationBindingVersion: '1.0.0',
           integrationEnvelopeVersion: '2',
           integrationSourceApp: 'fixture',
           integrationPayload: { revision: 1 },
-          integrationPayloadDigest: 'sha256:' + '0'.repeat(64),
+          integrationPayloadDigest: `sha256:${'0'.repeat(64)}`,
         }),
         url: 'http://events.example.invalid/webhook',
         keyId: 'fixture-key',
@@ -220,25 +219,29 @@ describe('verifyDomainEventWebhookV2', () => {
 
   it('rejects a body envelope that does not match the signed event ID', () => {
     const input = signedBody({ eventId: 'different-event' });
-    expect(() => verifyDomainEventWebhookV2({
-      method: 'POST',
-      requestTarget: '/events',
-      body: input.body,
-      headers: input.headers,
-      now: new Date('2026-08-07T00:00:00.000Z'),
-      keyResolver: () => key,
-    })).toThrow('envelope eventId');
+    expect(() =>
+      verifyDomainEventWebhookV2({
+        method: 'POST',
+        requestTarget: '/events',
+        body: input.body,
+        headers: input.headers,
+        now: new Date('2026-08-07T00:00:00.000Z'),
+        keyResolver: () => key,
+      }),
+    ).toThrow('envelope eventId');
   });
 
   it('requires JSON content type and returns retryable 503 for a disabled binding', () => {
     const input = signedBody();
-    expect(() => verifyDomainEventWebhookV2({
-      method: 'POST',
-      requestTarget: '/events',
-      body: input.body,
-      headers: { ...input.headers, 'content-type': 'text/plain' },
-      keyResolver: () => key,
-    })).toThrow('content type');
+    expect(() =>
+      verifyDomainEventWebhookV2({
+        method: 'POST',
+        requestTarget: '/events',
+        body: input.body,
+        headers: { ...input.headers, 'content-type': 'text/plain' },
+        keyResolver: () => key,
+      }),
+    ).toThrow('content type');
     try {
       verifyDomainEventWebhookV2({
         method: 'POST',

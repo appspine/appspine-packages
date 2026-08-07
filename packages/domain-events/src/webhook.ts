@@ -8,12 +8,12 @@ import {
   buildWebhookV2Headers,
   canonicalJson,
   classifyHttpOutcome,
-  resolveSafeDestination,
   type DestinationPolicyOptions,
   type ExternalEventEnvelope,
+  resolveSafeDestination,
   verifyWebhookV2,
-  WebhookVerificationError,
   type WebhookKey,
+  WebhookVerificationError,
 } from '@appspine/integration-contracts';
 
 import { DomainEventRetryableError, DomainEventTerminalError } from './domain-event-errors';
@@ -138,14 +138,27 @@ export function verifyDomainEventWebhookV2(
 ): ReturnType<typeof verifyWebhookV2> {
   const contentType = input.headers['content-type'] ?? input.headers['Content-Type'] ?? '';
   if (!/^application\/json(?:\s*;|$)/iu.test(contentType))
-    throw new WebhookVerificationError('unsupported_content_type', 'Webhook content type must be application/json');
+    throw new WebhookVerificationError(
+      'unsupported_content_type',
+      'Webhook content type must be application/json',
+    );
   const verified = verifyWebhookV2({ ...input, maxBodyBytes: input.maxBodyBytes ?? 1_048_576 });
   if (input.bindingEnabled && !input.bindingEnabled(verified.bindingId))
-    throw new WebhookVerificationError('binding_disabled', 'Webhook binding is temporarily disabled', { retryable: true, status: 503 });
+    throw new WebhookVerificationError(
+      'binding_disabled',
+      'Webhook binding is temporarily disabled',
+      { retryable: true, status: 503 },
+    );
   let envelope: unknown;
-  try { envelope = JSON.parse(typeof input.body === 'string' ? input.body : Buffer.from(input.body).toString('utf8')); }
-  catch { throw new WebhookVerificationError('invalid_json', 'Webhook body is not valid JSON'); }
-  if (!envelope || typeof envelope !== 'object') throw new WebhookVerificationError('invalid_envelope', 'Webhook body is not an envelope');
+  try {
+    envelope = JSON.parse(
+      typeof input.body === 'string' ? input.body : Buffer.from(input.body).toString('utf8'),
+    );
+  } catch {
+    throw new WebhookVerificationError('invalid_json', 'Webhook body is not valid JSON');
+  }
+  if (!envelope || typeof envelope !== 'object')
+    throw new WebhookVerificationError('invalid_envelope', 'Webhook body is not an envelope');
   const body = envelope as Record<string, unknown>;
   const expected: Record<string, unknown> = {
     eventId: verified.eventId,
@@ -156,10 +169,21 @@ export function verifyDomainEventWebhookV2(
     bindingVersion: verified.bindingVersion,
   };
   for (const [key, expectedValue] of Object.entries(expected))
-    if (body[key] !== expectedValue) throw new WebhookVerificationError('envelope_binding_mismatch', `Webhook envelope ${key} does not match signed headers`);
-  if (body.envelopeVersion !== '2') throw new WebhookVerificationError('unsupported_envelope', 'Unsupported external event envelope version');
+    if (body[key] !== expectedValue)
+      throw new WebhookVerificationError(
+        'envelope_binding_mismatch',
+        `Webhook envelope ${key} does not match signed headers`,
+      );
+  if (body.envelopeVersion !== '2')
+    throw new WebhookVerificationError(
+      'unsupported_envelope',
+      'Unsupported external event envelope version',
+    );
   if (body.capabilityDigest !== verified.capabilityDigest)
-    throw new WebhookVerificationError('capability_digest_mismatch', 'Webhook envelope capability digest does not match the configured key');
+    throw new WebhookVerificationError(
+      'capability_digest_mismatch',
+      'Webhook envelope capability digest does not match the configured key',
+    );
   return verified;
 }
 
@@ -285,32 +309,43 @@ function postToFixedDestination(
       if (deadlineTimer) clearTimeout(deadlineTimer);
       reject(error);
     };
-    const req = request(destination.url, {
-      method: 'POST',
-      headers,
-      servername: destination.url.hostname,
-      lookup: (_hostname, _options, callback) => callback(null, address, isIP(address)),
-      timeout: timeoutMs,
-    }, (response) => {
-      const chunks: Buffer[] = [];
-      let size = 0;
-      response.on('data', (chunk: Buffer) => {
-        size += chunk.length;
-        if (size > 1_048_576) {
-          finishReject(new Error('Webhook response body exceeds the configured limit'));
-          req.destroy();
-          return;
-        }
-        chunks.push(chunk);
-      });
-      response.on('end', () => finishResolve({
-        status: response.statusCode ?? 0,
-        headers: Object.fromEntries(Object.entries(response.headers).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value])),
-        body: Buffer.concat(chunks).toString('utf8'),
-      }));
-      response.on('aborted', () => finishReject(new Error('Webhook response was aborted')));
-      response.on('error', finishReject);
-    });
+    const req = request(
+      destination.url,
+      {
+        method: 'POST',
+        headers,
+        servername: destination.url.hostname,
+        lookup: (_hostname, _options, callback) => callback(null, address, isIP(address)),
+        timeout: timeoutMs,
+      },
+      (response) => {
+        const chunks: Buffer[] = [];
+        let size = 0;
+        response.on('data', (chunk: Buffer) => {
+          size += chunk.length;
+          if (size > 1_048_576) {
+            finishReject(new Error('Webhook response body exceeds the configured limit'));
+            req.destroy();
+            return;
+          }
+          chunks.push(chunk);
+        });
+        response.on('end', () =>
+          finishResolve({
+            status: response.statusCode ?? 0,
+            headers: Object.fromEntries(
+              Object.entries(response.headers).map(([key, value]) => [
+                key,
+                Array.isArray(value) ? value[0] : value,
+              ]),
+            ),
+            body: Buffer.concat(chunks).toString('utf8'),
+          }),
+        );
+        response.on('aborted', () => finishReject(new Error('Webhook response was aborted')));
+        response.on('error', finishReject);
+      },
+    );
     const abort = () => {
       finishReject(new Error('Webhook request timed out'));
       req.destroy();

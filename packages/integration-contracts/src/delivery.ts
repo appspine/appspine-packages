@@ -63,9 +63,10 @@ export function boundedRetryAfter(
 }
 
 function isAlreadyProcessed(value: unknown, expectedEventId?: string): boolean {
-  const eventId = typeof value === 'object' && value !== null && 'eventId' in value
-    ? (value as { eventId?: unknown }).eventId
-    : undefined;
+  const eventId =
+    typeof value === 'object' && value !== null && 'eventId' in value
+      ? (value as { eventId?: unknown }).eventId
+      : undefined;
   return (
     typeof value === 'object' &&
     value !== null &&

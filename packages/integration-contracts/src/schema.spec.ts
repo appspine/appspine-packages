@@ -8,7 +8,10 @@ describe('integration schema validation', () => {
     required: ['id', 'status'],
     properties: {
       id: { type: 'string', minLength: 1, 'x-appspine-data-classification': 'INTERNAL' as const },
-      status: { enum: ['PENDING', 'CONFIRMED'], 'x-appspine-data-classification': 'INTERNAL' as const },
+      status: {
+        enum: ['PENDING', 'CONFIRMED'],
+        'x-appspine-data-classification': 'INTERNAL' as const,
+      },
       secret: { type: 'string', 'x-appspine-data-classification': 'SECRET' as const },
     },
     additionalProperties: false,
@@ -25,7 +28,10 @@ describe('integration schema validation', () => {
   });
 
   it('allows unknown fields for a tolerant reader', () => {
-    const tolerantSchema = { ...schema, properties: { id: schema.properties.id, status: schema.properties.status }, };
+    const tolerantSchema = {
+      ...schema,
+      properties: { id: schema.properties.id, status: schema.properties.status },
+    };
     expect(
       validateJsonSchema({ id: '1', status: 'PENDING', extra: true }, tolerantSchema, {
         mode: 'tolerant-reader',
@@ -34,9 +40,13 @@ describe('integration schema validation', () => {
   });
 
   it('rejects unknown Appspine schema keywords', () => {
-    expect(validateJsonSchema('value', { type: 'string', 'x-appspine-data-classification': 'INTERNAL', 'x-appspine-unknown': true })).toEqual([
-      expect.objectContaining({ keyword: 'x-appspine-unknown' }),
-    ]);
+    expect(
+      validateJsonSchema('value', {
+        type: 'string',
+        'x-appspine-data-classification': 'INTERNAL',
+        'x-appspine-unknown': true,
+      }),
+    ).toEqual([expect.objectContaining({ keyword: 'x-appspine-unknown' })]);
   });
 
   it('rejects impossible calendar dates and offsets in date-time values', () => {
