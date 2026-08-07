@@ -1,5 +1,12 @@
 # @appspine/domain-events
 
+## 7.1.1
+
+### Patch Changes
+
+- Publish the runtime dependency on `@appspine/integration-contracts` as a concrete registry
+  version so clean consumers never receive an unresolved `workspace:*` dependency.
+
 ## 7.1.0
 
 ### Minor Changes
