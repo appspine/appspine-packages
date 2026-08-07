@@ -1,5 +1,11 @@
 # @appspine/domain-events
 
+## 7.1.5
+
+### Patch Changes
+
+- Mark admin-only auth and API-key peers as optional so consumers of the core domain-events entrypoint do not need to install admin dependencies.
+
 ## 7.1.4
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@appspine/domain-events",
-  "version": "7.1.4",
+  "version": "7.1.5",
   "files": [
     "dist",
     "docs",
@@ -54,6 +54,14 @@
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
     "zod": "^4.4.3"
+  },
+  "peerDependenciesMeta": {
+    "@appspine/auth": {
+      "optional": true
+    },
+    "@appspine/m2m-api-key": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@appspine/auth": "workspace:*",
