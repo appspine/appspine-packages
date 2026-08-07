@@ -1,5 +1,24 @@
 # @appspine/domain-events
 
+## 7.1.0
+
+### Minor Changes
+
+- Resolve and validate integration payloads against a pinned capability contract, persist its digest,
+  bind webhook envelope fields to signed headers, and add transactional receipt contract checks.
+- Make production webhook delivery HTTPS/allowlist-only with DNS-rebinding protection, and keep
+  disabled bindings pending without consuming retry attempts.
+- Add the cross-app integration receipt migration and keep generated Prisma/schema drift checks in
+  sync.
+
+## 7.0.0
+
+### Breaking Changes
+
+- Add frozen integration metadata and payload digest fields to `DomainEventRecord`.
+- Add Webhook v2 sender/receiver helpers, retry taxonomy, binding kill-switch callback and consumer receipt transaction helper.
+- Consumers must regenerate the Prisma DomainEvent model with the nullable integration columns before upgrading.
+
 ## 6.0.0
 
 ### Patch Changes

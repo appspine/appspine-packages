@@ -156,6 +156,32 @@ describe('DomainEventDispatcherService.tick', () => {
     expect(row?.lastError).toBe('ignored by admin');
   });
 
+  it('leaves a disabled integration binding pending without consuming an attempt', async () => {
+    const row = createMockDeliveryRow('disabled-binding', 1n, 'ok', {
+      attempts: 3,
+      integrationBindingId: 'approve-to-wiki.events',
+    });
+    const registry = new DomainEventRegistry();
+    const handler = vi.fn();
+    registry.on('submitted', { key: 'ok', handle: handler });
+    const dispatcher = new DomainEventDispatcherService(
+      createMockDispatcherPrisma([row]) as never,
+      registry,
+      {
+        bindingEnabled: () => false,
+        autoStart: false,
+      },
+    );
+
+    await dispatcher.tick();
+
+    expect(handler).not.toHaveBeenCalled();
+    expect(row.status).toBe(DomainEventDeliveryStatus.PENDING);
+    expect(row.attempts).toBe(3);
+    expect(row.nextAttemptAt).toBeNull();
+    expect(row.lastError).toContain('disabled');
+  });
+
   it('makes an overlapping tick a no-op while one is already in flight', async () => {
     const registry = new DomainEventRegistry();
     const counters = { transactions: 0 };

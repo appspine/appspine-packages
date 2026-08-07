@@ -13,6 +13,14 @@ export type MockDomainEventRow = {
   eventType: string;
   operation: DomainEventOperation;
   changedFields: string[];
+  integrationCapabilityId?: string | null;
+  integrationCapabilityVersion?: string | null;
+  integrationBindingId?: string | null;
+  integrationBindingVersion?: string | null;
+  integrationEnvelopeVersion?: string | null;
+  integrationSourceApp?: string | null;
+  integrationPayload?: unknown;
+  integrationPayloadDigest?: string | null;
 };
 
 export type MockDomainEventTxState = {
@@ -81,7 +89,7 @@ export type MockDeliveryRow = {
   lastError: string | null;
   processedAt: Date | null;
   createdAt: Date;
-  event: { id: string; seq: bigint; eventType: string };
+  event: { id: string; seq: bigint; eventType: string; integrationBindingId?: string | null };
 };
 
 /** Builds one `DomainEventDelivery` + joined `event` row for dispatcher tests. */
@@ -91,6 +99,7 @@ export function createMockDeliveryRow(
   handlerKey: string,
   overrides?: Partial<Pick<MockDeliveryRow, 'attempts' | 'status' | 'lockedAt'>> & {
     eventType?: string;
+    integrationBindingId?: string | null;
   },
 ): MockDeliveryRow {
   return {
@@ -105,7 +114,12 @@ export function createMockDeliveryRow(
     lastError: null,
     processedAt: null,
     createdAt: new Date('2026-07-17T00:00:00.000Z'),
-    event: { id: `event-${id}`, seq, eventType: overrides?.eventType ?? 'test.event' },
+    event: {
+      id: `event-${id}`,
+      seq,
+      eventType: overrides?.eventType ?? 'test.event',
+      integrationBindingId: overrides?.integrationBindingId ?? null,
+    },
   };
 }
 

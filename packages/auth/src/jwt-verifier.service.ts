@@ -130,16 +130,18 @@ export class JwtVerifierService {
   private async provisionOidcUser(email: string, name: string | undefined) {
     try {
       const created = await this.usersService.create({ email, name });
-      void this.auditLogService
-        .record({
+      try {
+        await this.auditLogService.record({
           entityType: 'User',
           entityId: created.id,
           action: AUDIT_CREATE,
           actorId: created.id,
           actorEmail: email,
           appName: process.env.APP_NAME ?? 'appspine-app-template',
-        })
-        .catch(() => this.logger.warn('Failed to record OIDC provisioning audit'));
+        });
+      } catch {
+        this.logger.warn('Failed to record OIDC provisioning audit');
+      }
     } catch (error) {
       // Concurrent first logins for the same email race inside UsersService.create():
       // either the findUnique pre-check or the DB's own unique constraint on email can

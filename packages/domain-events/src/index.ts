@@ -4,6 +4,7 @@ export * from './domain-event-errors';
 export * from './domain-event-registry';
 export * from './domain-event-subscriber.decorator';
 export * from './domain-events.service';
+export * from './receipt';
 export * from './schema-drift-check';
 export * from './types';
 export * from './webhook';

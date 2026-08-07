@@ -1,11 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import {
+  buildExternalEventEnvelope,
+  buildWebhookV2Headers,
+  canonicalJson,
+} from '@appspine/integration-contracts';
+
 import { DomainEventOperation, type DomainEventRecord } from './types';
 import {
   buildDomainEventWebhookPayload,
   createDomainEventWebhookSignature,
   postDomainEventWebhook,
   redactDomainEventWebhookValue,
+  verifyDomainEventWebhookV2,
 } from './webhook';
 
 function event(overrides: Partial<DomainEventRecord> = {}): DomainEventRecord {
@@ -24,6 +31,15 @@ function event(overrides: Partial<DomainEventRecord> = {}): DomainEventRecord {
     after: { title: 'New', nested: { hashedKey: 'after-secret' } },
     changedFields: ['title'],
     metadata: { api_key: 'metadata-secret', safe: 'visible' },
+    integrationCapabilityId: null,
+    integrationCapabilityVersion: null,
+    integrationCapabilityDigest: null,
+    integrationBindingId: null,
+    integrationBindingVersion: null,
+    integrationEnvelopeVersion: null,
+    integrationSourceApp: null,
+    integrationPayload: null,
+    integrationPayloadDigest: null,
     createdAt: new Date('2026-07-20T00:00:00.000Z'),
     ...overrides,
   };
@@ -112,5 +128,101 @@ describe('postDomainEventWebhook', () => {
       }),
     ).rejects.toThrow('Webhook POST failed with HTTP 500');
     expect(arrayBuffer).toHaveBeenCalled();
+  });
+});
+
+describe('verifyDomainEventWebhookV2', () => {
+  const key = {
+    keyId: 'approve-key-1',
+    secret: 'secret',
+    sourceApp: 'approve',
+    capabilityId: 'approve.document.approved',
+    capabilityVersion: '1.0.0',
+    capabilityDigest: 'sha256:capability',
+    bindingId: 'approve-to-wiki.document.approved',
+    bindingVersion: '1.0.0',
+  } as const;
+
+  function signedBody(overrides: Record<string, unknown> = {}) {
+    const envelope = buildExternalEventEnvelope({
+      eventId: 'event-1',
+      eventType: 'document.approved',
+      capabilityId: key.capabilityId,
+      capabilityVersion: key.capabilityVersion,
+      capabilityDigest: key.capabilityDigest,
+      bindingId: key.bindingId,
+      bindingVersion: key.bindingVersion,
+      sourceApp: key.sourceApp,
+      occurredAt: '2026-08-07T00:00:00.000Z',
+      aggregateType: 'Document',
+      aggregateId: 'doc-1',
+      correlationId: null,
+      actor: { userId: 'user-1' },
+      payload: { revision: 2 },
+      ...overrides,
+    });
+    const body = canonicalJson(envelope);
+    return {
+      body,
+      headers: buildWebhookV2Headers({
+        ...key,
+        method: 'POST',
+        requestTarget: '/events',
+        timestamp: '2026-08-07T00:00:00.000Z',
+        eventId: 'event-1',
+        body,
+      }),
+    };
+  }
+
+  it('binds the parsed envelope to the signed headers and configured digest', () => {
+    const input = signedBody();
+    expect(
+      verifyDomainEventWebhookV2({
+        method: 'POST',
+        requestTarget: '/events',
+        body: input.body,
+        headers: input.headers,
+        now: new Date('2026-08-07T00:00:00.000Z'),
+        keyResolver: () => key,
+      }),
+    ).toMatchObject({ eventId: 'event-1', bindingId: key.bindingId });
+  });
+
+  it('rejects a body envelope that does not match the signed event ID', () => {
+    const input = signedBody({ eventId: 'different-event' });
+    expect(() => verifyDomainEventWebhookV2({
+      method: 'POST',
+      requestTarget: '/events',
+      body: input.body,
+      headers: input.headers,
+      now: new Date('2026-08-07T00:00:00.000Z'),
+      keyResolver: () => key,
+    })).toThrow('envelope eventId');
+  });
+
+  it('requires JSON content type and returns retryable 503 for a disabled binding', () => {
+    const input = signedBody();
+    expect(() => verifyDomainEventWebhookV2({
+      method: 'POST',
+      requestTarget: '/events',
+      body: input.body,
+      headers: { ...input.headers, 'content-type': 'text/plain' },
+      keyResolver: () => key,
+    })).toThrow('content type');
+    try {
+      verifyDomainEventWebhookV2({
+        method: 'POST',
+        requestTarget: '/events',
+        body: input.body,
+        headers: input.headers,
+        now: new Date('2026-08-07T00:00:00.000Z'),
+        keyResolver: () => key,
+        bindingEnabled: () => false,
+      });
+      throw new Error('expected disabled binding error');
+    } catch (error) {
+      expect(error).toMatchObject({ code: 'binding_disabled', retryable: true, status: 503 });
+    }
   });
 });

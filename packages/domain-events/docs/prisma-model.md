@@ -38,6 +38,16 @@ model DomainEvent {
   changedFields String[]             @map("changed_fields")
   /// Free-form handler context, including audit metadata.
   metadata      Json?
+  /// Frozen capability and binding pin for externally delivered events.
+  integrationCapabilityId      String? @map("integration_capability_id")
+  integrationCapabilityVersion String? @map("integration_capability_version")
+  integrationCapabilityDigest  String? @map("integration_capability_digest")
+  integrationBindingId         String? @map("integration_binding_id")
+  integrationBindingVersion    String? @map("integration_binding_version")
+  integrationEnvelopeVersion   String? @map("integration_envelope_version")
+  integrationSourceApp         String? @map("integration_source_app")
+  integrationPayload           Json?   @map("integration_payload")
+  integrationPayloadDigest     String? @map("integration_payload_digest")
   createdAt     DateTime             @default(now()) @map("created_at")
 
   deliveries DomainEventDelivery[]
@@ -86,6 +96,24 @@ enum DomainEventDeliveryStatus {
   PROCESSED
   DEAD_LETTER
   IGNORED
+}
+
+/// Idempotent inbox record for an externally delivered integration event.
+model IntegrationEventReceipt {
+  id                   String   @id @default(cuid())
+  sourceApp            String   @map("source_app")
+  eventId              String   @map("event_id")
+  capabilityId         String   @map("capability_id")
+  capabilityVersion    String   @map("capability_version")
+  bindingId            String   @map("binding_id")
+  bindingVersion       String   @map("binding_version")
+  payloadDigest        String   @map("payload_digest")
+  processedAt          DateTime @default(now()) @map("processed_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@unique([sourceApp, eventId])
+  @@index([bindingId, createdAt])
+  @@map("integration_event_receipts")
 }
 ```
 
