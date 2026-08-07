@@ -118,6 +118,14 @@ model IntegrationEventReceipt {
 }
 ```
 
+`IntegrationEventReceipt` is an inbound idempotency record. The receiver must create the receipt,
+apply the business state change, and write any next local outbox event through the same Prisma
+transaction. The package helper `withIntegrationEventReceipt()` requires the root Prisma client
+to expose `$transaction()` and passes the transaction client to the callback. A duplicate
+`(source_app, event_id)` is accepted only when the pinned contract and payload digest match the
+existing record; a concurrent `P2002` is resolved by reading and verifying the committed winner,
+and the business callback is never retried.
+
 Nothing else is part of this package's contract. In particular, an outbound-webhook subscription
 model (if the app wants one) is app-local — it is data-driven routing wired through
 `DomainEventRegistry.registerHandlerKeyContributor()`, not something this package's `record()`/

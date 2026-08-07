@@ -151,7 +151,9 @@ export const DEFAULT_DISPATCHER_OPTIONS: Required<DomainEventDispatcherOptions> 
   staleLockMs: 300000,
   baseBackoffMs: 30000,
   maxBackoffMs: 3600000,
-  bindingEnabled: async () => true,
+  // Integration delivery is fail-closed until the consuming app supplies its binding state
+  // lookup. Legacy non-integration events never consult this callback.
+  bindingEnabled: async () => false,
   autoStart: true,
 };
 

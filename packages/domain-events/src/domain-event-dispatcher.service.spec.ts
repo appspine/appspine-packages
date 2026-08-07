@@ -156,6 +156,28 @@ describe('DomainEventDispatcherService.tick', () => {
     expect(row?.lastError).toBe('ignored by admin');
   });
 
+  it('does not complete a delivery after its lease is reclaimed by another worker', async () => {
+    const rows = [createMockDeliveryRow('lease-race', 1n, 'ok')];
+    const registry = new DomainEventRegistry();
+    registry.on('submitted', {
+      key: 'ok',
+      handle: async () => {
+        const row = rows.find((candidate) => candidate.id === 'lease-race');
+        if (row) row.lockedBy = 'another-worker:lease';
+      },
+    });
+    const dispatcher = new DomainEventDispatcherService(
+      createMockDispatcherPrisma(rows) as never,
+      registry,
+      { autoStart: false },
+    );
+
+    await dispatcher.tick();
+
+    expect(rows[0].status).toBe(DomainEventDeliveryStatus.PROCESSING);
+    expect(rows[0].lockedBy).toBe('another-worker:lease');
+  });
+
   it('leaves a disabled integration binding pending without consuming an attempt', async () => {
     const row = createMockDeliveryRow('disabled-binding', 1n, 'ok', {
       attempts: 3,

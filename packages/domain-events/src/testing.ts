@@ -15,6 +15,7 @@ export type MockDomainEventRow = {
   changedFields: string[];
   integrationCapabilityId?: string | null;
   integrationCapabilityVersion?: string | null;
+  integrationCapabilityDigest?: string | null;
   integrationBindingId?: string | null;
   integrationBindingVersion?: string | null;
   integrationEnvelopeVersion?: string | null;
@@ -126,6 +127,7 @@ export function createMockDeliveryRow(
 type MockDeliveryWhere = {
   id?: string | { in: string[] };
   status?: DomainEventDeliveryStatus;
+  lockedBy?: string;
   attempts?: { gte?: number; lt?: number };
   lockedAt?: { lt: Date };
 };
@@ -155,6 +157,7 @@ function matchesWhere(row: MockDeliveryRow, where: MockDeliveryWhere): boolean {
       return false;
     }
   }
+  if (where.lockedBy !== undefined && row.lockedBy !== where.lockedBy) return false;
   if (where.attempts?.gte !== undefined && row.attempts < where.attempts.gte) return false;
   if (where.attempts?.lt !== undefined && row.attempts >= where.attempts.lt) return false;
   return true;
@@ -181,7 +184,8 @@ export function createMockDispatcherPrisma(
   const findMany = async ({ where }: { where: MockDeliveryWhere }) =>
     rows
       .filter((row) => matchesWhere(row, where))
-      .sort((left, right) => Number(left.event.seq - right.event.seq));
+      .sort((left, right) => Number(left.event.seq - right.event.seq))
+      .map((row) => ({ ...row, event: { ...row.event } }));
 
   return {
     domainEventDelivery: {

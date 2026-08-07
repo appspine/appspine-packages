@@ -11,6 +11,7 @@ import {
   buildDomainEventWebhookPayload,
   createDomainEventWebhookSignature,
   postDomainEventWebhook,
+  postDomainEventWebhookV2,
   redactDomainEventWebhookValue,
   verifyDomainEventWebhookV2,
 } from './webhook';
@@ -128,6 +129,34 @@ describe('postDomainEventWebhook', () => {
       }),
     ).rejects.toThrow('Webhook POST failed with HTTP 500');
     expect(arrayBuffer).toHaveBeenCalled();
+  });
+});
+
+describe('postDomainEventWebhookV2 destination policy', () => {
+  it('cannot be downgraded from production HTTPS by caller policy', async () => {
+    await expect(
+      postDomainEventWebhookV2({
+        event: event({
+          integrationCapabilityId: 'fixture.capability',
+          integrationCapabilityVersion: '1.0.0',
+          integrationCapabilityDigest: 'sha256:' + '0'.repeat(64),
+          integrationBindingId: 'fixture.binding',
+          integrationBindingVersion: '1.0.0',
+          integrationEnvelopeVersion: '2',
+          integrationSourceApp: 'fixture',
+          integrationPayload: { revision: 1 },
+          integrationPayloadDigest: 'sha256:' + '0'.repeat(64),
+        }),
+        url: 'http://events.example.invalid/webhook',
+        keyId: 'fixture-key',
+        secret: 'secret',
+        destinationPolicy: {
+          production: false,
+          allowedHosts: ['events.example.invalid'],
+          resolve: async () => ['8.8.8.8'],
+        },
+      }),
+    ).rejects.toThrow('must use HTTPS');
   });
 });
 

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { hostname } from 'node:os';
 import { PrismaService } from '@appspine/common';
 import {
@@ -154,6 +155,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
 
   private async claimDueDeliveries(): Promise<ClaimedDelivery[]> {
     return this.prisma.$transaction(async (tx: DispatcherTransactionClient) => {
+      const leaseId = `${this.workerId}:${randomUUID()}`;
       // Physical table/column names below (domain_event_deliveries, domain_events, seq,
       // next_attempt_at, locked_at, locked_by) mirror the documented model pattern's @@map/@map
       // directives (see docs/prisma-model.md and schema-drift-check.ts). They are a
@@ -172,7 +174,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
         UPDATE domain_event_deliveries ded
         SET status = 'PROCESSING',
             locked_at = now(),
-            locked_by = ${this.workerId}
+            locked_by = ${leaseId}
         FROM due
         WHERE ded.id = due.id
         RETURNING ded.id
@@ -191,7 +193,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
   private async processDelivery(delivery: ClaimedDelivery): Promise<void> {
     const handler = this.registry.resolve(delivery.handlerKey);
     if (!handler) {
-      await this.completeDelivery(delivery.id, {
+      await this.completeDelivery(delivery, {
         status: DomainEventDeliveryStatus.IGNORED,
         processedAt: new Date(),
         lastError: `No handler registered for ${delivery.handlerKey}`,
@@ -206,7 +208,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
         delivery.event.integrationBindingId &&
         !(await this.bindingEnabled(delivery.event.integrationBindingId))
       ) {
-        await this.completeDelivery(delivery.id, {
+        await this.completeDelivery(delivery, {
           status: DomainEventDeliveryStatus.PENDING,
           attempts: delivery.attempts,
           nextAttemptAt: null,
@@ -217,7 +219,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
         return;
       }
       await handler.handle({ event: delivery.event, delivery });
-      await this.completeDelivery(delivery.id, {
+      await this.completeDelivery(delivery, {
         status: DomainEventDeliveryStatus.PROCESSED,
         processedAt: new Date(),
         lockedAt: null,
@@ -226,7 +228,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
       });
     } catch (error) {
       if (error instanceof DomainEventIgnoredError) {
-        await this.completeDelivery(delivery.id, {
+        await this.completeDelivery(delivery, {
           status: DomainEventDeliveryStatus.IGNORED,
           processedAt: new Date(),
           lastError: error.message,
@@ -236,7 +238,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
         return;
       }
       if (error instanceof DomainEventTerminalError) {
-        await this.completeDelivery(delivery.id, {
+        await this.completeDelivery(delivery, {
           status: DomainEventDeliveryStatus.DEAD_LETTER,
           processedAt: new Date(),
           lastError: boundedError(error.message),
@@ -252,7 +254,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
   private async markFailed(delivery: DomainEventDeliveryRecord, error: unknown): Promise<void> {
     const nextAttempts = delivery.attempts + 1;
     const terminal = nextAttempts >= this.maxAttempts;
-    await this.completeDelivery(delivery.id, {
+    await this.completeDelivery(delivery, {
       status: terminal ? DomainEventDeliveryStatus.DEAD_LETTER : DomainEventDeliveryStatus.PENDING,
       attempts: nextAttempts,
       nextAttemptAt: terminal
@@ -270,9 +272,16 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
    * was running, the guard makes this a no-op instead of clobbering that decision — the same
    * atomic-update defense apps/approve's admin service uses for the other side of this race.
    */
-  private async completeDelivery(id: string, data: DeliveryCompletionData): Promise<void> {
+  private async completeDelivery(
+    delivery: Pick<ClaimedDelivery, 'id' | 'lockedBy'>,
+    data: DeliveryCompletionData,
+  ): Promise<void> {
     await this.prisma.domainEventDelivery.updateMany({
-      where: { id, status: DomainEventDeliveryStatus.PROCESSING },
+      where: {
+        id: delivery.id,
+        status: DomainEventDeliveryStatus.PROCESSING,
+        lockedBy: delivery.lockedBy ?? '__missing_lease__',
+      },
       data,
     });
   }

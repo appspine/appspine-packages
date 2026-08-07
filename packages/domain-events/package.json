@@ -1,7 +1,15 @@
 {
   "name": "@appspine/domain-events",
-  "version": "7.1.2",
-  "files": ["dist", "docs", "admin.js", "admin.d.ts", "testing.js", "testing.d.ts", "CHANGELOG.md"],
+  "version": "7.1.4",
+  "files": [
+    "dist",
+    "docs",
+    "admin.js",
+    "admin.d.ts",
+    "testing.js",
+    "testing.d.ts",
+    "CHANGELOG.md"
+  ],
   "private": false,
   "repository": {
     "type": "git",
@@ -35,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/integration-contracts": "0.3.0",
+    "@appspine/integration-contracts": "0.3.1",
     "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {

@@ -83,8 +83,8 @@ export async function postDomainEventWebhookV2({
   now = new Date(),
 }: PostDomainEventWebhookV2Input): Promise<void> {
   const destination = await resolveSafeDestination(url, {
-    production: true,
     ...destinationPolicy,
+    production: true,
   });
   const envelope = buildIntegrationEventEnvelope(event);
   const body = canonicalJson(envelope);
@@ -99,6 +99,7 @@ export async function postDomainEventWebhookV2({
     sourceApp: envelope.sourceApp,
     capabilityId: envelope.capabilityId,
     capabilityVersion: envelope.capabilityVersion,
+    capabilityDigest: envelope.capabilityDigest,
     bindingId: envelope.bindingId,
     bindingVersion: envelope.bindingVersion,
     body,
@@ -157,8 +158,7 @@ export function verifyDomainEventWebhookV2(
   for (const [key, expectedValue] of Object.entries(expected))
     if (body[key] !== expectedValue) throw new WebhookVerificationError('envelope_binding_mismatch', `Webhook envelope ${key} does not match signed headers`);
   if (body.envelopeVersion !== '2') throw new WebhookVerificationError('unsupported_envelope', 'Unsupported external event envelope version');
-  const key = input.keyResolver(verified.keyId);
-  if (key?.capabilityDigest && body.capabilityDigest !== key.capabilityDigest)
+  if (body.capabilityDigest !== verified.capabilityDigest)
     throw new WebhookVerificationError('capability_digest_mismatch', 'Webhook envelope capability digest does not match the configured key');
   return verified;
 }
@@ -271,6 +271,20 @@ function postToFixedDestination(
   const request = destination.url.protocol === 'https:' ? httpsRequest : httpRequest;
   const address = destination.addresses[0];
   return new Promise((resolve, reject) => {
+    let settled = false;
+    let deadlineTimer: NodeJS.Timeout | undefined;
+    const finishResolve = (value: FixedDestinationResponse) => {
+      if (settled) return;
+      settled = true;
+      if (deadlineTimer) clearTimeout(deadlineTimer);
+      resolve(value);
+    };
+    const finishReject = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      if (deadlineTimer) clearTimeout(deadlineTimer);
+      reject(error);
+    };
     const req = request(destination.url, {
       method: 'POST',
       headers,
@@ -283,20 +297,27 @@ function postToFixedDestination(
       response.on('data', (chunk: Buffer) => {
         size += chunk.length;
         if (size > 1_048_576) {
-          req.destroy(new Error('Webhook response body exceeds the configured limit'));
+          finishReject(new Error('Webhook response body exceeds the configured limit'));
+          req.destroy();
           return;
         }
         chunks.push(chunk);
       });
-      response.on('end', () => resolve({
+      response.on('end', () => finishResolve({
         status: response.statusCode ?? 0,
         headers: Object.fromEntries(Object.entries(response.headers).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value])),
         body: Buffer.concat(chunks).toString('utf8'),
       }));
-      response.on('error', reject);
+      response.on('aborted', () => finishReject(new Error('Webhook response was aborted')));
+      response.on('error', finishReject);
     });
-    req.on('timeout', () => req.destroy(new Error('Webhook request timed out')));
-    req.on('error', reject);
+    const abort = () => {
+      finishReject(new Error('Webhook request timed out'));
+      req.destroy();
+    };
+    req.on('timeout', abort);
+    deadlineTimer = setTimeout(abort, Math.max(1, timeoutMs));
+    req.on('error', finishReject);
     req.end(body);
   });
 }

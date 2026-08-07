@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { JsonSchema } from '@appspine/integration-contracts';
 
 import { DomainEventRegistry } from './domain-event-registry';
 import { DomainEventsService } from './domain-events.service';
@@ -6,6 +7,46 @@ import { createMockDomainEventTx } from './testing';
 import { DomainEventOperation } from './types';
 
 describe('DomainEventsService.record', () => {
+  it('rejects a caller schema that is more permissive than the pinned resolver schema', async () => {
+    const registry = new DomainEventRegistry();
+    const pinnedSchema: JsonSchema = {
+      type: 'object',
+      required: ['documentId'],
+      properties: {
+        documentId: { type: 'string', 'x-appspine-data-classification': 'INTERNAL' },
+      },
+      additionalProperties: false,
+    };
+    const service = new DomainEventsService(registry, {
+      resolve: () => ({
+        capabilityDigest: `sha256:${'0'.repeat(64)}`,
+        payloadSchema: pinnedSchema,
+      }),
+    });
+    const { tx } = createMockDomainEventTx();
+
+    await expect(
+      service.record(tx as never, {
+        aggregateType: 'WikiPage',
+        aggregateId: 'doc-1',
+        eventType: 'wiki.document.changed',
+        operation: DomainEventOperation.UPDATE,
+        integration: {
+          capabilityId: 'approve.knowledge-document-change-approved',
+          capabilityVersion: '1.0.0',
+          bindingId: 'approve-to-wiki.knowledge-document-change-approved',
+          bindingVersion: '1.0.0',
+          sourceApp: 'approve',
+          payload: { documentId: 'doc-1' },
+        },
+        integrationPayloadSchema: {
+          type: 'object',
+          additionalProperties: true,
+        },
+      }),
+    ).rejects.toThrow('does not match the pinned runtime contract');
+  });
+
   it('freezes an integration payload and persists its deterministic digest with the outbox row', async () => {
     const registry = new DomainEventRegistry();
     const service = new DomainEventsService(registry, {

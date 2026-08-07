@@ -1,5 +1,22 @@
 # @appspine/domain-events
 
+## 7.1.4
+
+### Patch Changes
+
+- Limit concurrent-receipt recovery to unique conflicts raised by the receipt insert, so business
+  transaction errors are never mistaken for a duplicate delivery.
+
+## 7.1.3
+
+### Patch Changes
+
+- Harden pinned contract enforcement, Webhook v2 raw-body and capability-digest verification,
+  production destination policy, absolute request deadlines, receipt transactions, and dispatcher
+  lease ownership.
+- Updated dependencies
+  - @appspine/integration-contracts@0.3.1
+
 ## 7.1.2
 
 ### Patch Changes

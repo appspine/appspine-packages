@@ -94,6 +94,11 @@ export type VerifyWebhookV2Input = {
 export function verifyWebhookV2(
   input: VerifyWebhookV2Input,
 ): WebhookVerificationContext & { eventId: string; timestamp: string } {
+  if (typeof input.body !== 'string' && !(input.body instanceof Uint8Array))
+    throw new WebhookVerificationError(
+      'raw_body_required',
+      'Webhook verification requires the original raw request body',
+    );
   const headers = normalizeHeaders(input.headers);
   const bodySize =
     typeof input.body === 'string' ? Buffer.byteLength(input.body) : input.body.byteLength;
@@ -111,11 +116,17 @@ export function verifyWebhookV2(
   const keyId = requiredHeader(headers, 'x-appspine-key-id');
   const context = input.keyResolver(keyId);
   if (!context) throw new WebhookVerificationError('unknown_key', 'Webhook key is not configured');
+  if (!context.capabilityDigest)
+    throw new WebhookVerificationError(
+      'missing_capability_digest',
+      'Webhook key is missing the pinned capability digest',
+    );
   const expected = {
     keyId,
     sourceApp: context.sourceApp,
     capabilityId: requiredHeader(headers, 'x-appspine-capability-id'),
     capabilityVersion: requiredHeader(headers, 'x-appspine-capability-version'),
+    capabilityDigest: context.capabilityDigest,
     bindingId: requiredHeader(headers, 'x-appspine-binding-id'),
     bindingVersion: requiredHeader(headers, 'x-appspine-binding-version'),
     method: input.method,
@@ -163,6 +174,7 @@ export function verifyWebhookV2(
     sourceApp: context.sourceApp,
     capabilityId: expected.capabilityId,
     capabilityVersion: expected.capabilityVersion,
+    capabilityDigest: context.capabilityDigest,
     bindingId: expected.bindingId,
     bindingVersion: expected.bindingVersion,
     timestamp: expected.timestamp,

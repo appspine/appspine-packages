@@ -1,5 +1,13 @@
 # @appspine/integration-contracts
 
+## 0.3.1
+
+### Patch Changes
+
+- Harden pinned contract enforcement, Webhook v2 raw-body and capability-digest verification,
+  production destination policy, absolute request deadlines, receipt transactions, and dispatcher
+  lease ownership.
+
 ## 0.3.0
 
 ### Minor Changes

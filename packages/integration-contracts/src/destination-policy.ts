@@ -67,14 +67,22 @@ function normalizeHost(value: string): string {
 function isBlockedAddress(address: string): boolean {
   const normalized = address.toLowerCase().replace(/^\[|\]$/gu, '');
   if (isIP(normalized) === 4) {
-    const [a, b] = normalized.split('.').map(Number);
+    const [a, b, c, d] = normalized.split('.').map(Number);
+    const value = (((a * 256) + b) * 256 + c) * 256 + d;
+    const inRange = (start: number, end: number) => value >= start && value <= end;
     return (
       a === 0 ||
       a === 10 ||
       a === 127 ||
       (a === 169 && b === 254) ||
+      (a === 100 && b >= 64 && b <= 127) ||
       (a === 172 && b >= 16 && b <= 31) ||
       (a === 192 && b === 168) ||
+      inRange(0xc0000000, 0xc00000ff) ||
+      inRange(0xc0000200, 0xc00002ff) ||
+      inRange(0xc6120000, 0xc613ffff) ||
+      inRange(0xc6336400, 0xc63364ff) ||
+      inRange(0xcb007100, 0xcb0071ff) ||
       a >= 224
     );
   }

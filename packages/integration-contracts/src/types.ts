@@ -171,7 +171,7 @@ export type WebhookVerificationContext = {
   sourceApp: string;
   capabilityId: string;
   capabilityVersion: string;
-  capabilityDigest?: string;
+  capabilityDigest: string;
   bindingId: string;
   bindingVersion: string;
 };
