@@ -1,5 +1,12 @@
 # @appspine/domain-events
 
+## 7.1.2
+
+### Patch Changes
+
+- Include the pinned capability digest in the Prisma receipt model, migration, documentation, and
+  schema-drift gate.
+
 ## 7.1.1
 
 ### Patch Changes

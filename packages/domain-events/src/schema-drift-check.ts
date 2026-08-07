@@ -226,6 +226,7 @@ const EXPECTED_MODELS: ExpectedModel[] = [
       { name: 'eventId', kind: 'scalar', type: 'String', column: 'event_id' },
       { name: 'capabilityId', kind: 'scalar', type: 'String', column: 'capability_id' },
       { name: 'capabilityVersion', kind: 'scalar', type: 'String', column: 'capability_version' },
+      { name: 'capabilityDigest', kind: 'scalar', type: 'String', column: 'capability_digest' },
       { name: 'bindingId', kind: 'scalar', type: 'String', column: 'binding_id' },
       { name: 'bindingVersion', kind: 'scalar', type: 'String', column: 'binding_version' },
       { name: 'payloadDigest', kind: 'scalar', type: 'String', column: 'payload_digest' },

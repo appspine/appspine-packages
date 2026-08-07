@@ -244,6 +244,14 @@ function conformingDatamodel(): DomainEventDatamodel {
             dbName: 'capability_version',
           },
           {
+            name: 'capabilityDigest',
+            kind: 'scalar',
+            type: 'String',
+            isRequired: true,
+            isList: false,
+            dbName: 'capability_digest',
+          },
+          {
             name: 'bindingId',
             kind: 'scalar',
             type: 'String',

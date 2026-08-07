@@ -105,6 +105,7 @@ model IntegrationEventReceipt {
   eventId              String   @map("event_id")
   capabilityId         String   @map("capability_id")
   capabilityVersion    String   @map("capability_version")
+  capabilityDigest     String   @map("capability_digest")
   bindingId            String   @map("binding_id")
   bindingVersion       String   @map("binding_version")
   payloadDigest        String   @map("payload_digest")
