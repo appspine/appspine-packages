@@ -3,16 +3,15 @@ import {
   type ExecutionContext,
   Inject,
   Injectable,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { DELEGATED_PROFILE_KEY } from './decorators/delegated-profile.decorator';
 import { DELEGATED_AUTH_PROFILES } from './delegated-auth.constants';
-import { DelegatedIdentityMappingError } from './delegated-identity-mapping.error';
 import { DelegatedJwtVerifierService } from './delegated-jwt-verifier.service';
 import { DelegatedPrincipalMapperService } from './delegated-principal-mapper.service';
-import type { DelegatedOidcTrustProfile, DelegationContext } from './types';
+import { DelegatedSecurityEventLogger } from './delegated-security-event-logger';
+import type { DelegationContext, ResolvedDelegatedOidcTrustProfile } from './types';
 
 type DelegatedRequest = {
   headers: Record<string, string | string[] | undefined>;
@@ -29,14 +28,13 @@ type DelegatedRequest = {
  */
 @Injectable()
 export class DelegatedAuthGuard implements CanActivate {
-  private readonly logger = new Logger(DelegatedAuthGuard.name);
-
   constructor(
     private readonly reflector: Reflector,
     private readonly verifier: DelegatedJwtVerifierService,
     private readonly mapper: DelegatedPrincipalMapperService,
+    private readonly securityEventLogger: DelegatedSecurityEventLogger,
     @Inject(DELEGATED_AUTH_PROFILES)
-    private readonly profiles: Record<string, DelegatedOidcTrustProfile>,
+    private readonly profiles: Readonly<Record<string, ResolvedDelegatedOidcTrustProfile>>,
   ) {}
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
@@ -74,19 +72,11 @@ export class DelegatedAuthGuard implements CanActivate {
       request.delegationContext = claims;
       return true;
     } catch (error) {
-      this.logRejection(profileName, error);
+      this.securityEventLogger.recordRejection(profileName, error);
       // Unified, opaque response regardless of the underlying reason (bad signature,
       // wrong audience, missing local account, ...) — see plan §9/§13.
       throw new UnauthorizedException('Invalid delegated token');
     }
-  }
-
-  private logRejection(profileName: string, error: unknown): void {
-    const reason =
-      error instanceof DelegatedIdentityMappingError || error instanceof Error
-        ? error.message
-        : String(error);
-    this.logger.warn(`Delegated auth rejected for profile "${profileName}": ${reason}`);
   }
 }
 

@@ -24,13 +24,15 @@
 // audience/source client/scope/TTL correct) -- the security-critical part of T-17000.
 //
 // Usage: node scripts/042-delegation-e2e-verify.mjs
-// Config (env, defaults match dev-infra's checked-in realm):
-//   KC_BASE_URL, KC_REALM, WIKI_SECRET, WIKI_DELEGATION_SECRET, WIKI_USER_PASSWORD
+// Config: KC_BASE_URL is required; the remaining variables default to the checked-in dev realm.
+//   KC_REALM, WIKI_SECRET, WIKI_DELEGATION_SECRET, WIKI_USER_PASSWORD
 
 import { DelegatedJwtVerifierService } from '../packages/auth/dist/delegated/delegated-jwt-verifier.service.js';
 import { OidcDelegationService } from '../packages/oidc-delegation/dist/index.js';
 
-const KC_BASE_URL = process.env.KC_BASE_URL ?? 'http://localhost:8180';
+const KC_BASE_URL = process.env.KC_BASE_URL;
+if (!KC_BASE_URL) throw new Error('KC_BASE_URL is required');
+const ALLOW_INSECURE_HTTP = new URL(KC_BASE_URL).protocol === 'http:';
 const KC_REALM = process.env.KC_REALM ?? 'appspine-dev';
 const WIKI_SECRET = process.env.WIKI_SECRET ?? 'dev-secret-wiki';
 const WIKI_DELEGATION_SECRET = process.env.WIKI_DELEGATION_SECRET ?? 'dev-secret-wiki-delegation';
@@ -47,6 +49,7 @@ const oidcDelegation = new OidcDelegationService({
   sourceClientId: 'wiki-delegation',
   sourceClientSecret: WIKI_DELEGATION_SECRET,
   subjectTokenIssuerClientId: 'wiki',
+  allowInsecureTokenEndpoint: ALLOW_INSECURE_HTTP,
   policies: {
     [POLICY_NAME]: {
       targetAudience: 'approve',
@@ -70,30 +73,23 @@ async function getWikiUserSubjectToken() {
   });
   const body = await res.json();
   if (!res.ok || !body.access_token) {
-    throw new Error(`failed to obtain wiki-user subject token: ${JSON.stringify(body)}`);
+    throw new Error('failed to obtain wiki-user subject token');
   }
   return body.access_token;
 }
 
 const trustProfile = {
   expectedIssuer: ISSUER,
+  allowInsecureHttp: ALLOW_INSECURE_HTTP,
   requiredAudience: 'approve',
   additionalAllowedAudiences: [],
   allowedClientIds: ['wiki-delegation'],
   requiredScopes: ['approve:knowledge-document-change:submit'],
   delegationScopeNamespace: 'approve:',
-  // Realm accessTokenLifespan is currently 300s (T-16620/T-16700's documented, not-yet-closed
-  // gap: Keycloak-side TTL has not been narrowed to the 120s target). Using the *target* value
-  // here would make every real exchange fail on token age alone — this profile intentionally
-  // matches today's real Keycloak, and a second, stricter profile below independently proves
-  // the app-side maxTokenAgeSeconds control does its job as the actual primary TTL control
-  // (plan §2 decision 16) regardless of what Keycloak issues.
-  maxTokenAgeSeconds: 300,
+  maxTokenAgeSeconds: 120,
   clockToleranceSeconds: 10,
   provisioning: 'never',
 };
-
-const targetTtlProfile = { ...trustProfile, maxTokenAgeSeconds: 120 };
 
 function redactedClaimSummary(claims) {
   return {
@@ -142,19 +138,11 @@ async function main() {
     ],
   ];
 
-  // [4/4] Independently prove maxTokenAgeSeconds is the real, effective primary TTL control
-  // (plan §2 decision 16) — reject the *same* real token when the profile is set to the
-  // T-16620 target (120s) instead of today's actual realm accessTokenLifespan (300s).
-  const rejectedAtTargetTtl = await verifier
-    .verify(delegated.accessToken, targetTtlProfile)
-    .then(() => false)
-    .catch((error) => error.message.includes('maximum allowed age'));
-  console.log(
-    `[4/4] re-verified the same token against the 120s target profile: ${rejectedAtTargetTtl ? 'correctly rejected on age' : 'did NOT reject as expected'}`,
-  );
+  const ttlContractHolds = delegated.expiresInSeconds === 120;
+  console.log(`[4/4] delegated token TTL is exactly 120 seconds: ${ttlContractHolds}`);
   assertions.push([
-    'app-side maxTokenAgeSeconds=120 correctly rejects a real 300s-TTL token (known Keycloak-side gap, app control compensates)',
-    rejectedAtTargetTtl,
+    'Keycloak TTL, outbound maximum, and inbound maximum all agree at 120 seconds',
+    ttlContractHolds,
   ]);
 
   let allPass = true;

@@ -14,6 +14,9 @@ export class RollingWindowRateLimiter {
   private readonly evictionTimer: NodeJS.Timeout;
 
   constructor(private readonly limitPerMinute: number) {
+    if (!Number.isInteger(limitPerMinute) || limitPerMinute <= 0) {
+      throw new Error('limitPerMinute must be a positive integer');
+    }
     this.evictionTimer = setInterval(() => this.evict(), EVICTION_INTERVAL_MS).unref();
   }
 
@@ -25,7 +28,7 @@ export class RollingWindowRateLimiter {
     if (!bucket || now - bucket.windowStart >= WINDOW_MS) {
       bucket = { count: 1, windowStart: now };
       this.buckets.set(key, bucket);
-      return true;
+      return bucket.count <= this.limitPerMinute;
     }
 
     bucket.count += 1;

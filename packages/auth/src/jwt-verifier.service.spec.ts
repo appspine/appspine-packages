@@ -13,8 +13,13 @@ process.env.OIDC_AUDIENCE = 'test-client';
 function createService(
   findUnique: (...args: never[]) => unknown = async () => null,
   create: (...args: never[]) => unknown = async () => {},
+  record: (...args: never[]) => unknown = async () => {},
 ) {
-  return new JwtVerifierService({ user: { findUnique } } as never, { create } as never);
+  return new JwtVerifierService(
+    { user: { findUnique } } as never,
+    { create } as never,
+    { record } as never,
+  );
 }
 
 describe('JwtVerifierService', () => {
@@ -30,7 +35,11 @@ describe('JwtVerifierService', () => {
     process.env.OIDC_JWKS_URL = 'https://issuer.example/.well-known/jwks.json';
     const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
     const token = jwt.sign(
-      { email: 'user@example.com', azp: process.env.OIDC_AUDIENCE },
+      {
+        email: 'user@example.com',
+        email_verified: true,
+        azp: process.env.OIDC_AUDIENCE,
+      },
       privateKey,
       {
         algorithm: 'RS256',
@@ -125,6 +134,7 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     await expect(
       service.buildOidcJwtUser({
         email: 'existing@example.com',
+        email_verified: true,
         azp: process.env.OIDC_AUDIENCE,
       }),
     ).resolves.toMatchObject({ sub: 'user-existing' });
@@ -133,7 +143,11 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
   it('requires the existing audience check in addition to azp', async () => {
     const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
     const token = jwt.sign(
-      { email: 'user@example.com', azp: process.env.OIDC_AUDIENCE },
+      {
+        email: 'user@example.com',
+        email_verified: true,
+        azp: process.env.OIDC_AUDIENCE,
+      },
       privateKey,
       {
         algorithm: 'RS256',
@@ -164,10 +178,12 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
       .mockResolvedValueOnce(null) // first lookup: no local user
       .mockResolvedValueOnce(provisionedUser); // re-fetch after create() succeeds
     const create = vi.fn().mockResolvedValue({ id: 'user-new' });
-    const service = createService(findUnique, create);
+    const record = vi.fn().mockResolvedValue(undefined);
+    const service = createService(findUnique, create, record);
 
     const result = await service.buildOidcJwtUser({
       email: 'newcomer@example.com',
+      email_verified: true,
       name: 'Newcomer',
       azp: process.env.OIDC_AUDIENCE,
     });
@@ -175,6 +191,14 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     expect(create).toHaveBeenCalledWith({ email: 'newcomer@example.com', name: 'Newcomer' });
     expect(result.sub).toBe('user-new');
     expect(result.roleNames).toEqual(['USER']);
+    expect(record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entityType: 'User',
+        entityId: 'user-new',
+        actorId: 'user-new',
+        actorEmail: 'newcomer@example.com',
+      }),
+    );
   });
 
   it('recovers from a concurrent first-login race by re-fetching instead of throwing', async () => {
@@ -188,6 +212,7 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     await expect(
       service.buildOidcJwtUser({
         email: 'newcomer@example.com',
+        email_verified: true,
         name: 'Newcomer',
         azp: process.env.OIDC_AUDIENCE,
       }),
@@ -204,6 +229,16 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
       service.buildOidcJwtUser({
         email: 'unverified@example.com',
         email_verified: false,
+        azp: process.env.OIDC_AUDIENCE,
+      }),
+    ).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('rejects a token whose email_verified claim is missing', async () => {
+    const service = createService();
+    await expect(
+      service.buildOidcJwtUser({
+        email: 'unverified@example.com',
         azp: process.env.OIDC_AUDIENCE,
       }),
     ).rejects.toThrow(UnauthorizedException);
@@ -242,6 +277,7 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
 
     await service.buildOidcJwtUser({
       email: 'existing@example.com',
+      email_verified: true,
       azp: process.env.OIDC_AUDIENCE,
     });
 

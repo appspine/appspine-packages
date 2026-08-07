@@ -32,6 +32,10 @@ describe('assertAccessTokenType', () => {
     expect(() => assertAccessTokenType({ typ: 'bearer' })).not.toThrow();
   });
 
+  it('accepts an RFC 9068 at+jwt JOSE header without a payload typ claim', () => {
+    expect(() => assertAccessTokenType({}, 'at+jwt')).not.toThrow();
+  });
+
   it('rejects a missing typ claim', () => {
     expect(() => assertAccessTokenType({})).toThrow(UnauthorizedException);
   });
@@ -161,15 +165,28 @@ describe('assertScopesAndReturn', () => {
 
 describe('assertTokenAge', () => {
   it('accepts a token within maxTokenAgeSeconds', () => {
-    expect(() => assertTokenAge({ iat: 1000, exp: 1000 + 100 }, profile)).not.toThrow();
+    const now = Math.floor(Date.now() / 1000);
+    expect(() => assertTokenAge({ iat: now, exp: now + 100 }, profile)).not.toThrow();
   });
 
   it('accepts a token exactly at the boundary including clock tolerance', () => {
-    expect(() => assertTokenAge({ iat: 1000, exp: 1000 + 130 }, profile)).not.toThrow();
+    const now = Math.floor(Date.now() / 1000);
+    expect(() => assertTokenAge({ iat: now, exp: now + 130 }, profile)).not.toThrow();
   });
 
   it('rejects a token older than maxTokenAgeSeconds + clockToleranceSeconds', () => {
-    expect(() => assertTokenAge({ iat: 1000, exp: 1000 + 131 }, profile)).toThrow(
+    const now = Math.floor(Date.now() / 1000);
+    expect(() => assertTokenAge({ iat: now, exp: now + 131 }, profile)).toThrow(
+      UnauthorizedException,
+    );
+  });
+
+  it('rejects a future iat and an exp that is not after iat', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(() => assertTokenAge({ iat: now + 3600, exp: now + 3660 }, profile)).toThrow(
+      UnauthorizedException,
+    );
+    expect(() => assertTokenAge({ iat: now + 10, exp: now + 5 }, profile)).toThrow(
       UnauthorizedException,
     );
   });

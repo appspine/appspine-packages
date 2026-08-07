@@ -6,12 +6,16 @@ import type { DelegatedOidcTrustProfile, VerifiedDelegatedClaims } from './types
 // 042-oidc-delegation-package-plan.md §9 for the numbered verification order these
 // correspond to.
 
-export function assertAccessTokenType(payload: Record<string, unknown>): void {
+export function assertAccessTokenType(
+  payload: Record<string, unknown>,
+  joseHeaderType?: unknown,
+): void {
   // Keycloak's access tokens carry `typ: "Bearer"` in the payload (not the RFC 9068
   // `at+jwt` header type); RFC 9068-compliant providers may only set the header. Neither
   // an ID token nor a refresh token satisfies either check.
   const payloadTyp = typeof payload.typ === 'string' ? payload.typ.toLowerCase() : '';
-  if (payloadTyp !== 'bearer') {
+  const headerTyp = typeof joseHeaderType === 'string' ? joseHeaderType.toLowerCase() : '';
+  if (payloadTyp !== 'bearer' && headerTyp !== 'at+jwt') {
     throw new UnauthorizedException('delegated token does not look like an access token');
   }
 }
@@ -105,8 +109,19 @@ export function assertTokenAge(
   if (typeof payload.iat !== 'number' || typeof payload.exp !== 'number') {
     throw new UnauthorizedException('delegated token is missing iat/exp claims');
   }
-  const age = payload.exp - payload.iat;
-  if (age > profile.maxTokenAgeSeconds + profile.clockToleranceSeconds) {
+  if (
+    !Number.isInteger(payload.iat) ||
+    !Number.isInteger(payload.exp) ||
+    payload.exp <= payload.iat
+  ) {
+    throw new UnauthorizedException('delegated token has an invalid iat/exp relationship');
+  }
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.iat > now + profile.clockToleranceSeconds) {
+    throw new UnauthorizedException('delegated token was issued in the future');
+  }
+  const maximumAge = profile.maxTokenAgeSeconds + profile.clockToleranceSeconds;
+  if (payload.exp - payload.iat > maximumAge || now - payload.iat > maximumAge) {
     throw new UnauthorizedException('delegated token exceeds the maximum allowed age');
   }
 }

@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { OidcDelegationError } from '../errors';
 import { KeycloakTokenExchangeProvider } from './keycloak-token-exchange.provider';
 
+const ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token';
+
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -32,7 +34,12 @@ describe('KeycloakTokenExchangeProvider', () => {
 
   it('maps request fields per RFC 8693 and does not let the caller override client/audience/scope', async () => {
     fetchMock.mockResolvedValueOnce(
-      jsonResponse(200, { access_token: 'tok', token_type: 'Bearer', expires_in: 120 }),
+      jsonResponse(200, {
+        access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'Bearer',
+        expires_in: 120,
+      }),
     );
 
     const provider = makeProvider();
@@ -60,7 +67,12 @@ describe('KeycloakTokenExchangeProvider', () => {
 
   it('returns accessToken/expiresInSeconds on a valid success response', async () => {
     fetchMock.mockResolvedValueOnce(
-      jsonResponse(200, { access_token: 'delegated-token', token_type: 'Bearer', expires_in: 120 }),
+      jsonResponse(200, {
+        access_token: 'delegated-token',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'Bearer',
+        expires_in: 120,
+      }),
     );
     const result = await makeProvider().exchange({
       subjectToken: 's',
@@ -74,6 +86,7 @@ describe('KeycloakTokenExchangeProvider', () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse(200, {
         access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
         token_type: 'Bearer',
         expires_in: 120,
         refresh_token: 'should-never-be-here',
@@ -89,11 +102,55 @@ describe('KeycloakTokenExchangeProvider', () => {
   });
 
   it.each([
-    ['missing access_token', { token_type: 'Bearer', expires_in: 120 }],
-    ['non-Bearer token_type', { access_token: 'tok', token_type: 'MAC', expires_in: 120 }],
-    ['zero expires_in', { access_token: 'tok', token_type: 'Bearer', expires_in: 0 }],
-    ['negative expires_in', { access_token: 'tok', token_type: 'Bearer', expires_in: -1 }],
-    ['absurd expires_in', { access_token: 'tok', token_type: 'Bearer', expires_in: 999_999_999 }],
+    [
+      'missing access_token',
+      { issued_token_type: ACCESS_TOKEN_TYPE, token_type: 'Bearer', expires_in: 120 },
+    ],
+    [
+      'non-Bearer token_type',
+      {
+        access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'MAC',
+        expires_in: 120,
+      },
+    ],
+    [
+      'zero expires_in',
+      {
+        access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'Bearer',
+        expires_in: 0,
+      },
+    ],
+    [
+      'negative expires_in',
+      {
+        access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'Bearer',
+        expires_in: -1,
+      },
+    ],
+    [
+      'absurd expires_in',
+      {
+        access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'Bearer',
+        expires_in: 999_999_999,
+      },
+    ],
+    [
+      'fractional expires_in',
+      {
+        access_token: 'tok',
+        issued_token_type: ACCESS_TOKEN_TYPE,
+        token_type: 'Bearer',
+        expires_in: 120.5,
+      },
+    ],
   ])('rejects a malformed success body: %s', async (_label, body) => {
     fetchMock.mockResolvedValueOnce(jsonResponse(200, body));
     await expect(
@@ -103,6 +160,46 @@ describe('KeycloakTokenExchangeProvider', () => {
         requestedScopes: ['x'],
       }),
     ).rejects.toMatchObject({ category: 'malformed_provider_response' });
+  });
+
+  it.each([
+    undefined,
+    'urn:ietf:params:oauth:token-type:id_token',
+  ])('rejects issued_token_type=%s', async (issuedTokenType) => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse(200, {
+        access_token: 'tok',
+        issued_token_type: issuedTokenType,
+        token_type: 'Bearer',
+        expires_in: 120,
+      }),
+    );
+    await expect(
+      makeProvider().exchange({
+        subjectToken: 's',
+        targetAudience: 'approve',
+        requestedScopes: ['x'],
+      }),
+    ).rejects.toMatchObject({ category: 'malformed_provider_response' });
+  });
+
+  it('rejects insecure or incomplete provider configuration at construction', () => {
+    expect(
+      () =>
+        new KeycloakTokenExchangeProvider({
+          tokenEndpoint: 'http://keycloak.invalid/token',
+          sourceClientId: 'wiki-delegation',
+          sourceClientSecret: 'secret',
+        }),
+    ).toThrow(/HTTPS/);
+    expect(
+      () =>
+        new KeycloakTokenExchangeProvider({
+          tokenEndpoint: 'https://keycloak.invalid/token',
+          sourceClientId: '',
+          sourceClientSecret: 'secret',
+        }),
+    ).toThrow(/sourceClientId/);
   });
 
   it('maps invalid_grant to invalid_subject_token', async () => {

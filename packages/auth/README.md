@@ -9,8 +9,10 @@ access token, maps the verified identity to a local `User`, and exposes `@Curren
 `AuthModule` is `@Global()` and reads its configuration from environment variables
 (`OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_JWKS_URL`) — every consuming app already imports it once
 and gets `JwtAuthGuard`, `AdminGuard`, `@CurrentUser()`, and `UsersService` everywhere. This is
-existing, unchanged behavior; nothing below affects it unless you explicitly opt into
-`DelegatedAuthModule` (see below).
+the existing general-login path. It now requires `email_verified === true` before using an
+email for identity mapping, and every successful JIT-created `User` gets a non-blocking audit
+record. Delegated-token acceptance still requires explicitly opting into `DelegatedAuthModule`
+(see below).
 
 ## Delegated (Token Exchange) inbound trust profile (042)
 
@@ -56,6 +58,12 @@ import { AuthModule, DelegatedAuthModule } from '@appspine/auth';
 export class AppModule {}
 ```
 
+Profiles are validated and copied immutably at module startup. `expectedIssuer` and
+`OIDC_JWKS_URL` must use HTTPS. An isolated local environment using HTTP must opt in explicitly
+with `allowInsecureHttp: true` on every configured delegated profile; this flag must not be set
+in production. Missing/empty arrays, duplicate entries, malformed scope namespaces, unsafe
+time bounds, or a missing JWKS URL stop the app at boot.
+
 ### Use
 
 ```ts
@@ -90,7 +98,8 @@ changes what `@CurrentUser()` returns.
   someone who was never granted access to this app.
 - **`'jit'`:** opts into the same just-in-time provisioning general login uses. Only choose this
   if the endpoint's own access model genuinely tolerates a delegated caller getting a fresh
-  local account on first use.
+  local account on first use. A successful account creation writes the same non-blocking
+  `User`/`CREATE` audit event as general-login JIT provisioning.
 
 ### Guard composition — do not add to `JwtOrApiKeyGuard`'s OR-chain
 
@@ -110,8 +119,10 @@ immediately on any handler that doesn't.
   account here.
 - A local account that exists but lacks the required permission produces a normal **403** from
   your own `PermissionGuard` — that's a different, later check this package doesn't perform.
-- Every rejection is logged server-side (`Logger.warn`) with the specific reason and the
-  profile name — never the token, secret, or full claims.
+- Rejections are logged server-side with only the profile and a bounded, de-identified category
+  (`token_rejected`, `identity_mapping_failed`, or `internal_error`). Each profile/category
+  bucket emits at most 20 detail events per minute plus one suppressed-count summary; underlying
+  exception messages, tokens, email addresses, secrets, and claims are never logged.
 
 ### Emergency disable
 

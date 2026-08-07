@@ -41,6 +41,16 @@ describe('PolicyRegistry', () => {
   });
 
   it.each([
+    ['offline access', ['offline_access']],
+    ['embedded whitespace', ['approve:submit extra']],
+    ['duplicate scopes', ['approve:submit', 'approve:submit']],
+  ])('rejects unsafe requested scopes: %s', (_label, requestedScopes) => {
+    expect(() => new PolicyRegistry({ submit: { ...validPolicy, requestedScopes } })).toThrow(
+      PolicyConfigurationError,
+    );
+  });
+
+  it.each([
     0,
     -1,
     Number.NaN,

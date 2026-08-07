@@ -16,7 +16,9 @@
 import { DelegatedJwtVerifierService } from '../packages/auth/dist/delegated/delegated-jwt-verifier.service.js';
 import { OidcDelegationService } from '../packages/oidc-delegation/dist/index.js';
 
-const KC_BASE_URL = process.env.KC_BASE_URL ?? 'http://localhost:8180';
+const KC_BASE_URL = process.env.KC_BASE_URL;
+if (!KC_BASE_URL) throw new Error('KC_BASE_URL is required');
+const ALLOW_INSECURE_HTTP = new URL(KC_BASE_URL).protocol === 'http:';
 const KC_REALM = process.env.KC_REALM ?? 'appspine-dev';
 const WIKI_SECRET = process.env.WIKI_SECRET ?? 'dev-secret-wiki';
 const WIKI_DELEGATION_SECRET = process.env.WIKI_DELEGATION_SECRET ?? 'dev-secret-wiki-delegation';
@@ -32,6 +34,7 @@ const oidcDelegation = new OidcDelegationService({
   sourceClientId: 'wiki-delegation',
   sourceClientSecret: WIKI_DELEGATION_SECRET,
   subjectTokenIssuerClientId: 'wiki',
+  allowInsecureTokenEndpoint: ALLOW_INSECURE_HTTP,
   policies: {
     [POLICY_NAME]: {
       targetAudience: 'approve',
@@ -55,7 +58,7 @@ async function getWikiUserSubjectToken() {
   });
   const body = await res.json();
   if (!res.ok || !body.access_token) {
-    throw new Error(`failed to obtain wiki-user subject token: ${JSON.stringify(body)}`);
+    throw new Error('failed to obtain wiki-user subject token');
   }
   return body.access_token;
 }
@@ -63,12 +66,13 @@ async function getWikiUserSubjectToken() {
 function baseProfile() {
   return {
     expectedIssuer: ISSUER,
+    allowInsecureHttp: ALLOW_INSECURE_HTTP,
     requiredAudience: 'approve',
     additionalAllowedAudiences: [],
     allowedClientIds: ['wiki-delegation'],
     requiredScopes: ['approve:knowledge-document-change:submit'],
     delegationScopeNamespace: 'approve:',
-    maxTokenAgeSeconds: 300, // matches today's real realm TTL — see T-17000
+    maxTokenAgeSeconds: 120,
     clockToleranceSeconds: 10,
     provisioning: 'never',
   };
@@ -101,8 +105,8 @@ async function main() {
       profile: { ...baseProfile(), requiredScopes: ['approve:admin:full-control'] },
     },
     {
-      name: 'maxTokenAgeSeconds tighter than the real token TTL (120s vs real 300s)',
-      profile: { ...baseProfile(), maxTokenAgeSeconds: 120 },
+      name: 'maxTokenAgeSeconds tighter than the real token TTL (60s vs real 120s)',
+      profile: { ...baseProfile(), maxTokenAgeSeconds: 60 },
     },
     {
       name: 'clockToleranceSeconds so small it cannot offset any real clock drift (0s, still same-process so should still pass)',

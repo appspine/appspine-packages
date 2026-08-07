@@ -27,6 +27,8 @@ export class SecurityEventLog {
 
   dispose(): void {
     clearInterval(this.flushTimer);
+    this.flushSuppressed();
+    this.limiter.dispose();
   }
 
   private flushSuppressed(): void {

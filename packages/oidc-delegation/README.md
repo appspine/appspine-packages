@@ -50,6 +50,8 @@ import { OidcDelegationModule } from '@appspine/oidc-delegation';
       // token looks like; getting this wrong makes every real exchange fail closed, since
       // the dedicated exchange-only client above never itself issues tokens to anyone.
       subjectTokenIssuerClientId: process.env.OIDC_LOGIN_CLIENT_ID, // e.g. 'wiki'
+      // HTTPS is required by default. Only isolated local development may set
+      // allowInsecureTokenEndpoint: true.
       requestTimeoutMs: 5000, // optional, default 5000
       maxExchangesPerMinutePerPolicy: 60, // optional, default 60 — see "Outbound throttling" below
       policies: {
@@ -64,6 +66,11 @@ import { OidcDelegationModule } from '@appspine/oidc-delegation';
 })
 export class AppModule {}
 ```
+
+Configuration is validated at startup. URLs with embedded credentials, insecure token
+endpoints without the explicit development opt-in, empty identifiers, unsafe scopes
+(`offline_access`, duplicates, or whitespace), invalid bounds, and empty policy maps all fail
+closed before the first exchange.
 
 ## Use
 
@@ -118,8 +125,10 @@ whose `.calls` array records every exchange attempt, for asserting on what was a
   stop a token issued by a *different* app from being exchanged, once that app's own token
   audience has been widened by unrelated realm configuration. This package's own check is what
   actually stops that.
-- **Access-token-only response contract.** A response containing a `refresh_token` field is
-  rejected outright and its value is never logged, regardless of what else is in the response.
+- **Access-token-only response contract.** The provider response must identify
+  `issued_token_type` as an OAuth access token, use Bearer `token_type`, contain an integer
+  `expires_in`, and omit `refresh_token`. The returned lifetime must not exceed the selected
+  policy's `maxExpiresInSeconds`; any mismatch fails closed and no token is returned.
 - **No provider error is ever passed through verbatim.** Errors are normalized into one of six
   categories (`invalid_subject_token`, `policy_not_found`, `policy_violation`,
   `exchange_denied`, `provider_unavailable`, `malformed_provider_response`) — branch on
@@ -159,9 +168,10 @@ The first version ships with exactly one policy per deployment (e.g.
 Every `exchange()` call is rate-limited per policy (`maxExchangesPerMinutePerPolicy`, default
 60/min) and backed by a simple circuit breaker: after 5 consecutive provider failures, further
 calls fail immediately with `provider_unavailable` for 30 seconds without hitting the network.
-This exists so a business-layer retry loop (or an attacker) can't hammer the IdP's token
-endpoint hard enough to trip its own brute-force protection and lock out normal logins for
-everyone.
+Circuit state is isolated per policy, a rejected call while open does not extend the cooldown,
+and a successful provider call resets that policy's failure count. This exists so a
+business-layer retry loop (or an attacker) can't hammer the IdP's token endpoint hard enough
+to trip its own brute-force protection and lock out normal logins for everyone.
 
 ## Secret rotation
 
@@ -174,10 +184,13 @@ memory.
 
 A delegated access token is a bearer token like any other: if it leaks within its (short) TTL,
 it can be replayed by whoever holds it, audience-restricted to the target app. This package
-minimizes exposure (short default TTL, no cache, no logging) but does not eliminate this risk —
-DPoP or mTLS sender-constrained tokens would, but are out of scope for this version. This
-package also assumes the network between your app and the target app is trusted or encrypted
-(TLS/service mesh) — it does not add transport-level protection of its own.
+minimizes exposure by enforcing each policy's configured maximum TTL, rejecting a provider
+that issues a longer-lived token, avoiding caches, and never logging tokens. There is no
+implicit TTL default: the IdP client and `maxExpiresInSeconds` must be configured to agree.
+DPoP or mTLS sender-constrained tokens would further reduce replay risk, but are out of scope
+for this version. This package also assumes the network between your app and the target app is
+trusted or encrypted (TLS/service mesh) — it does not add transport-level protection of its
+own.
 
 ## What this package will refuse to do
 
@@ -185,4 +198,6 @@ package also assumes the network between your app and the target app is trusted 
 - Exchange a token whose `azp`/`client_id` doesn't match this app's configured
   `subjectTokenIssuerClientId`.
 - Return a response that includes a refresh token.
+- Request `offline_access` from a delegation policy.
+- Return a provider token whose lifetime exceeds the selected policy maximum.
 - Retry a failed exchange internally, or exceed the configured per-policy rate limit.

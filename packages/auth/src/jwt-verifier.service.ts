@@ -1,11 +1,21 @@
+import type { AuditAction } from '@appspine/common';
 import { PrismaService } from '@appspine/common';
-import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import jwt, { type JwtHeader } from 'jsonwebtoken';
 import jwksClient, { type JwksClient } from 'jwks-rsa';
+import { AUTH_AUDIT_LOG, type AuthAuditLog } from './auth-audit-log';
 import { SYSTEM_ADMIN_ROLE } from './constants';
 import type { JwtUser } from './decorators/current-user.decorator';
 import { buildUserContext } from './user-context.util';
 import { UsersService } from './users/users.service';
+
+const AUDIT_CREATE: AuditAction = 'CREATE';
 
 @Injectable()
 export class JwtVerifierService {
@@ -15,6 +25,7 @@ export class JwtVerifierService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly usersService: UsersService,
+    @Inject(AUTH_AUDIT_LOG) private readonly auditLogService: AuthAuditLog,
   ) {
     if (!process.env.OIDC_ISSUER || !process.env.OIDC_AUDIENCE) {
       // See the matching check in OidcStrategy's constructor — this class is a second,
@@ -40,7 +51,7 @@ export class JwtVerifierService {
     if (!email) {
       throw new UnauthorizedException('OIDC token is missing an email claim');
     }
-    if (payload.email_verified === false) {
+    if (payload.email_verified !== true) {
       // Identity here is keyed purely on the email claim (JIT provisioning matches an
       // existing local User by email, or creates one). If the realm ever federates an
       // IdP or allows self-registration without verifying email ownership, an
@@ -54,7 +65,7 @@ export class JwtVerifierService {
 
   /**
    * Maps an already-verified OIDC identity (caller has already confirmed `email` is
-   * present and `email_verified !== false`) to a local principal, JIT-provisioning a User
+   * present and `email_verified === true`) to a local principal, JIT-provisioning a User
    * row if none exists yet. Contains no `azp`/authorized-party logic — callers own that
    * check (see `buildOidcJwtUser` above and `DelegatedPrincipalMapperService`'s `'jit'`
    * path in packages/auth/src/delegated, which also has its own upstream verification).
@@ -118,7 +129,17 @@ export class JwtVerifierService {
   // for this identity; access is gated per-client on the IdP side instead.
   private async provisionOidcUser(email: string, name: string | undefined) {
     try {
-      await this.usersService.create({ email, name });
+      const created = await this.usersService.create({ email, name });
+      void this.auditLogService
+        .record({
+          entityType: 'User',
+          entityId: created.id,
+          action: AUDIT_CREATE,
+          actorId: created.id,
+          actorEmail: email,
+          appName: process.env.APP_NAME ?? 'appspine-app-template',
+        })
+        .catch(() => this.logger.warn('Failed to record OIDC provisioning audit'));
     } catch (error) {
       // Concurrent first logins for the same email race inside UsersService.create():
       // either the findUnique pre-check or the DB's own unique constraint on email can

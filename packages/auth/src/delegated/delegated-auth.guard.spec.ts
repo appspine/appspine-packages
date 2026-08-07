@@ -55,6 +55,7 @@ function createGuard(opts: {
   verify?: ReturnType<typeof vi.fn>;
   mapToLocalPrincipal?: ReturnType<typeof vi.fn>;
   profiles?: Record<string, DelegatedOidcTrustProfile>;
+  recordRejection?: ReturnType<typeof vi.fn>;
 }) {
   const verifier = { verify: opts.verify ?? vi.fn().mockResolvedValue(verifiedResult) };
   const mapper = {
@@ -64,7 +65,8 @@ function createGuard(opts: {
     opts.reflector,
     verifier as never,
     mapper as never,
-    opts.profiles ?? { submit: profile },
+    { recordRejection: opts.recordRejection ?? vi.fn() } as never,
+    (opts.profiles ?? { submit: profile }) as never,
   );
 }
 
@@ -113,15 +115,18 @@ describe('DelegatedAuthGuard', () => {
     const { reflector, ctx } = createContext('submit', {
       headers: { authorization: 'Bearer sometoken' },
     });
+    const recordRejection = vi.fn();
     const guard = createGuard({
       reflector,
       verify: vi.fn().mockRejectedValue(new UnauthorizedException('wrong audience: chat')),
+      recordRejection,
     });
 
     const error = await guard.canActivate(ctx).catch((e) => e);
     expect(error).toBeInstanceOf(UnauthorizedException);
     expect(error.message).toBe('Invalid delegated token');
     expect(error.message).not.toContain('wrong audience');
+    expect(recordRejection).toHaveBeenCalledWith('submit', expect.any(UnauthorizedException));
   });
 
   it('converts an identity-mapping failure into the same unified opaque 401 (not distinguishable)', async () => {

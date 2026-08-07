@@ -139,6 +139,15 @@ describe('OidcDelegationService', () => {
     expect(error.retryable).toBe(false);
   });
 
+  it('rejects a provider token whose lifetime exceeds the named policy maximum', async () => {
+    const provider = createSuccessFixture({ expiresInSeconds: 300 });
+    const service = new OidcDelegationService(baseOptions, { provider, logger: { log: vi.fn() } });
+
+    await expect(
+      service.exchange({ subjectToken: validSubjectToken, policy: 'submit' }),
+    ).rejects.toMatchObject({ category: 'policy_violation' });
+  });
+
   it('opens the circuit after repeated provider failures and fails fast without calling the provider', async () => {
     const provider = new FakeOidcDelegationProvider(async () => {
       throw new OidcDelegationError('provider_unavailable', 'down');
@@ -159,6 +168,33 @@ describe('OidcDelegationService', () => {
     ).rejects.toMatchObject({ category: 'provider_unavailable' });
     // The circuit-open rejection must not have reached the provider at all.
     expect(provider.calls.length).toBe(callsBeforeCircuitOpen);
+  });
+
+  it('keeps circuit state isolated per policy', async () => {
+    const provider = new FakeOidcDelegationProvider(async () => {
+      throw new OidcDelegationError('provider_unavailable', 'down');
+    });
+    const service = new OidcDelegationService(
+      {
+        ...baseOptions,
+        policies: {
+          ...baseOptions.policies,
+          withdraw: {
+            targetAudience: 'approve',
+            requestedScopes: ['approve:knowledge-document-change:withdraw'],
+            maxExpiresInSeconds: 120,
+          },
+        },
+      },
+      { provider, logger: { log: vi.fn() } },
+    );
+
+    for (let i = 0; i < 5; i++) {
+      await service.exchange({ subjectToken: validSubjectToken, policy: 'submit' }).catch(() => {});
+    }
+    const callsBeforeOtherPolicy = provider.calls.length;
+    await service.exchange({ subjectToken: validSubjectToken, policy: 'withdraw' }).catch(() => {});
+    expect(provider.calls).toHaveLength(callsBeforeOtherPolicy + 1);
   });
 
   it('enforces the outbound rate limit per policy', async () => {

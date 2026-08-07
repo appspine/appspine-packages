@@ -3,7 +3,11 @@ import { DELEGATED_AUTH_PROFILES } from './delegated-auth.constants';
 import { DelegatedAuthGuard } from './delegated-auth.guard';
 import { DelegatedJwtVerifierService } from './delegated-jwt-verifier.service';
 import { DelegatedPrincipalMapperService } from './delegated-principal-mapper.service';
-import { validateDelegatedProfiles } from './delegated-profile-validation';
+import {
+  validateDelegatedJwksUrl,
+  validateDelegatedProfiles,
+} from './delegated-profile-validation';
+import { DelegatedSecurityEventLogger } from './delegated-security-event-logger';
 import type { DelegatedOidcTrustProfile } from './types';
 
 export type DelegatedAuthModuleOptions = {
@@ -20,14 +24,19 @@ export type DelegatedAuthModuleOptions = {
 // biome-ignore lint/complexity/noStaticOnlyClass: Nest dynamic modules expose static factory methods.
 export class DelegatedAuthModule {
   static forFeature(options: DelegatedAuthModuleOptions): DynamicModule {
-    validateDelegatedProfiles(options.profiles);
+    if (!options || typeof options !== 'object') {
+      throw new Error('DelegatedAuthModule.forFeature() options must be configured');
+    }
+    const profiles = validateDelegatedProfiles(options.profiles);
+    validateDelegatedJwksUrl(process.env.OIDC_JWKS_URL, profiles);
 
     return {
       module: DelegatedAuthModule,
       providers: [
-        { provide: DELEGATED_AUTH_PROFILES, useValue: options.profiles },
+        { provide: DELEGATED_AUTH_PROFILES, useValue: profiles },
         DelegatedJwtVerifierService,
         DelegatedPrincipalMapperService,
+        DelegatedSecurityEventLogger,
         DelegatedAuthGuard,
       ],
       exports: [DelegatedAuthGuard],

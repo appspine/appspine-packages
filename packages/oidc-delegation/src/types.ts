@@ -38,6 +38,8 @@ export type OidcDelegationModuleOptions = {
    * dedicated exchange-only client never itself issues subject tokens to anyone.
    */
   subjectTokenIssuerClientId: string;
+  /** Allow an HTTP token endpoint for explicitly isolated development environments. */
+  allowInsecureTokenEndpoint?: boolean;
   /** Outbound HTTP request timeout in milliseconds. Default 5000. */
   requestTimeoutMs?: number;
   /**

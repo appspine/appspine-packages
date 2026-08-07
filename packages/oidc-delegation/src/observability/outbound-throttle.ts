@@ -12,8 +12,10 @@ const DEFAULT_COOLDOWN_MS = 30_000;
  */
 export class OutboundThrottle {
   private readonly limiter: RollingWindowRateLimiter;
-  private consecutiveFailures = 0;
-  private circuitOpenUntil = 0;
+  private readonly circuits = new Map<
+    string,
+    { consecutiveFailures: number; circuitOpenUntil: number }
+  >();
 
   constructor(
     maxExchangesPerMinutePerPolicy: number,
@@ -25,7 +27,7 @@ export class OutboundThrottle {
 
   /** Throws provider_unavailable if the circuit is open or the rate limit is exceeded. */
   checkAndConsume(policyName: string): void {
-    if (Date.now() < this.circuitOpenUntil) {
+    if (this.isCircuitOpen(policyName)) {
       throw new OidcDelegationError(
         'provider_unavailable',
         'exchange temporarily suspended after repeated provider failures',
@@ -39,15 +41,28 @@ export class OutboundThrottle {
     }
   }
 
-  recordSuccess(): void {
-    this.consecutiveFailures = 0;
+  recordSuccess(policyName: string): void {
+    this.circuits.delete(policyName);
   }
 
-  recordProviderFailure(): void {
-    this.consecutiveFailures += 1;
-    if (this.consecutiveFailures >= this.failureThreshold) {
-      this.circuitOpenUntil = Date.now() + this.cooldownMs;
+  recordProviderFailure(policyName: string): void {
+    const previous = this.circuits.get(policyName);
+    const consecutiveFailures = (previous?.consecutiveFailures ?? 0) + 1;
+    this.circuits.set(policyName, {
+      consecutiveFailures,
+      circuitOpenUntil:
+        consecutiveFailures >= this.failureThreshold ? Date.now() + this.cooldownMs : 0,
+    });
+  }
+
+  private isCircuitOpen(policyName: string): boolean {
+    const circuit = this.circuits.get(policyName);
+    if (!circuit) return false;
+    if (Date.now() < circuit.circuitOpenUntil) return true;
+    if (circuit.circuitOpenUntil > 0) {
+      this.circuits.delete(policyName);
     }
+    return false;
   }
 
   dispose(): void {

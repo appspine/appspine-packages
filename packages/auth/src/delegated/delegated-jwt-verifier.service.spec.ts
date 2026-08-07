@@ -125,6 +125,30 @@ describe('DelegatedJwtVerifierService.verify', () => {
     );
   });
 
+  it('accepts an RFC 9068 at+jwt JOSE header without a payload typ claim', async () => {
+    const token = signDelegatedToken(
+      { typ: undefined },
+      { header: { alg: 'RS256', kid: 'key-1', typ: 'at+jwt' } },
+    );
+    await expect(createVerifierWithFakeJwks().verify(token, profile)).resolves.toMatchObject({
+      emailVerified: true,
+    });
+  });
+
+  it('rejects a token whose iat is in the future', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const token = signDelegatedToken({ iat: now + 3600, exp: now + 3660 });
+    await expect(createVerifierWithFakeJwks().verify(token, profile)).rejects.toThrow(
+      UnauthorizedException,
+    );
+  });
+
+  it('treats a missing email_verified claim as unverified', async () => {
+    const token = signDelegatedToken({ email_verified: undefined });
+    const result = await createVerifierWithFakeJwks().verify(token, profile);
+    expect(result.emailVerified).toBe(false);
+  });
+
   it('rejects a token whose azp is not in allowedClientIds', async () => {
     const token = signDelegatedToken({ azp: 'chat' });
     await expect(createVerifierWithFakeJwks().verify(token, profile)).rejects.toThrow(

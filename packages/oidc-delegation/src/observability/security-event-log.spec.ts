@@ -35,6 +35,11 @@ describe('SecurityEventLog', () => {
     expect(log).toHaveBeenCalledTimes(20);
 
     securityLog.dispose();
+    expect(log).toHaveBeenCalledTimes(21);
+    expect(log.mock.calls.at(-1)?.[0]).toMatchObject({
+      category: 'exchange_denied_suppressed_summary',
+      correlationId: 'suppressed_count=80',
+    });
   });
 
   it('buckets rate limiting independently per category', () => {

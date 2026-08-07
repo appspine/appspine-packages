@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { validateDelegatedProfiles } from './delegated-profile-validation';
+import {
+  validateDelegatedJwksUrl,
+  validateDelegatedProfiles,
+} from './delegated-profile-validation';
 import type { DelegatedOidcTrustProfile } from './types';
 
 const validProfile: DelegatedOidcTrustProfile = {
@@ -16,11 +19,21 @@ const validProfile: DelegatedOidcTrustProfile = {
 
 describe('validateDelegatedProfiles', () => {
   it('accepts a well-formed profile map', () => {
-    expect(() => validateDelegatedProfiles({ submit: validProfile })).not.toThrow();
+    expect(validateDelegatedProfiles({ submit: validProfile }).submit.provisioning).toBe('never');
   });
 
   it('rejects an empty profile map', () => {
     expect(() => validateDelegatedProfiles({})).toThrow(/at least one profile/);
+  });
+
+  it('rejects a missing profile map with a configuration error', () => {
+    expect(() => validateDelegatedProfiles(undefined as never)).toThrow(/profiles must be/);
+  });
+
+  it('rejects a non-object profile entry with a configuration error', () => {
+    expect(() => validateDelegatedProfiles({ submit: undefined as never })).toThrow(
+      /configuration must be an object/,
+    );
   });
 
   it('rejects a profile missing expectedIssuer', () => {
@@ -69,6 +82,43 @@ describe('validateDelegatedProfiles', () => {
     ).toThrow();
   });
 
+  it('defaults omitted provisioning to never', () => {
+    const { provisioning: _provisioning, ...withoutProvisioning } = validProfile;
+    const resolved = validateDelegatedProfiles({ submit: withoutProvisioning });
+    expect(resolved.submit.provisioning).toBe('never');
+  });
+
+  it.each([
+    ['non-array additional audiences', { additionalAllowedAudiences: 'chat' as never }],
+    ['empty allowed client entry', { allowedClientIds: [''] }],
+    [
+      'duplicate required scope',
+      { requiredScopes: [validProfile.requiredScopes[0], validProfile.requiredScopes[0]] },
+    ],
+    ['scope outside namespace', { requiredScopes: ['chat:send'] }],
+  ])('rejects malformed arrays: %s', (_label, override) => {
+    expect(() => validateDelegatedProfiles({ submit: { ...validProfile, ...override } })).toThrow();
+  });
+
+  it('requires explicit opt-in for an HTTP issuer', () => {
+    const insecure = { ...validProfile, expectedIssuer: 'http://issuer.example' };
+    expect(() => validateDelegatedProfiles({ submit: insecure })).toThrow(/HTTPS/);
+    expect(() =>
+      validateDelegatedProfiles({ submit: { ...insecure, allowInsecureHttp: true } }),
+    ).not.toThrow();
+  });
+
+  it('returns immutable profile and array copies', () => {
+    const sourceAudiences: string[] = [];
+    const resolved = validateDelegatedProfiles({
+      submit: { ...validProfile, additionalAllowedAudiences: sourceAudiences },
+    });
+    sourceAudiences.push('chat');
+    expect(resolved.submit.additionalAllowedAudiences).toEqual([]);
+    expect(Object.isFrozen(resolved.submit)).toBe(true);
+    expect(Object.isFrozen(resolved.submit.requiredScopes)).toBe(true);
+  });
+
   it('accepts multiple distinct profiles', () => {
     expect(() =>
       validateDelegatedProfiles({
@@ -78,6 +128,19 @@ describe('validateDelegatedProfiles', () => {
           requiredScopes: ['approve:knowledge-document-change:withdraw'],
         },
       }),
+    ).not.toThrow();
+  });
+
+  it('requires a secure JWKS URL unless every profile explicitly opts into HTTP', () => {
+    const secure = validateDelegatedProfiles({ submit: validProfile });
+    expect(() => validateDelegatedJwksUrl(undefined, secure)).toThrow(/OIDC_JWKS_URL/);
+    expect(() => validateDelegatedJwksUrl('http://issuer.example/certs', secure)).toThrow(/HTTPS/);
+
+    const development = validateDelegatedProfiles({
+      submit: { ...validProfile, expectedIssuer: 'http://issuer.example', allowInsecureHttp: true },
+    });
+    expect(() =>
+      validateDelegatedJwksUrl('http://issuer.example/certs', development),
     ).not.toThrow();
   });
 });

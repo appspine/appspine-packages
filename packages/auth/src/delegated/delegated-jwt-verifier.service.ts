@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import jwt, { type JwtHeader } from 'jsonwebtoken';
 import jwksClient, { type JwksClient } from 'jwks-rsa';
 import {
@@ -23,7 +23,6 @@ import type { DelegatedOidcTrustProfile, DelegatedTokenVerificationResult } from
  */
 @Injectable()
 export class DelegatedJwtVerifierService {
-  private readonly logger = new Logger(DelegatedJwtVerifierService.name);
   private oidcClient: JwksClient | null = null;
 
   async verify(
@@ -43,13 +42,12 @@ export class DelegatedJwtVerifierService {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      this.logger.warn(`Delegated token verification failed: ${errorMessage(error)}`);
       throw new UnauthorizedException('Invalid delegated token');
     }
 
     // Steps 2a, 3-7 of plan §9 — order matters: type before audience/client (cheap checks
     // first), audience before client (both must hold before trusting who the requester is).
-    assertAccessTokenType(payload);
+    assertAccessTokenType(payload, decoded.header.typ);
     assertAudience(payload, profile);
     const clientId = normalizeClientId(payload);
     assertAllowedClient(clientId, profile);
@@ -60,9 +58,7 @@ export class DelegatedJwtVerifierService {
     return {
       claims: buildVerifiedClaims(profile, clientId, externalSubject, scopes),
       email: typeof payload.email === 'string' ? payload.email : undefined,
-      // Matches JwtVerifierService.buildOidcJwtUser()'s existing convention: only an
-      // explicit `false` counts as unverified, an absent claim does not.
-      emailVerified: payload.email_verified !== false,
+      emailVerified: payload.email_verified === true,
       name: typeof payload.name === 'string' ? payload.name : undefined,
     };
   }
@@ -121,8 +117,4 @@ export class DelegatedJwtVerifierService {
       );
     });
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

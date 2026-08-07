@@ -1,4 +1,6 @@
 import { OidcDelegationError } from '../errors';
+import { assertTokenEndpoint } from '../module-options-validation';
+import { PolicyConfigurationError } from '../policy-registry';
 import type {
   TokenExchangeProvider,
   TokenExchangeProviderParams,
@@ -18,10 +20,16 @@ export type KeycloakTokenExchangeProviderConfig = {
   sourceClientId: string;
   sourceClientSecret: string;
   requestTimeoutMs?: number;
+  allowInsecureTokenEndpoint?: boolean;
 };
 
 export class KeycloakTokenExchangeProvider implements TokenExchangeProvider {
-  constructor(private readonly config: KeycloakTokenExchangeProviderConfig) {}
+  private readonly config: Readonly<KeycloakTokenExchangeProviderConfig>;
+
+  constructor(config: KeycloakTokenExchangeProviderConfig) {
+    validateProviderConfig(config);
+    this.config = Object.freeze({ ...config });
+  }
 
   async exchange(params: TokenExchangeProviderParams): Promise<TokenExchangeProviderResult> {
     const body = new URLSearchParams({
@@ -137,10 +145,17 @@ function validateSuccessResponse(body: unknown): TokenExchangeProviderResult {
     );
   }
 
+  if (body.issued_token_type !== TOKEN_TYPE_ACCESS_TOKEN) {
+    throw new OidcDelegationError(
+      'malformed_provider_response',
+      'response issued_token_type was not an access token',
+    );
+  }
+
   const expiresIn = body.expires_in;
   if (
     typeof expiresIn !== 'number' ||
-    !Number.isFinite(expiresIn) ||
+    !Number.isInteger(expiresIn) ||
     expiresIn <= 0 ||
     expiresIn > MAX_SANE_EXPIRES_IN_SECONDS
   ) {
@@ -160,6 +175,36 @@ function validateSuccessResponse(body: unknown): TokenExchangeProviderResult {
   }
 
   return { accessToken, expiresInSeconds: expiresIn };
+}
+
+function validateProviderConfig(config: KeycloakTokenExchangeProviderConfig): void {
+  if (!config || typeof config !== 'object') {
+    throw new PolicyConfigurationError('Keycloak token exchange provider must be configured');
+  }
+  assertTokenEndpoint(config.tokenEndpoint, config.allowInsecureTokenEndpoint === true);
+  if (
+    typeof config.sourceClientId !== 'string' ||
+    config.sourceClientId.length === 0 ||
+    /\s/.test(config.sourceClientId)
+  ) {
+    throw new PolicyConfigurationError(
+      'sourceClientId must be non-empty and contain no whitespace',
+    );
+  }
+  if (
+    typeof config.sourceClientSecret !== 'string' ||
+    config.sourceClientSecret.trim().length === 0
+  ) {
+    throw new PolicyConfigurationError('sourceClientSecret must be a non-empty string');
+  }
+  if (
+    config.requestTimeoutMs !== undefined &&
+    (!Number.isInteger(config.requestTimeoutMs) ||
+      config.requestTimeoutMs <= 0 ||
+      config.requestTimeoutMs > 60_000)
+  ) {
+    throw new PolicyConfigurationError('requestTimeoutMs must be a positive integer <= 60000');
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -9,6 +9,8 @@ import type { JwtUser } from '../decorators/current-user.decorator';
  */
 export type DelegatedOidcTrustProfile = {
   expectedIssuer: string;
+  /** Allow HTTP issuer/JWKS URLs for explicitly isolated development environments. */
+  allowInsecureHttp?: boolean;
   requiredAudience: string;
   additionalAllowedAudiences: readonly string[];
   allowedClientIds: readonly string[];
@@ -28,6 +30,10 @@ export type DelegatedOidcTrustProfile = {
    * See plan §2 decision 12 for why `'never'` must be the default: general login is gated by
    * Keycloak per-client access checks that the delegated path bypasses entirely.
    */
+  provisioning?: 'never' | 'jit';
+};
+
+export type ResolvedDelegatedOidcTrustProfile = Omit<DelegatedOidcTrustProfile, 'provisioning'> & {
   provisioning: 'never' | 'jit';
 };
 
