@@ -35,6 +35,8 @@
 | [044-apps-projects-kaneo-style-plan.md](decisions/044-apps-projects-kaneo-style-plan.md) | decision | active | 044 - `apps/projects` Kaneo 式綠地專案管理 App - 系統設計計畫 |
 | [045-drive-whiteboard-excalidraw-plan.md](decisions/045-drive-whiteboard-excalidraw-plan.md) | decision | active | 045 - `apps/drive` 白板功能（Excalidraw 整合）- 系統設計計畫 |
 | [046-cross-repo-contract-checker-sync-todo.md](decisions/046-cross-repo-contract-checker-sync-todo.md) | decision | active | 046 Cross-Repo Contract Checker Synchronization TODO |
+| [047-repo-restructure-plan.md](decisions/047-repo-restructure-plan.md) | decision | completed | Repo 架構重整 — 執行完畢 |
+| [047-repo-restructure-task-breakdown.md](decisions/047-repo-restructure-task-breakdown.md) | decision | completed | appspine Repo 重整 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
 | [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
