@@ -19,10 +19,7 @@
           "supportUntil": null
         }
       ],
-      "usedByApps": [
-        "apps/approve",
-        "apps/wiki"
-      ]
+      "usedByApps": []
     },
     {
       "contractId": "approve.get-knowledge-document-change-request-status",
@@ -42,9 +39,7 @@
           "supportUntil": null
         }
       ],
-      "usedByApps": [
-        "apps/approve"
-      ]
+      "usedByApps": []
     },
     {
       "contractId": "approve.knowledge-document-change-approved",
@@ -64,9 +59,7 @@
           "supportUntil": null
         }
       ],
-      "usedByApps": [
-        "apps/approve"
-      ]
+      "usedByApps": []
     },
     {
       "contractId": "approve.submit-knowledge-document-change",
@@ -86,9 +79,7 @@
           "supportUntil": null
         }
       ],
-      "usedByApps": [
-        "apps/approve"
-      ]
+      "usedByApps": []
     },
     {
       "contractId": "wiki-to-approve.get-knowledge-document-change-request-status",
@@ -108,9 +99,7 @@
           "supportUntil": null
         }
       ],
-      "usedByApps": [
-        "apps/wiki"
-      ]
+      "usedByApps": []
     },
     {
       "contractId": "wiki-to-approve.submit-knowledge-document-change",
@@ -130,9 +119,7 @@
           "supportUntil": null
         }
       ],
-      "usedByApps": [
-        "apps/wiki"
-      ]
+      "usedByApps": []
     }
   ]
 }
