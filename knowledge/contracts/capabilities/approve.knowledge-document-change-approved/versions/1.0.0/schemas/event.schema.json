@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "approve.knowledge-document-change-approved.event.1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["changeRequestId", "documentId", "revision", "contentChecksum", "approvedAt", "actor"],
+  "properties": {
+    "changeRequestId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "INTERNAL" },
+    "documentId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "INTERNAL" },
+    "revision": { "type": "integer", "minimum": 1, "x-appspine-data-classification": "INTERNAL" },
+    "contentChecksum": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "x-appspine-data-classification": "INTERNAL" },
+    "approvedAt": { "type": "string", "format": "date-time", "x-appspine-data-classification": "PUBLIC" },
+    "actor": { "type": "object", "additionalProperties": false, "required": ["userId"], "properties": { "userId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "PERSONAL" }, "displayName": { "type": "string", "maxLength": 200, "x-appspine-data-classification": "PERSONAL" } } },
+    "summary": { "type": "string", "maxLength": 500, "x-appspine-data-classification": "INTERNAL" }
+  }
+}

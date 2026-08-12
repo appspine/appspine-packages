@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "approve.get-knowledge-document-change-request-status.response.1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["changeRequestId", "status", "requestId"],
+  "properties": {
+    "changeRequestId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "INTERNAL" },
+    "status": { "enum": ["SUBMISSION_PENDING", "CONFIRMED", "FAILED"], "x-appspine-data-classification": "PUBLIC" },
+    "requestId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "INTERNAL" },
+    "revision": { "type": "integer", "minimum": 0, "x-appspine-data-classification": "INTERNAL" },
+    "reasonCode": { "type": "string", "maxLength": 100, "x-appspine-data-classification": "INTERNAL" }
+  }
+}

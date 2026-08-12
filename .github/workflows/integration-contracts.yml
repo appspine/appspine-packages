@@ -1,0 +1,40 @@
+name: Integration contracts
+
+on:
+  pull_request:
+    paths:
+      - "knowledge/contracts/**"
+      - "scripts/contract-cli.mjs"
+      - "fixtures/043-clean-consumer/**"
+      - "fixtures/043-two-app/**"
+  push:
+    branches: [main]
+    paths:
+      - "knowledge/contracts/**"
+      - "scripts/contract-cli.mjs"
+      - "fixtures/043-clean-consumer/**"
+      - "fixtures/043-two-app/**"
+
+jobs:
+  contract-gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build integration-contracts package
+        run: pnpm --filter @appspine/integration-contracts build
+      - name: Validate canonical contracts
+        run: node scripts/contract-cli.mjs validate
+      - name: Check canonical index freshness
+        run: node scripts/contract-cli.mjs index --check --root-only
+      - name: Check clean consumer fixture syntax
+        working-directory: fixtures/043-clean-consumer
+        run: node --check setup.mjs && node --check consumer.mjs

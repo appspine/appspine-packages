@@ -1,0 +1,10 @@
+[
+  { "case": "accepted command", "expected": "202 ACCEPTED" },
+  { "case": "same idempotency key and payload", "expected": "200 replay" },
+  { "case": "same idempotency key and different payload", "expected": "409 conflict" },
+  { "case": "validation failure", "expected": "422 terminal" },
+  { "case": "rate limited provider", "expected": "429 retryable with bounded Retry-After" },
+  { "case": "provider failure", "expected": "5xx retryable" },
+  { "case": "lost response", "expected": "caller reconciles with status query" },
+  { "case": "approved event", "expected": "receipt and local state commit atomically" }
+]

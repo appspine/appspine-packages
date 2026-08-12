@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "approve.submit-knowledge-document-change.response.1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["changeRequestId", "status", "requestId"],
+  "properties": { "changeRequestId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "INTERNAL" }, "status": { "enum": ["SUBMISSION_PENDING", "CONFIRMED"], "x-appspine-data-classification": "PUBLIC" }, "requestId": { "type": "string", "minLength": 1, "x-appspine-data-classification": "INTERNAL" } }
+}

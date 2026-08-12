@@ -1,0 +1,10 @@
+[
+  { "case": "tampered body", "expected": "signature rejected" },
+  { "case": "stale timestamp", "expected": "signature rejected" },
+  { "case": "wrong source/capability/binding", "expected": "signature rejected" },
+  { "case": "same event duplicate", "expected": "same digest is ignored after receipt" },
+  { "case": "same event different digest", "expected": "terminal digest mismatch" },
+  { "case": "private or metadata destination", "expected": "SSRF policy rejects before fetch" },
+  { "case": "redirect", "expected": "fetch uses redirect:error" },
+  { "case": "secret disclosure", "expected": "fixture contains no secret material" }
+]

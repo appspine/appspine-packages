@@ -1,0 +1,26 @@
+{
+  "name": "appspine-043-clean-consumer",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@appspine/common": "0.3.2",
+    "@appspine/domain-events": "7.1.5",
+    "@appspine/integration-contracts": "0.3.1",
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@prisma/client": "6.19.3",
+    "express": "5.2.1",
+    "pino": "10.3.1",
+    "pino-http": "11.0.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "prisma": "6.19.3"
+  },
+  "scripts": {
+    "setup": "node setup.mjs",
+    "test": "node consumer.mjs"
+  }
+}
