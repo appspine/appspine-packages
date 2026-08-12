@@ -1,5 +1,11 @@
 # @appspine/health-check
 
+## 0.1.7
+
+### Patch Changes
+
+- 73f1242: Update repository metadata to appspine-packages
+
 ## 0.1.6
 
 ### Patch Changes
