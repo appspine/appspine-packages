@@ -1,38 +1,46 @@
-# appspine Framework — Agent Guide
+# appspine Packages & Governance — Agent Guide
 
-This document is the development guide for adding or modifying shared `@appspine/*` packages inside the framework monorepo.
+`appspine-packages` is the central monorepo hosting shared core packages (`@appspine/*`), integration contracts (`knowledge/contracts/`), and system-wide governance knowledge documents (`knowledge/`).
 
-## Package Dependency Architecture
+## Architecture & Knowledge Base
 
-To avoid circular dependencies (which cause build and runtime issues), packages must adhere to the following dependency direction:
+System-wide architectural standards, conventions, and decision logs:
+- `knowledge/topics/001-app-framework-plan.md` — Tech stack, topology, template mechanism, and capability list.
+- `knowledge/topics/002-app-dev-conventions.md` — Coding conventions, Prisma standards, API design, commit rules, and CRUD module workflows.
+- `knowledge/decisions/` — Architecture decision records (ADRs).
+- `knowledge/log.md` — Historical ingest and cleanup logs.
 
-- **`common`** — The foundation package. No dependencies on other shared framework packages.
-- **`auth`** — Depends on `common`.
-- **`rbac`** — Depends on `auth` and `common`.
-- **`m2m-api-key`** — Depends on `auth` and `common`.
-- **`mcp-server`** — Depends on `auth` and `m2m-api-key` (for `ApiKeyGuard` / `ApiKeyUser`).
-- **`metadata-schema`** — Depends on `common` and `m2m-api-key`.
-- **`audit-log`** — Depends on `common`.
-- **`health-check`** — Depends on `common`.
-- **`e2e-kit`** — No workspace dependencies (Playwright-only).
-- **`frontend-shell`** — No workspace dependencies (frontend peer deps only).
+Validate knowledge files across repositories:
+```bash
+node scripts/lint-knowledge.js
+```
 
+## Integration Contracts Toolchain
 
-## Standard Flow for Adding a New Package
+Integration contract schemas, bindings, and generation CLI reside in this repository:
 
-When creating a new shared package under `packages/`:
-1. Initialize the package folder with a `package.json` that includes `"private": false`, a unique name like `@appspine/<name>`, and appropriate peer/dev dependencies.
-2. Maintain a `tsconfig.json` extending the workspace root `tsconfig.base.json`.
-3. Export files via `package.json` `"exports"` field properly.
-4. Declare any database models as individual Prisma schema snippets under `prisma/` and expose them so they can be consumed and combined by the downstream template.
-5. Register the new directory in the workspace configuration if necessary (pnpm-workspace.yaml already matches `packages/*` automatically).
+```bash
+# Validate contract schemas and index freshness
+node scripts/contract-cli.mjs validate
+node scripts/contract-cli.mjs index --check --root-only
 
-## Release and Versioning Strategy
+# Generate or sync contract runtime artifacts for consumer apps
+node scripts/contract-cli.mjs sync-views --contract <contract-id>@<version> --target <app-path> --dry-run
+node scripts/contract-cli.mjs generate-runtime --contract <contract-id>@<version> --target <app-path> --dry-run
+```
 
-We follow a strict semver flow managed by Changesets:
-1. When making code changes, run `pnpm changeset` to generate a markdown changeset log under `.changeset/`. Choose `patch` or `minor` bumps depending on the nature of API additions.
-2. Bumping version: `pnpm version-packages` will parse changesets, modify package.json files, and write `CHANGELOG.md` updates.
-3. Publication: Packages are compiled and published to GitHub Packages repository via `pnpm release`.
+## Local Dev Ports Assignment
 
-For the original discussion on AuraNest packages reuse analysis and the architectural decisions behind these shared modules, see the workspace document:
-`dev_docs/003-shared-package-reuse-plan.md` in the `appspine` workspace root (the local workspace this repo lives in; not tracked inside this repo's GitHub remote).
+Check this table before creating or initializing new app forks:
+
+| App | DB Port | Backend Port | Frontend Port |
+| --- | --- | --- | --- |
+| `appspine-app-template` | 5432 | 3000 | 3001 |
+| `apps/approve` | 5433 | 3002 | 3003 |
+| `apps/calendar` | 5434 | 3004 | 3005 |
+| `apps/chat` | 5435 | 3006 | 3007 |
+| `apps/drive` | 5436 | 3008 | 3009 |
+| `apps/master-data` | 5437 | 3010 | 3011 |
+| `apps/mcp-gateway` | 5438 | 3012 | 3013 |
+| `apps/projects` | 5439 | 3014 | 3015 |
+| `apps/wiki` | 5440 | 3016 | 3017 |
