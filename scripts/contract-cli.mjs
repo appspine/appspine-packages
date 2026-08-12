@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// NOTE: This code/template corresponds verbatim with check-generated-integration-contracts.mjs in appspine-packages / app-template / forks. Changes here must be synchronized across repositories.
 
 import { createHash } from 'node:crypto';
 import {
