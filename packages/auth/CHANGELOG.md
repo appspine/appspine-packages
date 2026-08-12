@@ -1,5 +1,12 @@
 # @appspine/auth
 
+## 6.2.1
+
+### Patch Changes
+
+- Await successful OIDC JIT-provisioning audit writes so the request cannot report success before
+  its audit record has been durably attempted.
+
 ## 6.2.0
 
 ### Minor Changes

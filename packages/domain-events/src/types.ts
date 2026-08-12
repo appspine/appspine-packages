@@ -40,6 +40,15 @@ export type DomainEventRecord = {
   after: DomainEventJson | null;
   changedFields: string[];
   metadata: DomainEventJson | null;
+  integrationCapabilityId: string | null;
+  integrationCapabilityVersion: string | null;
+  integrationCapabilityDigest: string | null;
+  integrationBindingId: string | null;
+  integrationBindingVersion: string | null;
+  integrationEnvelopeVersion: string | null;
+  integrationSourceApp: string | null;
+  integrationPayload: DomainEventJson | null;
+  integrationPayloadDigest: string | null;
   createdAt: Date;
 };
 
@@ -71,6 +80,8 @@ export type RecordDomainEventInput = {
   after?: DomainEventSnapshot | null;
   changedFields?: string[];
   metadata?: DomainEventJson | null;
+  integration?: IntegrationEventMetadata;
+  integrationPayloadSchema?: JsonSchema;
 };
 
 /**
@@ -94,6 +105,15 @@ export type DomainEventTxClient = {
         after: DomainEventSnapshot | undefined;
         changedFields: string[];
         metadata: DomainEventJson | undefined;
+        integrationCapabilityId?: string | null;
+        integrationCapabilityVersion?: string | null;
+        integrationCapabilityDigest?: string | null;
+        integrationBindingId?: string | null;
+        integrationBindingVersion?: string | null;
+        integrationEnvelopeVersion?: string | null;
+        integrationSourceApp?: string | null;
+        integrationPayload?: DomainEventJson | null;
+        integrationPayloadDigest?: string | null;
       };
     }): Promise<DomainEventRecord>;
   };
@@ -118,6 +138,8 @@ export type DomainEventDispatcherOptions = {
   baseBackoffMs?: number;
   /** Cap on the exponential retry backoff, in ms. */
   maxBackoffMs?: number;
+  /** Optional app-local binding state lookup used by the integration kill switch. */
+  bindingEnabled?: (bindingId: string) => boolean | Promise<boolean>;
   /** Whether the dispatcher starts its interval timer on module init. Default true. */
   autoStart?: boolean;
 };
@@ -129,6 +151,9 @@ export const DEFAULT_DISPATCHER_OPTIONS: Required<DomainEventDispatcherOptions> 
   staleLockMs: 300000,
   baseBackoffMs: 30000,
   maxBackoffMs: 3600000,
+  // Integration delivery is fail-closed until the consuming app supplies its binding state
+  // lookup. Legacy non-integration events never consult this callback.
+  bindingEnabled: async () => false,
   autoStart: true,
 };
 
@@ -158,3 +183,5 @@ export type DomainEventRegistryDescription = {
   /** Whether any `registerHandlerKeyContributor()` is registered — existence-only, for the same reason. */
   hasHandlerKeyContributors: boolean;
 };
+
+import type { IntegrationEventMetadata, JsonSchema } from '@appspine/integration-contracts';

@@ -156,6 +156,54 @@ describe('DomainEventDispatcherService.tick', () => {
     expect(row?.lastError).toBe('ignored by admin');
   });
 
+  it('does not complete a delivery after its lease is reclaimed by another worker', async () => {
+    const rows = [createMockDeliveryRow('lease-race', 1n, 'ok')];
+    const registry = new DomainEventRegistry();
+    registry.on('submitted', {
+      key: 'ok',
+      handle: async () => {
+        const row = rows.find((candidate) => candidate.id === 'lease-race');
+        if (row) row.lockedBy = 'another-worker:lease';
+      },
+    });
+    const dispatcher = new DomainEventDispatcherService(
+      createMockDispatcherPrisma(rows) as never,
+      registry,
+      { autoStart: false },
+    );
+
+    await dispatcher.tick();
+
+    expect(rows[0].status).toBe(DomainEventDeliveryStatus.PROCESSING);
+    expect(rows[0].lockedBy).toBe('another-worker:lease');
+  });
+
+  it('leaves a disabled integration binding pending without consuming an attempt', async () => {
+    const row = createMockDeliveryRow('disabled-binding', 1n, 'ok', {
+      attempts: 3,
+      integrationBindingId: 'approve-to-wiki.events',
+    });
+    const registry = new DomainEventRegistry();
+    const handler = vi.fn();
+    registry.on('submitted', { key: 'ok', handle: handler });
+    const dispatcher = new DomainEventDispatcherService(
+      createMockDispatcherPrisma([row]) as never,
+      registry,
+      {
+        bindingEnabled: () => false,
+        autoStart: false,
+      },
+    );
+
+    await dispatcher.tick();
+
+    expect(handler).not.toHaveBeenCalled();
+    expect(row.status).toBe(DomainEventDeliveryStatus.PENDING);
+    expect(row.attempts).toBe(3);
+    expect(row.nextAttemptAt).toBeNull();
+    expect(row.lastError).toContain('disabled');
+  });
+
   it('makes an overlapping tick a no-op while one is already in flight', async () => {
     const registry = new DomainEventRegistry();
     const counters = { transactions: 0 };

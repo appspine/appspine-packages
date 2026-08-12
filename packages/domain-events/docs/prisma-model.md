@@ -38,6 +38,16 @@ model DomainEvent {
   changedFields String[]             @map("changed_fields")
   /// Free-form handler context, including audit metadata.
   metadata      Json?
+  /// Frozen capability and binding pin for externally delivered events.
+  integrationCapabilityId      String? @map("integration_capability_id")
+  integrationCapabilityVersion String? @map("integration_capability_version")
+  integrationCapabilityDigest  String? @map("integration_capability_digest")
+  integrationBindingId         String? @map("integration_binding_id")
+  integrationBindingVersion    String? @map("integration_binding_version")
+  integrationEnvelopeVersion   String? @map("integration_envelope_version")
+  integrationSourceApp         String? @map("integration_source_app")
+  integrationPayload           Json?   @map("integration_payload")
+  integrationPayloadDigest     String? @map("integration_payload_digest")
   createdAt     DateTime             @default(now()) @map("created_at")
 
   deliveries DomainEventDelivery[]
@@ -87,7 +97,34 @@ enum DomainEventDeliveryStatus {
   DEAD_LETTER
   IGNORED
 }
+
+/// Idempotent inbox record for an externally delivered integration event.
+model IntegrationEventReceipt {
+  id                   String   @id @default(cuid())
+  sourceApp            String   @map("source_app")
+  eventId              String   @map("event_id")
+  capabilityId         String   @map("capability_id")
+  capabilityVersion    String   @map("capability_version")
+  capabilityDigest     String   @map("capability_digest")
+  bindingId            String   @map("binding_id")
+  bindingVersion       String   @map("binding_version")
+  payloadDigest        String   @map("payload_digest")
+  processedAt          DateTime @default(now()) @map("processed_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@unique([sourceApp, eventId])
+  @@index([bindingId, createdAt])
+  @@map("integration_event_receipts")
+}
 ```
+
+`IntegrationEventReceipt` is an inbound idempotency record. The receiver must create the receipt,
+apply the business state change, and write any next local outbox event through the same Prisma
+transaction. The package helper `withIntegrationEventReceipt()` requires the root Prisma client
+to expose `$transaction()` and passes the transaction client to the callback. A duplicate
+`(source_app, event_id)` is accepted only when the pinned contract and payload digest match the
+existing record; a concurrent `P2002` is resolved by reading and verifying the committed winner,
+and the business callback is never retried.
 
 Nothing else is part of this package's contract. In particular, an outbound-webhook subscription
 model (if the app wants one) is app-local — it is data-driven routing wired through

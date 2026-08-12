@@ -53,6 +53,7 @@ describe('KeycloakTokenExchangeProvider', () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe('https://keycloak.invalid/realms/appspine-dev/protocol/openid-connect/token');
     expect(init.method).toBe('POST');
+    expect(init.redirect).toBe('error');
 
     const body = new URLSearchParams(init.body as URLSearchParams);
     expect(body.get('grant_type')).toBe('urn:ietf:params:oauth:grant-type:token-exchange');
@@ -260,6 +261,17 @@ describe('KeycloakTokenExchangeProvider', () => {
 
   it('maps a 5xx response to provider_unavailable', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'server_error' }));
+    await expect(
+      makeProvider().exchange({
+        subjectToken: 's',
+        targetAudience: 'approve',
+        requestedScopes: ['x'],
+      }),
+    ).rejects.toMatchObject({ category: 'provider_unavailable' });
+  });
+
+  it('maps a non-JSON 5xx response to provider_unavailable', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('<html>temporarily down</html>', { status: 503 }));
     await expect(
       makeProvider().exchange({
         subjectToken: 's',

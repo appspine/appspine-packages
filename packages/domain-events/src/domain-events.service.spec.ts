@@ -1,3 +1,4 @@
+import type { JsonSchema } from '@appspine/integration-contracts';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DomainEventRegistry } from './domain-event-registry';
@@ -6,6 +7,98 @@ import { createMockDomainEventTx } from './testing';
 import { DomainEventOperation } from './types';
 
 describe('DomainEventsService.record', () => {
+  it('rejects a caller schema that is more permissive than the pinned resolver schema', async () => {
+    const registry = new DomainEventRegistry();
+    const pinnedSchema: JsonSchema = {
+      type: 'object',
+      required: ['documentId'],
+      properties: {
+        documentId: { type: 'string', 'x-appspine-data-classification': 'INTERNAL' },
+      },
+      additionalProperties: false,
+    };
+    const service = new DomainEventsService(registry, {
+      resolve: () => ({
+        capabilityDigest: `sha256:${'0'.repeat(64)}`,
+        payloadSchema: pinnedSchema,
+      }),
+    });
+    const { tx } = createMockDomainEventTx();
+
+    await expect(
+      service.record(tx as never, {
+        aggregateType: 'WikiPage',
+        aggregateId: 'doc-1',
+        eventType: 'wiki.document.changed',
+        operation: DomainEventOperation.UPDATE,
+        integration: {
+          capabilityId: 'approve.knowledge-document-change-approved',
+          capabilityVersion: '1.0.0',
+          bindingId: 'approve-to-wiki.knowledge-document-change-approved',
+          bindingVersion: '1.0.0',
+          sourceApp: 'approve',
+          payload: { documentId: 'doc-1' },
+        },
+        integrationPayloadSchema: {
+          type: 'object',
+          additionalProperties: true,
+        },
+      }),
+    ).rejects.toThrow('does not match the pinned runtime contract');
+  });
+
+  it('freezes an integration payload and persists its deterministic digest with the outbox row', async () => {
+    const registry = new DomainEventRegistry();
+    const service = new DomainEventsService(registry, {
+      resolve: () => ({
+        capabilityDigest: `sha256:${'0'.repeat(64)}`,
+        payloadSchema: {
+          type: 'object',
+          required: ['documentId', 'revision'],
+          properties: {
+            documentId: { type: 'string', 'x-appspine-data-classification': 'INTERNAL' },
+            revision: { type: 'integer', 'x-appspine-data-classification': 'INTERNAL' },
+          },
+          additionalProperties: false,
+        },
+      }),
+    });
+    const { state, tx } = createMockDomainEventTx();
+    const payload = { documentId: 'doc-1', revision: 2 } as const;
+
+    await service.record(tx as never, {
+      aggregateType: 'WikiPage',
+      aggregateId: 'doc-1',
+      eventType: 'wiki.document.change-approved',
+      operation: DomainEventOperation.UPDATE,
+      integration: {
+        capabilityId: 'approve.knowledge-document-change-approved',
+        capabilityVersion: '1.0.0',
+        bindingId: 'approve-to-wiki.knowledge-document-change-approved',
+        bindingVersion: '1.0.0',
+        sourceApp: 'approve',
+        payload,
+      },
+      integrationPayloadSchema: {
+        type: 'object',
+        required: ['documentId', 'revision'],
+        properties: {
+          documentId: { type: 'string', 'x-appspine-data-classification': 'INTERNAL' },
+          revision: { type: 'integer', 'x-appspine-data-classification': 'INTERNAL' },
+        },
+        additionalProperties: false,
+      },
+    });
+
+    expect(state.events[0]).toMatchObject({
+      integrationCapabilityId: 'approve.knowledge-document-change-approved',
+      integrationBindingId: 'approve-to-wiki.knowledge-document-change-approved',
+      integrationPayload: payload,
+      integrationPayloadDigest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/u),
+    });
+    expect(Object.isFrozen(state.events[0].integrationPayload)).toBe(true);
+  });
+
   it('creates the event, computes changedFields, and fans out to code-registered plus contributed handler keys', async () => {
     // Simulates an app-local data-driven handler-key contributor (e.g. webhook subscriptions):
     // record()/fan-out never queries that model directly (plan 026 §11.1 G6/G3).

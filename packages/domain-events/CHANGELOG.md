@@ -1,12 +1,60 @@
 # @appspine/domain-events
 
-## 7.0.0
+## 7.1.5
 
 ### Patch Changes
 
-- Updated dependencies [85ef582]
-  - @appspine/auth@6.2.0
-  - @appspine/m2m-api-key@4.0.6
+- Mark admin-only auth and API-key peers as optional so consumers of the core domain-events entrypoint do not need to install admin dependencies.
+
+## 7.1.4
+
+### Patch Changes
+
+- Limit concurrent-receipt recovery to unique conflicts raised by the receipt insert, so business
+  transaction errors are never mistaken for a duplicate delivery.
+
+## 7.1.3
+
+### Patch Changes
+
+- Harden pinned contract enforcement, Webhook v2 raw-body and capability-digest verification,
+  production destination policy, absolute request deadlines, receipt transactions, and dispatcher
+  lease ownership.
+- Updated dependencies
+  - @appspine/integration-contracts@0.3.1
+
+## 7.1.2
+
+### Patch Changes
+
+- Include the pinned capability digest in the Prisma receipt model, migration, documentation, and
+  schema-drift gate.
+
+## 7.1.1
+
+### Patch Changes
+
+- Publish the runtime dependency on `@appspine/integration-contracts` as a concrete registry
+  version so clean consumers never receive an unresolved `workspace:*` dependency.
+
+## 7.1.0
+
+### Minor Changes
+
+- Resolve and validate integration payloads against a pinned capability contract, persist its digest,
+  bind webhook envelope fields to signed headers, and add transactional receipt contract checks.
+- Make production webhook delivery HTTPS/allowlist-only with DNS-rebinding protection, and keep
+  disabled bindings pending without consuming retry attempts.
+- Add the cross-app integration receipt migration and keep generated Prisma/schema drift checks in
+  sync.
+
+## 7.0.0
+
+### Breaking Changes
+
+- Add frozen integration metadata and payload digest fields to `DomainEventRecord`.
+- Add Webhook v2 sender/receiver helpers, retry taxonomy, binding kill-switch callback and consumer receipt transaction helper.
+- Consumers must regenerate the Prisma DomainEvent model with the nullable integration columns before upgrading.
 
 ## 6.0.0
 

@@ -53,6 +53,7 @@ export class KeycloakTokenExchangeProvider implements TokenExchangeProvider {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body,
+        redirect: 'error',
         signal: controller.signal,
       });
     } catch (error) {
@@ -66,10 +67,16 @@ export class KeycloakTokenExchangeProvider implements TokenExchangeProvider {
       clearTimeout(timeout);
     }
 
+    const responseText = await response.text();
     let json: unknown;
     try {
-      json = await response.json();
+      json = responseText ? JSON.parse(responseText) : undefined;
     } catch {
+      if (!response.ok && response.status >= 500)
+        throw new OidcDelegationError(
+          'provider_unavailable',
+          `provider returned ${response.status}`,
+        );
       throw new OidcDelegationError(
         'malformed_provider_response',
         'token exchange response was not valid JSON',

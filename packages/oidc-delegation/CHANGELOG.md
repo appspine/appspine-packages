@@ -1,5 +1,12 @@
 # @appspine/oidc-delegation
 
+## 0.3.1
+
+### Patch Changes
+
+- Prevent token-exchange credentials from following redirects and classify non-JSON provider 5xx
+  responses as retryable provider outages.
+
 ## 0.3.0
 
 ### Minor Changes
