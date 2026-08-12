@@ -53,3 +53,6 @@ jobs:
       - run: pnpm run build
       - run: pnpm run typecheck
       - run: pnpm run test
+
+      - name: Lint knowledge base
+        run: node scripts/lint-knowledge.js

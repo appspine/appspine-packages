@@ -49,7 +49,15 @@
 | [042-oidc-delegation-package-plan.md](decisions/042-oidc-delegation-package-plan.md) | decision | completed | 042 - `@appspine/oidc-delegation` 共用身分委派套件計畫 |
 | [043-cross-app-integration-contracts-plan.md](decisions/043-cross-app-integration-contracts-plan.md) | decision | completed | 043 - 跨 App Integration Contract 機制計畫 |
 | [044-apps-projects-kaneo-style-plan.md](decisions/044-apps-projects-kaneo-style-plan.md) | decision | active | 044 - `apps/projects` Kaneo 式綠地專案管理 App - 系統設計計畫 |
+| [044-cross-repo-contract-checker-sync-todo.md](decisions/044-cross-repo-contract-checker-sync-todo.md) | decision | active | 044 Cross-Repo Contract Checker Synchronization TODO |
 | [045-drive-whiteboard-excalidraw-plan.md](decisions/045-drive-whiteboard-excalidraw-plan.md) | decision | active | 045 - `apps/drive` 白板功能（Excalidraw 整合）- 系統設計計畫 |
+| [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
+| [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
+| [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
+| [compatibility-matrix.md](contracts/compatibility-matrix.md) | topic | active | Integration contract compatibility matrix |
+| [contract.md](contracts/capabilities/approve.get-knowledge-document-change-request-status/versions/1.0.0/contract.md) | integration-contract | approved | approve.get-knowledge-document-change-request-status |
+| [contract.md](contracts/capabilities/approve.knowledge-document-change-approved/versions/1.0.0/contract.md) | integration-contract | approved | approve.knowledge-document-change-approved |
+| [contract.md](contracts/capabilities/approve.submit-knowledge-document-change/versions/1.0.0/contract.md) | integration-contract | approved | approve.submit-knowledge-document-change |
 | [Z01-ci-cd-fork-readiness-fixes.md](decisions/Z01-ci-cd-fork-readiness-fixes.md) | decision | active | Z01 - CI/CD 修復紀錄：app-template E2E Pipeline 從全紅到全綠 |
 | [Z02-app-template-fork-validation.md](decisions/Z02-app-template-fork-validation.md) | decision | active | Z02 - App Template Fork Validation Follow-ups |
 | [Z03-self-hosted-gitea-coolify-setup.md](topics/Z03-self-hosted-gitea-coolify-setup.md) | topic | superseded | Z03 - Coolify + GitHub 自動部署指南（appspine 業務 App 部署範本） |

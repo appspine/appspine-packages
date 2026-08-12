@@ -25,7 +25,7 @@ Agent 分析執行 → 資訊單位審核 → 自動佈署 → 回覆 ticket 並
 |---|---|---|
 | 聊天建立需求 | `apps/chat` | 已上線 |
 | 形成 Ticket / Todos | `apps/project` 的 Todo/Ticket 概念 | 已上線，但沒有「Ticket」這個型別，需確認是否沿用既有型別 |
-| 資訊單位核准／審核 | `apps/approve` 簽核流程 | 已上線；[`Z22-approve-admin-layout-redirect-not-firing.md`](../../apps/approve/knowledge/decisions/Z22-approve-admin-layout-redirect-not-firing.md) 的坑尚未解 |
+| 資訊單位核准／審核 | `apps/approve` 簽核流程 | 已上線；``Z22-approve-admin-layout-redirect-not-firing.md`` 的坑尚未解 |
 | Agent 分析執行 | `apps/mcp-gateway`（025/031，一人一 key 跨 App agent 存取） | 已上線 |
 | 自動佈署 | `_archive/dev_docs-20260803/auto-deploy/`（034 正式計畫 + Z03 技術參考，Coolify + GitHub） | 計畫已定案、task breakdown 已建立，尚未實際落地——**此構想的前置依賴** |
 | 通知 user | [[041-shared-notification-capability-plan\|041]]（Shared Notification Capability / `@appspine/notification`） | Phase 1 已定案待執行；external delivery 另開後續計畫 |

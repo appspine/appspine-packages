@@ -1,4 +1,5 @@
 ---
+scope: framework
 type: decision
 status: active
 owner: framework-team

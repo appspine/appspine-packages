@@ -91,8 +91,8 @@ superseded_by: null
 
 **這個委派語意與各 App 現行行為一致，不是新引入的模型**：各業務 App 的 MCP tool 目前就是用
 `ctx.actingUserId` + `ctx.roleNames` 做授權（例如
-[`apps/wiki/backend/src/pages/pages.mcp.ts:45`](../../apps/wiki/backend/src/pages/pages.mcp.ts)、
-[`apps/wiki/backend/src/spaces/spaces.mcp.ts:43`](../../apps/wiki/backend/src/spaces/spaces.mcp.ts)），
+``apps/wiki/backend/src/pages/pages.mcp.ts:45``、
+``apps/wiki/backend/src/spaces/spaces.mcp.ts:43``），
 也就是「以某個真人身份、用他在該 App 的完整角色權限執行工具」。本計畫改變的只是**這個身份的
 來源**（從 API key 的 acting-user 綁定改為 OIDC token claims），`McpCallContext` 的欄位語意
 不需要重新設計。這讓 §2 提到的共用套件改造範圍比表面看起來小：主要是新增一條「從已驗證的 JWT
@@ -132,11 +132,11 @@ sequenceDiagram
 各業務 App 的 `/mcp` 端點來自共用套件 `@appspine/mcp-server`，而它**只認 M2M API key，沒有
 JWT fallback**：
 
-- [`mcp.controller.ts:29`](../../appspine-packages/packages/mcp-server/src/mcp.controller.ts) —
+- [`mcp.controller.ts:29`](../../packages/mcp-server/src/mcp.controller.ts) —
   `@UseGuards(ApiKeyGuard)`，單一 guard。
 - 同檔 `:19-20` 的註解：「MCP is for external agents (n8n, AI clients) authenticated via M2M
   API key」。
-- [`types.ts`](../../appspine-packages/packages/mcp-server/src/types.ts) 的 `McpCallContext` 註解寫得更
+- [`types.ts`](../../packages/mcp-server/src/types.ts) 的 `McpCallContext` 註解寫得更
   直接：「**MCP is exclusively API-key-gated** (see mcp.controller.ts)」，且 context 帶有
   `isApiKey: boolean` 欄位。
 
@@ -147,7 +147,7 @@ Bearer token，再依 template propagation 流程傳播到 `appspine-app-templat
 決定移除 `VaultedAppKey`，就必須承擔這部分工作，不能假設 App 端零改動。
 
 **現成的 `JwtOrApiKeyGuard` 不能直接沿用**：
-[`jwt-or-api-key.guard.ts:14-18`](../../appspine-packages/packages/m2m-api-key/src/guards/jwt-or-api-key.guard.ts)
+[`jwt-or-api-key.guard.ts:14-18`](../../packages/m2m-api-key/src/guards/jwt-or-api-key.guard.ts)
 的語意是「API key 優先，沒有 API key 才 fallback 到 JWT」，與本計畫「`/mcp` 只認 EMA 委派
 token」的方向相反，需要另外實作或改造。
 
@@ -325,7 +325,7 @@ VS Code GitHub Copilot、ChatGPT、Goose、Postman 等全部空白（Claude Code
 - 盤點 `VaultedAppKey` 現有資料與程式碼，規劃隨 Phase 4 一併停用／移除的範圍。
 - **決定既有 audit 欄位在無 API key 情境下的語意**：`McpCallContext.sub` 目前的定義是「the
   calling API key's id（`ApiKeyUser.sub`）— needed for `AuditLog.actingApiKeyId` snapshots」
-  （見 [`types.ts`](../../appspine-packages/packages/mcp-server/src/types.ts)）。EMA 之後這條路徑不再有
+  （見 [`types.ts`](../../packages/mcp-server/src/types.ts)）。EMA 之後這條路徑不再有
   API key，必須明確裁定 `AuditLog.actingApiKeyId` 要留空、改存 IdP subject，還是新增獨立欄位
   區分「M2M key 呼叫」與「EMA 委派呼叫」；同時確認 `McpCallContext.isApiKey` 這個既有欄位的
   去留。這是 schema 與稽核可讀性的決策，不能留到實作時臨場決定。
@@ -697,7 +697,7 @@ sequenceDiagram
 per-client 存取限制有效。
 
 **先前對「roles 從何而來」的擔憂已解除，但原因與預期不同**：實查
-[`jwt-verifier.service.ts:37-72`](../../appspine-packages/packages/auth/src/jwt-verifier.service.ts)
+[`jwt-verifier.service.ts:37-72`](../../packages/auth/src/jwt-verifier.service.ts)
 發現 `buildOidcJwtUser` **以 `email` 為身份鍵**（無 email 直接拒絕），`roleNames` 來自**各 App
 自己資料庫**的 `user.userRoles`，而非 Keycloak claims；回傳的 `JwtUser.sub` 是**本地 user id**，
 不是 IdP subject。因此換發 token 不需要攜帶目標 App 的角色，只需帶得動經驗證的 `email` 與正確
@@ -766,5 +766,5 @@ paused` 並定期回頭檢查上述兩個外部條件。
 - [MCP Authorization Extensions](https://modelcontextprotocol.io/extensions/auth/overview)
 - [Enterprise-Managed Authorization 技術規格（RFC 8693／7523 依據）](https://github.com/modelcontextprotocol/ext-auth/blob/main/specification/stable/enterprise-managed-authorization.mdx)
 - [[038-mcp-spec-2026-07-28-migration-plan]]
-- [031-cross-app-agent-access-plan](../../apps/mcp-gateway/knowledge/decisions/031-cross-app-agent-access-plan.md)
+- `031-cross-app-agent-access-plan`
 - [[035-oidc-only-auth-plan]]

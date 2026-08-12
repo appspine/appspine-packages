@@ -65,7 +65,7 @@ updated: 2026-08-03
 - **現象**：`ENOENT: no such file or directory, scandir '/home/runner/.../appspine/packages/frontend-shell'`
   （`e2e-kit` 也是同樣錯誤）。
 - **根因**：`frontend/package.json`、`e2e/package.json` 裡 `@appspine/frontend-shell`、`@appspine/e2e-kit`
-  兩個依賴寫的是 `file:../../appspine-packages/packages/...`——這個相對路徑只有在「`appspine` 跟
+  兩個依賴寫的是 `file:../packages/...`——這個相對路徑只有在「`appspine` 跟
   `appspine-app-template` 兩個 repo 被 clone 成同一層兄弟目錄」（也就是這個 workspace 目前的樣子）才解析
   得到。**這代表在這個發現之前，任何團隊透過 GitHub「Use this template」fork 出去、clone 下來執行
   `pnpm install`，都會用一模一樣的方式失敗**——因為新 repo 不會有 `appspine` 框架 monorepo 這個兄弟目錄。

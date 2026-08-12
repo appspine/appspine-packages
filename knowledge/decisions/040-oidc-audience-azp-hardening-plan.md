@@ -51,8 +51,8 @@ jwt.verify(token, key, { algorithms: ['RS256'], issuer, audience: 'wiki' })
 
 | 路徑 | 進入點 | 驗簽者 | 是否經過 `verifyOidcSignature()` |
 | --- | --- | --- | --- |
-| REST（8 個 App 全部 API） | `JwtAuthGuard` → `AuthGuard('jwt-oidc')` → [`strategies/oidc.strategy.ts`](../../appspine-packages/packages/auth/src/strategies/oidc.strategy.ts) | **passport-jwt 自己** | 否 |
-| WebSocket（僅 chat） | [`chat.gateway.ts`](../../apps/chat/backend/src/chat/chat.gateway.ts) → `verifyJwtToken()` | [`verifyOidcSignature()`](../../appspine-packages/packages/auth/src/jwt-verifier.service.ts) | 是 |
+| REST（8 個 App 全部 API） | `JwtAuthGuard` → `AuthGuard('jwt-oidc')` → [`strategies/oidc.strategy.ts`](../../packages/auth/src/strategies/oidc.strategy.ts) | **passport-jwt 自己** | 否 |
+| WebSocket（僅 chat） | ``chat.gateway.ts`` → `verifyJwtToken()` | [`verifyOidcSignature()`](../../packages/auth/src/jwt-verifier.service.ts) | 是 |
 
 `OidcStrategy.validate()` 只做一件事：把 passport-jwt 驗過簽的 payload 直接交給
 `buildOidcJwtUser()`，`verifyOidcSignature()` 完全沒被呼叫。但**兩條路徑的 audience 比對用的
@@ -277,7 +277,7 @@ and that audience is different than the authorized party」）；§3.1.3.7 的�
 
 - [[Z30-mcp-auth-migration-feasibility]] §6 風險第 14 點（原始發現）
 - [[035-oidc-only-auth-plan]]
-- [`jwt-verifier.service.ts`](../../appspine-packages/packages/auth/src/jwt-verifier.service.ts)
-- [`strategies/oidc.strategy.ts`](../../appspine-packages/packages/auth/src/strategies/oidc.strategy.ts)
+- [`jwt-verifier.service.ts`](../../packages/auth/src/jwt-verifier.service.ts)
+- [`strategies/oidc.strategy.ts`](../../packages/auth/src/strategies/oidc.strategy.ts)
 - [OpenID Connect Core 1.0 §2（`azp` 定義）](https://openid.net/specs/openid-connect-core-1_0.html)
 - [RFC 9068（JWT Profile for OAuth 2.0 Access Tokens）](https://www.rfc-editor.org/rfc/rfc9068)

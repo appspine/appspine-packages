@@ -77,14 +77,14 @@ Anthropic 於 2026-07-28 發佈 Model Context Protocol（MCP）第五個規範�
 - 舊的統一套件 `@modelcontextprotocol/sdk` 停在 `1.30.0`（2026-07-27），尚未跟上新規範；官方
   保證至少還有 6 個月的 bugfix/security patch，不強制立即遷移，但新功能只會進拆分後的套件。
 - appspine 只會用到拆分後的 `@modelcontextprotocol/server`：`packages/mcp-server` 是純 server
-  端；`apps/mcp-gateway` 呼叫其他 App 的 [mcp-client.ts](../../apps/mcp-gateway/backend/src/mcp-client/mcp-client.ts)
+  端；`apps/mcp-gateway` 呼叫其他 App 的 `mcp-client.ts`
   是手刻 JSON-RPC，完全沒用官方 SDK 的 client 模組——不需要 `@modelcontextprotocol/client`。
 
 ### 3.2 `@appspine/mcp-server` 的遷移動作（已查證 2.0.0 API 表面）
 
-現況：[mcp.service.ts](../../appspine-packages/packages/mcp-server/src/mcp.service.ts) 用
+現況：[mcp.service.ts](../../packages/mcp-server/src/mcp.service.ts) 用
 `@modelcontextprotocol/sdk/server/mcp.js` 的 `McpServer`，
-[mcp.controller.ts](../../appspine-packages/packages/mcp-server/src/mcp.controller.ts) 用
+[mcp.controller.ts](../../packages/mcp-server/src/mcp.controller.ts) 用
 `@modelcontextprotocol/sdk/server/streamableHttp.js` 的 `StreamableHTTPServerTransport`
 （已跑 stateless mode，`sessionIdGenerator: undefined`）。升級到 2.0.0 系列需要：
 
@@ -104,15 +104,15 @@ Anthropic 於 2026-07-28 發佈 Model Context Protocol（MCP）第五個規範�
 
 ### 3.3 `apps/mcp-gateway` 的 `mcp-client.ts` 遷移範圍
 
-[mcp-client.ts](../../apps/mcp-gateway/backend/src/mcp-client/mcp-client.ts) 這支手刻 JSON-RPC
+`mcp-client.ts` 這支手刻 JSON-RPC
 client（gateway 呼叫「其他 appspine app」的 MCP endpoint 用的，不走官方 SDK）要改的地方：
 
 - 硬編 `protocolVersion: "2024-11-05"`，且 `listMcpTools` 明確先送一次 `initialize` 交握——
   新規範徹底移除這個交握，改成每個 request 帶 `_meta`。
 - `callMcpTool` 沒處理新的必填 `resultType` 欄位，也還沒讀取新的 `tools/list` 快取提示
   （`ttlMs`/`cacheScope`）——這點跟 gateway 自己的
-  [ttl-cache.ts](../../apps/mcp-gateway/backend/src/gateway/ttl-cache.ts) 和
-  [gateway-catalog.service.ts](../../apps/mcp-gateway/backend/src/gateway/gateway-catalog.service.ts)
+  `ttl-cache.ts` 和
+  `gateway-catalog.service.ts`
   的快取邏輯有潛在的可整合空間。
 - 現有 HTTP client 也沒有送新版必要的 `MCP-Protocol-Version`、`Mcp-Method`、`Mcp-Name` headers，
   不能只把 body 改成 `_meta`。目前 `parseSseJsonRpc` 假設每個 response 都只有一個 SSE `data:` 行，
@@ -162,7 +162,7 @@ Z30，不在此重複定義。
 **appspine 現有基礎（2026-07-31 更新：IdP 前提已解決）**：appspine 現在有一個真的在運作的企業
 IdP——035（[035-oidc-only-auth-plan.md](035-oidc-only-auth-plan.md)）已於
 2026-07-30 執行完成，全部 App 已是 OIDC-only（Keycloak），`@appspine/auth` 的
-`AUTH_MODE=oidc` 機制（[jwt-verifier.service.ts](../../appspine-packages/packages/auth/src/jwt-verifier.service.ts)）
+`AUTH_MODE=oidc` 機制（[jwt-verifier.service.ts](../../packages/auth/src/jwt-verifier.service.ts)）
 用 `jwks-rsa` 對 Keycloak 的 JWKS endpoint 驗證 RS256 簽章、檢查 issuer/audience，再用 `email`
 claim 查本地 `User` 表拿角色權限——這跟驗證 ID-JAG 需要的簽章驗證機制、以及規範建議的 account
 linking 模式，底層原理相通。**但這條路徑是給真人登入各業務 app 自己的網頁前端用的**，跟
@@ -176,7 +176,7 @@ IdP」這個前提，不代表 mcp-gateway 的 agent/M2M 存取已經接上它�
    （`x-api-key` header，`@appspine/m2m-api-key` 核發），沒有任何 token 簽發流程。要接這個擴展
    等於要新蓋一層：驗證 ID-JAG 簽章（audience/issuer 對到 IdP）、簽發 MCP access token。
 2. **Profile 解析邏輯要換一條路**——現在
-   [gateway-profile-resolver.service.ts](../../apps/mcp-gateway/backend/src/gateway/gateway-profile-resolver.service.ts)
+   `gateway-profile-resolver.service.ts`
    是「拿 `apiKeyId` 查 `GatewayProfileApiKey` 這張手動綁定表」。ID-JAG 模式下身份是每次請求
    即時從 token claim（`sub`/`email`）來的，不一定有事先手動綁定的 row，需要新增一條
    「JWT claim → GatewayProfile」的解析路徑（可參考 `buildOidcJwtUser` 的 email 對應寫法，但是
@@ -244,9 +244,9 @@ sequenceDiagram
    mcp-gateway」。之後 mcp-gateway 端只驗證票是不是真的，不重新做一次授權判斷。
 2. **要新蓋的只有 `GW_AS` 這個角色**（驗證 ID-JAG、簽發 MCP access token）跟 `GW_RS` 裡
    「token claim → GatewayProfile」這條新解析路徑（取代現在
-   [gateway-profile-resolver.service.ts](../../apps/mcp-gateway/backend/src/gateway/gateway-profile-resolver.service.ts)
+   `gateway-profile-resolver.service.ts`
    的「apiKeyId 查手動綁定表」）。
-3. **mcp-gateway 呼叫其他 App 的那一段完全不受影響**——[mcp-client.ts](../../apps/mcp-gateway/backend/src/mcp-client/mcp-client.ts)
+3. **mcp-gateway 呼叫其他 App 的那一段完全不受影響**——`mcp-client.ts`
    用 vaulted M2M key 轉發到 target app，是 mcp-gateway 自己的內部機制，跟「員工怎麼被授權碰
    mcp-gateway」是兩層不同的事，不會被這次改動牽動到。
 4. **撤銷生效點在 IdP**：員工被停權/離職，IdP 不再核發新 ID-JAG 給他，所有 agent 呼叫立刻斷，
