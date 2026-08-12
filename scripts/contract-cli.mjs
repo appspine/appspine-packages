@@ -4,10 +4,9 @@ import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
-  readFileSync,
   readdirSync,
+  readFileSync,
   realpathSync,
-  statSync,
   writeFileSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -530,12 +529,13 @@ function validateMetaSchemaValue(value, schema, path, rootSchema) {
   if (Array.isArray(value)) {
     if (schema.minItems !== undefined && value.length < schema.minItems)
       errors.push(`${path}: must contain at least ${schema.minItems} items`);
-    if (schema.items)
-      value.forEach((item, index) =>
+    if (schema.items) {
+      value.forEach((item, index) => {
         errors.push(
           ...validateMetaSchemaValue(item, schema.items, `${path}[${index}]`, rootSchema),
-        ),
-      );
+        );
+      });
+    }
   }
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     const record = value;

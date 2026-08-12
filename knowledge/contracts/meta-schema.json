@@ -60,10 +60,7 @@
     {
       "if": { "properties": { "contract_kind": { "const": "capability" } } },
       "then": {
-        "anyOf": [
-          { "required": ["provider"] },
-          { "required": ["producer"] }
-        ]
+        "anyOf": [{ "required": ["provider"] }, { "required": ["producer"] }]
       }
     },
     {
