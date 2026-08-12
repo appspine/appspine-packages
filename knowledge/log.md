@@ -1,5 +1,33 @@
 # Knowledge Log - appspine-workspace
 
+## [2026-08-12] refactor | 043 | Repo 重整 Phase 8：歸檔與清理剩餘重號子歷史檔
+
+將以下 5 份附屬歷史審查與 task breakdown 檔案歸檔並移除：
+- decisions/026-t-10970-g7-dry-run-evidence.md
+- decisions/026-t-10970-gate-review.md
+- decisions/029-work-package-d-template-sync-execution.md
+- decisions/029-work-package-e-mcp-gateway-sync-execution.md
+- topics/034-task-breakdown.md
+
+歷史細節已留存於日誌與 Git History。
+
+## [2026-08-12] refactor | 043 | Repo 重整 Phase 8：歸檔 decisions/ 內 11 份 completed 任務拆解文件
+
+配合 repo 重整計畫，將以下 11 份位於 `decisions/` 的 `status: completed` 歷史 task breakdown 文件正式歸檔並移除：
+- 004-task-breakdown.md
+- 005-task-breakdown.md
+- 006-task-breakdown.md
+- 007-task-breakdown.md
+- 008-task-breakdown.md
+- 009-task-breakdown.md
+- 010-task-breakdown.md
+- 018-task-breakdown.md
+- 019-task-breakdown.md
+- 021-task-breakdown.md
+- 035-task-breakdown.md
+
+歷史任務拆解細節已留存於日誌與 Git History。
+
 ## [2026-08-12] refactor | 043 | Repo 重整 Phase 4：歸檔與刪除 19 份 status: completed 的 Topic 文件
 
 配合 repo 重整計畫，將以下 19 份 `status: completed` 的歷史 topic 文件正式歸檔並移除：

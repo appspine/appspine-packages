@@ -124,6 +124,12 @@ superseded_by: null
 - 禁止使用 `--no-verify` 略過 commit hook
 - `tsc --noEmit` 必須通過才能 commit
 
+## Knowledge Base 獨立編號與跨 Repo 治理規範
+
+- **知識庫文件編號獨立計算**：各 Repository (如 `appspine-packages`、`appspine-app-template` 與各業務 App Repo) 獨立維護各自 `knowledge/` 的文件編號 (如 `001-*.md` 等)，不共用全域中央序號。
+- **嚴禁跨 Repo 複製決策檔案**：跨 Repo 共用架構計畫與決策，統一只保留在 **`appspine-packages/knowledge/`** 集中維護。**絕對不要將全域決策檔案拷貝複製至各 App 庫中**（歷史上全庫 duplicate 複製副本已被清理完畢，重複複製只會導致文件狀態漂移與斷鏈）。
+- **任務 ID 標籤保持不變**：全系統需求與任務編號 (`T-XXXXX`) 格式維持統一，用以跨 Repo 追蹤變更履歷。
+
 ## 測試規範
 
 分兩層處理，不對所有 app 統一規定覆蓋率門檻：
@@ -258,7 +264,7 @@ export class WebhookPostDomainEventHandler implements DomainEventHandler {
 
 ### 何時該用 decorator（code-registered）vs 何時維持手動註冊（data-driven）
 
-見 `_archive/dev_docs-20260803/domain-events/Z20-domain-events-outbox.md` §8 完整推導，摘要：
+見 `Z20-domain-events-outbox.md` §8 完整推導，摘要：
 
 - **絕大多數訂閱都該 code-registered**（掛 `@DomainEventSubscriber`）——「Y 發生時通知 X」
   是開發時期決策，該進 `git log`、該被 `tsc` 檢查，不該是一筆可被 admin 在 UI 上任意改的
@@ -282,7 +288,7 @@ grep 級靜態檢查（不是 AST，目標是擋住「忘了照規範」）：
 
 - **何時該發事件**：只有「衍生」副作用才走 domain events——核心業務狀態機、DB 交易內的強一致
   寫入（例如版本鎖、同交易內的通知寫入）**永遠留在同步路徑**，不要為了套用這個模式而把本來就
-  該同步的邏輯拆成非同步事件（見 [Z20-domain-events-outbox.md](Z20-domain-events-outbox.md) §2「synchronous core, asynchronous derived effects」邊界）。
+  該同步的邏輯拆成非同步事件（見 `Z20-domain-events-outbox.md` §8 完整推導，摘要：2「synchronous core, asynchronous derived effects」邊界）。
 - **`record()` 必須跟業務寫入同一個 transaction**：`DomainEventsService.record(tx, input)` 一定
   要用呼叫方自己的 transaction client 呼叫，不能寫完業務資料才另外呼叫——否則失去「不遺失事件」
   的保證。
