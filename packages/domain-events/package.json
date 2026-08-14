@@ -47,9 +47,9 @@
     "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {
-    "@appspine/auth": "^6.2.0",
-    "@appspine/common": "^0.3.2",
-    "@appspine/m2m-api-key": "^4.0.6",
+    "@appspine/auth": "^6.2.2",
+    "@appspine/common": "^0.3.3",
+    "@appspine/m2m-api-key": "^4.0.7",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

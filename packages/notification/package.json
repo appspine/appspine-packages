@@ -1,6 +1,6 @@
 {
   "name": "@appspine/notification",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": false,
   "files": [
     "dist",
@@ -36,7 +36,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@appspine/common": "^0.3.2",
+    "@appspine/common": "^0.3.3",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

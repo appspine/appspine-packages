@@ -1,5 +1,16 @@
 # @appspine/e2e-kit
 
+## 1.0.2
+
+### Patch Changes
+
+- 147d374: Add executable unit coverage for the shared Playwright configuration and guarantee that
+  authentication fixture contexts are closed even when login setup fails.
+- 147d374: Harden shared package publishing and runtime dependencies: restrict package tarballs to runtime
+  artifacts and maintained documentation, add health-check coverage with a typed Terminus adapter,
+  upgrade bcrypt to remove the vulnerable node-pre-gyp chain, and require patched MCP Hono
+  dependencies.
+
 ## 1.0.1
 
 ### Patch Changes

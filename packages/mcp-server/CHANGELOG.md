@@ -1,5 +1,18 @@
 # @appspine/mcp-server
 
+## 0.6.7
+
+### Patch Changes
+
+- 147d374: Harden shared package publishing and runtime dependencies: restrict package tarballs to runtime
+  artifacts and maintained documentation, add health-check coverage with a typed Terminus adapter,
+  upgrade bcrypt to remove the vulnerable node-pre-gyp chain, and require patched MCP Hono
+  dependencies.
+- Updated dependencies [147d374]
+  - @appspine/audit-log@1.0.1
+  - @appspine/auth@6.2.2
+  - @appspine/m2m-api-key@4.0.7
+
 ## 0.6.6
 
 ### Patch Changes

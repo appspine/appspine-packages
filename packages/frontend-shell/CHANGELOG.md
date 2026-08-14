@@ -1,5 +1,14 @@
 # @appspine/frontend-shell
 
+## 0.14.1
+
+### Patch Changes
+
+- 147d374: Harden shared package publishing and runtime dependencies: restrict package tarballs to runtime
+  artifacts and maintained documentation, add health-check coverage with a typed Terminus adapter,
+  upgrade bcrypt to remove the vulnerable node-pre-gyp chain, and require patched MCP Hono
+  dependencies.
+
 ## 0.14.0
 
 ### Minor Changes
