@@ -64,3 +64,4 @@ export * from './notification/notification-bell.js';
 export * from './notification/types.js';
 export * from './notification/use-notification-polling.js';
 export * from './scripts/theme-boot.js';
+export * from './server/index.js';
