@@ -248,7 +248,7 @@ function checkKnowledgeLinks(repo, documents) {
       }
     }
 
-    const wikiLinkPattern = /!?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]/g;
+    const wikiLinkPattern = /!?\[\[((?:(?!\\\|)[^\]|#])+)(?:#[^\]|]+)?(?:\\?\|[^\]]+)?\]\]/g;
     for (const match of searchable.matchAll(wikiLinkPattern)) {
       const rawTarget = match[1].trim();
       const targetWithoutExtension = rawTarget.replace(/\.md$/i, '');
