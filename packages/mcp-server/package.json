@@ -12,7 +12,8 @@
   },
   "type": "commonjs",
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +34,8 @@
     "@appspine/auth": "workspace:*",
     "@appspine/m2m-api-key": "workspace:*",
     "@modelcontextprotocol/node": "2.0.0",
-    "@modelcontextprotocol/server": "2.0.0"
+    "@modelcontextprotocol/server": "2.0.0",
+    "hono": "^4.12.34"
   },
   "peerDependencies": {
     "@prisma/client": "^6.2.0",

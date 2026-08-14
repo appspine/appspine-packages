@@ -2,6 +2,11 @@
   "name": "@appspine/rbac",
   "version": "4.0.6",
   "private": false,
+  "files": [
+    "dist",
+    "prisma",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/appspine/appspine-packages.git",

@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
-import { buildExternalEventEnvelope, canonicalJson, sha256Digest } from '@appspine/integration-contracts';
 import { DomainEventRegistry, DomainEventsService } from '@appspine/domain-events';
 import { createMockDomainEventTx } from '@appspine/domain-events/testing';
+import {
+  buildExternalEventEnvelope,
+  canonicalJson,
+  sha256Digest,
+} from '@appspine/integration-contracts';
 
 const envelope = buildExternalEventEnvelope({
   eventId: 'clean-consumer-event',
@@ -51,4 +55,6 @@ const event = await new DomainEventsService(new DomainEventRegistry(), {
 });
 assert.equal(event.integrationPayloadDigest, envelope.payloadDigest);
 assert.equal(event.eventType, 'fixture.event');
-console.log('clean consumer passed: root package imports, envelope digest, and domain-event test double round trip');
+console.log(
+  'clean consumer passed: root package imports, envelope digest, and domain-event test double round trip',
+);

@@ -9,6 +9,8 @@ import {
   type Page,
 } from '@playwright/test';
 
+import { withBrowserContext } from './auth-context';
+
 export interface AuthUserConfig {
   /** Keycloak username (not the app-side email — see dev-infra/README.md's test user
    * table). Identity is JIT-provisioned/matched locally by the token's email claim,
@@ -50,37 +52,36 @@ async function loginAndSaveStorageState(
 ) {
   await ensureAuthDirectory(user.storageStatePath);
 
-  const context = await browser.newContext();
-  // Force English so this fixture's English-language locators (getByRole('button', {
-  // name: signInButtonName }), etc.) work regardless of the app's default locale
-  // (e.g. appspine-app-template defaults to zh-TW). Saved into storageState below, so it
-  // carries over into adminContext/userContext too.
-  await context.addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
-  const page = await context.newPage();
-  await page.goto(`${baseURL}/login`);
-  await page.getByRole('button', { name: signInButtonName }).click();
+  await withBrowserContext(browser, async (context) => {
+    // Force English so this fixture's English-language locators (getByRole('button', {
+    // name: signInButtonName }), etc.) work regardless of the app's default locale
+    // (e.g. appspine-app-template defaults to zh-TW). Saved into storageState below, so it
+    // carries over into adminContext/userContext too.
+    await context.addCookies([{ name: 'locale', value: 'en', url: baseURL }]);
+    const page = await context.newPage();
+    await page.goto(`${baseURL}/login`);
+    await page.getByRole('button', { name: signInButtonName }).click();
 
-  // Cross-origin redirect to the dev Keycloak's own login page (dev-infra/README.md).
-  await page.waitForURL('**/protocol/openid-connect/auth**');
-  await page.getByLabel('Username or email').fill(user.username);
-  await page.getByLabel('Password', { exact: true }).fill(user.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+    // Cross-origin redirect to the dev Keycloak's own login page (dev-infra/README.md).
+    await page.waitForURL('**/protocol/openid-connect/auth**');
+    await page.getByLabel('Username or email').fill(user.username);
+    await page.getByLabel('Password', { exact: true }).fill(user.password);
+    await page.getByRole('button', { name: 'Sign In' }).click();
 
-  try {
-    await page.waitForURL('**/dashboard');
-  } catch (error) {
-    throw new Error(
-      `Login timed out for ${user.username} — Keycloak may have denied this identity access ` +
-        `to this app's client (dev-infra/README.md's per-client access restriction — check ` +
-        `the identity is in the right group), or the login form/redirect no longer matches ` +
-        `this fixture's assumptions. Original error: ${(error as Error).message}`,
-    );
-  }
+    try {
+      await page.waitForURL('**/dashboard');
+    } catch (error) {
+      throw new Error(
+        `Login timed out for ${user.username} — Keycloak may have denied this identity access ` +
+          `to this app's client (dev-infra/README.md's per-client access restriction — check ` +
+          `the identity is in the right group), or the login form/redirect no longer matches ` +
+          `this fixture's assumptions. Original error: ${(error as Error).message}`,
+      );
+    }
 
-  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-  await context.storageState({ path: resolve(user.storageStatePath) });
-  await page.close();
-  await context.close();
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await context.storageState({ path: resolve(user.storageStatePath) });
+  });
 }
 
 async function ensureStorageState(

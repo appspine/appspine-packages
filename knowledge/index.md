@@ -37,6 +37,7 @@
 | [046-cross-repo-contract-checker-sync-todo.md](decisions/046-cross-repo-contract-checker-sync-todo.md) | decision | active | 046 Cross-Repo Contract Checker Synchronization TODO |
 | [047-repo-restructure-plan.md](decisions/047-repo-restructure-plan.md) | decision | completed | Repo 架構重整 — 執行完畢 |
 | [047-repo-restructure-task-breakdown.md](decisions/047-repo-restructure-task-breakdown.md) | decision | completed | appspine Repo 重整 — 執行任務拆解（how） |
+| [048-shared-packages-cleanup-scoping-plan.md](decisions/048-shared-packages-cleanup-scoping-plan.md) | decision | completed | 048 - `appspine-packages` 套件清理計畫（第一階段：範圍界定與盤點交接） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
 | [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |

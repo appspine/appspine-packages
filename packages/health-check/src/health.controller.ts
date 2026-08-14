@@ -2,6 +2,8 @@ import { PrismaService } from '@appspine/common';
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
 
+type PrismaPingClient = Parameters<PrismaHealthIndicator['pingCheck']>[1];
+
 @Controller('health')
 export class HealthController {
   constructor(
@@ -14,8 +16,9 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      // biome-ignore lint/suspicious/noExplicitAny: PrismaService delegates to consuming app's PrismaClient at runtime
-      () => this.prisma.pingCheck('database', this.prismaService as any),
+      // PrismaService delegates to the consuming app's generated client, while Terminus keeps
+      // its compatible structural client union private. Keep the cast at this adapter boundary.
+      () => this.prisma.pingCheck('database', this.prismaService as unknown as PrismaPingClient),
     ]);
   }
 }

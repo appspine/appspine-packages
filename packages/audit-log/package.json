@@ -2,6 +2,11 @@
   "name": "@appspine/audit-log",
   "version": "1.0.0",
   "private": false,
+  "files": [
+    "dist",
+    "prisma",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/appspine/appspine-packages.git",

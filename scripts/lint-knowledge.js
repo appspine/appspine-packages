@@ -9,7 +9,14 @@ const repoDir = process.cwd();
 const repos = [{ name: path.basename(repoDir), dir: repoDir }];
 
 const knowledgeSupportFiles = new Set(['index.md', 'log.md', 'Cited.md']);
-const validStatuses = new Set(['active', 'archived', 'approved', 'completed', 'paused', 'superseded']);
+const validStatuses = new Set([
+  'active',
+  'archived',
+  'approved',
+  'completed',
+  'paused',
+  'superseded',
+]);
 const retiredCapabilityPatterns = [
   {
     label: 'local credential authentication is retired; describe Auth as OIDC-only',

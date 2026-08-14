@@ -2,6 +2,10 @@
   "name": "@appspine/health-check",
   "version": "0.1.7",
   "private": false,
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/appspine/appspine-packages.git",
@@ -22,6 +26,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -39,6 +44,7 @@
     "@nestjs/terminus": "^11.1.1",
     "@prisma/client": "^6.2.0",
     "@types/node": "^22.10.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }

@@ -1,5 +1,7 @@
 packages:
   - "packages/*"
+overrides:
+  "@modelcontextprotocol/node>@hono/node-server": "^1.19.15"
 minimumReleaseAge: 0
 allowBuilds:
   '@prisma/client': true

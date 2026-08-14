@@ -1,5 +1,26 @@
 # Knowledge Log - appspine-workspace
 
+## [2026-08-14] complete | 048 | `appspine-packages` 15 套件深度清理完成
+
+完成 15 個套件的入口可達性、strict unused、依賴、重複區塊、tarball 與 CVE 稽核。補上
+`health-check` characterization tests 與精確 Terminus adapter 型別；全套件統一 `files` allowlist；
+升級 bcrypt 6 並鎖定 MCP 的修補版 Hono 鏈。驗證結果為 521 tests、15 套件 typecheck/build、
+package-scoped Biome、15 個 tarball exports、6 個 integration contracts、knowledge lint 全綠，
+production audit 從 20 個漏洞降為 0。changeset 已建立，未手改版本號；下游 repo 維持唯讀。
+Keycloak 26.2.5 啟動後，042 的套件正向、inbound-verifier 負向與 dev-infra provider smoke matrix
+均以 canonical issuer `http://host.docker.internal:8180` 真實驗證通過。
+追加清除範圍外的根層 Biome 紅燈，保護 approved contract schema bytes 不受 formatter 改寫，並補上
+047 重構遺漏的 043 fixture 套件路徑；根層 lint 與 fixture／contract gates 全綠。
+
+## [2026-08-14] plan | 048 | `appspine-packages` 套件清理計畫（第一階段：範圍界定與盤點交接）
+
+建立 `decisions/048-shared-packages-cleanup-scoping-plan.md`。使用者要求對套件/範本/業務 app
+三層做深度清理，決定從 `appspine-packages` 開始並交給 codex 執行。本文件盤點 15 個套件的規模
+與內部依賴分層、跨 8 個業務 app + template 的下游消費情形、既有版本發布/契約管理工具
+（changesets discipline、`contract-cli.mjs`、042 的 e2e 驗證腳本）。不是逐檔程式碼稽核，只是
+交接前的範圍簡報，深度清理由 codex 接手。待確認事項：`oidc-delegation` 零下游消費的處理方向、
+`apps/drive` 空目錄意圖、`health-check` 補測試排程。
+
 ## [2026-08-12] refactor | 043 | Repo 重整 Phase 8：歸檔與清理剩餘重號子歷史檔
 
 將以下 5 份附屬歷史審查與 task breakdown 檔案歸檔並移除：

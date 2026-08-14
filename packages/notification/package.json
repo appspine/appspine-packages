@@ -2,6 +2,12 @@
   "name": "@appspine/notification",
   "version": "0.2.1",
   "private": false,
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/appspine/appspine-packages.git",

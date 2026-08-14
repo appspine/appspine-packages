@@ -32,5 +32,13 @@
       "semicolons": "always",
       "trailingCommas": "all"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["knowledge/contracts/**/versions/**/schemas/*.json"],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }
