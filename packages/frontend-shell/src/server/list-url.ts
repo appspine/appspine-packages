@@ -1,4 +1,4 @@
-import type { SortOrder } from "../components/sortable-column-header.js";
+import type { SortOrder } from '../components/sortable-column-header.js';
 
 export interface ListUrlState {
   search?: string;
@@ -8,9 +8,9 @@ export interface ListUrlState {
 
 export function buildListHref(state: ListUrlState, page: number): string {
   const params = new URLSearchParams({ page: String(page) });
-  if (state.search) params.set("search", state.search);
-  if (state.sortField) params.set("sortField", state.sortField);
-  if (state.sortOrder) params.set("sortOrder", state.sortOrder);
+  if (state.search) params.set('search', state.search);
+  if (state.sortField) params.set('sortField', state.sortField);
+  if (state.sortOrder) params.set('sortOrder', state.sortOrder);
   return `?${params}`;
 }
 
@@ -23,12 +23,15 @@ export function buildSortHref<TField extends string>(
 }
 
 export function parseSortOrder(value?: string): SortOrder | undefined {
-  return value === "ASC" || value === "DESC" ? value : undefined;
+  return value === 'ASC' || value === 'DESC' ? value : undefined;
 }
 
-export function formatPageInfo(template: string, values: { page: number; totalPages: number; total: number }): string {
+export function formatPageInfo(
+  template: string,
+  values: { page: number; totalPages: number; total: number },
+): string {
   return template
-    .replaceAll("{page}", String(values.page))
-    .replaceAll("{totalPages}", String(values.totalPages))
-    .replaceAll("{total}", String(values.total));
+    .replaceAll('{page}', String(values.page))
+    .replaceAll('{totalPages}', String(values.totalPages))
+    .replaceAll('{total}', String(values.total));
 }

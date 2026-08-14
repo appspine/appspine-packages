@@ -1,5 +1,5 @@
-import { cache } from "react";
-import { ApiError } from "../lib/api-client.js";
+import { cache } from 'react';
+import { ApiError } from '../lib/api-client.js';
 
 export interface CurrentUser {
   sub: string;
@@ -20,7 +20,7 @@ export type FetchCurrentUserFn = <T = CurrentUser>(url: string) => Promise<T>;
 export function createGetCurrentUser(apiFetch: FetchCurrentUserFn) {
   return cache(async (): Promise<CurrentUser | null> => {
     try {
-      return await apiFetch<CurrentUser>("/auth/me");
+      return await apiFetch<CurrentUser>('/auth/me');
     } catch (err) {
       if (err instanceof ApiError && err.statusCode === 401) return null;
       throw err;
