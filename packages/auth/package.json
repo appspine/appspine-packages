@@ -1,6 +1,6 @@
 {
   "name": "@appspine/auth",
-  "version": "6.2.1",
+  "version": "6.2.2",
   "files": [
     "dist",
     "prisma",
@@ -40,8 +40,8 @@
     "passport-jwt": "^4.0.1"
   },
   "peerDependencies": {
-    "@appspine/audit-log": "^1.0.0",
-    "@appspine/common": "^0.3.2",
+    "@appspine/audit-log": "^1.0.1",
+    "@appspine/common": "^0.3.3",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/passport": "^11.0.5",

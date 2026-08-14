@@ -1,5 +1,16 @@
 # @appspine/health-check
 
+## 0.1.8
+
+### Patch Changes
+
+- 147d374: Harden shared package publishing and runtime dependencies: restrict package tarballs to runtime
+  artifacts and maintained documentation, add health-check coverage with a typed Terminus adapter,
+  upgrade bcrypt to remove the vulnerable node-pre-gyp chain, and require patched MCP Hono
+  dependencies.
+- Updated dependencies [147d374]
+  - @appspine/common@0.3.3
+
 ## 0.1.7
 
 ### Patch Changes
