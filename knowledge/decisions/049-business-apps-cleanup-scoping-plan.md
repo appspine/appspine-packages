@@ -313,12 +313,28 @@ flowchart TD
   §3.3 列的項目）**尚未真正執行**——目前 9 個 repo 除了前端共用層抽換與上述個別項目外，沒有
   對業務邏輯做過重複/死碼掃描或重構。
 
-### 8.3 前端共用層抽取的發版與 9 repo 同步狀態
+### 8.3 前端共用層抽取的發版與 9 repo 同步狀態（已完成）
 
 第一輪查核發現：`frontend-shell` 的 `/server` export 完全沒有版本 bump／changeset／發布，
 9 個 repo（範本 + 8 業務 app）的 `frontend/src/server/*.ts` 卻已經改成 import
 `@appspine/frontend-shell/server`——這在任何全新安裝或 CI `--frozen-lockfile` 都會直接找不到
 該 subpath 而失敗，本機能跑只是因為 node_modules 被塞了本機建置產物、沒有反映在 lockfile。
-已建立 `.changeset/frontend-shell-server-scaffolding.md`（minor）走正式發版流程；9 個 repo
-的 `@appspine/frontend-shell` 依賴版本與 lockfile 需要在套件實際發布後才能同步升級並重新驗證
-——**本文件寫下時這個同步尚未完成**，見對應的執行紀錄（將於發布完成後回填本節或另立記錄）。
+
+已補完整個正式發版流程：
+1. `.changeset/frontend-shell-server-scaffolding.md`（minor）→ push main → `changesets/action`
+   自動開出 `Version Packages` PR（#24，`@appspine/frontend-shell` 0.14.1 → 0.15.0）。
+2. PR 的 CI 首次因根層 `pnpm lint`（Biome 格式）與 `knowledge/decisions/049-*.md` 的一個跨
+   repo markdown link（相對路徑連結在 CI 各 repo 獨立 checkout 下必定 404，這個知識庫的既有
+   慣例是跨 repo 引用一律用反引號純文字，不用 markdown link）失敗，均已修正並重新跑綠。
+3. 合併 PR #24，`changeset publish` 成功發布 `@appspine/frontend-shell@0.15.0` 到 GitHub
+   Packages（以 `gh api` 查詢 registry 版本列表確認）。
+4. 9 個 repo（範本 + 8 業務 app）逐一同步：`pnpm-workspace.yaml` override 與
+   `frontend/package.json` 依賴由 `0.14.1` 改成 `0.15.0`、跑 `pnpm install`（範本額外做過一次
+   完整 `rm -rf node_modules` 的乾淨重裝，驗證真的是從 registry 抓到 0.15.0，不是沿用本機
+   殘留的假產物）、跑 `pnpm peers check`／`typecheck`／`biome check`／backend tests，全數
+   通過後才 commit + push。逐 repo 驗證結果：範本（6 tests + frontend production build）、
+   `approve`（37）、`calendar`（10）、`chat`（14）、`drive`（37）、`master-data`（9）、
+   `mcp-gateway`（121）、`projects`（131，含 MCP 合約測試）、`wiki`（11）——全部 typecheck／
+   test 通過，9 個 repo 的 git working tree 均為乾淨狀態（`chat` 的
+   `018-line-style-chat-redesign-plan.md` 與 `knowledge/index.md` 除外，屬於使用者另一個對話
+   的無關內容，依使用者指示保留不提交）。
