@@ -3,7 +3,7 @@ import {
   buildWebhookV2Headers,
   canonicalJson,
 } from '@appspine/integration-contracts';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { DomainEventOperation, type DomainEventRecord } from './types';
 import {
@@ -86,48 +86,67 @@ describe('createDomainEventWebhookSignature', () => {
   });
 });
 
-describe('postDomainEventWebhook', () => {
-  it('posts the signed payload and drains the response body', async () => {
-    const arrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(0));
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 204, arrayBuffer });
-    vi.stubGlobal('fetch', fetchMock);
+describe('postDomainEventWebhook destination policy', () => {
+  // v1 destinations are admin-supplied configuration. Before these guards it POSTed the
+  // signed payload at whatever the binding row said, making the dispatcher an SSRF proxy.
+  const base = { event: event(), secret: 'secret', timeoutMs: 1000 } as const;
 
-    await postDomainEventWebhook({
-      event: event(),
-      url: 'https://example.invalid/webhook',
-      secret: 'secret',
-      timeoutMs: 1000,
-    });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://example.invalid/webhook',
-      expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({
-          'content-type': 'application/json',
-          'x-appspine-event-id': 'event-1',
-          'x-appspine-event-type': 'wiki.page.updated',
-          'x-appspine-signature': expect.stringMatching(/^sha256=/),
-          'x-appspine-timestamp': expect.any(String),
-        }),
-        body: expect.stringContaining('"seq":"12"'),
-      }),
-    );
-    expect(arrayBuffer).toHaveBeenCalled();
-  });
-
-  it('throws for non-2xx responses after draining the body', async () => {
-    const arrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(0));
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500, arrayBuffer }));
-
+  it('refuses a destination resolving to the cloud metadata address', async () => {
     await expect(
       postDomainEventWebhook({
-        event: event(),
-        url: 'https://example.invalid/webhook',
-        secret: 'secret',
+        ...base,
+        url: 'https://metadata.example.invalid/webhook',
+        destinationPolicy: { resolve: async () => ['169.254.169.254'] },
       }),
-    ).rejects.toThrow('Webhook POST failed with HTTP 500');
-    expect(arrayBuffer).toHaveBeenCalled();
+    ).rejects.toThrow('blocked address');
+  });
+
+  it('refuses a destination resolving into a private range', async () => {
+    await expect(
+      postDomainEventWebhook({
+        ...base,
+        url: 'https://internal.example.invalid/webhook',
+        destinationPolicy: { resolve: async () => ['10.1.2.3'] },
+      }),
+    ).rejects.toThrow('blocked address');
+  });
+
+  it('refuses a non-HTTP scheme and a URL carrying credentials', async () => {
+    await expect(postDomainEventWebhook({ ...base, url: 'file:///etc/passwd' })).rejects.toThrow(
+      'HTTP or HTTPS',
+    );
+    await expect(
+      postDomainEventWebhook({
+        ...base,
+        url: 'https://user:pass@events.example.invalid/webhook',
+        destinationPolicy: { resolve: async () => ['8.8.8.8'] },
+      }),
+    ).rejects.toThrow('must not contain credentials');
+  });
+
+  it('honours an opt-in production policy the same way v2 does', async () => {
+    await expect(
+      postDomainEventWebhook({
+        ...base,
+        url: 'http://events.example.invalid/webhook',
+        destinationPolicy: {
+          production: true,
+          allowedHosts: ['events.example.invalid'],
+          resolve: async () => ['8.8.8.8'],
+        },
+      }),
+    ).rejects.toThrow('must use HTTPS');
+  });
+});
+
+describe('postDomainEventWebhook signature', () => {
+  it('signs the timestamp and body together over the redacted payload', () => {
+    const body = JSON.stringify(buildDomainEventWebhookPayload(event()));
+    expect(body).toContain('"seq":"12"');
+    expect(body).not.toContain('before-secret');
+    expect(createDomainEventWebhookSignature('secret', '2026-07-20T00:00:00.000Z', body)).toMatch(
+      /^[0-9a-f]{64}$/,
+    );
   });
 });
 

@@ -137,6 +137,33 @@ describe('GlobalExceptionFilter', () => {
     expect(traceId.length).toBeGreaterThan(0);
   });
 
+  it('discards an x-request-id that could forge a log line, rather than reflecting it', () => {
+    const forged = 'abc\n[Nest] 1 - ERROR [Auth] admin login succeeded';
+    const req = { url: '/test-path', headers: { 'x-request-id': forged } };
+    const { host, json } = mockHost(req);
+
+    filter.catch(new Error('boom'), host);
+
+    const traceId = json.mock.calls[0][0].traceId;
+    expect(traceId).not.toContain('\n');
+    expect(traceId).not.toContain('admin login succeeded');
+    expect(traceId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('rejects an over-long or non-token x-request-id and an array-valued one', () => {
+    for (const value of ['x'.repeat(65), 'has spaces', '<script>'] as const) {
+      const { host, json } = mockHost({ url: '/t', headers: { 'x-request-id': value } });
+      filter.catch(new Error('boom'), host);
+      expect(json.mock.calls[0][0].traceId).not.toBe(value);
+    }
+    const { host, json } = mockHost({
+      url: '/t',
+      headers: { 'x-request-id': ['a', 'b'] } as unknown as Record<string, string>,
+    });
+    filter.catch(new Error('boom'), host);
+    expect(json.mock.calls[0][0].traceId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
   it('should include timestamp in ISO format', () => {
     const req = { url: '/test-path', headers: {} };
     const { host, json } = mockHost(req);

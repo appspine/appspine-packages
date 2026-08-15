@@ -27,6 +27,14 @@ export interface PostDomainEventWebhookInput {
   event: DomainEventRecord;
   url: string;
   secret: string;
+  /**
+   * Destination policy applied before the request leaves the process. Defaults to
+   * `{}` — which still rejects non-HTTP(S) schemes, embedded credentials, and any host
+   * resolving into a loopback/link-local/private/CGNAT/multicast range or a cloud metadata
+   * address. Pass `{ production: true, allowedHosts: [...] }` to additionally require HTTPS
+   * and an explicit host allowlist, as `postDomainEventWebhookV2` always does.
+   */
+  destinationPolicy?: DestinationPolicyOptions;
   timeoutMs?: number;
 }
 
@@ -232,37 +240,45 @@ export function createDomainEventWebhookSignature(
   return createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
 }
 
+/**
+ * @deprecated Use {@link postDomainEventWebhookV2}, which signs the canonical external-event
+ * envelope, pins the capability/binding digest, and requires an explicit host allowlist. This
+ * v1 helper remains only for bindings that have not migrated to the v2 envelope; it now applies
+ * the same `resolveSafeDestination()` guard v2 uses (DNS resolved once, every resolved address
+ * checked against the blocked-range list, then the connection pinned to that address so a
+ * rebind between check and connect cannot redirect it).
+ */
 export async function postDomainEventWebhook({
   event,
   url,
   secret,
+  destinationPolicy,
   timeoutMs = DEFAULT_TIMEOUT_MS,
 }: PostDomainEventWebhookInput): Promise<void> {
+  // Destination URLs are admin-supplied configuration, not code — without this an operator
+  // (or anyone who can write the binding row) turns the dispatcher into an SSRF proxy that
+  // POSTs signed internal event payloads at 169.254.169.254, a loopback admin port, or an
+  // internal 10.0.0.0/8 service.
+  const destination = await resolveSafeDestination(url, destinationPolicy ?? {});
   const body = JSON.stringify(buildDomainEventWebhookPayload(event));
   const timestamp = new Date().toISOString();
   const signature = createDomainEventWebhookSignature(secret, timestamp, body);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-appspine-event-id': event.id,
-        'x-appspine-event-type': event.eventType,
-        'x-appspine-signature': `sha256=${signature}`,
-        'x-appspine-timestamp': timestamp,
-      },
-      body,
-      signal: controller.signal,
-    });
-    await response.arrayBuffer().catch(() => undefined);
-    if (!response.ok) {
-      throw new Error(`Webhook POST failed with HTTP ${response.status}`);
-    }
-  } finally {
-    clearTimeout(timer);
+  const response = await postToFixedDestination(
+    destination,
+    body,
+    {
+      'content-type': 'application/json',
+      'x-appspine-event-id': event.id,
+      'x-appspine-event-type': event.eventType,
+      'x-appspine-signature': `sha256=${signature}`,
+      'x-appspine-timestamp': timestamp,
+    },
+    timeoutMs,
+  );
+
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`Webhook POST failed with HTTP ${response.status}`);
   }
 }
 

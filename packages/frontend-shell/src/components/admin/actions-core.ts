@@ -64,7 +64,7 @@ export async function setUserServiceAccountRequest(
   isServiceAccount: boolean,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to update user', async () => {
-    await apiFetch(`/users/${id}`, {
+    await apiFetch(`/users/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify({ isServiceAccount }),
     });
@@ -79,7 +79,7 @@ export async function setUserActiveRequest(
   isActive: boolean,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to update user', async () => {
-    await apiFetch(`/users/${id}`, {
+    await apiFetch(`/users/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify({ isActive }),
     });
@@ -95,7 +95,7 @@ export async function updateUserRolesRequest(
 ): Promise<ActionResult> {
   const roleIds = formData.getAll('roleIds').map(String);
   return runAction(isApiError, 'Failed to update roles', async () => {
-    await apiFetch(`/users/${id}/roles`, {
+    await apiFetch(`/users/${encodeURIComponent(id)}/roles`, {
       method: 'PUT',
       body: JSON.stringify({ roleIds }),
     });
@@ -109,7 +109,7 @@ export async function deleteUserRequest(
   id: string,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to delete user', async () => {
-    await apiFetch(`/users/${id}`, { method: 'DELETE' });
+    await apiFetch(`/users/${encodeURIComponent(id)}`, { method: 'DELETE' });
     return {};
   });
 }
@@ -151,7 +151,10 @@ export async function updateRoleRequest(
     body.permissions = formData.getAll('permissions').map(String);
   }
   return runAction(isApiError, 'Failed to update role', async () => {
-    await apiFetch(`/roles/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+    await apiFetch(`/roles/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    });
     return {};
   });
 }
@@ -162,7 +165,7 @@ export async function deleteRoleRequest(
   id: string,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to delete role', async () => {
-    await apiFetch(`/roles/${id}`, { method: 'DELETE' });
+    await apiFetch(`/roles/${encodeURIComponent(id)}`, { method: 'DELETE' });
     return {};
   });
 }
@@ -205,7 +208,7 @@ export async function updateApiKeyActingUserRequest(
   actingUserId: string | null,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to update acting user', async () => {
-    await apiFetch(`/api-keys/${id}`, {
+    await apiFetch(`/api-keys/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify({ actingUserId }),
     });
@@ -220,7 +223,10 @@ export async function setApiKeyActiveRequest(
   isActive: boolean,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to update API key', async () => {
-    await apiFetch(`/api-keys/${id}`, { method: 'PATCH', body: JSON.stringify({ isActive }) });
+    await apiFetch(`/api-keys/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive }),
+    });
     return {};
   });
 }
@@ -231,7 +237,7 @@ export async function deleteApiKeyRequest(
   id: string,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to delete API key', async () => {
-    await apiFetch(`/api-keys/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api-keys/${encodeURIComponent(id)}`, { method: 'DELETE' });
     return {};
   });
 }
@@ -246,7 +252,7 @@ export async function retryDomainEventDeliveryRequest(
   id: string,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to retry delivery', async () => {
-    await apiFetch(`/domain-events/deliveries/${id}/retry`, { method: 'POST' });
+    await apiFetch(`/domain-events/deliveries/${encodeURIComponent(id)}/retry`, { method: 'POST' });
     return {};
   });
 }
@@ -257,7 +263,9 @@ export async function ignoreDomainEventDeliveryRequest(
   id: string,
 ): Promise<ActionResult> {
   return runAction(isApiError, 'Failed to ignore delivery', async () => {
-    await apiFetch(`/domain-events/deliveries/${id}/ignore`, { method: 'POST' });
+    await apiFetch(`/domain-events/deliveries/${encodeURIComponent(id)}/ignore`, {
+      method: 'POST',
+    });
     return {};
   });
 }

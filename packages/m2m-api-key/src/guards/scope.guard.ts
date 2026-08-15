@@ -26,15 +26,25 @@ export class ScopeGuard implements CanActivate {
       Reflect.getMetadata(SCOPES_KEY, ctx.getHandler()) ??
       Reflect.getMetadata(SCOPES_KEY, ctx.getClass());
 
-    // No @Scopes() decorator — allow all callers
-    if (!required?.length) return true;
-
     const { user } = ctx.switchToHttp().getRequest<{
       user?: { isApiKey?: boolean; scopes?: string[] };
     }>();
 
-    // JWT users are not scope-restricted
+    // JWT users are not scope-restricted — scopes are an API-key-only mechanism, and a JWT
+    // principal's authorization is decided by AdminGuard/PermissionGuard instead.
     if (!user?.isApiKey) return true;
+
+    // FAIL CLOSED for API-key principals: no @Scopes() reachable on the handler *or* the
+    // controller class means the route never declared what an API key is allowed to do
+    // there. Previously this returned true, so adding a handler to a ScopeGuard-protected
+    // controller without a @Scopes() decorator silently granted every API key full access to
+    // it. An intentionally scope-free M2M route must now say so explicitly with
+    // `@Scopes('*')`.
+    if (!required?.length) {
+      throw new ForbiddenException(
+        'This route declares no API key scopes; API key access is denied by default',
+      );
+    }
 
     const granted = user.scopes ?? [];
 

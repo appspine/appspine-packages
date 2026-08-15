@@ -9,6 +9,26 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
+/**
+ * Trace ids end up in a single-line log record and in the JSON error body, so only an opaque,
+ * bounded token is acceptable. An attacker-supplied `X-Request-Id: abc\n[ERROR] ...` would
+ * otherwise forge whole log lines (log-line injection) in every app that mounts this filter.
+ * Anything not matching this pattern is discarded in favour of a fresh UUID rather than
+ * sanitized, so no attacker-chosen substring survives into the log at all.
+ */
+const SAFE_TRACE_ID = /^[A-Za-z0-9._-]{1,64}$/;
+
+function resolveTraceId(req: Request): string {
+  const requestId = (req as Request & { id?: unknown }).id;
+  if (typeof requestId === 'string' && SAFE_TRACE_ID.test(requestId)) return requestId;
+
+  const header = req.headers['x-request-id'];
+  // Express yields string[] for a duplicated header — only a single well-formed value counts.
+  if (typeof header === 'string' && SAFE_TRACE_ID.test(header)) return header;
+
+  return randomUUID();
+}
+
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
@@ -43,8 +63,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
     }
 
-    const requestId = (req as Request & { id?: string }).id;
-    const traceId = requestId || req.headers['x-request-id'] || randomUUID();
+    const traceId = resolveTraceId(req);
 
     // Nest's own would-be default logging never runs — this filter fully handles the response
     // itself instead of rethrowing, and nestjs-pino's access-log line never sees `exception`, only
