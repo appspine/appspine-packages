@@ -1,6 +1,6 @@
 {
   "name": "@appspine/m2m-api-key",
-  "version": "4.0.7",
+  "version": "5.0.0",
   "private": false,
   "files": [
     "dist",

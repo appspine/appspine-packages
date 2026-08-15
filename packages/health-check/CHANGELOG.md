@@ -1,5 +1,12 @@
 # @appspine/health-check
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [3282f18]
+  - @appspine/common@0.3.4
+
 ## 0.1.8
 
 ### Patch Changes

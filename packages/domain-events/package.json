@@ -1,6 +1,6 @@
 {
   "name": "@appspine/domain-events",
-  "version": "7.1.5",
+  "version": "8.0.0",
   "files": [
     "dist",
     "docs",
@@ -43,13 +43,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/integration-contracts": "0.3.1",
+    "@appspine/integration-contracts": "0.4.0",
     "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {
     "@appspine/auth": "^6.2.2",
-    "@appspine/common": "^0.3.3",
-    "@appspine/m2m-api-key": "^4.0.7",
+    "@appspine/common": "^0.3.4",
+    "@appspine/m2m-api-key": "^5.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
