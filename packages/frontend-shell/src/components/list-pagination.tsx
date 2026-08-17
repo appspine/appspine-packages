@@ -29,9 +29,9 @@ export function ListPagination({
   const renderedInfoText = infoText ?? `Page ${page} of ${totalPages} (${total} total)`;
 
   return (
-    <div className="flex items-center justify-between text-muted-foreground text-sm">
-      <span>{renderedInfoText}</span>
-      <div className="flex gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-3 text-muted-foreground text-sm">
+      <span className="min-w-0">{renderedInfoText}</span>
+      <div className="flex shrink-0 gap-2">
         {page > 1 ? (
           <Button asChild variant="outline" size="sm">
             <LinkComponent href={buildPageHref(page - 1)}>{previousText}</LinkComponent>
