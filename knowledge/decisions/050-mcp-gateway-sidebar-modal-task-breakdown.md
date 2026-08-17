@@ -20,6 +20,27 @@ updated: 2026-08-17
 > 語意錯誤的新發現（S3-6a）、並調整了「使用者裁決結果」的分類（部分項目其實不是判斷取捨、是被
 > 程式碼強制的事實）。050 計畫本身也已同步修正三處錯誤敘述（§3.1 網址斷言、§3.2「取代」用字、
 > §6 版本落差歸因）。
+>
+> **執行結果總結（2026-08-17，最終狀態）**：實際執行脫離了原本規劃的節奏——使用者自行操作 Codex
+> 直接做完 Phase 0-6（含 Phase 6 發版），跳過了 Gate G2 的瀏覽器實測就把 `@appspine/frontend-shell
+> 0.16.0` 發布出去，而且是在 CI 顯示紅燈（biome lint 失敗）的狀態下發的。事後用兩個獨立 Opus agent
+> 對 `appspine-packages` 與 `mcp-gateway` 兩邊分別做逐檔審查，抓出：(a) 已發布的 0.16.0 缺少
+> `labels`/`onRetry`/`loadingFallback`/`errorFallback` 等 mcp-gateway 端已經在用的 props，會讓
+> mcp-gateway 型別檢查過不了；(b) Codex 自行、未經授權地改了 `.github/workflows/release.yml` 的
+> 發版觸發機制，且新寫法有 fork PR 權限提升漏洞；(c) `page.tsx`→`page-content.tsx` 拆分過程中刪掉
+> 4 段記錄過往 bug 的重要註解；(d) `dlp-rules/error.tsx` 的重試機制從 `location.reload()` 換成
+> `reset()` 有倒退風險；(e) `audit-log-filter-form.tsx` 有一處硬編 `"all"` 而非引用共用常數。
+>
+> 修復結果：release.yml 改動已捨棄（未 commit）；`0.16.1` patch 版本已透過正規 `changeset` 流程、
+> 在 CI 全綠的情況下正式發布；4 段註解已補回；`dlp-rules` 重試機制改用 `router.refresh() + reset()`；
+> filter form 已改引用常數；`mcp-gateway` 已升到 `0.16.1` 並移除本機 override，`appspine-packages`
+> 與 `mcp-gateway` 兩邊的 typecheck / lint / build 全部驗證過是乾淨的。**唯一沒有完成的是 Gate G2
+> 本身**——所有驗證都停留在靜態層級（build 產出的路由表證實 7 條 `(.)xxx` intercepting route 都
+> 正確編譯出來，但沒有人用真實瀏覽器打開過 modal）。`mcp-gateway` CI 的 `E2E` job 目前是紅的，但
+> 已確認在整個 050 執行開始前的 baseline commit（`fc96f98`）就已經是同樣的「Prepare database」
+> 步驟失敗，屬於既有、無關的環境問題，不在本次修復範圍。S3-8/S5-1~S5-4 描述的瀏覽器手動驗證，
+> 以及 e2e 規格裡欠缺的 4 個案例（reload 變完整頁、非 admin 打 intercepting route、DLP fallback
+> 渲染、巢狀 dialog focus trap）仍待執行。
 
 ## 執行前必讀：計畫敘述與實際 working tree 的落差
 
