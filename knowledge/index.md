@@ -39,6 +39,8 @@
 | [047-repo-restructure-task-breakdown.md](decisions/047-repo-restructure-task-breakdown.md) | decision | completed | appspine Repo 重整 — 執行任務拆解（how） |
 | [048-shared-packages-cleanup-scoping-plan.md](decisions/048-shared-packages-cleanup-scoping-plan.md) | decision | completed | 048 - `appspine-packages` 套件清理計畫（第一階段：範圍界定與盤點交接） |
 | [049-business-apps-cleanup-scoping-plan.md](decisions/049-business-apps-cleanup-scoping-plan.md) | decision | active | 049 - 業務 App 清理計畫（第三階段：範圍界定與盤點交接） |
+| [050-mcp-gateway-sidebar-modal-plan.md](decisions/050-mcp-gateway-sidebar-modal-plan.md) | decision | active | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal - 系統設計計畫 |
+| [050-mcp-gateway-sidebar-modal-task-breakdown.md](decisions/050-mcp-gateway-sidebar-modal-task-breakdown.md) | decision | active | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
 | [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
