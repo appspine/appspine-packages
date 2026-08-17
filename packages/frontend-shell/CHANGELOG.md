@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.16.3
+
+### Patch Changes
+
+- 663a772: feat(frontend-shell): support adminMenu in UserNav/DashboardShell, add createRequireAdminPage server factory, and add AdminModalShell client component
+
 ## 0.16.2
 
 ### Patch Changes
