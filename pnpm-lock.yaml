@@ -140,8 +140,8 @@ importers:
   packages/domain-events:
     dependencies:
       '@appspine/integration-contracts':
-        specifier: 0.3.1
-        version: 0.3.1
+        specifier: 0.4.0
+        version: 0.4.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -497,8 +497,8 @@ importers:
 
 packages:
 
-  '@appspine/integration-contracts@0.3.1':
-    resolution: {integrity: sha512-8ClXr1GqNfRozDBDeHI9T0Y42vHyN5YUoGp2IUTyWLBWhjr9yfjsgGaGUcNdxPiTPEbVb+ztmKNaKcCaGLJ2jw==, tarball: https://npm.pkg.github.com/download/@appspine/integration-contracts/0.3.1/1d00e096202bd8f0395b49a521f1e3c3572b6def}
+  '@appspine/integration-contracts@0.4.0':
+    resolution: {integrity: sha512-nPFu22EQbF/fUiITCGGogdpO2EF40kwUE9eXyF0NJc7miqKZpchc5CD3wxVGnAN4QtzujyQ9VrjVPfKkXsDnkw==, tarball: https://npm.pkg.github.com/download/@appspine/integration-contracts/0.4.0/02765e762910cdb0ab06609145d267cda2ba7c36}
 
   '@asamuzakjp/css-color@6.0.5':
     resolution: {integrity: sha512-mbhpPMmnw/kwW19aRNmSUl1QzLbdGo1SCuE49BT98MNwqF6zaHb3o2owssFc/PEO/4t2UjqtCNwocuDtJornzA==}
@@ -3477,7 +3477,7 @@ packages:
 
 snapshots:
 
-  '@appspine/integration-contracts@0.3.1': {}
+  '@appspine/integration-contracts@0.4.0': {}
 
   '@asamuzakjp/css-color@6.0.5':
     dependencies:
