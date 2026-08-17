@@ -1,7 +1,7 @@
 ---
 type: decision
 scope: cross-repo
-status: active
+status: completed
 supersedes: null
 superseded_by: null
 created: 2026-08-17
