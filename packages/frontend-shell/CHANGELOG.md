@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.16.1
+
+### Patch Changes
+
+- 6ea53ea: Fix admin settings modal retry, responsive navigation, localizable status labels, and shared list controls used by intercepted routes.
+
 ## 0.16.0
 
 ### Minor Changes
