@@ -15,7 +15,7 @@ import { NavMain } from './nav-main.js';
 import type { NavGroup, ShellLinkComponent } from './navigation.js';
 import { SidebarPageSlot } from './sidebar-page-slot.js';
 import { SidebarResizer } from './sidebar-resizer.js';
-import { UserNav } from './user-nav.js';
+import { UserNav, type UserNavAdminMenu } from './user-nav.js';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   readonly appName: string;
@@ -30,6 +30,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   readonly onSignOut: () => void;
   readonly accountLabel?: string;
   readonly signOutLabel?: string;
+  readonly adminMenu?: UserNavAdminMenu;
 }
 
 export function AppSidebar({
@@ -41,6 +42,7 @@ export function AppSidebar({
   onSignOut,
   accountLabel,
   signOutLabel,
+  adminMenu,
   ...props
 }: AppSidebarProps) {
   return (
@@ -67,6 +69,7 @@ export function AppSidebar({
           onSignOut={onSignOut}
           accountLabel={accountLabel}
           signOutLabel={signOutLabel}
+          adminMenu={adminMenu}
         />
       </SidebarFooter>
       <SidebarResizer />

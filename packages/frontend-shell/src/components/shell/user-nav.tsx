@@ -14,8 +14,16 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu.js';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/sidebar.js';
+import type { ShellLinkComponent } from './navigation.js';
 
-interface UserNavProps {
+export interface UserNavAdminMenu {
+  readonly label: string;
+  readonly url: string;
+  readonly icon?: React.ComponentType<{ className?: string }>;
+  readonly LinkComponent: ShellLinkComponent;
+}
+
+export interface UserNavProps {
   readonly user: {
     readonly name: string;
     readonly email: string;
@@ -24,6 +32,7 @@ interface UserNavProps {
   readonly onSignOut: () => void;
   readonly accountLabel?: string;
   readonly signOutLabel?: string;
+  readonly adminMenu?: UserNavAdminMenu;
 }
 
 export function UserNav({
@@ -31,6 +40,7 @@ export function UserNav({
   onSignOut,
   accountLabel = 'Account',
   signOutLabel = 'Log out',
+  adminMenu,
 }: UserNavProps) {
   const { isMobile } = useSidebar();
 
@@ -79,6 +89,22 @@ export function UserNav({
                 {accountLabel}
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            {adminMenu && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <adminMenu.LinkComponent
+                      href={adminMenu.url}
+                      className="flex w-full items-center gap-2"
+                    >
+                      {adminMenu.icon && <adminMenu.icon className="size-4" />}
+                      <span>{adminMenu.label}</span>
+                    </adminMenu.LinkComponent>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onSignOut}>
               <LogOut />

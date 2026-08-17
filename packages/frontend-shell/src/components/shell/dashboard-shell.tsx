@@ -4,8 +4,9 @@ import { Separator } from '../ui/separator.js';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '../ui/sidebar.js';
 import { AppSidebar } from './app-sidebar.js';
 import type { NavGroup, ShellLinkComponent } from './navigation.js';
+import type { UserNavAdminMenu } from './user-nav.js';
 
-interface DashboardShellProps {
+export interface DashboardShellProps {
   readonly appName: string;
   readonly currentPath: string;
   readonly navItems: readonly NavGroup[];
@@ -18,6 +19,7 @@ interface DashboardShellProps {
   readonly onSignOut: () => void;
   readonly accountLabel?: string;
   readonly signOutLabel?: string;
+  readonly adminMenu?: UserNavAdminMenu;
   readonly defaultOpen: boolean;
   readonly sidebarVariant: 'sidebar' | 'floating' | 'inset';
   readonly sidebarCollapsible: 'offcanvas' | 'icon' | 'none';
@@ -35,6 +37,7 @@ export function DashboardShell({
   onSignOut,
   accountLabel,
   signOutLabel,
+  adminMenu,
   defaultOpen,
   sidebarVariant,
   sidebarCollapsible,
@@ -60,6 +63,7 @@ export function DashboardShell({
         onSignOut={onSignOut}
         accountLabel={accountLabel}
         signOutLabel={signOutLabel}
+        adminMenu={adminMenu}
         variant={sidebarVariant}
         collapsible={sidebarCollapsible}
       />

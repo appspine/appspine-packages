@@ -20,6 +20,7 @@ export * from './components/date-range-picker.js';
 export * from './components/date-time-picker.js';
 export * from './components/list-pagination.js';
 export * from './components/list-search-form.js';
+export * from './components/shell/admin-modal-shell.js';
 export * from './components/shell/admin-settings-modal.js';
 export * from './components/shell/app-sidebar.js';
 export * from './components/shell/dashboard-shell.js';
