@@ -44,19 +44,27 @@ updated: 2026-08-17
 
 目的：本計畫唯一的高風險項（Next.js intercepting route 層級判斷）**只能靠本機瀏覽器實測**證明，所以開工前必須先確認「本機跑得起來」不是假設；同時把 050 §3.1 那句「可以直接 import 不用重構」從斷言變成逐檔核實過的事實。
 
-### S0-1 兩個 repo 的 baseline 快照與記憶體檢查
+> **執行狀態（2026-08-17，Codex 第一次執行紀錄）**：S0-1／S0-3／S0-4 已完成，S0-2／S0-5 卡在
+> Codex 沙盒環境限制（非計畫本身的問題）——沙盒沒有 Docker Engine 存取權、連不到 localhost
+> 瀏覽器、也沒有 `pnpm`；且這次 Codex 的 workspace 只放行 `appspine-packages`，寫不到
+> `mcp-gateway`。**沒有任何檔案被改動、沒有 push**，兩個 repo 仍是乾淨狀態
+> （`appspine-packages` HEAD `06c0765`、`mcp-gateway` HEAD `fc96f98`）。Gate G1 因此**尚未過關**，
+> 後續執行（無論是誰／哪個 agent 做）必須先解掉這兩個環境限制才能繼續，見下方各任務狀態標記。
+
+### ✅ S0-1 兩個 repo 的 baseline 快照與記憶體檢查（已完成）
 - **repo**：`appspine-packages`、`mcp-gateway`
 - **依賴**：無
 - **做什麼**：記錄兩 repo 的 branch / HEAD SHA / working tree 狀態。目前已確認：`mcp-gateway` clean（HEAD `fc96f98`）；`appspine-packages`（HEAD `b24a95c`）有 `M knowledge/index.md` 與兩個 untracked 的 050/Z32 文件——**都是文件，不影響程式碼異動的可回溯性**，但開工前先把它們 commit 掉，讓後續 Part A/B 的 diff 乾淨。同時檢查可用實體記憶體（既有教訓：兩個 Docker stack + dev server + IDE 會把可用記憶體壓到 0.5GB 以下，導致 tsc/node OOM 看起來像程式碼 bug）。
-- **驗證**：兩 repo 各有 SHA 紀錄；`git status --short` 只剩預期內的異動；可用記憶體 ≥ 4GB，否則先關掉其他 Docker stack。
+- **驗證**：兩 repo 各有 SHA 紀錄；`git status --short` 只剩預期內的異動；可用記憶體 ≥ 4GB，否則先關掉其他 Docker stack。**已由 Codex 執行確認**：`mcp-gateway` clean（HEAD `fc96f98`）；`appspine-packages` clean（HEAD `06c0765`，050 文件已 commit＋push，見下方 Phase 6 前言）；可用記憶體約 6.65GB，足夠。
 
-### S0-2 確認本機 dev 環境起得來
+### 🚫 S0-2 確認本機 dev 環境起得來（Codex 沙盒卡住，需要真正的本機環境重跑）
 - **repo**：`mcp-gateway`
 - **依賴**：S0-1
 - **做什麼**：`docker compose up -d`（Keycloak + DB）→ `pnpm dev`（root script 用 `concurrently` 同時起 backend 與 frontend，frontend 固定 `next dev -p 3071`）。注意兩個本機特例：(a) 本機 dev Keycloak 跑在 **8280** 而非 workspace 標準 8180，遇到 issuer 不合要用環境變數覆蓋，**不要去改文件裡的 port**；(b) `mcp-gateway/.npmrc` 用 `${GITHUB_TOKEN}` 對 GitHub Packages 認證，若 `pnpm install` 回 401，是既知的 token 漂移問題，先確認 token 有效再往下。
 - **驗證**：瀏覽器開 `http://localhost:3071/dashboard`，能用 admin 帳號登入並看到現有 7 項 administration 選單；隨手點開 `/dashboard/audit-logs` 有資料。
+- **執行紀錄**：Codex 這次跑在沒有 Docker Engine 存取權、連不到 localhost 瀏覽器的沙盒裡，`docker compose up -d` 與瀏覽器驗證兩者都做不到，port 3071/8280/5438 全部無法連。**這是執行環境限制，不是計畫或程式碼問題**——任何後續執行者（Codex 或其他 agent）都需要在有 Docker daemon 存取權、且能開真實瀏覽器連 localhost 的環境下才能過這關。
 
-### S0-3 逐檔核實 7 個 admin `page.tsx` 的預設匯出形狀
+### ✅ S0-3 逐檔核實 7 個 admin `page.tsx` 的預設匯出形狀（已完成，Codex 覆核一致）
 - **repo**：`mcp-gateway`
 - **依賴**：無（可與 S0-2 並行）
 - **做什麼**：這是把 050 §3.1 的斷言轉成事實。逐檔確認 `src/app/(main)/dashboard/(admin)/*/page.tsx` 的 `export default async function` 簽章。已核實結果：
@@ -76,7 +84,7 @@ updated: 2026-08-17
 
 > **判斷取捨（需要使用者確認）**：對 3 個無 props 的頁面，攔截頁採「不宣告、不轉送 props」寫法（`<VaultPage />`），而非硬塞一個被忽略的 `searchParams`。理由：那 3 個元件的 props 型別是 `{}`，多傳會直接 TS 編譯失敗，不是風格選擇。若之後這些頁面要加篩選參數，再單獨補。
 
-### S0-4 核實 `dlp-rules` 多出的兩個檔案實際做了什麼
+### ✅ S0-4 核實 `dlp-rules` 多出的兩個檔案實際做了什麼（已完成，Codex 覆核一致）
 - **repo**：`mcp-gateway`
 - **依賴**：無
 - **做什麼**：讀 `(admin)/dlp-rules/error.tsx` 與 `loading.tsx`，記下要被「近似」的具體行為，作為 S4-3 的比對基準。已核實：
@@ -85,7 +93,7 @@ updated: 2026-08-17
   - 兩者都**只掛在 `(admin)/dlp-rules/` 這條完整頁路徑上**。新增的 `@modal/(.)dlp-rules/` 是另一條路由分支，不會繼承。
 - **驗證**：兩份檔案內容已逐行記錄；確認其餘 6 個 admin 資料夾沒有 `error.tsx`/`loading.tsx`（`ls (admin)/*/` 已確認）。
 
-### S0-5 核實 `@appspine/frontend-shell` 的版本鏈路
+### 🟡 S0-5 核實 `@appspine/frontend-shell` 的版本鏈路（結論已由 Opus 事先查證，Codex 這次跑不了 `pnpm` 只能覆核靜態部分）
 - **repo**：`mcp-gateway`、`appspine-packages`、`appspine-app-template`
 - **依賴**：無
 - **做什麼**：把 S6-3 要改的位置全部先定位出來。已核實：
@@ -94,9 +102,11 @@ updated: 2026-08-17
   - 實際安裝：`node_modules/@appspine/frontend-shell/package.json` 版本 `0.15.0`（與 override 一致，佐證上一點）
   - `appspine-app-template/frontend/package.json:22` → `^0.15.0`（本次不動，050 §6.2 已排除）
   - `appspine-packages/packages/frontend-shell/package.json` 版本 `0.15.1`，`exports` 有 `.` / `./notification` / `./server` 三個進入點，`files` 只含 `dist`，`build` = `tsc -p tsconfig.build.json`
-- **驗證**：四處版本字串都有檔案:行號紀錄；`pnpm -C frontend why @appspine/frontend-shell` 顯示解析結果來自 override。
+- **驗證**：四處版本字串都有檔案:行號紀錄——**這部分已確認**。`pnpm -C frontend why @appspine/frontend-shell` 顯示解析結果來自 override——**這部分 Codex 這次做不到**，沙盒裡沒有 `pnpm` 可執行，只能從既有檔案內容推論版本鏈路，未能用指令即時驗證。後續執行者需要在有 `pnpm` 的環境下補跑這一條指令確認。
 
-> **閘門 G1**：S0-1 ~ S0-5 全綠才進 Phase 1。此時尚未動任何程式碼，零成本回頭。
+> **閘門 G1**：S0-1 ~ S0-5 全綠才進 Phase 1。此時尚未動任何程式碼，零成本回頭。**目前狀態：未過關**（卡在 S0-2 的 Docker/瀏覽器存取，與 S0-5 的 `pnpm` 指令驗證）。
+>
+> **另一個必要條件（Codex 這次才發現，原文件沒提到）**：執行環境（不論是 Codex CLI 或其他 agent）必須同時擁有 `d:\Source\Private\appspine\appspine-packages` **與** `d:\Source\Private\appspine\mcp-gateway` **兩個 repo 的寫入權限**——Phase 2 動 `appspine-packages`，Phase 3-5 幾乎全部動 `mcp-gateway`。Codex 這次的 workspace 只放行了前者，寫不到後者，這件事必須在下一次執行前解決（例如把 CLI 的工作目錄設在 `d:\Source\Private\appspine` 這個共同上層目錄再啟動，讓兩個子目錄都在存取範圍內）。
 
 ---
 
