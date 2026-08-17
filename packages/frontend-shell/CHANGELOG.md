@@ -1,5 +1,11 @@
 # @appspine/frontend-shell
 
+## 0.16.0
+
+### Minor Changes
+
+- e43e4ac: Fix-sidebar-account-positioning-and-add-AdminSettingsModal-shell
+
 ## 0.15.1
 
 ### Patch Changes
