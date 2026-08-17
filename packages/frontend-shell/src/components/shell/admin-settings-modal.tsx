@@ -207,7 +207,7 @@ export function AdminSettingsModal({
           </aside>
 
           <section className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
-            <div className="flex h-11 shrink-0 items-center justify-end border-b px-3 sm:px-4">
+            <div className="flex h-11 shrink-0 items-center justify-end px-3 sm:px-4">
               <DialogClose asChild>
                 <Button variant="ghost" size="icon-sm" aria-label={resolvedLabels.close}>
                   <X aria-hidden="true" />
