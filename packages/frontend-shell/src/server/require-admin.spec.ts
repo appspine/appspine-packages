@@ -25,8 +25,11 @@ describe('createRequireAdminPage', () => {
     expect(result).toBe(adminUser);
   });
 
-  it('redirects to /unauthorized by default when user is null', async () => {
-    const requireAdminPage = createRequireAdminPage(async () => null);
+  it.each([
+    null,
+    undefined,
+  ])('redirects to /unauthorized by default when user is %s', async (user) => {
+    const requireAdminPage = createRequireAdminPage(async () => user);
     await expect(requireAdminPage()).rejects.toThrow('REDIRECT:/unauthorized');
   });
 

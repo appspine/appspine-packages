@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ComponentType } from 'react';
 
 export type NavBadge = 'new' | 'soon';
 
@@ -39,13 +39,8 @@ export interface NavGroup {
   items: NavMainItem[];
 }
 
-export interface ShellLinkProps {
+export interface ShellLinkProps extends Omit<ComponentPropsWithRef<'a'>, 'href'> {
   href: string;
-  className?: string;
-  target?: string;
-  rel?: string;
-  'aria-current'?: 'page';
-  children: ReactNode;
 }
 
 export type ShellLinkComponent = ComponentType<ShellLinkProps>;
