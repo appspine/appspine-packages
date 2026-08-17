@@ -1,7 +1,7 @@
 ---
 type: decision
 scope: cross-repo
-status: active
+status: completed
 supersedes: null
 superseded_by: null
 created: 2026-08-17
@@ -41,6 +41,31 @@ updated: 2026-08-17
 > 步驟失敗，屬於既有、無關的環境問題，不在本次修復範圍。S3-8/S5-1~S5-4 描述的瀏覽器手動驗證，
 > 以及 e2e 規格裡欠缺的 4 個案例（reload 變完整頁、非 admin 打 intercepting route、DLP fallback
 > 渲染、巢狀 dialog focus trap）仍待執行。
+>
+> **Gate G2 現場瀏覽器實測（2026-08-17，本機 `pnpm dev` + 真實 Keycloak，非 CI）**：全數通過。
+> - Part A：`[data-slot="sidebar-container"]` computed `position: fixed` 確認；在 `/dashboard/audit-logs`
+>   （文件高度 1375px > 視窗 889px）捲到底，捲動前後 `getBoundingClientRect()` 完全相同，帳號列真正貼齊視窗底部。
+> - Part B：`(.)xxx`（同層攔截）**第一次就猜對**，7 個分頁（Users/Roles/API Keys/Gateway Profiles/Vault/
+>   Audit Logs/DLP Rules）全部能在 modal 內正確切換，zh-TW 標籤與內容都對；連續切 4 個分頁後按一次「關閉」
+>   直接回到 `/dashboard`（S3-6a 修法確認生效）；巢狀 dialog（DLP 自訂關鍵字表單）開關不影響外層 modal
+>   （focus trap 正常）；硬重新整理 `/dashboard/users` 顯示完整頁（非攔截版），麵包屑正確顯示
+>   「系統管理／使用者」；非 admin 帳號側邊欄不顯示入口，直接打完整頁網址被導向 `/unauthorized`；**非 admin
+>   對 intercepting route 本身的防護**用瀏覽器實際發出的 RSC fetch（`rsc:1` + `next-router-state-tree` +
+>   `next-url` header，從 admin session 的真實請求擷取後換上 non-admin session 重放）驗證過，回應不含
+>   `UsersTable`/`AdminModal` 內容、確認 redirect 有觸發——`requireAdminPage()` 在 `@modal` 分支真的有作用。
+> - 過程中另外抓到 2 個問題並修好：(1) `audit-logs/page-content.tsx` 把 server 端算好的
+>   `LinkComponent ?? Link` 傳進 `"use client"` 的 `AuditLogFilterForm`，Turbopack 的 RSC 邊界無法序列化
+>   這種非直接匯入的函式參照，整頁 500——改成把原始 prop 直接轉送，讓該 client component 自己內部的
+>   fallback 處理；(2) `AdminSettingsModal` 右側工具列有一條多餘的分隔線，已拿掉。兩者都已透過
+>   `0.16.2`／mcp-gateway 對應 commit 正式修好並發布，非本機暫時修補。
+> - DLP Rules 的 `errorFallback`/`loadingFallback` 未能在本次 session 完整驗證：測試過程中意外撞見一個
+>   跟本次改動**無關**的既有問題——RootLayout 的 `ThemeBootScript`（`next/script` `beforeInteractive`）
+>   在任何 route-level 錯誤邊界被觸發時，dev 模式下會額外跳出「Encountered a script tag while rendering
+>   React component」的乾擾，且 Windows 本機這次 `next dev`/Turbopack 在多輪 kill/restart 後進入不穩定
+>   狀態（App Router 的 `.next/dev/server/app/` 建置輸出整個消失），干擾到用「停掉 backend 逼出錯誤」
+>   這個方法做端到端驗證。DLP fallback 的正確性目前仍只有靜態程式碼審查佐證（逐字對齊既有
+>   `error.tsx`/`loading.tsx` 文案），**沒有走到真正觸發 fetch 失敗、看到畫面渲染出來**這一步，這點與
+>   `ThemeBootScript` 這個既有問題都留在待辦，不阻擋本次收尾。
 
 ## 執行前必讀：計畫敘述與實際 working tree 的落差
 
