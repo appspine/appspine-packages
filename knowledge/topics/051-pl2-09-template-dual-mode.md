@@ -117,6 +117,7 @@ TypeScript 編譯過了。
 | Substitution reason | 本 session 無獨立 Terra／Gemini provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-09-template-dual-mode`（本 repo）、`051-pl2-09-dual-mode-host`（template，**未 commit**）|
+| Commit | `b895dbe`（本 repo）|
 | Tools | repo read/write、pnpm、pnpm pack、vitest、tsc、nest build、prisma generate、biome |
 | Evidence | §3 的完整流程；`pnpm verify:template-dual-mode` |
 | 已知風險 | §4，尤其前兩項 |
