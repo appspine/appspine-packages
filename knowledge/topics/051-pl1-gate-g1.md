@@ -126,6 +126,7 @@ blocking 之前開始。
 | 欄位 | 內容 |
 |---|---|
 | Task | Gate G1 |
+| Commit | `4c0ce5f`（branch `051-plugin-platform-phase0-phase1`）|
 | Actual agent | Claude Opus 5（primary）＋獨立 Claude Opus general-purpose agent（blind-spot review） |
 | Required class | G3（Sol max 主責、Gemini 獨立遺漏審查）——本 session 依 G0 已建立的替代方式執行，見 §1 |
 | Substitution reason | 本 session 無獨立 Sol／Gemini provider |

@@ -117,6 +117,7 @@ Phase 1 的原始交付只驗證了三個新 package 各自的 `pnpm --filter �
 | 欄位 | 內容 |
 |---|---|
 | Task | PL1-01～14 彙總 |
+| Commit | `4c0ce5f`（branch `051-plugin-platform-phase0-phase1`）——Phase 0 與 Phase 1 合併為單一 commit，偏離見 [Gate G1 §1](051-pl1-gate-g1.md) |
 | Actual agent | Claude Opus 5 |
 | Required class | G2／G3 混合，見各分項文件 |
 | Substitution reason | 本 session 無獨立 Sol／Terra／Luna／Gemini provider |

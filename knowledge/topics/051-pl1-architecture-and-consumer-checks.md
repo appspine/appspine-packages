@@ -119,6 +119,7 @@ pnpm verify:phase1   # = architecture --self-test && architecture && clean-consu
 | 欄位 | 內容 |
 |---|---|
 | Task | PL1-07、PL1-14 |
+| Commit | `4c0ce5f`（branch `051-plugin-platform-phase0-phase1`）——Phase 0 與 Phase 1 合併為單一 commit，偏離見 [Gate G1 §1](051-pl1-gate-g1.md) |
 | Actual agent | Claude Opus 5（單一 session 依序執行；拆解建議的 Terra high + Gemini／Luna review 未接入，屬 §11 替代） |
 | Required class | G2 |
 | Substitution reason | 本 session 無獨立 Terra／Gemini／Luna provider；使用者要求直接執行 Phase 1 |

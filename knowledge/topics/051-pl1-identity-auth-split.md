@@ -142,6 +142,7 @@ pnpm --filter @appspine/m2m-api-key test     #  16 tests
 | 欄位 | 內容 |
 |---|---|
 | Task | PL1-10、PL1-12、PL1-13 |
+| Commit | `4c0ce5f`（branch `051-plugin-platform-phase0-phase1`）——Phase 0 與 Phase 1 合併為單一 commit，偏離見 [Gate G1 §1](051-pl1-gate-g1.md) |
 | Actual agent | Claude Opus 5（單一 session 依序執行；拆解建議的 Sol xhigh 主責＋Terra 切檔＋Claude review 未分派，屬 §11 替代） |
 | Required class | G3 |
 | Substitution reason | 本 session 無獨立 Sol／Terra provider；使用者要求直接執行 Phase 1 |

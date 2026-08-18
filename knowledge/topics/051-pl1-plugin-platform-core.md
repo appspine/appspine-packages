@@ -152,6 +152,7 @@ pnpm --filter @appspine/plugin-host-nest test  # 31 tests
 | 欄位 | 內容 |
 |---|---|
 | Task | PL1-01、PL1-02、PL1-03、PL1-04、PL1-05、PL1-06、PL1-11 |
+| Commit | `4c0ce5f`（branch `051-plugin-platform-phase0-phase1`）——Phase 0 與 Phase 1 合併為單一 commit，偏離見 [Gate G1 §1](051-pl1-gate-g1.md) |
 | Actual agent | Claude Opus 5（單一 session 依序執行；拆解建議的 Sol xhigh／Terra high 未接入，屬 §11 替代） |
 | Required class | G3（PL1-01／04／05／06／11）、G2（PL1-02／03） |
 | Substitution reason | 本 session 無獨立 Sol／Terra provider；使用者要求直接執行 Phase 1 |

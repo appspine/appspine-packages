@@ -203,6 +203,7 @@ Gate G0 通過**不代表**以下事項已解決，逐一列出以免 Phase 1 ta
 | 欄位 | 內容 |
 |---|---|
 | Task | Gate G0 |
+| Commit | `4c0ce5f`（branch `051-plugin-platform-phase0-phase1`）——與 Phase 1 同一個 commit，見 [Gate G1 §1](051-pl1-gate-g1.md) |
 | Actual agent | Claude Sonnet 5（primary）+ Claude Opus（第一輪 blind-spot review）+ Codex（G0 follow-up review 與 C1～C5 remediation，2026-08-18） |
 | Required class | G3（Sol xhigh 主責，Gemini 獨立遺漏審查）——本 session 依使用者核准替代，primary 由 Claude Sonnet 承接，review 由獨立 Claude Opus agent instance 承接（見第 1 節說明） |
 | Substitution reason | 使用者 2026-08-18 對話中明確核准：「全部由 Claude Sonnet 直接執行，用不同的 Agent 子代理 instance 做『獨立審查』角色」 |
