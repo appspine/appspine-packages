@@ -93,6 +93,7 @@ preset 版本變動造成 drift、`add` 不把展開結果寫回檔案。
 | Substitution reason | 本 session 無獨立 Terra provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-08-preset-standard` |
+| Commit | `f0a789d` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §7；`packages/preset-standard/src/preset.spec.ts`、`packages/plugin-cli/src/preset.spec.ts` |
 | 已知風險 | §8 |
