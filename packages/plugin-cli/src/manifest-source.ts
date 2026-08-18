@@ -83,6 +83,8 @@ export function locateManifest(
 export interface ManifestReadOk {
   ok: true;
   loaded: LoadedPluginManifest;
+  /** Directory the manifest was read from, so callers can digest files the package ships. */
+  packageDir: string;
   diagnostics: PluginDiagnostic[];
 }
 
@@ -118,7 +120,12 @@ export function readManifestFor(
 
   const result = loadPluginManifest(location.packageDir);
   if (!result.ok) return { ok: false, diagnostics: result.diagnostics };
-  return { ok: true, loaded: result.value, diagnostics: result.value.diagnostics };
+  return {
+    ok: true,
+    loaded: result.value,
+    packageDir: location.packageDir,
+    diagnostics: result.value.diagnostics,
+  };
 }
 
 export interface ManifestSet {
@@ -126,6 +133,11 @@ export interface ManifestSet {
   byRef: Map<string, LoadedPluginManifest>;
   /** Same manifests keyed by plugin id, for the config-boundary check. */
   byPluginId: Map<string, LoadedPluginManifest['manifest']>;
+  /**
+   * Package name -> the directory its manifest was read from. The lockfile digests each package's
+   * Prisma fragment, and it can only do that if it knows where the package actually is.
+   */
+  packageDirs: Map<string, string>;
   diagnostics: PluginDiagnostic[];
   /** Refs whose manifest could not be read. */
   missing: string[];
@@ -145,6 +157,7 @@ export function readManifestsFor(
 ): ManifestSet {
   const byRef = new Map<string, LoadedPluginManifest>();
   const byPluginId = new Map<string, LoadedPluginManifest['manifest']>();
+  const packageDirs = new Map<string, string>();
   const diagnostics: PluginDiagnostic[] = [];
   const missing: string[] = [];
 
@@ -157,8 +170,9 @@ export function readManifestsFor(
     }
     byRef.set(ref, result.loaded);
     byPluginId.set(result.loaded.manifest.id, result.loaded.manifest);
+    packageDirs.set(result.loaded.packageName, result.packageDir);
     diagnostics.push(...result.diagnostics);
   }
 
-  return { byRef, byPluginId, diagnostics, missing };
+  return { byRef, byPluginId, packageDirs, diagnostics, missing };
 }

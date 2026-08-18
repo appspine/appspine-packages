@@ -8,6 +8,11 @@
  * Generation refuses to run on an inventory that does not resolve. Emitting artefacts from a
  * broken graph would produce files that look authoritative and describe something the App cannot
  * boot — and `doctor` would then be comparing against them.
+ *
+ * It brings two different kinds of derived state up to date: `.appspine/generated/*`, which is
+ * regenerable output nobody reads, and `appspine.plugin-lock.json`, which is committed and read as
+ * a diff. One command, because they are derived from the same inputs and a repository where only
+ * one of them was refreshed is a repository whose lock describes a graph the App does not run.
  */
 
 import { diagnostic } from '@appspine/plugin-api';
@@ -24,6 +29,13 @@ import {
   sourceDigest,
   writeArtifacts,
 } from '../generate';
+import {
+  buildLockfile,
+  compareLockfile,
+  LOCKFILE_NAME,
+  readLockfile,
+  writeLockfile,
+} from '../lockfile';
 import { checkInventory, hasErrors, isLoaded, loadState } from './shared';
 
 export const CLI_TOOL_NAME = '@appspine/plugin-cli';
@@ -75,49 +87,74 @@ function build(context: CommandContext): CommandResult {
   };
   const artifacts = generateAll(input);
   const expected = sourceDigest(input);
+  // The lock records the artefacts' digests, so it has to be built from the same artefact objects
+  // that were (or would be) written - not from a second generation pass that could differ.
+  const lock = buildLockfile(input, artifacts, state.manifests.packageDirs);
 
   if (args.flags.get('check') === true) {
     const drift = detectDrift(appRoot, artifacts);
-    if (drift.length === 0) {
+    const lockDiagnostics = compareLockfile(readLockfile(appRoot), lock);
+
+    if (drift.length === 0 && lockDiagnostics.length === 0) {
       return {
         command,
         exitCode: ExitCode.OK,
         diagnostics: [
-          diagnostic('artifacts-current', `${artifacts.length} artefact(s) up to date`, {
-            severity: 'info',
-          }),
+          diagnostic(
+            'artifacts-current',
+            `${artifacts.length} artefact(s) and ${LOCKFILE_NAME} up to date`,
+            { severity: 'info' },
+          ),
         ],
-        data: { checked: artifacts.map((a) => a.path), sourceDigest: expected },
+        data: {
+          checked: [...artifacts.map((a) => a.path), LOCKFILE_NAME],
+          sourceDigest: expected,
+          resolutionDigest: lock.resolutionDigest,
+        },
       };
     }
     return {
       command,
       exitCode: ExitCode.DRIFT_DETECTED,
-      diagnostics: drift.map((entry) =>
-        driftDiagnostic(entry, expected, recordedSourceDigest(appRoot, entry.path)),
-      ),
-      data: { drift, sourceDigest: expected },
+      diagnostics: [
+        ...drift.map((entry) =>
+          driftDiagnostic(entry, expected, recordedSourceDigest(appRoot, entry.path)),
+        ),
+        ...lockDiagnostics,
+      ],
+      data: { drift, sourceDigest: expected, lockDrift: lockDiagnostics.map((d) => d.code) },
     };
   }
 
   const written = writeArtifacts(appRoot, artifacts);
+  if (writeLockfile(appRoot, lock)) written.push(LOCKFILE_NAME);
+
   return {
     command,
     exitCode: ExitCode.OK,
     diagnostics: [
       diagnostic(
         'artifacts-written',
-        written.length > 0
-          ? `wrote ${written.join(', ')}`
-          : 'all artefacts were already up to date',
+        written.length > 0 ? `wrote ${written.join(', ')}` : 'everything was already up to date',
         { severity: 'info' },
       ),
+      ...(written.includes(LOCKFILE_NAME)
+        ? [
+            diagnostic(
+              'lockfile-review',
+              `${LOCKFILE_NAME} changed. It is committed and reviewed as a diff - read it before merging`,
+              { severity: 'info', path: LOCKFILE_NAME },
+            ),
+          ]
+        : []),
     ],
     data: {
       written,
       artifacts: artifacts.map((a) => a.path),
       catalog: CATALOG_ARTIFACT,
+      lockfile: LOCKFILE_NAME,
       sourceDigest: expected,
+      resolutionDigest: lock.resolutionDigest,
     },
   };
 }

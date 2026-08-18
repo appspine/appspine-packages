@@ -24,6 +24,7 @@ import {
   recordedSourceDigest,
   sourceDigest,
 } from '../generate';
+import { buildLockfile, compareLockfile, readLockfile } from '../lockfile';
 import { CLI_TOOL_NAME } from './build';
 import { checkInventory, hasErrors, isLoaded, loadState } from './shared';
 
@@ -119,6 +120,7 @@ function doctor(context: CommandContext): CommandResult {
   // Generated-artefact drift, but only when the graph is good enough to generate from. Reporting
   // drift against a broken resolution would blame the artefacts for the inventory's problem.
   let drift: { path: string; reason: string }[] = [];
+  let lockDiagnostics: PluginDiagnostic[] = [];
   if (checked.graph && state.manifests.missing.length === 0 && !hasErrors(checked.diagnostics)) {
     const input: GenerationInput = {
       inventory: state.inventory,
@@ -133,6 +135,15 @@ function doctor(context: CommandContext): CommandResult {
     for (const entry of found) {
       diagnostics.push(driftDiagnostic(entry, expected, recordedSourceDigest(appRoot, entry.path)));
     }
+
+    // The two lockfiles have to be read together. A package upgraded through pnpm without a
+    // rebuild leaves a plugin lock describing the previous version's capability graph, and the App
+    // would boot on a graph nobody reviewed. That is what these diagnostics are for.
+    lockDiagnostics = compareLockfile(
+      readLockfile(appRoot),
+      buildLockfile(input, artifacts, state.manifests.packageDirs),
+    );
+    diagnostics.push(...lockDiagnostics);
   }
 
   const summary = {
@@ -145,7 +156,7 @@ function doctor(context: CommandContext): CommandResult {
   diagnostics.push(
     diagnostic(
       'doctor-summary',
-      `${summary.enabled} enabled, ${summary.disabled} disabled, ${summary.unresolved} unresolved, ${summary.manifestMissing} without a manifest; ${drift.length} artefact(s) out of date`,
+      `${summary.enabled} enabled, ${summary.disabled} disabled, ${summary.unresolved} unresolved, ${summary.manifestMissing} without a manifest; ${drift.length} artefact(s) out of date; ${lockDiagnostics.length} lockfile finding(s)`,
       { severity: 'info' },
     ),
   );
@@ -153,12 +164,18 @@ function doctor(context: CommandContext): CommandResult {
   return {
     command,
     exitCode: hasErrors(diagnostics)
-      ? drift.length > 0 && !hasErrorsExcludingDrift(diagnostics)
-        ? ExitCode.DRIFT_DETECTED
-        : ExitCode.RESOLUTION_FAILED
+      ? hasErrorsExcludingDrift(diagnostics)
+        ? ExitCode.RESOLUTION_FAILED
+        : ExitCode.DRIFT_DETECTED
       : ExitCode.OK,
     diagnostics,
-    data: { entries, summary, drift, catalog: CATALOG_ARTIFACT },
+    data: {
+      entries,
+      summary,
+      drift,
+      lockfile: lockDiagnostics.map((entry) => entry.code),
+      catalog: CATALOG_ARTIFACT,
+    },
   };
 }
 
@@ -167,11 +184,20 @@ function doctor(context: CommandContext): CommandResult {
  * inputs". Anything else outranks it: telling an operator to rebuild when their inventory does not
  * resolve would send them down the wrong path.
  */
+const REBUILDABLE_CODES = new Set([
+  'artifact-stale',
+  'artifact-missing',
+  'plugin-lock-missing',
+  'plugin-lock-package-added',
+  'plugin-lock-package-removed',
+  'plugin-lock-version-drift',
+  'plugin-lock-schema-drift',
+  'plugin-lock-resolution-drift',
+  'plugin-lock-artifact-drift',
+]);
+
 function hasErrorsExcludingDrift(diagnostics: readonly PluginDiagnostic[]): boolean {
   return diagnostics.some(
-    (entry) =>
-      entry.severity === 'error' &&
-      entry.code !== 'artifact-stale' &&
-      entry.code !== 'artifact-missing',
+    (entry) => entry.severity === 'error' && !REBUILDABLE_CODES.has(entry.code),
   );
 }

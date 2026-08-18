@@ -58,6 +58,7 @@
 | [051-pl2-01-plugin-cli.md](topics/051-pl2-01-plugin-cli.md) | topic | active | 051 PL2-01 — `@appspine/plugin-cli` 與設定 schema |
 | [051-pl2-02-cli-commands.md](topics/051-pl2-02-cli-commands.md) | topic | active | 051 PL2-02 — `add`／`remove`／`list`／`validate` |
 | [051-pl2-03-build-doctor.md](topics/051-pl2-03-build-doctor.md) | topic | active | 051 PL2-03 — `build`／`doctor` 與 catalog diagnostics |
+| [051-pl2-04-plugin-lockfile.md](topics/051-pl2-04-plugin-lockfile.md) | topic | active | 051 PL2-04 — `appspine.plugin-lock.json` |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

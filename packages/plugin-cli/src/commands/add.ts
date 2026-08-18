@@ -128,6 +128,7 @@ function add(context: CommandContext): CommandResult {
   // Step 2: the candidate must survive the same checks `validate` applies to a committed file.
   const manifestsWithNew = {
     ...state.manifests,
+    packageDirs: new Map(state.manifests.packageDirs),
     byRef: new Map(state.manifests.byRef).set(manifest.loaded.packageName, manifest.loaded),
     byPluginId: new Map(state.manifests.byPluginId).set(
       manifest.loaded.manifest.id,

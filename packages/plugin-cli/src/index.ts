@@ -100,6 +100,21 @@ export {
   writeInventory,
 } from './inventory-file';
 export {
+  artifactDigest,
+  buildLockfile,
+  compareLockfile,
+  LOCK_SCHEMA_VERSION,
+  LOCKFILE_NAME,
+  type LockedArtifact,
+  type LockedInstance,
+  type LockedPackage,
+  lockfilePath,
+  type PluginLockfile,
+  readLockfile,
+  serializeLockfile,
+  writeLockfile,
+} from './lockfile';
+export {
   candidateDirs,
   DEFAULT_OFFICIAL_SCOPE,
   locateManifest,
