@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "broken-notification-fork",
+  "displayName": "Broken Notification Fork",
+  "cardinality": "singleton",
+  "engine": { "appspinePluginApi": "^1.0.0", "node": ">=22.0.0" },
+  "provides": ["appspine.notification-inbox"],
+  "requires": [],
+  "conflicts": ["broken-notification-fork"],
+  "facets": {
+    "backend": { "modulePath": "./dist/broken.module.js", "exportName": "BrokenModule" }
+  }
+}

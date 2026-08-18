@@ -41,6 +41,20 @@
 | [049-business-apps-cleanup-scoping-plan.md](decisions/049-business-apps-cleanup-scoping-plan.md) | decision | active | 049 - 業務 App 清理計畫（第三階段：範圍界定與盤點交接） |
 | [050-mcp-gateway-sidebar-modal-plan.md](decisions/050-mcp-gateway-sidebar-modal-plan.md) | decision | completed | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal - 系統設計計畫 |
 | [050-mcp-gateway-sidebar-modal-task-breakdown.md](decisions/050-mcp-gateway-sidebar-modal-task-breakdown.md) | decision | completed | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal — 執行任務拆解（how） |
+| [051-pl0-baseline.md](topics/051-pl0-baseline.md) | topic | active | 051 PL0-01 — Execution Baseline |
+| [051-pl0-build-graph.md](topics/051-pl0-build-graph.md) | topic | active | 051 PL0-07 — TypeScript Project References ／ Build Graph |
+| [051-pl0-gate-g0.md](topics/051-pl0-gate-g0.md) | topic | active | 051 Gate G0 — 規格與基線凍結 |
+| [051-pl0-identity-responsibility-matrix.md](topics/051-pl0-identity-responsibility-matrix.md) | topic | active | 051 PL0-04 — Identity／Auth Responsibility & Migration Matrix |
+| [051-pl0-manifest-fixtures.md](topics/051-pl0-manifest-fixtures.md) | topic | active | 051 PL0-05 — Manifest／Inventory／Config／Lifecycle Acceptance Fixtures |
+| [051-pl0-package-classification.md](topics/051-pl0-package-classification.md) | topic | active | 051 PL0-03 — Package/Plugin/Facet Classification & Naming Registry |
+| [051-pl0-prisma-permission-fixtures.md](topics/051-pl0-prisma-permission-fixtures.md) | topic | active | 051 PL0-06 — Prisma Owns/Augments 與 Permission Lifecycle Fixtures |
+| [051-pl0-snapshot-summary.md](topics/051-pl0-snapshot-summary.md) | topic | active | 051 PL0-02 — Public API / Dependency / Consumer Snapshot |
+| [051-pl1-architecture-and-consumer-checks.md](topics/051-pl1-architecture-and-consumer-checks.md) | topic | active | 051 PL1-07／PL1-14 — architecture validator 與 tarball clean consumer |
+| [051-pl1-execution-log.md](topics/051-pl1-execution-log.md) | topic | active | 051 Phase 1 執行紀錄 — task ledger 與 workspace gate |
+| [051-pl1-gate-g1.md](topics/051-pl1-gate-g1.md) | topic | active | 051 Gate G1 — 最小平台核心 |
+| [051-pl1-identity-auth-split.md](topics/051-pl1-identity-auth-split.md) | topic | active | 051 PL1-10／PL1-12／PL1-13 — identity／OIDC 拆分與 `@appspine/auth` facade |
+| [051-pl1-pilot-plugins.md](topics/051-pl1-pilot-plugins.md) | topic | active | 051 PL1-08／PL1-09 — 兩個試點 capability plugin |
+| [051-pl1-plugin-platform-core.md](topics/051-pl1-plugin-platform-core.md) | topic | active | 051 PL1-01/02/03/04/05/06/11 — 最小平台核心 |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

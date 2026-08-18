@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "audit-log",
+  "displayName": "Audit Log",
+  "cardinality": "singleton",
+  "distribution": "official",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0",
+    "frameworks": {
+      "@nestjs/common": "^11.0.5",
+      "@nestjs/core": "^11.0.5",
+      "@prisma/client": "^6.2.0"
+    }
+  },
+  "provides": ["appspine.audit-sink"],
+  "requires": ["appspine.prisma"],
+  "facets": {
+    "backend": {
+      "modulePath": "./dist/audit-log.module.js",
+      "exportName": "AuditLogModule",
+      "global": true,
+      "providerTokens": ["appspine.audit-sink"]
+    },
+    "prisma": {
+      "owns": ["AuditLog"],
+      "ownsEnums": ["AuditAction"],
+      "schemaFragment": "prisma/audit-log.prisma",
+      "schemaDigest": "sha256:852ea6e7deaa4df5686dc9faa8eabdbd2244a85abb017800b7db46df2f84198c"
+    }
+  }
+}

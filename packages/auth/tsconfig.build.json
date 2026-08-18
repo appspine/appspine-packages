@@ -1,4 +1,22 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "dist", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "src/**/*.spec.ts", "src/**/*.test.ts"],
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./tsconfig.build.tsbuildinfo"
+  },
+  "references": [
+    {
+      "path": "../identity-core/tsconfig.build.json"
+    },
+    {
+      "path": "../oidc-auth/tsconfig.build.json"
+    },
+    {
+      "path": "../plugin-host-nest/tsconfig.build.json"
+    },
+    {
+      "path": "../rbac/tsconfig.build.json"
+    }
+  ]
 }

@@ -23,7 +23,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./prisma/role.prisma": "./prisma/role.prisma"
+    "./prisma/role.prisma": "./prisma/role.prisma",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -32,11 +33,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/auth": "workspace:*",
-    "@appspine/common": "workspace:*"
+    "@appspine/common": "workspace:*",
+    "@appspine/plugin-api": "workspace:*"
   },
   "peerDependencies": {
     "@appspine/audit-log": "^1.0.1",
+    "@appspine/plugin-host-nest": "^1.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
@@ -44,6 +46,7 @@
   },
   "devDependencies": {
     "@appspine/audit-log": "workspace:*",
+    "@appspine/plugin-host-nest": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

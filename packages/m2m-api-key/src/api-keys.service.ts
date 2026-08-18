@@ -1,7 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import type { PaginatedResult, PaginationQuery } from '@appspine/common';
 import { PrismaService, paginate, toPrismaOrderBy, toPrismaPage } from '@appspine/common';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { IDENTITY_STORE, type IdentityStorePort } from '@appspine/plugin-api';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateApiKeyDto, CreateApiKeyResponse, RoleRef, UpdateApiKeyDto } from './dto/api-key.dto';
 
 export interface ApiKeyRecord {
@@ -52,7 +53,18 @@ const API_KEY_SELECT = {
 
 @Injectable()
 export class ApiKeysService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    /**
+     * PL0-04 §1 found this service reading `identity-core`'s `User` table directly to validate an
+     * acting user — a cross-owner query the 051 split replaces with the
+     * `appspine.identity-store` capability.
+     *
+     * Required: accepting a fallback direct query would preserve the cross-owner dependency the
+     * Phase 1 split is specifically removing.
+     */
+    @Inject(IDENTITY_STORE) private readonly identityStore: IdentityStorePort,
+  ) {}
 
   async create(dto: CreateApiKeyDto, createdBy?: string): Promise<CreateApiKeyResponse> {
     this.validateScopes(dto.scopes);
@@ -149,10 +161,7 @@ export class ApiKeysService {
   }
 
   private async assertActingUser(actingUserId: string): Promise<void> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: actingUserId },
-      select: { id: true, isServiceAccount: true },
-    });
+    const user = await this.identityStore.findById(actingUserId);
     if (!user) throw new BadRequestException(`Acting user ${actingUserId} not found`);
     if (!user.isServiceAccount) {
       throw new BadRequestException(

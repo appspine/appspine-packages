@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { extractWorkflowId } from '@appspine/audit-log';
-import type { ApiKeyUser } from '@appspine/auth';
 import { ApiKeyGuard } from '@appspine/m2m-api-key';
+import type { ApiKeyUser } from '@appspine/plugin-host-nest';
 import {
   hostHeaderValidation,
   type NodeIncomingMessageLike,

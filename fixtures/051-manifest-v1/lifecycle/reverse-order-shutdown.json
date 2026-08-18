@@ -1,0 +1,13 @@
+{
+  "description": "Shutdown must run in reverse dependency order with a timeout per plugin. A plugin whose shutdown hook hangs must not block shutdown of already-completed plugins and must be reported, not silently swallowed.",
+  "registerOrder": ["common.prisma", "audit-log", "rbac", "mcp-server"],
+  "expectedShutdownOrder": ["mcp-server", "rbac", "audit-log", "common.prisma"],
+  "shutdownTimeoutMs": 5000,
+  "simulatedFailure": {
+    "plugin": "rbac",
+    "stage": "shutdown",
+    "reason": "shutdown hook exceeded timeout"
+  },
+  "expectedLifecycleOutcome": "shutdown-completed-with-reported-timeout",
+  "notes": "051 plan section 9: 'shutdown 依 dependency graph 反向執行並有 timeout'. registerOrder mirrors the concrete PL0-02 dependency chain audit -> auth -> rbac/m2m -> mcp-server captured in 051-pl0-snapshot-summary.md."
+}

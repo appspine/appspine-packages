@@ -1,4 +1,4 @@
-import type { ApiKeyUser } from '@appspine/auth';
+import type { ApiKeyUser } from '@appspine/plugin-host-nest';
 import type { Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { McpController } from './mcp.controller';

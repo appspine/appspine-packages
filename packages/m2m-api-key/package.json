@@ -23,7 +23,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./prisma/api-key.prisma": "./prisma/api-key.prisma"
+    "./prisma/api-key.prisma": "./prisma/api-key.prisma",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -32,11 +33,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/auth": "workspace:*",
-    "@appspine/common": "workspace:*"
+    "@appspine/common": "workspace:*",
+    "@appspine/plugin-api": "workspace:*"
   },
   "peerDependencies": {
     "@appspine/audit-log": "^1.0.1",
+    "@appspine/plugin-host-nest": "^1.0.0",
+    "@appspine/rbac": "^4.0.8",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
@@ -44,12 +47,19 @@
   },
   "devDependencies": {
     "@appspine/audit-log": "workspace:*",
+    "@appspine/plugin-host-nest": "workspace:*",
+    "@appspine/rbac": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
     "@types/node": "^22.10.0",
     "typescript": "^5.9.3",
-    "zod": "^4.4.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod": "^4.4.3"
+  },
+  "peerDependenciesMeta": {
+    "@appspine/rbac": {
+      "optional": true
+    }
   }
 }

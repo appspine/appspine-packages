@@ -162,7 +162,7 @@ Z30，不在此重複定義。
 **appspine 現有基礎（2026-07-31 更新：IdP 前提已解決）**：appspine 現在有一個真的在運作的企業
 IdP——035（[035-oidc-only-auth-plan.md](035-oidc-only-auth-plan.md)）已於
 2026-07-30 執行完成，全部 App 已是 OIDC-only（Keycloak），`@appspine/auth` 的
-`AUTH_MODE=oidc` 機制（[jwt-verifier.service.ts](../../packages/auth/src/jwt-verifier.service.ts)）
+`AUTH_MODE=oidc` 機制（[jwt-verifier.service.ts](../../packages/oidc-auth/src/jwt-verifier.service.ts)）
 用 `jwks-rsa` 對 Keycloak 的 JWKS endpoint 驗證 RS256 簽章、檢查 issuer/audience，再用 `email`
 claim 查本地 `User` 表拿角色權限——這跟驗證 ID-JAG 需要的簽章驗證機制、以及規範建議的 account
 linking 模式，底層原理相通。**但這條路徑是給真人登入各業務 app 自己的網頁前端用的**，跟

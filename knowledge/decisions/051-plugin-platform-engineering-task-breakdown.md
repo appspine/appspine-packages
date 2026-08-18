@@ -16,8 +16,9 @@ updated: 2026-08-18
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：全部實作 task 均為 pending。建立本文件不代表已授權 commit、push、publish、production
-> migration 或舊 API 移除。** 外部可見或難以回復的動作必須在對應 Gate 再取得授權。
+> **目前狀態：Phase 0 與 Phase 1 已完成並通過各自的 Gate（見 §13）；Phase 2 起仍為 pending。
+> 本文件不授權 push、publish、production migration 或舊 API 移除。** 外部可見或難以回復的動作必須在
+> 對應 Gate 再取得授權。
 
 ---
 
@@ -870,8 +871,9 @@ Handoff: diff summary, commands/results, changeset, risks, rollback, next prereq
 
 checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
 
-- [ ] Phase 0：PL0-01～07；Gate G0
-- [ ] Phase 1：PL1-01～14；Gate G1
+- [x] Phase 0：PL0-01～07；Gate G0 — 2026-08-18，證據 [Gate G0](../topics/051-pl0-gate-g0.md)
+- [x] Phase 1：PL1-01～14；Gate G1 — 2026-08-18，證據 [Gate G1](../topics/051-pl1-gate-g1.md)、
+      [PL1 執行紀錄](../topics/051-pl1-execution-log.md)
 - [ ] Phase 2：PL2-01～10；Gate G2
 - [ ] Phase 3：PL3-01～11；Gate G3
 - [ ] Phase 4：PL4-01～10；Gate G4

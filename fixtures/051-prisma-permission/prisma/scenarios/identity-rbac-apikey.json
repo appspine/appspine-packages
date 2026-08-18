@@ -1,0 +1,77 @@
+{
+  "description": "Current real composition per PL0-04 responsibility matrix: identity-core owns User, rbac and m2m-api-key each own their own models and augment User with a back-relation instead of identity-core declaring it.",
+  "contributions": [
+    {
+      "plugin": "identity-core",
+      "owns": [
+        {
+          "model": "User",
+          "fields": [
+            "id",
+            "email",
+            "password",
+            "name",
+            "employeeNumber",
+            "isActive",
+            "isServiceAccount",
+            "createdAt",
+            "updatedAt"
+          ]
+        }
+      ],
+      "augments": []
+    },
+    {
+      "plugin": "rbac",
+      "owns": [
+        {
+          "model": "Role",
+          "fields": [
+            "id",
+            "name",
+            "displayName",
+            "isSystem",
+            "permissionPolicy",
+            "createdAt",
+            "updatedAt"
+          ]
+        },
+        { "model": "RolePermission", "fields": ["id", "roleId", "permission"] },
+        { "model": "UserRole", "fields": ["userId", "roleId", "createdAt"] }
+      ],
+      "augments": [{ "targetModel": "User", "field": "userRoles", "type": "UserRole[]" }]
+    },
+    {
+      "plugin": "m2m-api-key",
+      "owns": [
+        {
+          "model": "ApiKey",
+          "fields": [
+            "id",
+            "name",
+            "prefix",
+            "hashedKey",
+            "roleId",
+            "actingUserId",
+            "scopes",
+            "rateLimit",
+            "isActive",
+            "expiresAt",
+            "createdBy",
+            "lastUsedAt",
+            "createdAt",
+            "updatedAt"
+          ]
+        }
+      ],
+      "augments": [
+        {
+          "targetModel": "User",
+          "field": "actingApiKeys",
+          "type": "ApiKey[] @relation(\"ApiKeyActingUser\")"
+        },
+        { "targetModel": "Role", "field": "apiKeys", "type": "ApiKey[]" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "audit-log",
+  "displayName": "Audit Log",
+  "cardinality": "singleton",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0"
+  },
+  "provides": ["appspine.audit-sink"],
+  "requires": ["appspine.prisma"],
+  "facets": {
+    "backend": { "modulePath": "./dist/audit-log.module.js", "exportName": "AuditLogModule" },
+    "prisma": { "owns": ["AuditLog"], "schemaFragment": "prisma/audit-log.prisma" }
+  }
+}

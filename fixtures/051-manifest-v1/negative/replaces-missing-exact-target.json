@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "acme-incomplete-override",
+  "displayName": "Incomplete Override",
+  "cardinality": "singleton",
+  "distribution": "app-local",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0"
+  },
+  "provides": ["appspine.notification-inbox"],
+  "requires": ["appspine.prisma"],
+  "replaces": [
+    {
+      "plugin": "notification",
+      "contribution": "NotificationInboxProvider",
+      "reason": "Facet is intentionally missing; a replacement target must be exact."
+    }
+  ],
+  "facets": { "backend": {} }
+}

@@ -697,7 +697,7 @@ sequenceDiagram
 per-client 存取限制有效。
 
 **先前對「roles 從何而來」的擔憂已解除，但原因與預期不同**：實查
-[`jwt-verifier.service.ts:37-72`](../../packages/auth/src/jwt-verifier.service.ts)
+[`jwt-verifier.service.ts:37-72`](../../packages/oidc-auth/src/jwt-verifier.service.ts)
 發現 `buildOidcJwtUser` **以 `email` 為身份鍵**（無 email 直接拒絕），`roleNames` 來自**各 App
 自己資料庫**的 `user.userRoles`，而非 Keycloak claims；回傳的 `JwtUser.sub` 是**本地 user id**，
 不是 IdP subject。因此換發 token 不需要攜帶目標 App 的角色，只需帶得動經驗證的 `email` 與正確

@@ -198,6 +198,7 @@ interface PluginManifestV1 {
   id: string;
   displayName: string;
   cardinality: "singleton" | "multiple";
+  distribution?: "official" | "app-local"; // replaces 存在時必填 app-local；loader 另驗 provenance
   engine: {
     appspinePluginApi: string;
     node: string;
@@ -210,6 +211,14 @@ interface PluginManifestV1 {
   replaces?: ReplacementDeclaration[];
   configSchema?: ConfigSchemaReference;
   environment?: EnvironmentContribution[];
+  optionalFailurePolicy?: {
+    isolationBoundary: "instance";
+    degradedBehavior: {
+      readiness: "degraded";
+      catalog: "degraded";
+      alert: "required";
+    };
+  };
   facets: {
     backend?: BackendFacetContribution;
     frontend?: FrontendFacetContribution;
@@ -223,7 +232,9 @@ interface PluginManifestV1 {
 
 package version 由 `package.json` 取得，不在兩個檔案手工維護兩份。`schemaVersion` 只描述 manifest
 格式；`engine.appspinePluginApi` 描述 host contract 相容範圍；業務 integration contract 仍使用自身
-的精確 SemVer + digest。
+的精確 SemVer + digest。`replaces` 的每一筆 declaration 必須同時提供 plugin/facet/contribution/reason；
+`distribution: "app-local"` 是必要宣告但不是信任來源，loader 仍須用 inventory/package provenance 驗證。
+只有具備完整 `optionalFailurePolicy` 的 plugin instance 才能在 inventory 標記 optional。
 
 ### 4.2 Capability 命名
 

@@ -1,11 +1,8 @@
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
+import { SYSTEM_ADMIN_ROLE } from '../constants';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';
 import { PermissionGuard } from './permission.guard';
-
-vi.mock('@appspine/auth', () => ({
-  SYSTEM_ADMIN_ROLE: 'SYSTEM_ADMIN',
-}));
 
 vi.mock('@appspine/common', () => ({
   PermissionPolicy: {
@@ -14,8 +11,6 @@ vi.mock('@appspine/common', () => ({
     READ_ALL: 'READ_ALL',
   },
 }));
-
-const SYSTEM_ADMIN_ROLE = 'SYSTEM_ADMIN';
 
 function mockCtx(opts: {
   handlerPerms?: string[];

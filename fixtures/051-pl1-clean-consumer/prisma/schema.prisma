@@ -1,0 +1,91 @@
+// Assembled by hand from the Phase 1 plugins' own Prisma fragments. PL2-06's composer will
+// generate this from `facets.prisma`; until then the consumer needs a schema that contains every
+// model the pilots touch, including the RBAC/API-key relations that identity-core deliberately
+// does not declare (051 PL0-04 §2) and that this App contributes itself.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./clean-consumer.db"
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  password         String?
+  name             String?
+  employeeNumber   String?  @unique @map("employee_number")
+  isActive         Boolean  @default(true) @map("is_active")
+  isServiceAccount Boolean  @default(false) @map("is_service_account")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Contributed by @appspine/rbac and @appspine/m2m-api-key as Prisma augmentations.
+  userRoles UserRole[]
+
+  @@map("users")
+}
+
+model Role {
+  id               String           @id @default(cuid())
+  name             String           @unique
+  displayName      String           @map("display_name")
+  permissionPolicy String           @default("DENY_ALL") @map("permission_policy")
+  permissions      RolePermission[]
+  userRoles        UserRole[]
+
+  @@map("roles")
+}
+
+model RolePermission {
+  id         String @id @default(cuid())
+  roleId     String @map("role_id")
+  permission String
+  role       Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permission])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  roleId String @map("role_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model OidcIdentity {
+  id                    String   @id @default(cuid())
+  issuer                String
+  subject               String
+  userId                String   @map("user_id")
+  linkedFromLegacyEmail Boolean  @default(false) @map("linked_from_legacy_email")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  @@unique([issuer, subject])
+  @@index([userId])
+  @@map("oidc_identities")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id")
+  action         String
+  actorId        String   @map("actor_id")
+  actorEmail     String   @map("actor_email")
+  appName        String   @map("app_name")
+  isAiOperation  Boolean  @default(false) @map("is_ai_operation")
+  mcpTool        String?  @map("mcp_tool")
+  actingApiKeyId String?  @map("acting_api_key_id")
+  workflowId     String?  @map("workflow_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}

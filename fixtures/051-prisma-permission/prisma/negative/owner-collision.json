@@ -1,0 +1,15 @@
+{
+  "description": "Two plugins both claim to own Role. Composer must fail-fast with owner-collision, never silently pick one.",
+  "contributions": [
+    {
+      "plugin": "rbac",
+      "owns": [{ "model": "Role", "fields": ["id", "name"] }],
+      "augments": []
+    },
+    {
+      "plugin": "acme-custom-rbac-fork",
+      "owns": [{ "model": "Role", "fields": ["id", "name", "customField"] }],
+      "augments": []
+    }
+  ]
+}

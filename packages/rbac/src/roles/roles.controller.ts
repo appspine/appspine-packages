@@ -1,11 +1,11 @@
 import { AuditLogService, recordAuditSafely } from '@appspine/audit-log';
-import { AdminGuard, CurrentUser, JwtAuthGuard } from '@appspine/auth';
 import {
   AuditAction,
   type PaginationQuery,
   paginationQuerySchema,
   ZodValidationPipe,
 } from '@appspine/common';
+import { CurrentUser, InteractiveAuthGuard } from '@appspine/plugin-host-nest';
 import {
   Body,
   Controller,
@@ -20,6 +20,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { RbacAdminGuard } from '../guards/admin.guard';
 import {
   type CreateRoleDto,
   createRoleSchema,
@@ -33,7 +34,7 @@ import { RolesService } from './roles.service';
 // Role management is exclusively ADMIN-only (AdminGuard, not PermissionGuard).
 // Custom roles cannot self-escalate by acquiring role-management permissions.
 @Controller('roles')
-@UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(InteractiveAuthGuard, RbacAdminGuard)
 export class RolesController {
   private readonly logger = new Logger(RolesController.name);
 

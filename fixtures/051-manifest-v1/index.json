@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "051-manifest-v1-fixture-index/v1",
+  "schema": "../../knowledge/contracts/051-manifest-v1.schema.json",
+  "positive": [
+    {
+      "file": "positive/health-check-minimal.json",
+      "covers": ["minimal manifest", "singleton", "operations facet"]
+    },
+    { "file": "positive/audit-log-with-prisma.json", "covers": ["prisma facet", "provides"] },
+    {
+      "file": "positive/rbac-full-facets.json",
+      "covers": ["all 5 facets", "requires", "frameworks range", "prisma augments"]
+    },
+    {
+      "file": "positive/master-data-client-multiple.json",
+      "covers": [
+        "cardinality multiple",
+        "optionalRequires",
+        "configRef",
+        "secret redaction (secret:true)",
+        "instance isolation and degraded behavior"
+      ]
+    },
+    {
+      "file": "positive/oidc-auth-interactive-provider.json",
+      "covers": ["interactive-auth-provider with conflicts declared", "frontend loginProviderUi"]
+    },
+    {
+      "file": "positive/app-local-replaces-override.json",
+      "covers": ["replaces (legitimate override)"]
+    }
+  ],
+  "negative": [
+    {
+      "file": "negative/missing-schema-version.json",
+      "expectedFailure": "required-field-missing",
+      "field": "schemaVersion"
+    },
+    {
+      "file": "negative/unknown-top-level-field.json",
+      "expectedFailure": "unknown-field",
+      "field": "downloadUrl"
+    },
+    {
+      "file": "negative/invalid-engine-range.json",
+      "expectedFailure": "invalid-engine-range",
+      "field": "engine.appspinePluginApi"
+    },
+    { "file": "negative/missing-facet.json", "expectedFailure": "empty-facets", "field": "facets" },
+    {
+      "file": "negative/interactive-provider-missing-conflicts.json",
+      "expectedFailure": "interactive-provider-without-conflicts",
+      "field": "conflicts"
+    },
+    {
+      "file": "negative/secret-not-redacted.json",
+      "expectedFailure": "secret-field-not-marked-secret",
+      "field": "environment[0].secret"
+    },
+    {
+      "file": "negative/provides-conflicts-contradiction.json",
+      "expectedFailure": "self-conflict",
+      "field": "conflicts"
+    },
+    {
+      "file": "negative/replaces-missing-exact-target.json",
+      "expectedFailure": "required-field-missing",
+      "field": "replaces[0].facet"
+    },
+    {
+      "file": "negative/official-plugin-replaces.json",
+      "expectedFailure": "replacement-not-app-local",
+      "field": "distribution"
+    }
+  ],
+  "lifecycle": [
+    {
+      "file": "lifecycle/required-plugin-failure-aborts-boot.json",
+      "covers": ["required failure policy"]
+    },
+    {
+      "file": "lifecycle/optional-plugin-failure-degrades.json",
+      "covers": ["optional failure policy", "degraded catalog/health"]
+    },
+    {
+      "file": "lifecycle/reverse-order-shutdown.json",
+      "covers": ["shutdown ordering", "timeout reporting"]
+    }
+  ]
+}

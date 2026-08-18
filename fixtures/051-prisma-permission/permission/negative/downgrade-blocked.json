@@ -1,0 +1,14 @@
+{
+  "description": "currentState already reflects schemaGeneration 3, but the reconciler is being asked to reconcile toward generation 2 (an older plan) — must detect the downgrade and stop, not silently apply an older plan on top of newer data.",
+  "targetGeneration": 2,
+  "currentState": [
+    {
+      "id": "rbac:role:create",
+      "displayName": "Create Role",
+      "status": "active",
+      "schemaGeneration": 3
+    }
+  ],
+  "desiredState": [{ "id": "rbac:role:create", "displayName": "Create Role", "status": "active" }],
+  "expectedFailure": "downgrade-blocked"
+}

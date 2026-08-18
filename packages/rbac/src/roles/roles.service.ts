@@ -1,4 +1,3 @@
-import { SYSTEM_ADMIN_ROLE } from '@appspine/auth';
 import {
   type PaginationQuery,
   PermissionPolicy,
@@ -14,6 +13,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { SYSTEM_ADMIN_ROLE } from '../constants';
 import { CreateRoleDto, ReplacePermissionsDto, UpdateRoleDto } from './dto/role.dto';
 
 // Non-relation fields go through the shared toPrismaOrderBy() helper; userCount/apiKeyCount

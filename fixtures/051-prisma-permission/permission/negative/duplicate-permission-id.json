@@ -1,0 +1,10 @@
+{
+  "description": "desiredState declares rbac:role:create twice with different display names — reconciler must fail-fast, not silently pick the last one.",
+  "targetGeneration": 1,
+  "currentState": [],
+  "desiredState": [
+    { "id": "rbac:role:create", "displayName": "Create Role", "status": "active" },
+    { "id": "rbac:role:create", "displayName": "Create a Role (duplicate)", "status": "active" }
+  ],
+  "expectedFailure": "duplicate-permission-id"
+}

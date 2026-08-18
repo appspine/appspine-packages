@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "051-identity-boundary-cases/v1",
+  "identityKeyCases": [
+    {
+      "name": "email change preserves external identity",
+      "left": {
+        "issuer": "https://id.example.com/realms/staff",
+        "subject": "00u-123",
+        "email": "before@example.com"
+      },
+      "right": {
+        "issuer": "https://id.example.com/realms/staff",
+        "subject": "00u-123",
+        "email": "after@example.com"
+      },
+      "expected": "same"
+    },
+    {
+      "name": "same subject from different issuer is distinct",
+      "left": {
+        "issuer": "https://id.example.com/realms/staff",
+        "subject": "00u-123",
+        "email": "user@example.com"
+      },
+      "right": {
+        "issuer": "https://id.example.com/realms/partners",
+        "subject": "00u-123",
+        "email": "user@example.com"
+      },
+      "expected": "different"
+    },
+    {
+      "name": "same email with different subject is distinct",
+      "left": {
+        "issuer": "https://id.example.com/realms/staff",
+        "subject": "00u-123",
+        "email": "shared@example.com"
+      },
+      "right": {
+        "issuer": "https://id.example.com/realms/staff",
+        "subject": "00u-456",
+        "email": "shared@example.com"
+      },
+      "expected": "different"
+    }
+  ],
+  "invalidIdentityCases": [
+    {
+      "name": "issuer is required",
+      "identity": { "issuer": "", "subject": "00u-123" },
+      "expectedFailure": "issuer-required"
+    },
+    {
+      "name": "subject is required",
+      "identity": {
+        "issuer": "https://id.example.com/realms/staff",
+        "subject": ""
+      },
+      "expectedFailure": "subject-required"
+    }
+  ],
+  "interactiveProviderConflict": {
+    "installedPluginIds": ["oidc-auth", "local-auth"],
+    "manifests": [
+      { "id": "oidc-auth", "conflicts": ["local-auth"] },
+      { "id": "local-auth", "conflicts": ["oidc-auth"] }
+    ],
+    "expectedConflictPairs": ["local-auth<->oidc-auth"]
+  }
+}

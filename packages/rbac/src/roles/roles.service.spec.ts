@@ -1,10 +1,7 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { SYSTEM_ADMIN_ROLE } from '../constants';
 import { RolesService } from './roles.service';
-
-vi.mock('@appspine/auth', () => ({
-  SYSTEM_ADMIN_ROLE: 'SYSTEM_ADMIN',
-}));
 
 vi.mock('@appspine/common', () => ({
   PermissionPolicy: {
@@ -19,7 +16,6 @@ vi.mock('@appspine/common', () => ({
   toPrismaSortDirection: (sortOrder: string) => (sortOrder === 'ASC' ? 'asc' : 'desc'),
 }));
 
-const SYSTEM_ADMIN_ROLE = 'SYSTEM_ADMIN';
 const PermissionPolicy = {
   DENY_ALL: 'DENY_ALL',
   ALLOW_ALL: 'ALLOW_ALL',

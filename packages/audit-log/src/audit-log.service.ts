@@ -41,8 +41,9 @@ export function extractWorkflowId(headers: Record<string, unknown>): string | nu
 export class AuditLogService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async record(dto: RecordAuditLogDto) {
-    return this.prisma.auditLog.create({
+  async record(dto: RecordAuditLogDto, transaction?: unknown) {
+    const client = (transaction ?? this.prisma) as Pick<PrismaService, 'auditLog'>;
+    return client.auditLog.create({
       data: {
         entityType: dto.entityType,
         entityId: dto.entityId,
