@@ -113,6 +113,7 @@ randomized order（正反順序診斷相同）、byte 穩定且與 inventory 順
 | Substitution reason | 本 session 無獨立 Terra／Sol provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-06-prisma-composer` |
+| Commit | `b92c1c3` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §8；`packages/plugin-cli/src/prisma-composer.spec.ts`、`packages/plugin-api/src/schema.spec.ts` |
 | 已知風險 | §9，尤其第一項 |
