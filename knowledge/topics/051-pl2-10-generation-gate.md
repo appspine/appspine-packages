@@ -114,6 +114,7 @@ node scripts/051-pl2-10-generation-gate.mjs --self-test   # 6 self-tests
 | Substitution reason | 本 session 無獨立 Terra／Luna／Gemini provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-10-generation-gate` |
+| Commit | `cab0d37` |
 | Tools | repo read/write、pnpm、node、prisma CLI、biome |
 | Evidence | §7；`fixtures/051-pl2-generation/golden/` |
 | 已知風險 | §8 |
