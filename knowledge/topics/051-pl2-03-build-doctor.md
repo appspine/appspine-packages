@@ -127,6 +127,7 @@ route／token／model 進 catalog、digest／drift、preset expansion diagnostic
 | Substitution reason | 本 session 無獨立 Terra／Gemini provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-03-build-doctor` |
+| Commit | `edb7936` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §5；`packages/plugin-cli/src/commands/build-doctor.spec.ts` |
 | 已知風險 | §6 |
