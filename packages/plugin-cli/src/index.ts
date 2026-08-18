@@ -139,3 +139,15 @@ export {
   renderDiff,
   renderPlan,
 } from './plan';
+export {
+  type ComposeResult,
+  collectContributions,
+  compose,
+  generatePrismaSchema,
+  injectAugmentations,
+  type MigrationPlanInput,
+  type PrismaAugmentation,
+  type PrismaContribution,
+  SCHEMA_ARTIFACT,
+  validateContributions,
+} from './prisma-composer';

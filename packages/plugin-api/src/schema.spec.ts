@@ -50,12 +50,38 @@ describe('shipped manifest schema vs. the PL0-05 frozen contract', () => {
     );
   });
 
-  it('leaves frontend/prisma/permissions opaque, because Phase 1 does not own them', () => {
+  it('leaves frontend/permissions opaque, because nothing owns them yet', () => {
     const facets = ((shipped.properties as SchemaNode).facets as SchemaNode)
       .properties as SchemaNode;
-    for (const facet of ['frontend', 'prisma', 'permissions']) {
+    // `prisma` used to be on this list. PL0-05 named PL2-06 as its owner, and PL2-06 tightened it
+    // — the same handover `backend` and `operations` got from PL1-06. `frontend` waits for PL3-02
+    // and `permissions` for PL2-07.
+    for (const facet of ['frontend', 'permissions']) {
       expect(facets[facet], `${facet} facet must stay opaque in v1`).toEqual({ type: 'object' });
     }
+  });
+
+  it('narrows prisma, which PL0-05 explicitly handed to PL2-06', () => {
+    const facets = ((shipped.properties as SchemaNode).facets as SchemaNode)
+      .properties as SchemaNode;
+    const prisma = facets.prisma as SchemaNode;
+
+    expect(prisma.additionalProperties).toBe(false);
+    expect(Object.keys(prisma.properties as SchemaNode).sort()).toEqual(
+      ['augmentedBy', 'augments', 'ownsEnums', 'owns', 'schemaDigest', 'schemaFragment'].sort(),
+    );
+    // PL0-05's frozen `rbac-full-facets` fixture declares an augmentation as
+    // {targetModel, field, owner} — no type. The tightened schema has to keep that fixture valid,
+    // so `type` is optional here even though the composer cannot emit a field without one. The
+    // composer reports that gap by name rather than the schema rejecting a frozen fixture.
+    const augments = (prisma.properties as SchemaNode).augments as SchemaNode;
+    expect((augments.items as SchemaNode).required).toEqual(['targetModel', 'field', 'owner']);
+    expect(Object.keys((augments.items as SchemaNode).properties as SchemaNode).sort()).toEqual([
+      'field',
+      'owner',
+      'targetModel',
+      'type',
+    ]);
   });
 
   it('narrows backend and operations, which PL0-05 explicitly handed to PL1-06', () => {

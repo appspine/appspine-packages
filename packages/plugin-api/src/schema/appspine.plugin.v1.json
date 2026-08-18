@@ -242,7 +242,83 @@
           "type": "object"
         },
         "prisma": {
-          "type": "object"
+          "type": "object",
+          "description": "Prisma contribution. PL0-05 left this opaque and named PL2-06 as its owner; this is that shape. A model has exactly one owner, and every augmentation names the model it extends and the field it adds, because the composer has to write that field into the owner it does not belong to.",
+          "additionalProperties": false,
+          "properties": {
+            "owns": {
+              "description": "Models this plugin owns outright. No other plugin may own them.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Za-z0-9]*$"
+              },
+              "uniqueItems": true
+            },
+            "ownsEnums": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Za-z0-9]*$"
+              },
+              "uniqueItems": true
+            },
+            "augments": {
+              "description": "Fields this plugin adds to a model another plugin owns. `owner` names that plugin, so the declaration is checkable without resolving the graph first. `type` is what the composer writes into the owner model; it is optional only because PL0-05 froze this shape before PL2-06 needed it, and an augmentation without one cannot be composed - the composer says so by name.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["targetModel", "field", "owner"],
+                "properties": {
+                  "targetModel": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Za-z0-9]*$"
+                  },
+                  "field": {
+                    "type": "string",
+                    "pattern": "^[a-z][A-Za-z0-9]*$"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "augmentedBy": {
+              "description": "Owner-side declaration of who may extend this plugin’s models. Documentation the composer checks against, so an augmentation nobody expected is visible in the owner.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["plugin", "field"],
+                "properties": {
+                  "plugin": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "field": {
+                    "type": "string",
+                    "pattern": "^[a-z][A-Za-z0-9]*$"
+                  }
+                }
+              }
+            },
+            "schemaFragment": {
+              "description": "Package-relative path to the .prisma file this plugin ships.",
+              "type": "string",
+              "minLength": 1
+            },
+            "schemaDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
         },
         "permissions": {
           "type": "object"

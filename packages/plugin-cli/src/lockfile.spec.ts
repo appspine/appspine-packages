@@ -182,13 +182,14 @@ describe('lockfile contents', () => {
     const { root } = make({ installed: [AUDIT], inventory: [entry('audit-log')] });
     await run(['build'], root);
     const lock = lockOf(root);
-    expect(lock.artifacts).toEqual([
-      {
-        path: '.appspine/generated/backend/composition.ts',
-        digest: expect.stringMatching(/^sha256:/),
-      },
-      { path: '.appspine/generated/catalog.json', digest: expect.stringMatching(/^sha256:/) },
+    expect(lock.artifacts.map((a) => a.path)).toEqual([
+      '.appspine/generated/backend/composition.ts',
+      '.appspine/generated/catalog.json',
+      '.appspine/generated/schema.prisma',
     ]);
+    for (const artifact of lock.artifacts) {
+      expect(artifact.digest).toMatch(/^sha256:/);
+    }
   });
 });
 

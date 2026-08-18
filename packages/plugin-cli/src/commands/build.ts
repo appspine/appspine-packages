@@ -37,6 +37,7 @@ import {
   readLockfile,
   writeLockfile,
 } from '../lockfile';
+import { compose } from '../prisma-composer';
 import { checkInventory, hasErrors, isLoaded, loadState } from './shared';
 
 export const CLI_TOOL_NAME = '@appspine/plugin-cli';
@@ -86,7 +87,25 @@ function build(context: CommandContext): CommandResult {
     graph: checked.graph,
     generatedBy: { tool: CLI_TOOL_NAME, version: context.version },
   };
-  const preflight = compositionPreflight(input);
+  // Compose the Prisma schema first, and refuse before writing anything if it cannot be composed.
+  // Emitting a schema with a missing relation field fails much later, inside Prisma, as something
+  // that looks unrelated to the plugin that caused it.
+  const prisma = compose(input);
+  if (prisma.schema === null) {
+    return {
+      command,
+      exitCode: ExitCode.RESOLUTION_FAILED,
+      diagnostics: [
+        diagnostic(
+          'prisma-composition-failed',
+          'the installed plugins cannot be composed into one Prisma schema, so nothing was generated',
+        ),
+        ...prisma.diagnostics,
+      ],
+    };
+  }
+
+  const preflight = [...compositionPreflight(input), ...prisma.diagnostics];
   const artifacts = generateAll(input);
   const expected = sourceDigest(input);
   // The lock records the artefacts' digests, so it has to be built from the same artefact objects
@@ -156,6 +175,8 @@ function build(context: CommandContext): CommandResult {
       artifacts: artifacts.map((a) => a.path),
       catalog: CATALOG_ARTIFACT,
       lockfile: LOCKFILE_NAME,
+      schemaDigest: prisma.digest,
+      migrationPlan: prisma.plan,
       sourceDigest: expected,
       resolutionDigest: lock.resolutionDigest,
     },
