@@ -1224,8 +1224,8 @@
     "appspine-app-template": {
       "repo": {
         "head": "1f12738f790c785633787235ed694ce584ac9f80",
-        "branch": "main",
-        "dirty": false
+        "branch": "051-pl2-09-dual-mode-host",
+        "dirty": true
       },
       "backend": {
         "declaredDependencies": {
@@ -1276,6 +1276,10 @@
             "backend/scripts/check-notification-schema-drift.ts",
             "backend/src/notifications/notifications.module.ts",
             "backend/src/notifications/notifications.service.ts"
+          ],
+          "@appspine/plugin-host-nest": [
+            "backend/src/app.module.ts",
+            "backend/src/appspine.config.ts"
           ],
           "@appspine/rbac": ["backend/src/app.module.ts"]
         }

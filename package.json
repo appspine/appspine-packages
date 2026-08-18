@@ -14,6 +14,7 @@
     "verify:phase0": "node scripts/051-pl0-identity-contract-check.mjs && node scripts/051-pl0-manifest-fixture-check.mjs && node scripts/051-pl0-prisma-composer-check.mjs && node scripts/051-pl0-permission-reconciler-check.mjs && node scripts/051-pl0-build-graph-check.mjs",
     "verify:architecture": "node scripts/051-pl1-architecture-check.mjs",
     "verify:phase1": "node scripts/051-pl1-architecture-check.mjs --self-test && node scripts/051-pl1-architecture-check.mjs && node scripts/051-pl1-clean-consumer.mjs",
+    "verify:template-dual-mode": "node scripts/051-pl2-09-template-dual-mode.mjs",
     "check:changeset-discipline": "node scripts/check-changeset-discipline.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",

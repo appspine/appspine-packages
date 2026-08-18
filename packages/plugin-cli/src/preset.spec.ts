@@ -253,6 +253,32 @@ describe('the preset name is never the only thing recorded', () => {
   });
 });
 
+describe('doctor sees the same inputs as build', () => {
+  it('reports no drift right after a successful build', async () => {
+    // PL2-09 caught this against the real template: `doctor` built its GenerationInput without the
+    // preset provenance `build` passes, so every artefact came out different and it reported drift
+    // against files `build --check` had just called current. A diagnostic tool that cries wolf is
+    // a diagnostic tool people learn to ignore.
+    const { root } = make({ installed: [HEALTH, AUDIT] });
+    installPreset(root, '@appspine/preset-standard', STANDARD);
+    writeInventoryFile(root, {
+      schemaVersion: 'appspine.plugins/v1',
+      presets: ['@appspine/preset-standard'],
+      plugins: [],
+    });
+
+    await cli(['build'], root);
+
+    const check = await cli(['build', '--check'], root);
+    const doctor = await cli(['doctor'], root);
+
+    expect(check.code).toBe(ExitCode.OK);
+    expect(doctor.code).toBe(ExitCode.OK);
+    expect(doctor.envelope.data.drift).toEqual([]);
+    expect(doctor.envelope.data.lockfile).toEqual([]);
+  });
+});
+
 describe('add and remove edit the file, not the expansion', () => {
   it('does not write preset-contributed entries into appspine.plugins.json', async () => {
     // Otherwise the first `add` would freeze a copy of the preset, and upgrading it later would

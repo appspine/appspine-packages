@@ -127,6 +127,11 @@ function doctor(context: CommandContext): CommandResult {
       inventory: state.inventory,
       manifests: state.manifests,
       graph: checked.graph,
+      // Exactly what `build` passes. A `doctor` that generated from a different input would
+      // report drift against artefacts `build --check` had just called current — which is how a
+      // diagnostic tool teaches people to ignore it.
+      presetProvenance: state.expanded.provenance,
+      presets: presetSummary(state.expanded).presets,
       generatedBy: { tool: CLI_TOOL_NAME, version: context.version },
     };
     const artifacts = generateAll(input);
