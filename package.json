@@ -17,6 +17,7 @@
     "verify:generation": "node scripts/051-pl2-10-generation-gate.mjs --self-test && node scripts/051-pl2-10-generation-gate.mjs",
     "verify:phase2": "pnpm run verify:generation && pnpm run verify:snapshot",
     "verify:template-dual-mode": "node scripts/051-pl2-09-template-dual-mode.mjs",
+    "verify:runtime-parity": "node scripts/051-g2-runtime-parity.mjs",
     "check:changeset-discipline": "node scripts/check-changeset-discipline.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",
