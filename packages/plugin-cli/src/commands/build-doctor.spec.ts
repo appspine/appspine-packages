@@ -122,6 +122,67 @@ describe('build', () => {
     expect(existsSync(path.join(root, CATALOG_ARTIFACT))).toBe(false);
   });
 
+  it('refuses when the graph resolves but an input is still wrong', async () => {
+    // The guard has two halves and they are separate failures: `graph === null` is "it does not
+    // compose", and `hasErrors` is "it composes, but something the CLI checks is wrong". A
+    // mutation sweep found the second half untested — and isolating it needs a diagnostic the
+    // *resolver* does not also raise, or the first half catches it anyway and the test proves
+    // nothing. A configRef on a plugin that declares no configSchema is exactly that: the resolver
+    // has nothing to compare against, so only `checkConfigBoundary` objects.
+    const { root } = make({
+      installed: [AUDIT],
+      inventory: [entry('audit-log', { configRef: 'audit' })],
+    });
+
+    const { code, envelope } = await run(['build'], root);
+
+    expect(code).toBe(ExitCode.RESOLUTION_FAILED);
+    expect(envelope.diagnostics.map((d: { code: string }) => d.code)).toContain(
+      'config-ref-not-declared',
+    );
+    expect(existsSync(path.join(root, CATALOG_ARTIFACT))).toBe(false);
+  });
+
+  it('refuses when the Prisma facets cannot be composed, even though the graph resolves', async () => {
+    // An augmentation with no type: the resolver is happy — capabilities all line up — and the
+    // composer is the only thing that can say no. Without this test that guard had never fired.
+    const owner = manifest({
+      id: 'demo-owner',
+      provides: ['appspine.identity-store'],
+      requires: [],
+      facets: {
+        backend: { modulePath: './dist/index.js', exportName: 'M' },
+        prisma: { owns: ['Thing'], schemaFragment: 'prisma/thing.prisma' },
+      },
+    });
+    const augmenter = manifest({
+      id: 'demo-augmenter',
+      provides: ['appspine.rbac-policy'],
+      requires: ['appspine.identity-store'],
+      facets: {
+        backend: { modulePath: './dist/index.js', exportName: 'M' },
+        prisma: {
+          owns: ['Other'],
+          schemaFragment: 'prisma/other.prisma',
+          augments: [{ targetModel: 'Thing', field: 'extra', owner: 'demo-owner' }],
+        },
+      },
+    });
+
+    const { root } = make({
+      installed: [owner, augmenter],
+      inventory: [entry('demo-owner'), entry('demo-augmenter')],
+    });
+
+    const { code, envelope } = await run(['build'], root);
+
+    expect(code).toBe(ExitCode.RESOLUTION_FAILED);
+    const codes = envelope.diagnostics.map((d: { code: string }) => d.code);
+    expect(codes).toContain('prisma-composition-failed');
+    expect(codes).toContain('augmentation-without-type');
+    expect(existsSync(path.join(root, CATALOG_ARTIFACT))).toBe(false);
+  });
+
   it('--check reports missing artefacts without writing them', async () => {
     const { root } = make({ installed: [AUDIT], inventory: [entry('audit-log')] });
 
@@ -266,6 +327,30 @@ describe('doctor', () => {
     expect(text).toContain('OIDC_CLIENT_SECRET');
     // The key that IS set must not have its value echoed anywhere.
     expect(text).not.toContain('https://issuer.example');
+  });
+
+  it('treats an empty env var as set, because presence is the question', async () => {
+    // `!process.env[key]` and `!(key in process.env)` differ exactly here, and the difference
+    // matters: reporting a key as missing when the operator deliberately set it empty sends them
+    // looking for the wrong thing. It is also the line that keeps this a presence check rather
+    // than a value read.
+    process.env.OIDC_ISSUER = '';
+    process.env.OIDC_CLIENT_SECRET = '';
+    const { root } = make({
+      installed: [AUDIT, OIDC],
+      inventory: [entry('audit-log'), entry('oidc-auth', { configRef: 'oidc' })],
+    });
+    await run(['build'], root);
+
+    const { envelope } = await run(['doctor'], root);
+
+    expect(envelope.diagnostics.map((d: { code: string }) => d.code)).not.toContain(
+      'missing-required-env-key',
+    );
+    expect(
+      envelope.data.entries.find((e: { pluginId: string }) => e.pluginId === 'oidc-auth')
+        .missingEnvKeys,
+    ).toEqual([]);
   });
 
   it('reports artefact drift with its own exit code', async () => {

@@ -225,6 +225,25 @@ describe('lockfile drift', () => {
     expect(envelope.data.lockDrift).toContain('plugin-lock-version-drift');
   });
 
+  it('moves the source digest when a manifest changes but the order does not', async () => {
+    // Pins the property, not the mechanism: a manifest change must invalidate every artefact.
+    // It reaches the digest through `graph.digest`, which carries each instance's manifest digest —
+    // so this stays green even if `sourceDigest`'s own `manifests` entry is removed. That is the
+    // right thing to assert; a test tied to one of two redundant paths would go red on a harmless
+    // refactor and stay green on a real regression in the other.
+    const { root } = make({ installed: [AUDIT], inventory: [entry('audit-log')] });
+    const before = await run(['build'], root);
+
+    const manifestPath = path.join(root, 'node_modules/@appspine/audit-log/appspine.plugin.json');
+    const parsed = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    parsed.displayName = 'Audit Log (renamed)';
+    writeFileSync(manifestPath, `${JSON.stringify(parsed, null, 2)}\n`, 'utf8');
+
+    const after = await run(['build', '--check'], root);
+
+    expect(after.envelope.data.sourceDigest).not.toBe(before.envelope.data.sourceDigest);
+  });
+
   it('detects an installed manifest modified in place at the same version', async () => {
     // Same version, different manifest: not an upgrade, a tampered package.
     const { root } = make({ installed: [AUDIT], inventory: [entry('audit-log')] });

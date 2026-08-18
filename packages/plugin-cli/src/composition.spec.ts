@@ -182,8 +182,15 @@ describe('generated composition', () => {
     await run(['build'], root);
     const source = compositionOf(root);
 
-    // Not imported: a disabled plugin must not end up in the bundle.
-    expect(source).not.toContain("from '@appspine/health-check/plugin';");
+    // Not imported: a disabled plugin must not end up in the bundle. Asserted over the whole
+    // import list rather than one absent string, so an extra import of any shape fails here.
+    const imports = source
+      .split('\n')
+      .filter((line) => line.startsWith('import ') && line.includes('/plugin'));
+    expect(imports).toEqual([
+      "import type { GeneratedComposition } from '@appspine/plugin-host-nest';",
+      "import { auditLogPlugin as auditLogPlugin_0 } from '@appspine/audit-log/plugin';",
+    ]);
     // Still in the inventory the host receives, so the catalog can report it as disabled.
     expect(source).toContain('"@appspine/health-check"');
     expect(source).toContain('enabled: false');
