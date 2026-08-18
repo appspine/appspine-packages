@@ -40,7 +40,17 @@ function walkTsFiles(dir, results = []) {
   return results;
 }
 
-const IMPORT_PATTERN = /from\s+['"]@appspine\/([a-zA-Z0-9._-]+)(?:\/[^'"]*)?['"]/g;
+/**
+ * Anchored to a line that actually starts an import or export clause, and bounded by the
+ * first semicolon.
+ *
+ * The unanchored version matched `from '@appspine/x'` anywhere - including inside string
+ * literals. It made `plugin-cli` look like it imported `@appspine/plugin-host-nest` because a
+ * code *generator* emits that import as text, and like it imported three plugin packages
+ * because its specs assert on the generated output. Neither is a dependency.
+ */
+const IMPORT_PATTERN =
+  /(?:^|\n)\s*(?:import|export)[^;]*?from\s+['"]@appspine\/([a-zA-Z0-9._-]+)(?:\/[^'"]*)?['"]/g;
 
 /**
  * Comments are prose about code. A `from '@appspine/x'` inside one is documentation, not a

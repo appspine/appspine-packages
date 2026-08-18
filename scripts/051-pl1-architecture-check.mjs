@@ -349,6 +349,24 @@ function checkFacetExports(pkgInfo, findings) {
     });
   }
 
+  // PL2-05 generates `import { <camelId>Plugin } from '<package>/plugin'` as a *static* import.
+  // The name is a convention, so it has to be enforced somewhere; enforcing it here fails in the
+  // package that broke it rather than in some consumer's build days later.
+  const expectedExport = `${pkgInfo.manifest.id.replace(/[-_.]+(.)/g, (_m, c) => c.toUpperCase())}Plugin`;
+  const pluginSource = ['src/plugin.ts', 'src/plugin.tsx']
+    .map((file) => path.join(pkgInfo.dir, file))
+    .find((file) => fs.existsSync(file));
+  if (pluginSource) {
+    const source = stripComments(fs.readFileSync(pluginSource, 'utf8'));
+    if (!new RegExp(`export\\s+const\\s+${expectedExport}\\b`).test(source)) {
+      findings.push({
+        code: 'missing-plugin-descriptor-export',
+        package: pkgInfo.name,
+        detail: `./plugin must export "${expectedExport}"; PL2-05 generates a static import of that name`,
+      });
+    }
+  }
+
   const fragment = pkgInfo.manifest.facets?.prisma?.schemaFragment;
   if (fragment && !fs.existsSync(path.join(pkgInfo.dir, fragment))) {
     findings.push({
@@ -675,6 +693,22 @@ function selfTest() {
             exports: {},
           },
           'appspine.plugin.json': { id: 'broken', provides: [], requires: [], facets: {} },
+        }),
+      }),
+    },
+    {
+      name: 'plugin descriptor exported under the wrong name',
+      expect: 'missing-plugin-descriptor-export',
+      fixture: () => ({
+        name: '@appspine/broken',
+        dir: makeTempPackage({
+          'package.json': {
+            name: '@appspine/broken',
+            files: ['dist', 'appspine.plugin.json'],
+            exports: { './plugin': './dist/plugin.js' },
+          },
+          'appspine.plugin.json': { id: 'health-check', provides: [], requires: [], facets: {} },
+          'src/plugin.ts': 'export const healthPlugin = {};\n',
         }),
       }),
     },

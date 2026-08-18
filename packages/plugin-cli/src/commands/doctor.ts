@@ -20,10 +20,10 @@ import {
   detectDrift,
   driftDiagnostic,
   type GenerationInput,
-  generateAll,
   recordedSourceDigest,
   sourceDigest,
 } from '../generate';
+import { generateAll } from '../generators';
 import { buildLockfile, compareLockfile, readLockfile } from '../lockfile';
 import { CLI_TOOL_NAME } from './build';
 import { checkInventory, hasErrors, isLoaded, loadState } from './shared';

@@ -10,9 +10,12 @@
  *   3. **Regenerable, never hand-edited.** These files are outputs. The header says so, and the
  *      drift check is what makes that stick.
  *
- * PL2-03 owns the framework plus the catalog. PL2-05 registers the Nest composition here, PL2-06
- * the composed Prisma schema, PL2-07 the permission plan — each one a generator function, so the
+ * PL2-03 owns the framework plus the catalog. PL2-05 registers the Nest composition, PL2-06 the
+ * composed Prisma schema, PL2-07 the permission plan — each one a generator function, so the
  * determinism and drift rules are written once instead of three times.
+ *
+ * The registry itself lives in `generators.ts`. Each generator needs `sourceDigest` from here, so
+ * holding the list here too would make every generator module a cycle with this one.
  */
 
 import { createHash } from 'node:crypto';
@@ -153,15 +156,6 @@ export function generateCatalog(input: GenerationInput): GeneratedArtifact {
 }
 
 export type Generator = (input: GenerationInput) => GeneratedArtifact;
-
-/** Registered generators, in output order. PL2-05/06/07 append theirs. */
-export const GENERATORS: readonly Generator[] = [generateCatalog];
-
-export function generateAll(input: GenerationInput): GeneratedArtifact[] {
-  return GENERATORS.map((generate) => generate(input)).sort((a, b) =>
-    a.path < b.path ? -1 : a.path > b.path ? 1 : 0,
-  );
-}
 
 export interface DriftEntry {
   path: string;

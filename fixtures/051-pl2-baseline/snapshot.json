@@ -846,6 +846,7 @@
       "packages/plugin-cli/src/commands/shared.ts",
       "packages/plugin-cli/src/commands/test-support.ts",
       "packages/plugin-cli/src/commands/validate.ts",
+      "packages/plugin-cli/src/composition.ts",
       "packages/plugin-cli/src/config-boundary.ts",
       "packages/plugin-cli/src/diagnostics.ts",
       "packages/plugin-cli/src/generate.ts",

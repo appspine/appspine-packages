@@ -41,6 +41,12 @@ export {
   resolveInventory,
 } from './commands/shared';
 export {
+  COMPOSITION_ARTIFACT,
+  compositionPreflight,
+  descriptorExportName,
+  generateComposition,
+} from './composition';
+export {
   checkConfigBoundary,
   configStub,
   type EnvironmentRequirement,
@@ -69,16 +75,15 @@ export {
   detectDrift,
   driftDiagnostic,
   GENERATED_DIR,
-  GENERATORS,
   type GeneratedArtifact,
   type GenerationInput,
   type Generator,
-  generateAll,
   generateCatalog,
   recordedSourceDigest,
   sourceDigest,
   writeArtifacts,
 } from './generate';
+export { GENERATORS, generateAll } from './generators';
 export {
   DEFAULT_INSTANCE_ID,
   emptyInventory,

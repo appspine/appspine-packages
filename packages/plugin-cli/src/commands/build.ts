@@ -17,6 +17,7 @@
 
 import { diagnostic } from '@appspine/plugin-api';
 import type { CommandContext, CommandDefinition } from '../cli';
+import { compositionPreflight } from '../composition';
 import type { CommandResult } from '../diagnostics';
 import { ExitCode } from '../exit-codes';
 import {
@@ -24,11 +25,11 @@ import {
   detectDrift,
   driftDiagnostic,
   type GenerationInput,
-  generateAll,
   recordedSourceDigest,
   sourceDigest,
   writeArtifacts,
 } from '../generate';
+import { generateAll } from '../generators';
 import {
   buildLockfile,
   compareLockfile,
@@ -85,6 +86,7 @@ function build(context: CommandContext): CommandResult {
     graph: checked.graph,
     generatedBy: { tool: CLI_TOOL_NAME, version: context.version },
   };
+  const preflight = compositionPreflight(input);
   const artifacts = generateAll(input);
   const expected = sourceDigest(input);
   // The lock records the artefacts' digests, so it has to be built from the same artefact objects
@@ -133,6 +135,7 @@ function build(context: CommandContext): CommandResult {
     command,
     exitCode: ExitCode.OK,
     diagnostics: [
+      ...preflight,
       diagnostic(
         'artifacts-written',
         written.length > 0 ? `wrote ${written.join(', ')}` : 'everything was already up to date',

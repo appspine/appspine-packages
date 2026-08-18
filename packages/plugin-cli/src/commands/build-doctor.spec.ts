@@ -128,7 +128,7 @@ describe('build', () => {
     const { code, envelope } = await run(['build', '--check'], root);
 
     expect(code).toBe(ExitCode.DRIFT_DETECTED);
-    expect(envelope.data.drift).toEqual([{ path: CATALOG_ARTIFACT, reason: 'missing' }]);
+    expect(envelope.data.drift).toContainEqual({ path: CATALOG_ARTIFACT, reason: 'missing' });
     expect(existsSync(path.join(root, CATALOG_ARTIFACT))).toBe(false);
   });
 
@@ -278,7 +278,7 @@ describe('doctor', () => {
     const { code, envelope } = await run(['doctor'], root);
 
     expect(code).toBe(ExitCode.DRIFT_DETECTED);
-    expect(envelope.data.drift).toEqual([{ path: CATALOG_ARTIFACT, reason: 'missing' }]);
+    expect(envelope.data.drift).toContainEqual({ path: CATALOG_ARTIFACT, reason: 'missing' });
   });
 
   it('prefers the resolution failure over the drift it also sees', async () => {

@@ -183,6 +183,10 @@ describe('lockfile contents', () => {
     await run(['build'], root);
     const lock = lockOf(root);
     expect(lock.artifacts).toEqual([
+      {
+        path: '.appspine/generated/backend/composition.ts',
+        digest: expect.stringMatching(/^sha256:/),
+      },
       { path: '.appspine/generated/catalog.json', digest: expect.stringMatching(/^sha256:/) },
     ]);
   });
