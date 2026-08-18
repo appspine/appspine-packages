@@ -27,10 +27,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { PluginDiagnostic } from '@appspine/plugin-api';
 import { diagnostic } from '@appspine/plugin-api';
-import type { ResolutionGraph } from '@appspine/plugin-api/resolver';
 import type { GeneratedArtifact, GenerationInput } from './generate';
-import type { InventoryFile } from './inventory-file';
-import type { ManifestSet } from './manifest-source';
 
 export const LOCKFILE_NAME = 'appspine.plugin-lock.json';
 export const LOCK_SCHEMA_VERSION = 'appspine.plugin-lock/v1';

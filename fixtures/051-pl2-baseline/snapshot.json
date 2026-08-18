@@ -890,8 +890,7 @@
     ],
     "@appspine/plugin-cli -> @appspine/plugin-api/resolver": [
       "packages/plugin-cli/src/commands/shared.ts",
-      "packages/plugin-cli/src/generate.ts",
-      "packages/plugin-cli/src/lockfile.ts"
+      "packages/plugin-cli/src/generate.ts"
     ],
     "@appspine/plugin-host-nest -> @appspine/plugin-api": [
       "packages/plugin-host-nest/src/auth/admin.guard.ts",

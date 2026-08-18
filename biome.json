@@ -39,6 +39,18 @@
       "formatter": {
         "enabled": false
       }
+    },
+    {
+      "includes": ["fixtures/051-pl2-generation/**"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      },
+      "assist": {
+        "enabled": false
+      }
     }
   ]
 }

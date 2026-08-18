@@ -64,6 +64,7 @@
 | [051-pl2-07-permission-reconciler.md](topics/051-pl2-07-permission-reconciler.md) | topic | active | 051 PL2-07 — permission reconciler |
 | [051-pl2-08-preset-standard.md](topics/051-pl2-08-preset-standard.md) | topic | active | 051 PL2-08 — `@appspine/preset-standard` 與 preset 展開 |
 | [051-pl2-09-template-dual-mode.md](topics/051-pl2-09-template-dual-mode.md) | topic | active | 051 PL2-09 — template 雙模式 host + preset |
+| [051-pl2-10-generation-gate.md](topics/051-pl2-10-generation-gate.md) | topic | active | 051 PL2-10 — deterministic generation 與 CI gate |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

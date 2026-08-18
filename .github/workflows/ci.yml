@@ -69,5 +69,24 @@ jobs:
       - name: Verify Phase 1 architecture and Node 22 tarball consumer
         run: pnpm run verify:phase1
 
+      # PL2-10: the generation gate compares every generated artefact against a committed golden,
+      # regenerates in a second directory to prove determinism means "same inputs" rather than
+      # "same run", hands the composed schema to Prisma, and — with --self-test — breaks each
+      # artefact in turn to prove it would notice. A drift check nobody has watched fail is a
+      # drift check nobody knows works.
+      - name: Verify Phase 2 deterministic generation
+        run: pnpm run verify:phase2
+
+      # Uploaded on failure only: a generation diff is unreadable in a log and obvious as a file.
+      - name: Upload generation diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appspine-generation-diagnostics
+          path: |
+            fixtures/051-pl2-generation/golden/**
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Lint knowledge base
         run: node scripts/lint-knowledge.js

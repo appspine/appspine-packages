@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "appspine.plugins/v1",
+  "plugins": [
+    {
+      "plugin": "@appspine/demo-audit",
+      "instanceId": "default",
+      "enabled": true,
+      "required": true
+    },
+    {
+      "plugin": "@appspine/demo-health",
+      "instanceId": "default",
+      "enabled": true,
+      "required": true
+    },
+    {
+      "plugin": "@appspine/demo-identity",
+      "instanceId": "default",
+      "enabled": true,
+      "required": true
+    },
+    {
+      "plugin": "@appspine/demo-roles",
+      "instanceId": "default",
+      "enabled": true,
+      "required": true
+    }
+  ]
+}

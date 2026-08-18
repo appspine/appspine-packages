@@ -14,6 +14,8 @@
     "verify:phase0": "node scripts/051-pl0-identity-contract-check.mjs && node scripts/051-pl0-manifest-fixture-check.mjs && node scripts/051-pl0-prisma-composer-check.mjs && node scripts/051-pl0-permission-reconciler-check.mjs && node scripts/051-pl0-build-graph-check.mjs",
     "verify:architecture": "node scripts/051-pl1-architecture-check.mjs",
     "verify:phase1": "node scripts/051-pl1-architecture-check.mjs --self-test && node scripts/051-pl1-architecture-check.mjs && node scripts/051-pl1-clean-consumer.mjs",
+    "verify:generation": "node scripts/051-pl2-10-generation-gate.mjs --self-test && node scripts/051-pl2-10-generation-gate.mjs",
+    "verify:phase2": "pnpm run verify:generation && pnpm run verify:snapshot",
     "verify:template-dual-mode": "node scripts/051-pl2-09-template-dual-mode.mjs",
     "check:changeset-discipline": "node scripts/check-changeset-discipline.mjs",
     "changeset": "changeset",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
     "@changesets/cli": "^2.31.0",
+    "prisma": "6.19.3",
     "semver": "^7.8.5",
     "typescript": "^5.9.3"
   }
