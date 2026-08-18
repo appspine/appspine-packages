@@ -321,7 +321,50 @@
           }
         },
         "permissions": {
-          "type": "object"
+          "type": "object",
+          "description": "Permissions this plugin declares. PL0-05 left this opaque and named PL2-07 as its owner. An ID is immutable and namespaced to the declaring plugin: renaming one is a new ID plus an alias, never an edit, because roles, audit rows and customer policies all reference it.",
+          "additionalProperties": false,
+          "properties": {
+            "definitions": {
+              "description": "Either a bare ID - the shape PL0-05 froze, where the display name defaults to the ID - or an object carrying a display name, an alias, or a frontend-only marker.",
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["id"],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+                      },
+                      "displayName": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "status": {
+                        "enum": ["active", "retired"]
+                      },
+                      "aliasOf": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+                      },
+                      "frontendOnly": {
+                        "type": "boolean",
+                        "description": "A visibility hint for the UI. Never an authorization decision."
+                      }
+                    }
+                  }
+                ]
+              },
+              "uniqueItems": true
+            }
+          }
         },
         "operations": {
           "type": "object",

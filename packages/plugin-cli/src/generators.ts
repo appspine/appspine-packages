@@ -9,12 +9,14 @@
 import { generateComposition } from './composition';
 import type { GeneratedArtifact, GenerationInput, Generator } from './generate';
 import { generateCatalog } from './generate';
+import { generatePermissionPlan } from './permission-reconciler';
 import { generatePrismaSchema } from './prisma-composer';
 
 export const GENERATORS: readonly Generator[] = [
   generateCatalog,
   generateComposition,
   generatePrismaSchema,
+  generatePermissionPlan,
 ];
 
 /** Sorted by path, so the artefact list — and the lockfile that digests it — is order-independent. */

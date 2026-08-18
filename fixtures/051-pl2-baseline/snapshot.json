@@ -853,6 +853,7 @@
       "packages/plugin-cli/src/inventory-file.ts",
       "packages/plugin-cli/src/lockfile.ts",
       "packages/plugin-cli/src/manifest-source.ts",
+      "packages/plugin-cli/src/permission-reconciler.ts",
       "packages/plugin-cli/src/plan.ts",
       "packages/plugin-cli/src/prisma-composer.ts"
     ],

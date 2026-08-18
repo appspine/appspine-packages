@@ -50,15 +50,35 @@ describe('shipped manifest schema vs. the PL0-05 frozen contract', () => {
     );
   });
 
-  it('leaves frontend/permissions opaque, because nothing owns them yet', () => {
+  it('leaves frontend opaque, because PL3-02 owns it', () => {
     const facets = ((shipped.properties as SchemaNode).facets as SchemaNode)
       .properties as SchemaNode;
-    // `prisma` used to be on this list. PL0-05 named PL2-06 as its owner, and PL2-06 tightened it
-    // — the same handover `backend` and `operations` got from PL1-06. `frontend` waits for PL3-02
-    // and `permissions` for PL2-07.
-    for (const facet of ['frontend', 'permissions']) {
-      expect(facets[facet], `${facet} facet must stay opaque in v1`).toEqual({ type: 'object' });
-    }
+    // `prisma` and `permissions` used to be on this list. PL0-05 named PL2-06 and PL2-07 as their
+    // owners and both have tightened them — the same handover `backend` and `operations` got from
+    // PL1-06. Only `frontend` is still waiting for its owner.
+    expect(facets.frontend, 'frontend facet must stay opaque in v1').toEqual({ type: 'object' });
+  });
+
+  it('narrows permissions, which PL0-05 explicitly handed to PL2-07', () => {
+    const facets = ((shipped.properties as SchemaNode).facets as SchemaNode)
+      .properties as SchemaNode;
+    const permissions = facets.permissions as SchemaNode;
+    const definitions = (permissions.properties as SchemaNode).definitions as SchemaNode;
+    const variants = (definitions.items as SchemaNode).oneOf as SchemaNode[];
+
+    expect(permissions.additionalProperties).toBe(false);
+    // PL0-05's frozen `rbac-full-facets` fixture declares permissions as bare ID strings. The
+    // tightened schema has to keep accepting that, so an entry is either a string or the richer
+    // object the reconciler needs for display names and aliases.
+    expect(variants).toHaveLength(2);
+    expect(variants[0].type).toBe('string');
+    expect(variants[1].required).toEqual(['id']);
+    // Namespaced by pattern in both shapes, so a plugin cannot collide with another's IDs by
+    // accident — and the reconciler's own check catches the deliberate case.
+    expect(variants[0].pattern).toContain(':');
+    expect((variants[1].properties as SchemaNode).id).toMatchObject({
+      pattern: expect.stringContaining(':'),
+    });
   });
 
   it('narrows prisma, which PL0-05 explicitly handed to PL2-06', () => {

@@ -131,6 +131,18 @@ export {
   readManifestsFor,
 } from './manifest-source';
 export {
+  type DesiredPermission,
+  desiredPermissionsFrom,
+  generatePermissionPlan,
+  PERMISSION_ARTIFACT,
+  PERMISSION_ID,
+  type PermissionOp,
+  type PermissionPlan,
+  type PermissionRecord,
+  type ReconcileResult,
+  reconcilePermissions,
+} from './permission-reconciler';
+export {
   applyPlan,
   type ChangePlan,
   type FileChange,
