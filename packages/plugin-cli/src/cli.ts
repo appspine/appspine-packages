@@ -38,6 +38,11 @@ export interface CommandDefinition {
   name: string;
   summary: string;
   usage: string;
+  /**
+   * Flags this command accepts, beyond the global ones. Declared per command rather than pooled
+   * globally so `--dry-run` on a read-only command is a usage error instead of a silent no-op.
+   */
+  flags?: readonly string[];
   handler: CommandHandler;
 }
 
@@ -127,10 +132,6 @@ export async function runCli(
     return args.flags.get('help') === true ? ExitCode.OK : ExitCode.USAGE;
   }
 
-  const unknownFlags = [...args.flags.keys()].filter(
-    (flag) => !GLOBAL_FLAGS.has(flag) && !FLAGS_WITH_VALUES.has(flag),
-  );
-
   const definition = commands.find((entry) => entry.name === args.command);
   if (!definition) {
     return emit(
@@ -151,6 +152,8 @@ export async function runCli(
     );
   }
 
+  const accepted = new Set([...GLOBAL_FLAGS, ...(definition.flags ?? [])]);
+  const unknownFlags = [...args.flags.keys()].filter((flag) => !accepted.has(flag));
   if (unknownFlags.length > 0) {
     return emit(io, asJson, {
       command: definition.name,

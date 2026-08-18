@@ -42,6 +42,14 @@ function walkTsFiles(dir, results = []) {
 
 const IMPORT_PATTERN = /from\s+['"]@appspine\/([a-zA-Z0-9._-]+)(?:\/[^'"]*)?['"]/g;
 
+/**
+ * Comments are prose about code. A `from '@appspine/x'` inside one is documentation, not a
+ * dependency, and counting it makes this scan disagree with the compiler.
+ */
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+}
+
 let failed = 0;
 let checked = 0;
 function report(label, ok, detail) {
@@ -72,8 +80,8 @@ for (const dirName of packageDirNames) {
   const actualImports = new Set();
   const testOnlyImports = new Set();
   for (const file of walkTsFiles(path.join(packagesDir, dirName, 'src'))) {
-    const isTestFile = /\.(spec|test)\.tsx?$/.test(file) || /[/]test-support\.ts$/.test(file);
-    const content = fs.readFileSync(file, 'utf8');
+    const isTestFile = /\.(spec|test)\.tsx?$/.test(file) || /[\\/]test-support\.ts$/.test(file);
+    const content = stripComments(fs.readFileSync(file, 'utf8'));
     let match = IMPORT_PATTERN.exec(content);
     while (match) {
       const toPkg = `@appspine/${match[1]}`;

@@ -52,7 +52,16 @@ const AMBIENT_CAPABILITIES = new Set([
   'appspine.authentication-strategy-registry',
 ]);
 
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export)[\s\S]*?from\s+['"]([^'"]+)['"]/g;
+/**
+ * An import/export clause up to its `from`.
+ *
+ * `[^;]*?` rather than `[\s\S]*?` on purpose: the lazy any-character version can start at one
+ * `import` line and run all the way down the file to a `from '...'` inside a *later* string or
+ * comment, reporting whatever it finds there as a dependency. That is not hypothetical - it
+ * fired on a comment reading `tell "already there" from "added"` and claimed the package
+ * "added" was undeclared. An import clause never contains a semicolon before its `from`.
+ */
+const IMPORT_RE = /(?:^|\n)\s*(?:import|export)[^;]*?from\s+['"]([^'"]+)['"]/g;
 const REQUIRE_RE = /require\(\s*['"]([^'"]+)['"]\s*\)/g;
 
 function readJson(file) {
@@ -96,7 +105,17 @@ const NODE_BUILTINS = new Set([
 /** A real specifier, not something the regex scraped out of a string literal or a comment. */
 const SPECIFIER_SHAPE = /^(?:@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*(?:\/[\w.@-]+)*$/i;
 
-function externalSpecifiers(source) {
+/**
+ * Comments are prose about code, not code. Every source-text rule in this repo that skipped this
+ * step has produced a false positive on its own documentation - identity-core's RBAC ban at Gate
+ * G1, and this checker's import scan right after. Strip first, match second.
+ */
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+}
+
+function externalSpecifiers(rawSource) {
+  const source = stripComments(rawSource);
   const found = new Set();
   for (const re of [IMPORT_RE, REQUIRE_RE]) {
     re.lastIndex = 0;
@@ -588,6 +607,22 @@ function selfTest() {
             engine: {},
             facets: {},
           },
+        }),
+      }),
+    },
+    {
+      name: 'a comment containing an import (must NOT fire)',
+      expect: null,
+      fixture: () => ({
+        name: '@appspine/fine',
+        dir: makeTempPackage({
+          'package.json': { name: '@appspine/fine' },
+          'src/index.ts':
+            '/*\n' +
+            "import { legacy } from 'lodash';\n" +
+            '*/\n' +
+            'export const y = 1;\n' +
+            '// a script should tell "already there" from "added".\n',
         }),
       }),
     },

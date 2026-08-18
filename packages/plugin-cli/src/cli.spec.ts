@@ -255,7 +255,11 @@ describe('never executes plugin code', () => {
     expect(files.length).toBeGreaterThan(3);
 
     for (const file of files) {
-      const source = readFileSync(file, 'utf8');
+      // Comments describe the ban; a raw-text scan reads the description as the violation.
+      // Same false positive identity-core hit at Gate G1, same fix: match code, not prose.
+      const source = readFileSync(file, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
       expect(source, `${file} must not dynamically import`).not.toMatch(/\bimport\s*\(/);
       expect(source, `${file} must not use require()`).not.toMatch(/\brequire\s*\(/);
       expect(source, `${file} must not spawn a process`).not.toMatch(

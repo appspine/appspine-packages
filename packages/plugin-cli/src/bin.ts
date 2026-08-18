@@ -9,6 +9,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { runCli } from './cli';
+import { COMMANDS } from './commands';
 import { ExitCode } from './exit-codes';
 
 function version(): string {
@@ -22,7 +23,7 @@ function version(): string {
   }
 }
 
-runCli(process.argv.slice(2), { version: version() })
+runCli(process.argv.slice(2), { commands: COMMANDS, version: version() })
   .then((code) => {
     process.exitCode = code;
   })

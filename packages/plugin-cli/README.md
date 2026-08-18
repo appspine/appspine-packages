@@ -20,8 +20,15 @@ appspine <command> [--json] [--cwd <path>]
 
 ## What it will never do
 
-- **Modify anything but the inventory.** When a plugin needs programmatic wiring, the CLI prints a
-  typed stub with a `TODO` for the developer to review and paste. It does not rewrite TypeScript.
+- **Rewrite TypeScript.** When a plugin needs programmatic wiring, `appspine config-stub` prints a
+  typed block with a `TODO` for the developer to review and paste. `appspine.config.ts` is never
+  touched by the CLI.
+- **Run your package manager.** `add` records the dependency in `package.json` and tells you to
+  install it. Installing reaches the network and mutates `node_modules`; a tool that does that as a
+  side effect of editing a config file is one nobody can run in CI.
+- **Uninstall or delete data.** `remove` takes the entry out of the inventory and stops. The package
+  may still be a transitive dependency, and 051 decision 13 is explicit that removing a plugin never
+  removes its tables.
 - **Execute plugin code.** Manifests are JSON, validated against a JSON Schema. Nothing in the
   shipped source can `import()` or `require()` a package by name, and a test asserts that.
 - **Touch a credential.** The inventory holds a `configRef` — a dotted path — never a value. A
@@ -30,6 +37,9 @@ appspine <command> [--json] [--cwd <path>]
 
 Build-time validation only requires that the secret env keys a manifest *declares* are declared.
 It never needs a production value, so the whole thing runs in CI with no secrets available.
+
+The CLI's entire write surface is two declarative JSON files: `appspine.plugins.json`, and the
+`dependencies` block of `package.json` when `add` records a new package.
 
 ## Output
 
@@ -68,9 +78,24 @@ Stable, and part of the published contract: scripts branch on them.
 
 Adding a code is a minor change; changing what an existing number means is a breaking one.
 
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `add <package>` | reads the manifest, checks the result resolves, then records the entry and the dependency |
+| `remove <plugin>` | takes the entry out — refusing if anything still enabled needs what it provided |
+| `list` | the inventory, its resolution status and the resolved order |
+| `validate` | what CI runs: schema, manifests, config boundary, resolution |
+| `config-stub <plugin>` | prints a block for `appspine.config.ts`; never applies it |
+
+`add` and `remove` accept `--dry-run`, which stops between computing the plan and applying it, so
+"what would this do" and "what did this do" are the same code path. Flags are declared per command,
+so `--dry-run` on a read-only command is a usage error rather than a silent no-op.
+
 ## Status
 
-PL2-01 ships the shell: the inventory file format and schema, the config/secret boundary, exit
-codes, the JSON envelope and command dispatch. `add`, `remove`, `list` and `validate` arrive in
-PL2-02; `build` and `doctor` in PL2-03. The programmatic API is exported alongside the binary so
-PL2-09 and PL2-10 can run these checks from a script instead of parsing stdout.
+PL2-01 shipped the shell — the inventory format and schema, the config/secret boundary, exit codes,
+the JSON envelope, command dispatch. PL2-02 added the five commands above. `build` and `doctor`
+arrive in PL2-03, the plugin lockfile in PL2-04, preset expansion in PL2-08. The programmatic API is
+exported alongside the binary so PL2-09 and PL2-10 can run these checks from a script instead of
+parsing stdout.

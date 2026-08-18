@@ -25,6 +25,20 @@ export {
   usage,
 } from './cli';
 export {
+  addCommand,
+  COMMANDS,
+  configStubCommand,
+  listCommand,
+  removeCommand,
+  validateCommand,
+} from './commands';
+export {
+  AMBIENT_CAPABILITIES,
+  checkInventory,
+  loadState,
+  resolveInventory,
+} from './commands/shared';
+export {
   checkConfigBoundary,
   configStub,
   type EnvironmentRequirement,
@@ -66,3 +80,23 @@ export {
   toResolverInventory,
   writeInventory,
 } from './inventory-file';
+export {
+  candidateDirs,
+  DEFAULT_OFFICIAL_SCOPE,
+  locateManifest,
+  type ManifestLocation,
+  type ManifestLookupOptions,
+  type ManifestReadResult,
+  type ManifestSet,
+  readManifestFor,
+  readManifestsFor,
+} from './manifest-source';
+export {
+  applyPlan,
+  type ChangePlan,
+  type FileChange,
+  inventoryChange,
+  packageJsonChange,
+  renderDiff,
+  renderPlan,
+} from './plan';

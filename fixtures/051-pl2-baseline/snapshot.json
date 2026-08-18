@@ -837,9 +837,24 @@
     "@appspine/oidc-auth -> @appspine/plugin-testkit": ["packages/oidc-auth/src/plugin.spec.ts"],
     "@appspine/plugin-cli -> @appspine/plugin-api": [
       "packages/plugin-cli/src/cli.spec.ts",
+      "packages/plugin-cli/src/commands/add.ts",
+      "packages/plugin-cli/src/commands/commands.spec.ts",
+      "packages/plugin-cli/src/commands/list.ts",
+      "packages/plugin-cli/src/commands/remove.ts",
+      "packages/plugin-cli/src/commands/shared.ts",
+      "packages/plugin-cli/src/commands/validate.ts",
       "packages/plugin-cli/src/config-boundary.ts",
       "packages/plugin-cli/src/diagnostics.ts",
-      "packages/plugin-cli/src/inventory-file.ts"
+      "packages/plugin-cli/src/inventory-file.ts",
+      "packages/plugin-cli/src/manifest-source.ts",
+      "packages/plugin-cli/src/plan.ts"
+    ],
+    "@appspine/plugin-cli -> @appspine/plugin-api/loader": [
+      "packages/plugin-cli/src/commands/shared.ts",
+      "packages/plugin-cli/src/manifest-source.ts"
+    ],
+    "@appspine/plugin-cli -> @appspine/plugin-api/resolver": [
+      "packages/plugin-cli/src/commands/shared.ts"
     ],
     "@appspine/plugin-host-nest -> @appspine/plugin-api": [
       "packages/plugin-host-nest/src/auth/admin.guard.ts",

@@ -13,7 +13,8 @@ updated: 2026-08-18
 > Task：`PL2-01`（見 [051 拆解 §6](../decisions/051-plugin-platform-engineering-task-breakdown.md#6-phase-2--clilockfileprismapermission-與-preset)）。
 > 依賴：[Gate G1](051-pl1-gate-g1.md)。
 > Changeset：`.changeset/051-phase2-plugin-cli.md`。
-> 本 task 只交付 CLI 的**外殼**；`add`／`remove`／`list`／`validate` 是 PL2-02，`build`／`doctor` 是 PL2-03。
+> 本 task 只交付 CLI 的**外殼**；`add`／`remove`／`list`／`validate` 見 [PL2-02](051-pl2-02-cli-commands.md)，
+> `build`／`doctor` 是 PL2-03。
 
 ---
 
@@ -147,6 +148,9 @@ node scripts/051-pl1-architecture-check.mjs
   誤貼擋下來。
 - CLI 尚未讀取任何 manifest（`checkConfigBoundary` 的 manifests 參數目前由呼叫者提供）；從 package 解析
   manifest 是 PL2-02 的工作。
+- 本文件原本寫「CLI 只寫一個檔案」。[PL2-02](051-pl2-02-cli-commands.md) 讓 `add` 也會寫
+  `package.json` 的 `dependencies`（計畫 §7 step 3 要求的）。正確的說法是：**寫入面是兩個宣告式 JSON
+  檔案，而且永遠不碰 TypeScript**。`writeInventory` 本身仍然只寫 inventory，那條測試依然成立。
 
 ## 8. Workspace gate
 

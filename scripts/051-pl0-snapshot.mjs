@@ -44,6 +44,14 @@ const CONSUMERS = [
 const IGNORED_DIR_NAMES = new Set(['node_modules', 'dist', '.git', '.next', '.turbo', 'coverage']);
 const IMPORT_PATTERN = /from\s+['"]@appspine\/([a-zA-Z0-9._-]+)((?:\/[^'"]*)?)['"]/g;
 
+/**
+ * Comments are prose about code. A `from '@appspine/x'` inside one is documentation, not a
+ * dependency, and counting it makes this scan disagree with the compiler.
+ */
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+}
+
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
@@ -97,7 +105,7 @@ function gitState(repoDir) {
 function collectImportEdges(files, baseDir) {
   const edges = {};
   for (const file of files) {
-    const content = fs.readFileSync(file, 'utf8');
+    const content = stripComments(fs.readFileSync(file, 'utf8'));
     let match = IMPORT_PATTERN.exec(content);
     while (match) {
       const subpath = `@appspine/${match[1]}${match[2] ?? ''}`;
