@@ -287,15 +287,20 @@ const output = formatJson(snapshot);
 //
 // So the file each phase re-generates is its own, selected with --baseline. The PL0 file stays put.
 const DEFAULT_BASELINE = 'fixtures/051-pl0-baseline/snapshot.json';
+// Baselines a gate has already accepted. Each phase seals its own at its gate and never rewrites
+// it afterwards; the *current* phase writes to its own file, which is what `verify:snapshot`
+// checks. Regenerating a sealed one deletes the evidence its gate was judged against — that is
+// what happened to the PL0 baseline during Phase 1 (Gate G1 review B2).
+const SEALED_BASELINES = new Set([DEFAULT_BASELINE, 'fixtures/051-pl1-baseline/snapshot.json']);
 const baselineFlag = process.argv.indexOf('--baseline');
 const baselineRelative = baselineFlag === -1 ? DEFAULT_BASELINE : process.argv[baselineFlag + 1];
 if (!baselineRelative) {
   throw new Error('--baseline requires a path');
 }
-if (shouldWrite && baselineRelative === DEFAULT_BASELINE) {
+if (shouldWrite && SEALED_BASELINES.has(baselineRelative.split(path.sep).join('/'))) {
   throw new Error(
-    `${DEFAULT_BASELINE} is the frozen PL0 baseline and must not be regenerated; ` +
-      'pass --baseline <phase snapshot> to write a new one',
+    `${baselineRelative} is a sealed phase baseline and must not be regenerated; ` +
+      'pass --baseline <current phase snapshot> to write a new one',
   );
 }
 const outPath = path.join(repoRoot, baselineRelative);

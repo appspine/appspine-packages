@@ -2,6 +2,9 @@
   "files": [],
   "references": [
     {
+      "path": "./packages/plugin-cli/tsconfig.build.json"
+    },
+    {
       "path": "packages/audit-log/tsconfig.build.json"
     },
     {

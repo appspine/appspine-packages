@@ -587,6 +587,25 @@ importers:
         specifier: ^3.2.4
         version: 3.2.6(@types/node@22.20.0)(jsdom@30.0.1)
 
+  packages/plugin-cli:
+    dependencies:
+      ajv:
+        specifier: ^8.17.1
+        version: 8.20.0
+    devDependencies:
+      '@appspine/plugin-api':
+        specifier: workspace:*
+        version: link:../plugin-api
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6(@types/node@22.20.0)(jsdom@30.0.1)
+
   packages/plugin-host-nest:
     devDependencies:
       '@appspine/plugin-api':

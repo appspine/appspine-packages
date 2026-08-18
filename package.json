@@ -10,7 +10,7 @@
     "lint:fix": "biome check --write .",
     "build:graph": "tsc -b tsconfig.json",
     "verify:build-graph": "node scripts/051-pl0-build-graph-check.mjs",
-    "verify:snapshot": "node scripts/051-pl0-snapshot.mjs --check --baseline fixtures/051-pl1-baseline/snapshot.json",
+    "verify:snapshot": "node scripts/051-pl0-snapshot.mjs --check --baseline fixtures/051-pl2-baseline/snapshot.json",
     "verify:phase0": "node scripts/051-pl0-identity-contract-check.mjs && node scripts/051-pl0-manifest-fixture-check.mjs && node scripts/051-pl0-prisma-composer-check.mjs && node scripts/051-pl0-permission-reconciler-check.mjs && node scripts/051-pl0-build-graph-check.mjs",
     "verify:architecture": "node scripts/051-pl1-architecture-check.mjs",
     "verify:phase1": "node scripts/051-pl1-architecture-check.mjs --self-test && node scripts/051-pl1-architecture-check.mjs && node scripts/051-pl1-clean-consumer.mjs",

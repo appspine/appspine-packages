@@ -55,6 +55,7 @@
 | [051-pl1-identity-auth-split.md](topics/051-pl1-identity-auth-split.md) | topic | active | 051 PL1-10／PL1-12／PL1-13 — identity／OIDC 拆分與 `@appspine/auth` facade |
 | [051-pl1-pilot-plugins.md](topics/051-pl1-pilot-plugins.md) | topic | active | 051 PL1-08／PL1-09 — 兩個試點 capability plugin |
 | [051-pl1-plugin-platform-core.md](topics/051-pl1-plugin-platform-core.md) | topic | active | 051 PL1-01/02/03/04/05/06/11 — 最小平台核心 |
+| [051-pl2-01-plugin-cli.md](topics/051-pl2-01-plugin-cli.md) | topic | active | 051 PL2-01 — `@appspine/plugin-cli` 與設定 schema |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
