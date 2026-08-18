@@ -26,8 +26,10 @@ export {
 } from './cli';
 export {
   addCommand,
+  buildCommand,
   COMMANDS,
   configStubCommand,
+  doctorCommand,
   listCommand,
   removeCommand,
   validateCommand,
@@ -60,6 +62,23 @@ export {
   type ExitCodeValue,
   exitCodeName,
 } from './exit-codes';
+export {
+  CATALOG_ARTIFACT,
+  type CatalogArtifactEntry,
+  type DriftEntry,
+  detectDrift,
+  driftDiagnostic,
+  GENERATED_DIR,
+  GENERATORS,
+  type GeneratedArtifact,
+  type GenerationInput,
+  type Generator,
+  generateAll,
+  generateCatalog,
+  recordedSourceDigest,
+  sourceDigest,
+  writeArtifacts,
+} from './generate';
 export {
   DEFAULT_INSTANCE_ID,
   emptyInventory,

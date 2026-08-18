@@ -30,6 +30,8 @@ export interface CommandContext {
   appRoot: string;
   args: ParsedArgs;
   io: CliIo;
+  /** The CLI's own version, recorded in generated artefacts so a stale file names what wrote it. */
+  version: string;
 }
 
 export type CommandHandler = (context: CommandContext) => CommandResult | Promise<CommandResult>;
@@ -170,7 +172,12 @@ export async function runCli(
   const appRoot = typeof cwdFlag === 'string' ? cwdFlag : io.cwd();
 
   try {
-    const result = await definition.handler({ appRoot, args, io });
+    const result = await definition.handler({
+      appRoot,
+      args,
+      io,
+      version: options.version ?? '0.0.0-unknown',
+    });
     return emit(io, asJson, result);
   } catch (error) {
     if (error instanceof CliError) {
