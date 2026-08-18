@@ -108,6 +108,7 @@ pnpm lock 與 plugin lock 的責任分工。preset 展開待 PL2-08。
 | Substitution reason | 本 session 無獨立 Terra／Sol provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-04-plugin-lockfile` |
+| Commit | `6339d8a` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §5；`packages/plugin-cli/src/lockfile.spec.ts` |
 | 已知風險 | §6 |
