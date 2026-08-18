@@ -43,6 +43,7 @@ const FOUNDATION_PACKAGES = new Set([
   '@appspine/plugin-testkit',
   '@appspine/plugin-host-nest',
   '@appspine/plugin-cli',
+  '@appspine/preset-standard',
 ]);
 
 /** Capabilities the App or host supplies; a plugin may require them with no plugin installed. */

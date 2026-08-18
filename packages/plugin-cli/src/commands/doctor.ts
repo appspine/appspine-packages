@@ -25,6 +25,7 @@ import {
 } from '../generate';
 import { generateAll } from '../generators';
 import { buildLockfile, compareLockfile, readLockfile } from '../lockfile';
+import { presetSummary } from '../preset';
 import { CLI_TOOL_NAME } from './build';
 import { checkInventory, hasErrors, isLoaded, loadState } from './shared';
 

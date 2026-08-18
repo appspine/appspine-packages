@@ -62,6 +62,7 @@
 | [051-pl2-05-generated-composition.md](topics/051-pl2-05-generated-composition.md) | topic | active | 051 PL2-05 — generated Nest composition |
 | [051-pl2-06-prisma-composer.md](topics/051-pl2-06-prisma-composer.md) | topic | active | 051 PL2-06 — Prisma owns/augments composer |
 | [051-pl2-07-permission-reconciler.md](topics/051-pl2-07-permission-reconciler.md) | topic | active | 051 PL2-07 — permission reconciler |
+| [051-pl2-08-preset-standard.md](topics/051-pl2-08-preset-standard.md) | topic | active | 051 PL2-08 — `@appspine/preset-standard` 與 preset 展開 |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

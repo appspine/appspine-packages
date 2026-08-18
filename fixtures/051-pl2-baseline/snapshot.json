@@ -651,6 +651,32 @@
         "@appspine/plugin-api": "^1.0.0"
       }
     },
+    "@appspine/preset-standard": {
+      "dir": "packages/preset-standard",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./appspine.preset.json": "./appspine.preset.json",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      }
+    },
     "@appspine/rbac": {
       "dir": "packages/rbac",
       "version": "4.0.8",
@@ -855,6 +881,7 @@
       "packages/plugin-cli/src/manifest-source.ts",
       "packages/plugin-cli/src/permission-reconciler.ts",
       "packages/plugin-cli/src/plan.ts",
+      "packages/plugin-cli/src/preset.ts",
       "packages/plugin-cli/src/prisma-composer.ts"
     ],
     "@appspine/plugin-cli -> @appspine/plugin-api/loader": [
@@ -907,6 +934,7 @@
       "packages/plugin-testkit/src/assertions.ts",
       "packages/plugin-testkit/src/harness.ts"
     ],
+    "@appspine/preset-standard -> @appspine/plugin-api": ["packages/preset-standard/src/index.ts"],
     "@appspine/rbac -> @appspine/audit-log": ["packages/rbac/src/roles/roles.controller.ts"],
     "@appspine/rbac -> @appspine/common": [
       "packages/rbac/src/guards/permission.guard.ts",

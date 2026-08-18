@@ -152,6 +152,16 @@ export {
   renderPlan,
 } from './plan';
 export {
+  type ExpandedInventory,
+  expandPresets,
+  type LoadedPreset,
+  PRESET_FILENAME,
+  PRESET_SCHEMA_VERSION,
+  type PresetDocument,
+  presetSummary,
+  readPreset,
+} from './preset';
+export {
   type ComposeResult,
   collectContributions,
   compose,

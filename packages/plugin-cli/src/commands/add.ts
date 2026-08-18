@@ -112,9 +112,9 @@ function add(context: CommandContext): CommandResult {
 
   const configRef = manifest.loaded.manifest.configSchema?.configRef;
   const next: InventoryFile = {
-    ...state.inventory,
+    ...state.declared,
     plugins: [
-      ...state.inventory.plugins,
+      ...state.declared.plugins,
       {
         plugin: manifest.loaded.packageName,
         instanceId,
@@ -146,7 +146,7 @@ function add(context: CommandContext): CommandResult {
   }
 
   // Step 3: the two declarative files, and only those.
-  const changes = [inventoryChange(appRoot, state.inventory, next)];
+  const changes = [inventoryChange(appRoot, state.declared, next)];
   const dependency = packageJsonChange(
     appRoot,
     manifest.loaded.packageName,

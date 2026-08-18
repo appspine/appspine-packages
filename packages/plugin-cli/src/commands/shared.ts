@@ -13,6 +13,7 @@ import { checkConfigBoundary } from '../config-boundary';
 import type { InventoryFile } from '../inventory-file';
 import { readInventory } from '../inventory-file';
 import { type ManifestSet, readManifestsFor } from '../manifest-source';
+import { type ExpandedInventory, expandPresets } from '../preset';
 
 /**
  * Capabilities an App supplies without any plugin: the host owns two, and the App's own Prisma
@@ -25,7 +26,14 @@ export const AMBIENT_CAPABILITIES = [
 ];
 
 export interface LoadedState {
+  /**
+   * The inventory **after preset expansion**. Everything downstream — resolver, catalog, lockfile,
+   * generators — sees ordinary entries and never learns a preset was involved (PL2-08).
+   */
   inventory: InventoryFile;
+  /** The file as written, before expansion, for anything that edits it. */
+  declared: InventoryFile;
+  expanded: ExpandedInventory;
   manifests: ManifestSet;
   diagnostics: PluginDiagnostic[];
 }
@@ -34,15 +42,23 @@ export function loadState(appRoot: string): LoadedState | { diagnostics: PluginD
   const read = readInventory(appRoot);
   if (!read.ok) return { diagnostics: read.diagnostics };
 
+  const expanded = expandPresets(appRoot, read.inventory);
+  const inventory: InventoryFile = {
+    schemaVersion: read.inventory.schemaVersion,
+    plugins: expanded.entries,
+  };
+
   const manifests = readManifestsFor(
     appRoot,
-    read.inventory.plugins.map((entry) => entry.plugin),
+    inventory.plugins.map((entry) => entry.plugin),
   );
 
   return {
-    inventory: read.inventory,
+    inventory,
+    declared: read.inventory,
+    expanded,
     manifests,
-    diagnostics: [...read.diagnostics, ...manifests.diagnostics],
+    diagnostics: [...read.diagnostics, ...expanded.diagnostics, ...manifests.diagnostics],
   };
 }
 

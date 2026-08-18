@@ -5,6 +5,9 @@
       "path": "./packages/plugin-cli/tsconfig.build.json"
     },
     {
+      "path": "./packages/preset-standard/tsconfig.build.json"
+    },
+    {
       "path": "packages/audit-log/tsconfig.build.json"
     },
     {

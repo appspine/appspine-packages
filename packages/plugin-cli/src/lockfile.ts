@@ -57,6 +57,8 @@ export interface LockedInstance {
   enabled: boolean;
   required: boolean;
   configRef: string | null;
+  /** Preset package that contributed this entry, or null when the App wrote it itself. */
+  fromPreset: string | null;
   /** Capabilities this instance provides, instance-qualified for `cardinality: multiple`. */
   provides: string[];
   requires: string[];
@@ -75,6 +77,11 @@ export interface LockedArtifact {
 
 export interface PluginLockfile {
   schemaVersion: typeof LOCK_SCHEMA_VERSION;
+  /**
+   * Presets that contributed entries, with the instance keys each one supplied. Recorded next to
+   * the resolved instances, never instead of them (PL2-08).
+   */
+  presets: { package: string; version: string; id: string; contributes: string[] }[];
   /** Digest of the resolution this lock describes. */
   resolutionDigest: string;
   /** Registration order. Shutdown is the reverse. */
@@ -145,6 +152,7 @@ export function buildLockfile(
       enabled: entry.enabled,
       required: entry.required,
       configRef: entry.configRef ?? null,
+      fromPreset: input.presetProvenance?.get(key) ?? null,
       provides: resolved ? [...resolved.provides] : [],
       requires: resolved ? [...resolved.requires] : [...loaded.manifest.requires],
       optionalRequires: resolved
@@ -162,6 +170,7 @@ export function buildLockfile(
 
   return {
     schemaVersion: LOCK_SCHEMA_VERSION,
+    presets: input.presets ?? [],
     resolutionDigest: graph.digest,
     order: [...graph.order],
     capabilities: Object.fromEntries(

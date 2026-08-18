@@ -71,8 +71,8 @@ function remove(context: CommandContext): CommandResult {
   }
 
   const next: InventoryFile = {
-    ...state.inventory,
-    plugins: state.inventory.plugins.filter((entry) => entry !== target),
+    ...state.declared,
+    plugins: state.declared.plugins.filter((entry) => entry !== target),
   };
 
   const checked = checkInventory(next, state.manifests);
@@ -96,7 +96,7 @@ function remove(context: CommandContext): CommandResult {
 
   const plan: ChangePlan = {
     summary: `remove ${targetId}#${instanceId}`,
-    changes: [inventoryChange(appRoot, state.inventory, next)],
+    changes: [inventoryChange(appRoot, state.declared, next)],
     diagnostics: checked.diagnostics,
   };
 

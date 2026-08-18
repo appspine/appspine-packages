@@ -37,6 +37,7 @@ import {
   readLockfile,
   writeLockfile,
 } from '../lockfile';
+import { presetSummary } from '../preset';
 import { compose } from '../prisma-composer';
 import { checkInventory, hasErrors, isLoaded, loadState } from './shared';
 
@@ -85,6 +86,8 @@ function build(context: CommandContext): CommandResult {
     inventory: state.inventory,
     manifests: state.manifests,
     graph: checked.graph,
+    presetProvenance: state.expanded.provenance,
+    presets: presetSummary(state.expanded).presets,
     generatedBy: { tool: CLI_TOOL_NAME, version: context.version },
   };
   // Compose the Prisma schema first, and refuse before writing anything if it cannot be composed.

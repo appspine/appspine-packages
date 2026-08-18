@@ -134,16 +134,16 @@ describe('inventory file schema', () => {
     expect(result.diagnostics.map((d) => d.code)).toContain('disabled-optional-entry');
   });
 
-  it('refuses presets rather than silently ignoring them', () => {
-    // Dropping them would let `validate` pass on an inventory that does not describe what the App
-    // runs — the worst thing this tool could do.
+  it('accepts presets, and keeps them out of the resolver until they are expanded', () => {
+    // PL2-08 made presets real. `parseInventory` accepts them; `toResolverInventory` still refuses
+    // an unexpanded one, because silently dropping them would let `validate` pass on an inventory
+    // that does not describe what the App runs.
     const result = parseInventory({
       schemaVersion: 'appspine.plugins/v1',
       presets: ['@appspine/preset-standard'],
       plugins: [],
     });
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.map((d) => d.code)).toContain('presets-not-supported');
+    expect(result.ok).toBe(true);
 
     expect(() =>
       toResolverInventory({
@@ -151,7 +151,7 @@ describe('inventory file schema', () => {
         presets: ['@appspine/preset-standard'],
         plugins: [],
       }),
-    ).toThrow(/cannot be expanded yet/);
+    ).toThrow(/expand them/);
   });
 });
 

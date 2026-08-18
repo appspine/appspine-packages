@@ -141,16 +141,6 @@ function semanticDiagnostics(candidate: InventoryFile): PluginDiagnostic[] {
     }
   });
 
-  if (candidate.presets && candidate.presets.length > 0) {
-    diagnostics.push(
-      diagnostic(
-        'presets-not-supported',
-        'preset expansion is not implemented yet (051 PL2-08); remove "presets" or list the plugins explicitly',
-        { path: 'presets' },
-      ),
-    );
-  }
-
   return diagnostics;
 }
 
@@ -269,14 +259,14 @@ export function writeInventory(appRoot: string, inventory: InventoryFile): strin
 /**
  * Narrow the file to what the resolver accepts.
  *
- * Presets are refused rather than dropped. Silently ignoring them would make `plugin validate`
- * pass on an inventory that does not describe what the App actually runs, which is the single
- * worst thing this tool could do.
+ * `plugins` only: a caller that has presets must expand them first (`expandPresets`) and pass the
+ * result. Silently dropping them here would make `plugin validate` pass on an inventory that does
+ * not describe what the App actually runs, which is the single worst thing this tool could do.
  */
 export function toResolverInventory(inventory: InventoryFile): PluginInventory {
   if (inventory.presets && inventory.presets.length > 0) {
     throw new Error(
-      'inventory declares presets, which cannot be expanded yet (051 PL2-08); resolve is not possible',
+      'inventory declares presets; expand them with expandPresets() before resolving',
     );
   }
   return { schemaVersion: INVENTORY_SCHEMA_VERSION, plugins: inventory.plugins };
