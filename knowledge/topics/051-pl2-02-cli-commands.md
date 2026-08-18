@@ -166,6 +166,7 @@ PL2-01 的 README 與文件寫「CLI 只會修改 inventory」。本 task 讓 `a
 | Substitution reason | 本 session 無獨立 Terra provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-02-cli-commands` |
+| Commit | `fd642e7` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §5；`packages/plugin-cli/src/commands/commands.spec.ts`；兩次變異驗證 |
 | 已知風險 | §6 |
