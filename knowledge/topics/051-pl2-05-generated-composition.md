@@ -109,6 +109,7 @@ disabled plugin 的兩面行為、composition 被 lockfile digest 且被 drift c
 | Substitution reason | 本 session 無獨立 Terra／Sol provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收 |
 | Branch | `051-pl2-05-generated-composition` |
+| Commit | `63eb0cc` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §7；`packages/plugin-cli/src/composition.spec.ts` |
 | 已知風險 | §8，尤其第一項 |
