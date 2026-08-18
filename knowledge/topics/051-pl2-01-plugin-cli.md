@@ -182,6 +182,7 @@ node scripts/051-pl1-architecture-check.mjs
 | Substitution reason | 本 session 無獨立 Terra／Sol provider |
 | Independent reviewer | **尚未執行**——Gate G2 才驗收；本 task 的 handoff 尚未被獨立 reviewer 接受 |
 | Branch | `051-pl2-01-plugin-cli` |
+| Commit | `b75516d` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node |
 | Evidence | §2～§5；`packages/plugin-cli/src/cli.spec.ts`（42 tests）；architecture checker 21 packages 0 findings |
 | 已知風險 | §7 |
