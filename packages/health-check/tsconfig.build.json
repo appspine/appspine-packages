@@ -10,7 +10,13 @@
       "path": "../common/tsconfig.build.json"
     },
     {
+      "path": "../frontend-shell/tsconfig.build.json"
+    },
+    {
       "path": "../plugin-api/tsconfig.build.json"
+    },
+    {
+      "path": "../plugin-host-nest/tsconfig.build.json"
     }
   ]
 }

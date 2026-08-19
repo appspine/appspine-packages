@@ -25,6 +25,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./frontend": {
+      "types": "./dist/frontend/index.d.ts",
+      "default": "./dist/frontend/index.js"
+    },
     "./plugin": {
       "types": "./dist/plugin.d.ts",
       "default": "./dist/plugin.js"
@@ -40,21 +44,44 @@
   },
   "dependencies": {
     "@appspine/common": "workspace:*",
-    "@appspine/plugin-api": "workspace:*"
+    "@appspine/frontend-shell": "workspace:*",
+    "@appspine/plugin-api": "workspace:*",
+    "@appspine/plugin-host-nest": "workspace:*"
   },
   "peerDependencies": {
+    "@appspine/frontend-shell": "^0.16.3",
+    "@appspine/plugin-host-nest": "^1.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/terminus": "^11.1.1",
-    "@prisma/client": "^6.2.0"
+    "@prisma/client": "^6.2.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "peerDependenciesMeta": {
+    "@appspine/frontend-shell": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@appspine/frontend-shell": "workspace:*",
+    "@appspine/plugin-host-nest": "workspace:*",
     "@appspine/plugin-testkit": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/terminus": "^11.1.1",
     "@prisma/client": "^6.2.0",
     "@types/node": "^22.10.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

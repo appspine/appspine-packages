@@ -2,10 +2,8 @@
  * `@appspine/health-check/plugin` — the runtime half of the plugin contract (PL1-08).
  *
  * First pilot of the 051 migration: the smallest possible shape (one controller, one health
- * contribution, no Prisma models, no config). Its job is to prove the host can compose a plugin at
- * all, so it deliberately adds no behaviour — `HealthModule` stays exported from the package root
- * and the plugin mode returns that same module, which is what makes legacy/plugin response parity
- * testable rather than merely asserted.
+ * contribution, no Prisma models, no config). Extended in Phase 3 (PL3-10) to declare the
+ * plugin catalog and health admin page contribution.
  */
 
 import { definePlugin, type PluginManifestV1 } from '@appspine/plugin-api';
@@ -31,6 +29,8 @@ export const healthCheckManifest: PluginManifestV1 = {
       '@nestjs/common': '^11.0.5',
       '@nestjs/core': '^11.0.5',
       '@prisma/client': '^6.2.0',
+      react: '^19.2.7',
+      'react-dom': '^19.2.7',
     },
   },
   provides: ['appspine.health-indicator'],
@@ -39,10 +39,37 @@ export const healthCheckManifest: PluginManifestV1 = {
     backend: {
       modulePath: './dist/health.module.js',
       exportName: 'HealthModule',
-      controllerRoutes: ['health'],
+      controllerRoutes: ['health', 'admin/plugins'],
+    },
+    frontend: {
+      adminPages: [
+        {
+          id: 'plugins',
+          routePath: '/dashboard/plugins',
+          title: 'Plugins',
+          componentExport: 'PluginCatalogTable',
+          order: 50,
+          requiredPermission: 'plugin:catalog:read',
+        },
+      ],
+      navigationItems: [
+        {
+          id: 'plugins',
+          title: 'Plugins',
+          href: '/dashboard/plugins',
+          icon: 'Puzzle',
+          order: 50,
+          requiredPermission: 'plugin:catalog:read',
+        },
+      ],
+      i18nNamespace: 'health-check',
+      clientEntry: './dist/frontend.js',
     },
     operations: {
       healthIndicatorId: 'health-check',
+    },
+    permissions: {
+      definitions: ['plugin:catalog:read'],
     },
   },
 };
@@ -63,3 +90,4 @@ export function healthCheck() {
 
 export { HealthController } from './health.controller';
 export { HealthModule } from './health.module';
+export { PluginCatalogController } from './plugin-catalog.controller';

@@ -10,7 +10,9 @@
     "frameworks": {
       "@nestjs/common": "^11.0.5",
       "@nestjs/core": "^11.0.5",
-      "@prisma/client": "^6.2.0"
+      "@prisma/client": "^6.2.0",
+      "react": "^19.2.7",
+      "react-dom": "^19.2.7"
     }
   },
   "provides": ["appspine.health-indicator"],
@@ -19,10 +21,37 @@
     "backend": {
       "modulePath": "./dist/health.module.js",
       "exportName": "HealthModule",
-      "controllerRoutes": ["health"]
+      "controllerRoutes": ["health", "admin/plugins"]
+    },
+    "frontend": {
+      "adminPages": [
+        {
+          "id": "plugins",
+          "routePath": "/dashboard/plugins",
+          "title": "Plugins",
+          "componentExport": "PluginCatalogTable",
+          "order": 50,
+          "requiredPermission": "plugin:catalog:read"
+        }
+      ],
+      "navigationItems": [
+        {
+          "id": "plugins",
+          "title": "Plugins",
+          "href": "/dashboard/plugins",
+          "icon": "Puzzle",
+          "order": 50,
+          "requiredPermission": "plugin:catalog:read"
+        }
+      ],
+      "i18nNamespace": "health-check",
+      "clientEntry": "./dist/frontend.js"
     },
     "operations": {
       "healthIndicatorId": "health-check"
+    },
+    "permissions": {
+      "definitions": ["plugin:catalog:read"]
     }
   }
 }

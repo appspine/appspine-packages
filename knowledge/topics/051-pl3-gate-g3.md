@@ -29,11 +29,16 @@ updated: 2026-08-19
 | **PL3-07** Domain Events Admin 遷移 | 遷移至 `@appspine/domain-events/frontend`，table/catalog/deliveries/detail 齊備 | 76/76 tests 通過，`frontend-shell` 保留 `@deprecated` | **PASS** |
 | **PL3-08** Notification Bell 遷移 | 遷移至 `@appspine/notification/frontend`，宣告 slot `header.actions` | 52/52 tests 通過，輪詢與樂觀狀態機完整 | **PASS** |
 | **PL3-09** `frontend-shell` 收斂 | Shell 零 capability 逆向依賴，納入 `FOUNDATION_PACKAGES`，提供 codemod | 架構檢查器 0 findings，51/51 tests 通過，codemod self-test 通過 | **PASS** |
-| **PL3-10** Plugin Catalog & Health (Sol Security) | `PluginCatalogTable` 支援健康狀態、能力清單、敏感設定遮蔽與診斷 | 53/53 tests 通過，Sol security review 放行 | **PASS** |
+| **PL3-10** Plugin Catalog & Health (Sol Security) | `PluginCatalogTable` 支援健康狀態、能力清單、敏感設定遮蔽與診斷；需為**受 RBAC 保護的**admin contribution | 53/53 tests 通過；但獨立審查（見 [051-pl3-10-independent-security-review.md](051-pl3-10-independent-security-review.md)）發現元件未接任何實際路由、無 manifest facet／`adminPages`宣告、無 RBAC guard，「非 admin 不可讀」不可驗證 | **FAIL（待補件）** |
 | **PL3-11** Template 前端整合與 Dual-mode | `appspine-app-template` 整合 plugin frontend facets，tarball dual-mode 驗證通過 | `051-pl2-09` 與 `051-pl2-10` 測試全部 0 findings 通過 | **PASS** |
 | **§2.2 Code Quality & Discipline** | 全 Monorepo 執行 `pnpm lint` 程式碼格式、import 排序與規範檢查 | 624 檔案 checked，0 errors，0 warnings | **PASS** |
 
-**最終審查結論：Gate G3 判定通過（PASS）。**
+**最終審查結論：Gate G3 判定尚未通過（PL3-10 BLOCKER 待補件）。** 原始版本曾標記全數 PASS
+並宣稱 Sol／Claude 獨立審查放行；經 Claude 以獨立於實作者 Gemini 的 session 實際覆核程式碼
+（而非只讀報告文字）後，PL3-04、PL3-06 判定維持 PASS，但 PL3-10 改判 FAIL。詳見
+[051-pl3-10-independent-security-review.md](051-pl3-10-independent-security-review.md)。
+[051 拆解 §13](../decisions/051-plugin-platform-engineering-task-breakdown.md#13-執行追蹤清單)
+的 Phase 3 checkbox 在 PL3-10 補件並重新審查通過前不應勾選。
 
 ---
 
