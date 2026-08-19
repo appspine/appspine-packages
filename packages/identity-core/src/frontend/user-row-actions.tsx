@@ -1,9 +1,5 @@
 'use client';
 
-import { MoreHorizontal } from 'lucide-react';
-import { useState, useTransition } from 'react';
-import { useTranslations } from '../../i18n/index.js';
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,24 +9,25 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../ui/alert-dialog.js';
-import { Button } from '../ui/button.js';
-import { Checkbox } from '../ui/checkbox.js';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog.js';
-import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu.js';
-import { FieldError } from '../ui/field.js';
-import { Label } from '../ui/label.js';
+  FieldError,
+  Label,
+  useTranslations,
+} from '@appspine/frontend-shell';
+import { MoreHorizontal } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import type { UserRowActionsProps } from './types.js';
 
-import type { UserRoleOption, UserRow } from './types.js';
-
-/**
- * @deprecated Moved to `@appspine/identity-core/frontend` in Phase 3 (PL3-03).
- */
 export function UserRowActions({
   user,
   roles,
@@ -39,18 +36,7 @@ export function UserRowActions({
   setUserServiceAccountAction,
   updateUserRolesAction,
   deleteUserAction,
-}: {
-  user: UserRow;
-  roles: UserRoleOption[];
-  isSelf: boolean;
-  setUserActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
-  setUserServiceAccountAction: (
-    id: string,
-    isServiceAccount: boolean,
-  ) => Promise<{ error?: string }>;
-  updateUserRolesAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
-  deleteUserAction: (id: string) => Promise<{ error?: string }>;
-}) {
+}: UserRowActionsProps) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
   const [rolesOpen, setRolesOpen] = useState(false);
@@ -81,13 +67,9 @@ export function UserRowActions({
       if (result.error) {
         setError(result.error);
       } else {
-        setOpen(false);
+        setRolesOpen(false);
       }
     });
-  }
-
-  function setOpen(val: boolean) {
-    setRolesOpen(val);
   }
 
   function handleDelete() {
@@ -102,32 +84,37 @@ export function UserRowActions({
     });
   }
 
+  const userRoleIds = new Set(user.roles.map((r) => r.id));
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label={`Actions for ${user.email}`}>
-            <MoreHorizontal className="size-4" />
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">{tCommon('actions')}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => setRolesOpen(true)}>
-            {t('manageRoles')}
+          <DropdownMenuItem onClick={() => setRolesOpen(true)}>
+            {t('editRoles')}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={toggleActive} disabled={isPending}>
+          <DropdownMenuItem onClick={toggleActive} disabled={isPending}>
             {user.isActive ? t('deactivate') : t('activate')}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={toggleServiceAccount} disabled={isPending}>
-            {user.isServiceAccount ? t('unmarkServiceAccount') : t('markServiceAccount')}
+          <DropdownMenuItem onClick={toggleServiceAccount} disabled={isPending}>
+            {user.isServiceAccount
+              ? t('unsetServiceAccount')
+              : t('setServiceAccount')}
           </DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            disabled={isSelf}
-            onSelect={() => setDeleteOpen(true)}
-          >
-            {t('delete')}
-            {isSelf ? t('cantDeleteSelf') : ''}
-          </DropdownMenuItem>
+          {!isSelf && (
+            <DropdownMenuItem
+              onClick={() => setDeleteOpen(true)}
+              className="text-destructive focus:text-destructive"
+            >
+              {tCommon('delete')}
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -135,7 +122,7 @@ export function UserRowActions({
         <DialogContent>
           <form action={handleRolesSubmit}>
             <DialogHeader>
-              <DialogTitle>{t('rolesForUser').replace('{email}', user.email)}</DialogTitle>
+              <DialogTitle>{t('editRoles')}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-2 py-4">
               {roles.map((role) => (
@@ -143,7 +130,7 @@ export function UserRowActions({
                   <Checkbox
                     name="roleIds"
                     value={role.id}
-                    defaultChecked={user.roles.some((r) => r.id === role.id)}
+                    defaultChecked={userRoleIds.has(role.id)}
                   />
                   {role.displayName}
                 </Label>
@@ -151,8 +138,16 @@ export function UserRowActions({
               {error && <FieldError>{error}</FieldError>}
             </div>
             <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setRolesOpen(false)}
+                disabled={isPending}
+              >
+                {t('cancel')}
+              </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? t('saving') : tCommon('save')}
+                {isPending ? t('saving') : t('save')}
               </Button>
             </DialogFooter>
           </form>
@@ -162,16 +157,21 @@ export function UserRowActions({
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t('deleteUserTitle').replace('{email}', user.email)}
-            </AlertDialogTitle>
-            <AlertDialogDescription>{t('deleteWarning')}</AlertDialogDescription>
+            <AlertDialogTitle>{t('deleteUser')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('deleteDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           {error && <FieldError>{error}</FieldError>}
           <AlertDialogFooter>
-            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
-              {isPending ? t('deleting') : t('delete')}
+            <AlertDialogCancel disabled={isPending}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? t('deleting') : tCommon('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

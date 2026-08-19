@@ -1,6 +1,8 @@
 /**
- * Reserved Phase 1 public boundary. Phase 3 adds Users Admin contributions behind this subpath.
+ * Phase 3 frontend facet exports for `@appspine/identity-core/frontend` (PL3-03).
  */
 export interface IdentityCoreFrontendContribution {
   readonly kind: 'appspine.identity-core.frontend';
 }
+
+export * from './frontend/index.js';

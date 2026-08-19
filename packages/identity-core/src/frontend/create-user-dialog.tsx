@@ -1,12 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-
-import { useTranslations } from '../../i18n/index.js';
-
-import { Button } from '../ui/button.js';
-import { Checkbox } from '../ui/checkbox.js';
 import {
+  Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -14,23 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog.js';
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field.js';
-import { Input } from '../ui/input.js';
-import { Label } from '../ui/label.js';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+  Label,
+  useTranslations,
+} from '@appspine/frontend-shell';
+import { useState, useTransition } from 'react';
+import type { CreateUserDialogProps } from './types.js';
 
-import type { UserRoleOption } from './types.js';
-
-/**
- * @deprecated Moved to `@appspine/identity-core/frontend` in Phase 3 (PL3-03).
- */
-export function CreateUserDialog({
-  roles,
-  createUserAction,
-}: {
-  roles: UserRoleOption[];
-  createUserAction: (formData: FormData) => Promise<{ error?: string }>;
-}) {
+export function CreateUserDialog({ roles, createUserAction }: CreateUserDialogProps) {
   const t = useTranslations('users');
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -104,6 +95,14 @@ export function CreateUserDialog({
             {error && <FieldError>{error}</FieldError>}
           </FieldGroup>
           <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+            >
+              {t('cancel')}
+            </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? t('creating') : t('create')}
             </Button>

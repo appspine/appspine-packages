@@ -1,28 +1,16 @@
 import {
+  Badge,
   SortableColumnHeader,
-  type SortableLinkComponent,
-  type SortOrder,
-} from '../sortable-column-header.js';
-import { Badge } from '../ui/badge.js';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
-import type { UserRoleOption, UserRow } from './types.js';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@appspine/frontend-shell';
+import type { UserSortField, UsersTableProps } from './types.js';
 import { UserRowActions } from './user-row-actions.js';
 
-type UserSortField = 'email' | 'name';
-
-type UsersTableKey =
-  | 'active'
-  | 'email'
-  | 'inactive'
-  | 'name'
-  | 'noUsers'
-  | 'roles'
-  | 'serviceAccount'
-  | 'status';
-
-/**
- * @deprecated Moved to `@appspine/identity-core/frontend` in Phase 3 (PL3-03).
- */
 export function UsersTable({
   users,
   roles,
@@ -36,23 +24,7 @@ export function UsersTable({
   setUserServiceAccountAction,
   updateUserRolesAction,
   deleteUserAction,
-}: {
-  users: UserRow[];
-  roles: UserRoleOption[];
-  currentUserId: string | undefined;
-  sortField: string | undefined;
-  sortOrder: SortOrder | undefined;
-  LinkComponent: SortableLinkComponent;
-  buildSortHref: (field: UserSortField, order: SortOrder) => string;
-  t: (key: UsersTableKey) => string;
-  setUserActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
-  setUserServiceAccountAction: (
-    id: string,
-    isServiceAccount: boolean,
-  ) => Promise<{ error?: string }>;
-  updateUserRolesAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
-  deleteUserAction: (id: string) => Promise<{ error?: string }>;
-}) {
+}: UsersTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -111,7 +83,9 @@ export function UsersTable({
                 </Badge>
               </TableCell>
               <TableCell>
-                {user.isServiceAccount && <Badge variant="secondary">{t('serviceAccount')}</Badge>}
+                {user.isServiceAccount && (
+                  <Badge variant="outline">{t('serviceAccount')}</Badge>
+                )}
               </TableCell>
               <TableCell>
                 <UserRowActions

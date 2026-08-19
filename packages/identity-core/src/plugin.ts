@@ -27,6 +27,9 @@ export const identityCoreManifest: PluginManifestV1 = {
       '@nestjs/common': '^11.0.5',
       '@nestjs/core': '^11.0.5',
       '@prisma/client': '^6.2.0',
+      'lucide-react': '^1.22.0',
+      react: '^19.0.0',
+      'react-dom': '^19.0.0',
     },
   },
   provides: ['appspine.identity-store'],
@@ -41,6 +44,31 @@ export const identityCoreManifest: PluginManifestV1 = {
       exportName: 'IdentityCoreModule',
       controllerRoutes: ['users'],
       providerTokens: ['appspine.identity-store'],
+    },
+    frontend: {
+      adminPages: [
+        {
+          id: 'users',
+          routePath: '/dashboard/users',
+          title: 'users',
+          componentExport: 'UsersTable',
+          requiredPermission: 'identity:user:read',
+          order: 10,
+        },
+      ],
+      navigationItems: [
+        {
+          id: 'users',
+          title: 'users',
+          href: '/dashboard/users',
+          icon: 'Users',
+          order: 10,
+          section: 'admin',
+          requiredPermission: 'identity:user:read',
+        },
+      ],
+      i18nNamespace: 'users',
+      clientEntry: './dist/frontend.js',
     },
     prisma: {
       owns: ['User'],
