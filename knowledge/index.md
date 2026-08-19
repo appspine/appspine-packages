@@ -81,6 +81,7 @@
 | [051-pl3-gate-g3.md](topics/051-pl3-gate-g3.md) | topic | active | 051 Gate G3 — Frontend Facet／Slots 與 Capability UI Ownership 驗收報告 |
 | [051-pl4-01-notification-plugin.md](topics/051-pl4-01-notification-plugin.md) | topic | active | 051 PL4-01 — 遷移 `notification` plugin（4A） |
 | [051-pl4-02-rbac-plugin.md](topics/051-pl4-02-rbac-plugin.md) | topic | active | 051 PL4-02 — 遷移 `rbac` plugin（4A） |
+| [051-pl4-03-m2m-api-key-plugin.md](topics/051-pl4-03-m2m-api-key-plugin.md) | topic | active | 051 PL4-03 — 遷移 `m2m-api-key` plugin（4A） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

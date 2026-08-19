@@ -606,7 +606,9 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-03 遷移 `m2m-api-key` plugin（4A）
 
-- **owner**：Terra xhigh（G2）；Sol G3 審 authentication/security。
+> 交付報告：[051-pl4-03-m2m-api-key-plugin.md](../topics/051-pl4-03-m2m-api-key-plugin.md)。
+
+- **owner**：Terra xhigh（G2，本次由 Gemini 執行，見報告 §5 substitution log）；Sol G3 審 authentication/security。
 - **依賴**：PL4-02、PL1-11。
 - **交付**：machine auth strategy、scope matcher token、backend/prisma/frontend facets、instance-aware diagnostics；
   移除 `JwtOrApiKeyGuard` 作為跨插件組裝機制。
@@ -899,7 +901,18 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       Gate G3 文件本身。
 - [x] Phase 4：PL4-01 已完成（[報告](../topics/051-pl4-01-notification-plugin.md)，Claude 獨立覆核
       通過 2026-08-19；獨立覆核發現 2 處超出 scope 的變更，remediation 後重新驗證全套
-      lint/typecheck/build/test/generation-gate/template-dual-mode 皆綠燈）；PL4-02～10 待執行；Gate G4
+      lint/typecheck/build/test/generation-gate/template-dual-mode 皆綠燈）。
+      PL4-02 已完成（[報告](../topics/051-pl4-02-rbac-plugin.md)，Claude 獨立覆核通過 2026-08-19）。
+      首次繳交移除 `RbacModule` 的 `@Global()`，經覆核追蹤發現下游 9 個 repo（template + 8 App）
+      共 40+ 個 feature controller 依賴此全域性、尚未顯式 import，會在下游升級時導致開機
+      `UnknownDependenciesException`；remediation 改為在 Phase 4 過渡期保留 `@Global()`（manifest
+      加註 `facets.backend.global: true`），實際移除排入 Phase 5。**此 task 要求的「Sol G3 審
+      authorization」實質未取得獨立於 Claude 的第三方核准**——remediation 後的變更是把風險行為
+      完整還原為變更前狀態（`@Global()` 不變），不構成新的 authorization 風險，故由 Claude 以
+      §11 校準替補方式一併認定通過；若之後有 Sol 或同級 G3 可用，建議回頭補審。另外，remediation
+      commit 再次帶入與 PL4-01 相同、已被要求移除過一次的 `frontend-shell/alert-dialog.tsx`
+      無效改動（對 typecheck 無實際影響），本次由 Claude 直接 revert（commit `d94b95f`），未退回
+      給 Gemini。PL4-03～10 待執行；Gate G4
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
