@@ -29,8 +29,10 @@
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
+const require = createRequire(import.meta.url);
 const repoRoot = process.cwd();
 const keep = process.argv.includes('--keep');
 const reuseIndex = process.argv.indexOf('--reuse');
@@ -230,6 +232,108 @@ function materialise() {
   return path.join(match[1].trim(), 'app');
 }
 
+/**
+ * Current-state read adapter for App templates that store permissions as a Prisma compile-time enum.
+ *
+ * Location & Architecture Rationale:
+ * This read adapter lives inside `scripts/051-g2-runtime-parity.mjs` rather than in `@appspine/plugin-cli`.
+ * In Phase 2, `@appspine/plugin-cli` is strictly a pure artifact/code generator and diagnostic tool
+ * that never connects to databases (and Phase 2 has no apply adapter). Placing DB introspection logic
+ * here fulfills the Gate G2 requirement to inspect real deployed database state during verification
+ * without violating the CLI's pure-generator boundary or Phase 2's "no DB write/apply" rule.
+ *
+ * Information Limitations & Plan Semantic Implications:
+ * 1. `pg_enum` only stores `enumlabel` strings (e.g. `USERS_READ`, `USERS_CREATE`).
+ * 2. It has no source for human-readable `displayName`, lifecycle `status` (active vs retired),
+ *    or `schemaGeneration` numbers.
+ * 3. Therefore, this adapter honestly maps `enumlabel` -> `id`, falls back `displayName` to `enumlabel`,
+ *    and defaults `status` to 'active'.
+ * 4. Consequently, `update-display` ops can NEVER be meaningfully produced from this current state
+ *    (as display names are identical to IDs), and historical 'retired' statuses cannot be retained.
+ *    This limitation reflects the nature of enum-based permissions and underscores why Phase 4
+ *    migrates to database-backed catalog tables.
+ */
+function readCurrentPermissionsFromDb(containerName, dbName, typeName = 'Permission') {
+  const query = `SELECT e.enumlabel FROM pg_type t JOIN pg_enum e ON e.enumtypid = t.oid WHERE t.typname = '${typeName}' ORDER BY e.enumsortorder;`;
+  const result = run(
+    'docker',
+    ['exec', containerName, 'psql', '-U', 'postgres', '-d', dbName, '-tAc', query],
+    { shell: false },
+  );
+  if (result.status !== 0) {
+    throw new Error(`Failed to read current permissions from pg_enum: ${result.stderr}`);
+  }
+  const lines = (result.stdout ?? '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  return lines.map((label) => ({
+    id: label,
+    displayName: label,
+    status: 'active',
+    schemaGeneration: 1,
+  }));
+}
+
+function readPermissionDbState(containerName, dbName) {
+  const enumResult = run(
+    'docker',
+    [
+      'exec',
+      containerName,
+      'psql',
+      '-U',
+      'postgres',
+      '-d',
+      dbName,
+      '-tAc',
+      "SELECT e.enumlabel FROM pg_type t JOIN pg_enum e ON e.enumtypid = t.oid WHERE t.typname = 'Permission' ORDER BY e.enumsortorder;",
+    ],
+    { shell: false },
+  );
+  const rolePermResult = run(
+    'docker',
+    [
+      'exec',
+      containerName,
+      'psql',
+      '-U',
+      'postgres',
+      '-d',
+      dbName,
+      '-tAc',
+      'SELECT count(*) FROM "role_permissions";',
+    ],
+    { shell: false },
+  );
+  return {
+    labels: (enumResult.stdout ?? '')
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean),
+    rolePermissionCount: parseInt((rolePermResult.stdout ?? '').trim(), 10) || 0,
+  };
+}
+
+/**
+ * The reconciler, from its build output.
+ *
+ * Built first, deliberately. `dist/` is a build artefact: an older one loads perfectly happily and
+ * would have this script verify last week's reconciler while printing PASS - the failure mode a
+ * dry-run is least able to survive, because its whole value is that it reflects what would really
+ * happen. Building takes a second and removes the question.
+ */
+function loadReconciler() {
+  const built = run('pnpm', ['--filter', '@appspine/plugin-cli', 'build'], { cwd: repoRoot });
+  if (built.status !== 0) {
+    throw new Error(
+      `could not build @appspine/plugin-cli:\n${built.stdout ?? ''}${built.stderr ?? ''}`,
+    );
+  }
+  return require(path.join(repoRoot, 'packages/plugin-cli/dist/permission-reconciler.js'));
+}
+
 function main() {
   const templateEnv = readEnvFile(path.resolve(repoRoot, '../appspine-app-template/.env'));
   const parityUrl = PARITY_URL;
@@ -352,6 +456,7 @@ function main() {
 
   const onlyLegacy = legacy.routes.filter((route) => !plugin.routes.includes(route));
   const onlyPlugin = plugin.routes.filter((route) => !legacy.routes.includes(route));
+
   check(
     `both modes serve the same ${legacy.routes.length} routes`,
     onlyLegacy.length === 0 && onlyPlugin.length === 0,
@@ -401,6 +506,9 @@ function main() {
   // ---- 3. Schema dry-run -----------------------------------------------------------------
   console.log('\nschema dry-run: what the composed schema would change');
   const composed = path.join(backendDir, '.appspine/generated/schema.prisma');
+  // `prisma migrate diff` needs a Prisma datasource config to parse the schema file, which the
+  // composer deliberately omitted (051 plan §7: "no datasource / generator blocks; those belong to
+  // the App"). Prepend the parity database datasource to a scratch copy so Prisma can diff it.
   const dryRunSchema = path.join(backendDir, 'g2-dry-run.prisma');
   fs.writeFileSync(
     dryRunSchema,
@@ -418,6 +526,7 @@ function main() {
     ].join('\n'),
     'utf8',
   );
+
   const diff = run(
     'npx',
     [
@@ -457,7 +566,7 @@ function main() {
     );
   }
 
-  // Permissions: the same question, and it has no answer yet on either side.
+  // ---- 4. Permission dry-run -------------------------------------------------------------
   console.log('\npermission dry-run: what the plan would reconcile');
   const permissions = JSON.parse(
     fs.readFileSync(path.join(backendDir, '.appspine/generated/permissions.json'), 'utf8'),
@@ -466,25 +575,139 @@ function main() {
     `desired: ${permissions.desired.length}, fresh-install plan: ${permissions.freshInstallPlan.length}`,
   );
   check(
-    'the permission plan is generated and applies nothing',
+    'the fresh-install permission plan is generated with zero diagnostics',
     Array.isArray(permissions.freshInstallPlan) && permissions.diagnostics.length === 0,
     JSON.stringify(permissions.diagnostics),
   );
 
-  // Gate G2's independent review added a `reconcilePermissions` call here, with hand-written
-  // current/desired arrays, asserting the plan contains no `delete`. It was removed again, for
-  // three reasons: `permission-reconciler.spec.ts` already asserts exactly that, driven by the
-  // frozen PL0-06 fixture rather than by literals written next to the assertion; `drop-table` is
-  // not in the op vocabulary, so half of it could never fire; and calling the reconciler with
-  // invented state inside a *runtime* script does not make it a runtime dry-run. It reads as one,
-  // which is the problem — it let this condition be reported as met.
+  // Capture DB state before dry-run
+  const permDbBefore = readPermissionDbState(PARITY_CONTAINER, PARITY_DB);
+  const currentPermissions = readCurrentPermissionsFromDb(PARITY_CONTAINER, PARITY_DB);
   console.log(
-    'NOTE no reconciliation against live state was possible, for two independent reasons:\n' +
-      '     (1) no plugin in preset-standard contributes a permission, so the desired set is empty;\n' +
-      '     (2) this App models permissions as a Prisma `enum Permission`, resolved at compile\n' +
-      '         time, so there is no catalog table for reconcilePermissions to read as current\n' +
-      '         state. A real permission dry-run needs the PL2-07 apply adapter and an App that\n' +
-      '         stores its catalog as data. Both are Phase 4. This is a gap, not a pass.',
+    `current permissions read from pg_enum: ${currentPermissions.length} labels (${currentPermissions.map((p) => p.id).join(', ')})`,
+  );
+  // Pointed at a different enum, on purpose.
+  //
+  // The whole value of this dry-run is that `current` is what the database actually has, and no
+  // assertion about the *values* can establish that: a hardcoded list of the very same seven
+  // labels is indistinguishable from a correct read. A mutation sweep replaced the reader's body
+  // with exactly that constant and every check stayed green, including one that compared it
+  // against a second, independent query — because the constant was right.
+  //
+  // What does separate the two is asking the reader for something else. `AuditAction` is another
+  // enum in the same schema; a reader that queries returns its labels, and a reader that returns a
+  // constant returns the permissions again. Read-only, and it needs no write to prove liveness.
+  const auditActionLabels = readCurrentPermissionsFromDb(
+    PARITY_CONTAINER,
+    PARITY_DB,
+    'AuditAction',
+  ).map((p) => p.id);
+  check(
+    'the current state is read from the database, not assumed',
+    currentPermissions.length === permDbBefore.labels.length &&
+      currentPermissions.every((p, index) => p.id === permDbBefore.labels[index]) &&
+      auditActionLabels.length > 0 &&
+      auditActionLabels.every((label) => !permDbBefore.labels.includes(label)),
+    `permissions: [${currentPermissions.map((p) => p.id).join(', ')}] | same reader on AuditAction: [${auditActionLabels.join(', ')}]`,
+  );
+
+  // Run reconciler against real deployed current and real desired
+  const desiredPermissions = permissions.desired ?? [];
+  const { reconcilePermissions } = loadReconciler();
+  const reconciliation = reconcilePermissions(currentPermissions, desiredPermissions, 2);
+  check(
+    'reconcilePermissions successfully produces plan from real deployed current state',
+    reconciliation.plan !== null && reconciliation.diagnostics.length === 0,
+    JSON.stringify(reconciliation.diagnostics),
+  );
+
+  // Semantic assertion: every current ID missing from desired produces a 'retire' op with 'not-in-desired-state'
+  const currentIds = currentPermissions.map((p) => p.id);
+  const retireOps = reconciliation.plan?.ops.filter((op) => op.op === 'retire') ?? [];
+  const retiredIds = retireOps.map((op) => op.id);
+  const allRetiredHaveReason = retireOps.every((op) => op.reason === 'not-in-desired-state');
+  check(
+    'all unmentioned deployed permissions are retired rather than deleted/lost',
+    retireOps.length === currentPermissions.length &&
+      currentIds.every((id) => retiredIds.includes(id)) &&
+      allRetiredHaveReason,
+    `expected ${currentPermissions.length} retire ops, got ${retireOps.length}: ${retiredIds.join(', ')}`,
+  );
+
+  // Verify database state is strictly unchanged by the dry-run
+  const permDbAfter = readPermissionDbState(PARITY_CONTAINER, PARITY_DB);
+  check(
+    'permission dry-run left database pg_enum labels and role_permissions unchanged',
+    JSON.stringify(permDbAfter.labels) === JSON.stringify(permDbBefore.labels) &&
+      permDbAfter.rolePermissionCount === permDbBefore.rolePermissionCount,
+    `labels: ${permDbBefore.labels.length} -> ${permDbAfter.labels.length}, role_perms: ${permDbBefore.rolePermissionCount} -> ${permDbAfter.rolePermissionCount}`,
+  );
+
+  // ---- 4b. Synthetic permission dry-run (Option b: plugin contribution pipeline) --------
+  // NOTE on Scope and Truthfulness:
+  // The App's currently installed plugins contribute 0 permissions (verified in step 4 above).
+  // To prove how the reconciler calculates plans when plugins DO contribute permissions to a live
+  // deployed catalog, this step uses a synthetic desired state against the real `pg_enum` current state.
+  // This exercises the `add`, `alias`, and non-destructive `retire` pipeline against live database state
+  // without modifying published package manifests, breaking baseline snapshots, or writing to DB.
+  console.log(
+    '\npermission dry-run (synthetic desired != 0): exercising plugin contribution pipeline',
+  );
+  const syntheticDesired = [
+    // 1. A brand new plugin permission (triggers 'add')
+    { id: 'audit-log:export:create', displayName: 'Export Audit Logs' },
+    // 2. An alias migrating a legacy Postgres enum permission (triggers 'alias')
+    { id: 'identity:user:read', displayName: 'Read User Profile', aliasOf: 'USERS_READ' },
+    // 3. Another alias migrating a second legacy Postgres enum permission (triggers 'alias')
+    { id: 'm2m:api-key:read', displayName: 'Read API Keys', aliasOf: 'API_KEYS_READ' },
+  ];
+
+  const syntheticReconciliation = reconcilePermissions(currentPermissions, syntheticDesired, 2);
+  check(
+    'synthetic desired successfully produces reconciliation plan against live deployed state',
+    syntheticReconciliation.plan !== null && syntheticReconciliation.diagnostics.length === 0,
+    JSON.stringify(syntheticReconciliation.diagnostics),
+  );
+
+  const synthOps = syntheticReconciliation.plan?.ops ?? [];
+  const addOp = synthOps.find((op) => op.op === 'add' && op.id === 'audit-log:export:create');
+  const userAliasOp = synthOps.find(
+    (op) => op.op === 'alias' && op.id === 'identity:user:read' && op.aliasOf === 'USERS_READ',
+  );
+  const apiKeyAliasOp = synthOps.find(
+    (op) => op.op === 'alias' && op.id === 'm2m:api-key:read' && op.aliasOf === 'API_KEYS_READ',
+  );
+  const synthRetires = synthOps.filter((op) => op.op === 'retire');
+
+  // The aliased IDs ('USERS_READ', 'API_KEYS_READ') are replaced by alias and not retired.
+  // The remaining 5 unmentioned IDs must all be retired.
+  const expectedRetiredLabels = [
+    'USERS_CREATE',
+    'USERS_UPDATE',
+    'USERS_DELETE',
+    'API_KEYS_CREATE',
+    'API_KEYS_DELETE',
+  ].sort();
+  const synthRetiredIds = synthRetires.map((op) => op.id).sort();
+
+  check(
+    'synthetic plan contains expected op distribution (add, alias, non-destructive retire)',
+    addOp !== undefined &&
+      userAliasOp !== undefined &&
+      apiKeyAliasOp !== undefined &&
+      synthRetires.length === 5 &&
+      JSON.stringify(synthRetiredIds) === JSON.stringify(expectedRetiredLabels) &&
+      synthRetires.every((op) => op.reason === 'not-in-desired-state'),
+    `add: ${addOp ? 'yes' : 'no'}, userAlias: ${userAliasOp ? 'yes' : 'no'}, apiKeyAlias: ${apiKeyAliasOp ? 'yes' : 'no'}, retired: ${synthRetiredIds.join(', ')}`,
+  );
+
+  // Re-verify that database state remained completely untouched across both dry-runs
+  const permDbFinal = readPermissionDbState(PARITY_CONTAINER, PARITY_DB);
+  check(
+    'synthetic dry-run also left database pg_enum labels and role_permissions untouched',
+    JSON.stringify(permDbFinal.labels) === JSON.stringify(permDbBefore.labels) &&
+      permDbFinal.rolePermissionCount === permDbBefore.rolePermissionCount,
+    `labels: ${permDbBefore.labels.length} -> ${permDbFinal.labels.length}, role_perms: ${permDbBefore.rolePermissionCount} -> ${permDbFinal.rolePermissionCount}`,
   );
 
   // "Applied nothing" has to be asked of the tables the plan would have dropped. Row counts in

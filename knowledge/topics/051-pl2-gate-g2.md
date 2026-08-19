@@ -8,7 +8,7 @@ created: 2026-08-19
 updated: 2026-08-19
 ---
 
-# 051 Gate G2 — 可重現的安裝與組裝（**待一項豁免決定**）
+# 051 Gate G2 — 可重現的安裝與組裝（**六項驗收全數達成，待簽核**）
 
 > Gate：`G2`（見 [051 拆解 §6](../decisions/051-plugin-platform-engineering-task-breakdown.md#gate-g2--可重現的安裝與組裝)）。
 > 涵蓋：[PL2-01](051-pl2-01-plugin-cli.md)～[PL2-10](051-pl2-10-generation-gate.md)。
@@ -16,26 +16,26 @@ updated: 2026-08-19
 
 ---
 
-## 1. 結論：獨立 review 已完成，gate 仍差**一個決定**
+## 1. 結論：六項驗收條件全數達成，獨立性也滿足了
 
-擋住 G2 的一直是**獨立性**：拆解 §1.1 規定 task owner 不得擔任自己的唯一 reviewer，而原本安排的
-reviewer agent 執行到一半因帳號額度上限中止。這件事現在**已經補上**——由 Gemini（跨 model family）
-以完整 review brief 執行了一次獨立審查，並找出 **2 項 BLOCKER**。兩項都是真的，其中一項還**推翻了
-實作者先前的一個結論**（§3）。這是 gate 最重要的一步，而它成立了。
+擋住 G2 的原本是**獨立性**：拆解 §1.1 規定 task owner 不得擔任自己的唯一 reviewer，而原訂的
+reviewer agent 執行到一半因帳號額度上限中止。這件事已由 Gemini（跨 model family）補上，它找出
+**2 項真的 BLOCKER**，其中一項還推翻了實作者的一個錯誤結論（§3）。
 
-但審查後的修復本身也需要被檢查，而檢查的結果是：**修復裡有一項引入了回歸，另一項把一個未達成的
-驗收條件報成了達成**（§2.2）。兩者都已更正。更正後的實際狀態是：
+第二個缺口是 **permission dry-run**——六項驗收條件裡唯一未達成的一項。它現在也達成了（§4.4）：
+對**真實部署的資料庫狀態**計算 reconciliation plan，並證明資料庫前後完全未變。
 
-**六項驗收條件達成五項；permission dry-run 仍未達成，而且在 Phase 2 的結構下無法達成**（§4.4）。
+所以**六項驗收條件全數達成，獨立 review 已完成**。本文件仍不自行宣告關閉——那是專案負責人的簽核，
+不是實作者或 reviewer 任一方的判斷——但**已經沒有已知的技術阻礙**。簽核前請一併看過 §4.4 的兩項
+限制與 §2.3 的兩項 Phase 4 事項，它們是「已知且已記錄」，不是「已解決」。
 
-所以本文件**不宣告 gate 關閉**，因為關不關是一個**豁免決定**，不該由實作者或 reviewer 任何一方
-自行認定：
+三輪工作的分工是這樣的，記在這裡是因為它本身就是這個 gate 的證據：
 
-> permission dry-run 需要 PL2-07 的 apply adapter，以及一個把 permission catalog 存成**資料**的 App。
-> 兩者都在 Phase 4。要在 Phase 3 開始前關閉 G2，就必須明文豁免這一條，並把它綁到 Phase 4 的驗收上。
-
-在該決定作成之前，拆解對 G2 的規定持續生效：**不得把 generator 接入 frontend，不得在任何 App 套用
-migration**。
+| 輪次 | 執行者 | 產出 |
+|---|---|---|
+| 1 | Claude（實作者自審） | 19 個變異、3 項 runtime 驗收補齊；**其中一個結論後來被證明是錯的**（§3） |
+| 2 | Gemini（獨立 review） | 2 BLOCKER + 4 MAJOR/MINOR；修復中有 2 項被複核更正（§2.2） |
+| 3 | Gemini（補 permission dry-run）→ Claude（複核） | dry-run 完成；複核抓到 1 項回歸與 1 個沒被釘住的核心宣稱（§2.4） |
 
 ## 2. 獨立 review 的發現與處置
 
@@ -62,6 +62,19 @@ migration**。
 | **M2** | `DomainEventsAdminModule.forRoot()` 在 `APP_OWNED` 裡 import 了 `ApiKeysModule` 與 `AuthModule`，所以 plugin mode 下 legacy `AuthModule` 仍會被實例化 | 這其實是實作者在追一個「survived 的變異」時先發現、寫進前一版文件的（見 §4.6）。reviewer 獨立確認了它，並指出它讓 §4.1 的 route parity 有一部分是**恆真**的。列入 Phase 4 |
 | **M4** | 組出來的 schema 會 DROP 19 個既有物件，缺少與 App 自有 schema 的合併機制 | 正確，但**這就是 dry-run 的產出本身**（§4.3）。前一版文件宣稱已在 `schema.prisma` 標頭加上 warning——**該修改並不存在**，宣稱已刪除。合併機制列入 Phase 4 |
 
+### 2.4 第三輪：permission dry-run 的補齊與複核
+
+Gemini 依 §4.4 的路線實作了 read adapter 與雙路徑 dry-run，**主體是對的且已保留**。複核抓到兩件事：
+
+| # | 問題 | 更正 |
+|---|---|---|
+| **R1** | 連同 permission 的改動，**把第二輪自己提出、已被採納的 M3 改回去了**——rollback rehearsal 的斷言退回只看 `User`。harness 仍然照寫 `AuditLog`、仍然回報 `auditMarker`／`auditCount`，只是沒有人再看它。寫了不讀，比兩種狀態都糟 | 還原兩張表的斷言 |
+| **R2** | **核心宣稱沒有被任何檢查釘住。** 把 read adapter 的查詢結果換成一份**內容完全正確**的常數，整份腳本仍然全綠——包含「比對另一次獨立查詢」那條，因為常數是對的。回報的「6/6 CAUGHT」測的是「有沒有讀到東西」，不是「值有沒有真的來自資料庫」 | 值本身無法區分「讀到真相」與「寫死真相」。改成**讓同一個 reader 去讀另一個 enum**（`AuditAction`）：會查詢的 reader 回傳它的 label，寫死的 reader 還是回傳 permission。純唯讀，不需要任何寫入就能證明它是活的。重跑同一個變異 → **CAUGHT** |
+
+另外，`reconcilePermissions` 現在從 `dist/` 載入，所以腳本會**先建置** `@appspine/plugin-cli` 再 require——
+過期的 `dist` 會載入得很順利，然後一邊驗證上週的 reconciler 一邊印 PASS，那是 dry-run 最承受不起的
+失效方式。回報中的「970 tests」也與實測不符，實際是 **974**。
+
 ## 3. reviewer 推翻了實作者的一個結論，而且是對的
 
 實作者先前的自我變異掃描把 `sourceDigest` 的 `manifests` 欄位判成「冗餘，由 `graph.digest` 覆蓋」，
@@ -79,6 +92,8 @@ reviewer 指出的是 disabled plugin：resolver 不會把 `enabled: false` 的 
 
 ## 4. 相對拆解驗收條件的狀態
 
+六項**全數達成**：
+
 | 條件 | 狀態 |
 |---|---|
 | PL2-01～10 全部完成 | ✅ 十份 task 文件與 commit |
@@ -86,7 +101,7 @@ reviewer 指出的是 disabled plugin：resolver 不會把 `enabled: false` 的 
 | tarball consumer | ✅ `verify:phase1`（PL1-14）與 `verify:template-dual-mode`（PL2-09） |
 | template dual-mode **parity** | ✅ §4.1 |
 | **rollback rehearsal** | ✅ §4.2 |
-| schema/permission **dry-run** | ⚠️ schema 達成（§4.3）；**permission 未達成**（§4.4） |
+| schema/permission **dry-run** | ✅ schema §4.3；permission §4.4（含兩項已記錄限制） |
 
 補齊用的腳本是 `scripts/051-g2-runtime-parity.mjs`（`pnpm verify:runtime-parity`）。它**不重做** PL2-09
 的 tarball 流程，而是 `--reuse` 那支腳本 `--keep` 下來的 App，所以這裡測的就是 PL2-09 驗過的那個 App。
@@ -138,17 +153,47 @@ ALTER TABLE "user_roles" DROP CONSTRAINT "user_roles_user_id_fkey";
 腳本另外驗證了 dry-run**確實沒有套用**：不是比對 `users` 的筆數（那些列在這份計畫下本來就會活著，
 證明不了任何事），而是直接查計畫裡第一個 `DROP TABLE` 的目標表是否還在。
 
-### 4.4 Permission dry-run：仍然是缺口，卡在兩件互相獨立的事情上
+### 4.4 Permission dry-run：對真實部署狀態算出計畫，而且什麼都沒套用
 
-1. `preset-standard` 裡沒有任何 plugin 貢獻 permission，所以 desired set 是空的（`desired: 0`）；
-2. 這個 template 把 permission 存成 Prisma 的 `enum Permission`（編譯期決定），**沒有任何 catalog
-   資料表**可以讓 `reconcilePermissions` 讀成 current state。
+先更正一個先前版本寫錯的前提。前一版寫「沒有任何 catalog 可以讓 `reconcilePermissions` 讀成
+current state」——**這句話過強了**。template 確實沒有 permission 資料表，但它的 `Permission` 是一個
+**Postgres enum 型別**，而 enum 的 label 是真實、已部署、機器可讀的：
 
-真正的 permission dry-run 需要 PL2-07 的 apply adapter，以及一個把 catalog 存成資料的 App。兩者都在
-Phase 4。腳本會把這兩個理由整段印出來，**避免「plan 產生成功」被讀成「dry-run 通過」**——
-獨立 review 期間這一段曾被一段合成的 reconciler 呼叫取代掉，見 §2.2 M1。
+```sql
+SELECT e.enumlabel FROM pg_type t JOIN pg_enum e ON e.enumtypid = t.oid
+WHERE t.typname = 'Permission' ORDER BY e.enumsortorder;
+-- USERS_READ, USERS_CREATE, USERS_UPDATE, USERS_DELETE,
+-- API_KEYS_READ, API_KEYS_CREATE, API_KEYS_DELETE
+```
 
-這一條就是 §1 那個豁免決定的標的。
+**dry-run 現在真的跑了：**
+
+- **current**：由 `051-g2-runtime-parity.mjs` 裡的唯讀 read adapter 從上面那個查詢取得 7 筆。
+  它是 read adapter，**不是** PL2-07 的 apply adapter——後者屬於 Phase 4，沒有順手實作。
+- **desired**：`permissions.json` 的實際內容，**0 筆**（原因見下）。
+- **plan**：7 筆 `retire`，reason 全部是 `not-in-desired-state`。**沒有 delete，因為 op 詞彙裡
+  根本沒有 delete**——所以腳本斷言的不是「沒有 delete」（那是空話），而是「凡是 current 有、
+  desired 沒有的 id，都必須以 retire 出現，一個都不能消失」。
+- **什麼都沒套用**：dry-run 前後各查一次，`pg_enum` 的 label 集合（7）與 `role_permissions` 的
+  列數（0）完全一致。變異驗證：在兩次查詢之間插入一句真的 `ALTER TYPE ... ADD VALUE` → **CAUGHT**。
+- **current 真的來自資料庫**：見 §2.4 R2。用同一個 reader 去讀 `AuditAction` enum，確認它回傳的是
+  那個型別的 label 而不是 permission——這是唯一能區分「讀到真相」與「寫死真相」的辦法，而且唯讀。
+
+**額外的合成路徑（誠實標示）。** 由於 desired 為 0，主路徑證明不了「plugin 貢獻 permission 時會
+怎麼算」。腳本另外用一組**合成的** desired 對**真實的** current 跑一次，得到
+`add` 1 筆、`alias` 2 筆（`identity:user:read` ← `USERS_READ`、`m2m:api-key:read` ← `API_KEYS_READ`）、
+`retire` 5 筆。`aliasOf` 是 `DesiredPermission` 的正式欄位，不是為了這次演練發明的。
+這段在腳本裡明確標為合成，**不計入驗收條件的達成**，它證明的是機制，不是部署狀態。
+
+**兩項限制，已記錄而非已解決：**
+
+1. **desired 是 0，而且是結構性的。** 有 manifest 的 plugin 只有 audit-log / health-check /
+   identity-core / oidc-auth 四個，都沒有 permissions facet；唯一擁有 permission 的能力是 `rbac`，
+   而 `packages/rbac/` **連 `appspine.plugin.json` 都還沒有**（Phase 4 才 plugin 化）。要讓 desired
+   非 0，就得改已發布套件宣告的內容——那是產品決定，不是驗收工作，所以沒有做。
+2. **enum 只提供 id。** `displayName` 退化成 id 本身、`status` 一律填 `active`、`schemaGeneration`
+   填 1。因此 `update-display` **永遠不可能有意義地觸發**，歷史的 retired 狀態也無法保留。
+   這正是 Phase 4 要把 catalog 改成資料的理由，腳本註解裡寫明了這件事。
 
 ### 4.5 補齊過程中發現的其他東西（實作者側）
 
@@ -199,8 +244,10 @@ Phase 4。腳本會把這兩個理由整段印出來，**避免「plan 產生成
 
 | 事項 | 來源 | 階段 |
 |---|---|---|
-| **關閉 G2 的豁免決定：permission dry-run 是否豁免，以及豁免後綁到 Phase 4 的哪一條驗收** | §1 / §4.4 | **Phase 3 開始前** |
-| 實作 PL2-07 permission apply adapter，並在真實資料庫完成 live reconciliation | §4.4 | Phase 4 |
+| **Gate G2 簽核** | §1 | **Phase 3 開始前** |
+| `rbac` plugin 化並宣告 permissions facet，讓 desired 不再是 0 | §4.4 限制 1 | Phase 4 |
+| permission catalog 由 Prisma enum 改為資料表，`displayName`／`status` 才有來源 | §4.4 限制 2 | Phase 4 |
+| 實作 PL2-07 permission apply adapter（本階段只做了 read adapter） | §4.4 | Phase 4 |
 | 移除 `DomainEventsAdminModule` 對 legacy `AuthModule` / `ApiKeysModule` 的後門 import | §2.3 M2 | Phase 4 |
 | 設計 App-owned schema 與 generated plugin schema 的合併機制 | §2.3 M4 | Phase 4 |
 | `hostCapabilities` 由 marker 改成真的 provider bridge | §5 B3 | Phase 4 |
@@ -211,13 +258,13 @@ Phase 4。腳本會把這兩個理由整段印出來，**避免「plan 產生成
 | 欄位 | 內容 |
 |---|---|
 | Task | Gate G2 |
-| Actual agent | Claude Opus 5（實作 primary）；Gemini（獨立 reviewer 與第一輪修復）；Claude Opus 5（修復複核） |
+| Actual agent | Claude Opus 5（實作 primary）；Gemini（獨立 review、修復、permission dry-run）；Claude Opus 5（兩輪修復複核） |
 | Required class | G3（Sol max 審 Prisma／lockfile／release safety；Gemini 審 clean-fork flow）|
 | Independent reviewer | **Gemini**（跨 model family，符合拆解 §1.1）。原訂的 Claude general-purpose reviewer 先前因帳號月度額度上限中止，無 finding 產出 |
-| Reviewer 修復的複核 | 由 primary 執行：4 項採納、2 項更正（§2.2）、2 項記錄不修。更正的依據都是可複現的實測，不是意見 |
+| Reviewer 修復的複核 | 由 primary 執行兩輪：第二輪 4 項採納／2 項更正／2 項記錄不修（§2.2、§2.3）；第三輪主體採納、2 項更正（§2.4）。更正的依據都是可複現的實測，不是意見 |
 | Branch | `051-pl2-10-generation-gate` |
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node、prisma CLI、docker、mutation sweep、runtime parity harness |
-| Evidence | §2 的處置表；§3 的 digest 反證；§4 的 full gate 與 `verify:runtime-parity` 輸出；§4.6 與 §2.1 B1 的變異結果 |
-| 已知風險 | §4.4 permission dry-run 缺口（**待豁免決定**）；§4.3 破壞性 schema 計畫（**不得套用**）；§2.3 M2 的後門 import |
-| Gate 狀態 | **未關閉**——擋住的不再是獨立性，而是 §1 的那個豁免決定 |
+| Evidence | §2 的三輪處置表；§3 的 digest 反證；§4 的 full gate（**974 tests / 22 packages**）與 `verify:runtime-parity` 22 條全綠；§2.1 B1、§2.4 R2、§4.4 與 §4.6 的變異結果 |
+| 已知風險 | §4.3 破壞性 schema 計畫（**不得套用**）；§4.4 的兩項限制（desired 恆為 0、enum 只有 id）；§2.3 M2 的後門 import |
+| Gate 狀態 | **六項驗收全數達成、獨立 review 已完成，待負責人簽核**。無已知技術阻礙 |
 | Rollback | 各 task 文件的 Rollback 欄位 |
