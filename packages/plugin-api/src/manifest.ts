@@ -51,8 +51,53 @@ export interface BackendFacetContribution {
   workers?: string[];
 }
 
-/** Owned by PL3-02; deliberately open in v1 so Phase 1 cannot freeze a shape it does not implement. */
-export type FrontendFacetContribution = Record<string, unknown>;
+export interface PluginAdminPageContribution {
+  id: string;
+  routePath?: string;
+  title?: string;
+  componentExport?: string;
+  requiredPermission?: string;
+  breadcrumb?: string;
+  order?: number;
+}
+
+export interface PluginNavigationContribution {
+  id: string;
+  title?: string;
+  href?: string;
+  icon?: string;
+  order?: number;
+  section?: string;
+  requiredPermission?: string;
+  before?: string;
+  after?: string;
+}
+
+export interface PluginSlotContribution {
+  slot: string;
+  componentExport: string;
+  order?: number;
+  before?: string;
+  after?: string;
+  requiredPermission?: string;
+}
+
+export interface PluginI18nContribution {
+  namespace: string;
+  locales?: string[];
+}
+
+/** Frontend facet contribution owned by PL3-01 / PL3-02. */
+export interface FrontendFacetContribution {
+  adminPages?: (string | PluginAdminPageContribution)[];
+  navigationItems?: (string | PluginNavigationContribution)[];
+  slots?: PluginSlotContribution[];
+  loginProviderUi?: boolean;
+  i18nNamespace?: string;
+  i18n?: PluginI18nContribution;
+  clientEntry?: string;
+  serverEntry?: string;
+}
 
 /** Owned by PL2-06. */
 export type PrismaFacetContribution = Record<string, unknown>;

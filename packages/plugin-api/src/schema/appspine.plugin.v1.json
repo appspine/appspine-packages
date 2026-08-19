@@ -239,7 +239,180 @@
           }
         },
         "frontend": {
-          "type": "object"
+          "type": "object",
+          "description": "Frontend facet contribution (PL3-01/PL3-02).",
+          "additionalProperties": false,
+          "properties": {
+            "adminPages": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["id"],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "routePath": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "componentExport": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "requiredPermission": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+                      },
+                      "breadcrumb": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "order": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                ]
+              },
+              "uniqueItems": true
+            },
+            "navigationItems": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["id"],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "href": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "icon": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "order": {
+                        "type": "integer"
+                      },
+                      "section": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "requiredPermission": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+                      },
+                      "before": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "after": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              "uniqueItems": true
+            },
+            "slots": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["slot", "componentExport"],
+                "properties": {
+                  "slot": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentExport": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "order": {
+                    "type": "integer"
+                  },
+                  "before": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "after": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "requiredPermission": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+                  }
+                }
+              },
+              "uniqueItems": true
+            },
+            "loginProviderUi": {
+              "type": "boolean",
+              "description": "True when the plugin provides interactive login UI components (PL3-04)."
+            },
+            "i18nNamespace": {
+              "type": "string",
+              "minLength": 1
+            },
+            "i18n": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["namespace"],
+              "properties": {
+                "namespace": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "locales": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            "clientEntry": {
+              "type": "string",
+              "minLength": 1
+            },
+            "serverEntry": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
         "prisma": {
           "type": "object",

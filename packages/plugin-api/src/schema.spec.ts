@@ -50,13 +50,26 @@ describe('shipped manifest schema vs. the PL0-05 frozen contract', () => {
     );
   });
 
-  it('leaves frontend opaque, because PL3-02 owns it', () => {
+  it('narrows frontend, which PL0-05 explicitly handed to PL3-01/PL3-02', () => {
     const facets = ((shipped.properties as SchemaNode).facets as SchemaNode)
       .properties as SchemaNode;
-    // `prisma` and `permissions` used to be on this list. PL0-05 named PL2-06 and PL2-07 as their
-    // owners and both have tightened them — the same handover `backend` and `operations` got from
-    // PL1-06. Only `frontend` is still waiting for its owner.
-    expect(facets.frontend, 'frontend facet must stay opaque in v1').toEqual({ type: 'object' });
+    const frontend = facets.frontend as SchemaNode;
+    expect(frontend.additionalProperties).toBe(false);
+    expect(Object.keys((frontend.properties as SchemaNode)).sort()).toEqual(
+      ['adminPages', 'clientEntry', 'i18n', 'i18nNamespace', 'loginProviderUi', 'navigationItems', 'serverEntry', 'slots'].sort(),
+    );
+    const adminPages = (frontend.properties as SchemaNode).adminPages as SchemaNode;
+    const adminPageItems = (adminPages.items as SchemaNode).oneOf as SchemaNode[];
+    expect(adminPageItems[0].type).toBe('string');
+    expect(adminPageItems[1].required).toEqual(['id']);
+
+    const navItems = (frontend.properties as SchemaNode).navigationItems as SchemaNode;
+    const navItemVariants = (navItems.items as SchemaNode).oneOf as SchemaNode[];
+    expect(navItemVariants[0].type).toBe('string');
+    expect(navItemVariants[1].required).toEqual(['id']);
+
+    const slots = (frontend.properties as SchemaNode).slots as SchemaNode;
+    expect((slots.items as SchemaNode).required).toEqual(['slot', 'componentExport']);
   });
 
   it('narrows permissions, which PL0-05 explicitly handed to PL2-07', () => {
