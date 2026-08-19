@@ -70,6 +70,77 @@ function toPosix(value) {
   return value.split(path.sep).join('/');
 }
 
+// `fixtures/051-pl0-baseline/snapshot.json` is the PL0 *frozen* baseline: the pre-split public API
+// PL1-13's acceptance ("every pre-split export is preserved or has an explicit migration
+// conclusion") is measured against. Regenerating it in place destroys that measurement — which is
+// exactly what happened during Phase 1 and what Gate G1's independent review caught.
+//
+// So the file each phase re-generates is its own, selected with --baseline. The PL0 file stays put.
+const DEFAULT_BASELINE = 'fixtures/051-pl0-baseline/snapshot.json';
+// Baselines a gate has already accepted. Each phase seals its own at its gate and never rewrites
+// it afterwards; the *current* phase writes to its own file, which is what `verify:snapshot`
+// checks. Regenerating a sealed one deletes the evidence its gate was judged against — that is
+// what happened to the PL0 baseline during Phase 1 (Gate G1 review B2).
+const SEALED_BASELINES = new Set([DEFAULT_BASELINE, 'fixtures/051-pl1-baseline/snapshot.json']);
+
+/**
+ * Which file --baseline names, and whether writing to it is allowed.
+ *
+ * The seal compares a *normalised* path, not the argument as typed. Gate G2's independent review
+ * found the earlier string comparison let `--baseline ./fixtures/051-pl0-baseline/snapshot.json`,
+ * a `..` detour, or an absolute path through — three spellings of the same sealed file, each one
+ * enough to destroy the evidence a gate was judged against. --self-test below watches it refuse.
+ */
+function resolveBaseline(argv, root, writing) {
+  const flag = argv.indexOf('--baseline');
+  const arg = flag === -1 ? DEFAULT_BASELINE : argv[flag + 1];
+  if (!arg) {
+    throw new Error('--baseline requires a path');
+  }
+  const resolved = path.resolve(root, arg);
+  const relative = toPosix(path.relative(root, resolved));
+  if (writing && SEALED_BASELINES.has(relative)) {
+    throw new Error(
+      `${relative} is a sealed phase baseline and must not be regenerated; ` +
+        'pass --baseline <current phase snapshot> to write a new one',
+    );
+  }
+  return { path: resolved, relative };
+}
+
+if (process.argv.includes('--self-test')) {
+  const sealed = 'fixtures/051-pl0-baseline/snapshot.json';
+  const spellings = [
+    sealed,
+    `./${sealed}`,
+    `fixtures/../${sealed}`,
+    path.resolve(repoRoot, sealed),
+    toPosix(sealed).split('/').join(path.sep),
+  ];
+  let failures = 0;
+  for (const spelling of spellings) {
+    let refused = false;
+    try {
+      resolveBaseline(['--baseline', spelling], repoRoot, true);
+    } catch {
+      refused = true;
+    }
+    if (!refused) failures += 1;
+    console.log(`${refused ? 'PASS' : 'FAIL'} refuses --write to ${spelling}`);
+  }
+  // The seal must not become a blanket refusal: the current phase writes its own file.
+  const current = 'fixtures/051-pl2-baseline/snapshot.json';
+  let allowed = true;
+  try {
+    resolveBaseline(['--baseline', current], repoRoot, true);
+  } catch {
+    allowed = false;
+  }
+  if (!allowed) failures += 1;
+  console.log(`${allowed ? 'PASS' : 'FAIL'} still allows --write to ${current}`);
+  process.exit(failures === 0 ? 0 : 1);
+}
+
 function walk(dir, extensions, results = []) {
   if (!fs.existsSync(dir)) {
     return results;
@@ -298,30 +369,7 @@ const snapshot = {
 
 const output = formatJson(snapshot);
 
-// `fixtures/051-pl0-baseline/snapshot.json` is the PL0 *frozen* baseline: the pre-split public API
-// PL1-13's acceptance ("every pre-split export is preserved or has an explicit migration
-// conclusion") is measured against. Regenerating it in place destroys that measurement — which is
-// exactly what happened during Phase 1 and what Gate G1's independent review caught.
-//
-// So the file each phase re-generates is its own, selected with --baseline. The PL0 file stays put.
-const DEFAULT_BASELINE = 'fixtures/051-pl0-baseline/snapshot.json';
-// Baselines a gate has already accepted. Each phase seals its own at its gate and never rewrites
-// it afterwards; the *current* phase writes to its own file, which is what `verify:snapshot`
-// checks. Regenerating a sealed one deletes the evidence its gate was judged against — that is
-// what happened to the PL0 baseline during Phase 1 (Gate G1 review B2).
-const SEALED_BASELINES = new Set([DEFAULT_BASELINE, 'fixtures/051-pl1-baseline/snapshot.json']);
-const baselineFlag = process.argv.indexOf('--baseline');
-const baselineRelative = baselineFlag === -1 ? DEFAULT_BASELINE : process.argv[baselineFlag + 1];
-if (!baselineRelative) {
-  throw new Error('--baseline requires a path');
-}
-if (shouldWrite && SEALED_BASELINES.has(baselineRelative.split(path.sep).join('/'))) {
-  throw new Error(
-    `${baselineRelative} is a sealed phase baseline and must not be regenerated; ` +
-      'pass --baseline <current phase snapshot> to write a new one',
-  );
-}
-const outPath = path.join(repoRoot, baselineRelative);
+const { path: outPath } = resolveBaseline(process.argv, repoRoot, shouldWrite);
 const outDir = path.dirname(outPath);
 
 if (shouldWrite) {

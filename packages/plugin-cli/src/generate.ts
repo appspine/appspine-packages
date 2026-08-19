@@ -57,12 +57,11 @@ export interface GenerationInput {
  * The property that matters: a change to the inventory, to a manifest, or to a preset's version
  * must invalidate every artefact, even when the resolved *order* comes out the same.
  *
- * The `manifests` entry below is redundant today and is kept as defence in depth, honestly
- * labelled. `graph.digest` already folds in each instance's `digest`, which is the manifest digest
- * merged with the package name and version — so removing this entry changes no digest anywhere. A
- * mutation sweep proved that by deleting it and watching the suite stay green. It stays because a
- * future resolver that stopped carrying per-instance digests would silently take the guarantee
- * with it; what does not stay is the earlier comment claiming this entry is what provides it.
+ * The `manifests` entry below covers all declared plugins (including those with `enabled: false`,
+ * which the resolver omits from `graph.instances` and therefore from `graph.digest`). For enabled
+ * plugins, `graph.digest` already folds in each instance's digest (manifest digest + package name
+ * and version), so `manifests` acts as defence in depth; for disabled plugins, `manifests` is the
+ * authoritative source ensuring manifest changes invalidate generated artefacts.
  */
 export function sourceDigest(input: GenerationInput): string {
   const canonical = canonicalJsonString({

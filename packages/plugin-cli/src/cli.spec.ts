@@ -292,12 +292,34 @@ describe('config and secret boundary', () => {
     ['base64', 'aGVsbG8gd29ybGQgdGhpcyBpcyBub3QgYSBwYXRoIGF0IGFsbA=='],
     ['hex', '0123456789abcdef0123456789abcdef'],
     ['a PEM header', '-----BEGIN PRIVATE KEY-----'],
+    [
+      'a JWT token',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.do_not_put_me_in_a_committed_file',
+    ],
+    ['an opaque token', 'my_custom_secret_api_key_12345678901234567890'],
   ])('rejects %s pasted into configRef', (_label, value) => {
     const diagnostics = checkConfigBoundary({
       schemaVersion: 'appspine.plugins/v1',
       plugins: [entry({ configRef: value })],
     });
     expect(diagnostics.map((d) => d.code)).toContain('secret-value-in-inventory');
+    expect(JSON.stringify(diagnostics)).not.toContain(value);
+  });
+
+  it.each([
+    ['kebab-case, the naming convention plugin ids use', 'master-data'],
+    ['a kebab-case segment inside a dotted path', 'masterData.hr-primary'],
+  ])('accepts %s', (_label, configRef) => {
+    // The frozen manifest schema says configRef is `{ type: "string", minLength: 1 }`. A CLI that
+    // rejects contract-legal refs narrows a frozen contract, and this one would do it while
+    // telling the author they pasted a secret. Gate G2's independent review added exactly such a
+    // rule; this pins the boundary so it does not come back unnoticed.
+    const diagnostics = checkConfigBoundary({
+      schemaVersion: 'appspine.plugins/v1',
+      plugins: [entry({ configRef })],
+    });
+
+    expect(diagnostics.map((d) => d.code)).not.toContain('secret-value-in-inventory');
   });
 
   it('never repeats the offending value back', () => {

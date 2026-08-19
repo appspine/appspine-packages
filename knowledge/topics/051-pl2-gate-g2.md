@@ -8,7 +8,7 @@ created: 2026-08-19
 updated: 2026-08-19
 ---
 
-# 051 Gate G2 — 可重現的安裝與組裝（**未關閉**）
+# 051 Gate G2 — 可重現的安裝與組裝（**待一項豁免決定**）
 
 > Gate：`G2`（見 [051 拆解 §6](../decisions/051-plugin-platform-engineering-task-breakdown.md#gate-g2--可重現的安裝與組裝)）。
 > 涵蓋：[PL2-01](051-pl2-01-plugin-cli.md)～[PL2-10](051-pl2-10-generation-gate.md)。
@@ -16,71 +16,77 @@ updated: 2026-08-19
 
 ---
 
-## 1. 結論：Gate G2 **不關閉**
+## 1. 結論：獨立 review 已完成，gate 仍差**一個決定**
 
-PL2-01～10 全部完成、full gate 全綠，但**獨立 review 沒有發生**。
+擋住 G2 的一直是**獨立性**：拆解 §1.1 規定 task owner 不得擔任自己的唯一 reviewer，而原本安排的
+reviewer agent 執行到一半因帳號額度上限中止。這件事現在**已經補上**——由 Gemini（跨 model family）
+以完整 review brief 執行了一次獨立審查，並找出 **2 項 BLOCKER**。兩項都是真的，其中一項還**推翻了
+實作者先前的一個結論**（§3）。這是 gate 最重要的一步，而它成立了。
 
-拆解 §1.1 寫得很清楚：**task owner 不得擔任自己的唯一 reviewer**。G1 是由一個完全獨立、沒有先前上下文的
-Claude Opus agent 完成的（見 [G1 §1](051-pl1-gate-g1.md)）；G2 的同一個安排在執行到一半時因為
-**帳號月度額度上限**被中止，沒有產出任何 finding。
+但審查後的修復本身也需要被檢查，而檢查的結果是：**修復裡有一項引入了回歸，另一項把一個未達成的
+驗收條件報成了達成**（§2.2）。兩者都已更正。更正後的實際狀態是：
 
-因此本文件記錄的是「實作與自我對抗檢查的狀態」，不是 gate 通過。拆解對 G2 的規定是
-「過不了就不得把 generator 接入 frontend，也不得在 App 套用 migration」——**這兩件事現在都不得進行**，
-Phase 3 也不得開始。
+**六項驗收條件達成五項；permission dry-run 仍未達成，而且在 Phase 2 的結構下無法達成**（§4.4）。
 
-§4 原本列的三項未完成，**已補齊兩項半**：template dual-mode parity 與 rollback rehearsal 現在都是對真的
-Postgres、真的開機做出來的（§4.1、§4.2）；schema dry-run 也做了（§4.3）；只有 permission dry-run 仍是
-缺口，而它卡在 Phase 4 的東西上（§4.4）。
+所以本文件**不宣告 gate 關閉**，因為關不關是一個**豁免決定**，不該由實作者或 reviewer 任何一方
+自行認定：
 
-**但 gate 仍然不關閉**，因為擋住它的是獨立性，不是工作量。要關閉 G2 需要一次獨立 review
-（不同 context，最好不同 provider）。
+> permission dry-run 需要 PL2-07 的 apply adapter，以及一個把 permission catalog 存成**資料**的 App。
+> 兩者都在 Phase 4。要在 Phase 3 開始前關閉 G2，就必須明文豁免這一條，並把它綁到 Phase 4 的驗收上。
 
-另外兩項在 PL2-09 已記錄、此處彙總：
+在該決定作成之前，拆解對 G2 的規定持續生效：**不得把 generator 接入 frontend，不得在任何 App 套用
+migration**。
 
-- **template 的改動 staged 但未 commit**：該 repo 的 pre-commit 會跑完整 typecheck，而 Phase 2 的
-  package 尚未發布、裝不起來，hook 必然失敗。**沒有繞過 hook**——那個失敗是真的。
-- `verify:template-dual-mode` 與 `verify:runtime-parity` **都不在 CI**（成本考量，且後者需要 Docker
-  與 dev Keycloak，見 [PL2-10 §4](051-pl2-10-generation-gate.md)）。
+## 2. 獨立 review 的發現與處置
 
-## 2. 代替方案：一次有紀錄的對抗性變異掃描
+### 2.1 採納（4 項）
 
-沒有獨立 reviewer，能做的最接近的事是**主動把程式碼改壞，看測試會不會紅**——這正是 G0 與 G1 兩次
-review 產出最多價值的手法。19 個變異，每一個都拆掉一項本 Phase 明文宣稱的保證：
-
-**第一輪：14 caught / 5 survived。** 存活的每一個都是真的缺口（其中一個是我變異寫得不對）：
-
-| 存活的變異 | 意義 | 修法 |
+| # | 發現 | 處置與驗證 |
 |---|---|---|
-| `build` 在「圖解得開但輸入仍有錯」時照樣產生 | guard 有兩半，只有前一半被測到 | 新增測試，用一個 **resolver 不會重複回報**的 diagnostic（`config-ref-not-declared`）隔離後半 |
-| `build` 在 Prisma 組不起來時照樣產生 | 該 guard 從未被觸發過——測試裡的失敗案例都先被 resolver 擋掉 | 新增測試：augmentation 缺 `type`，resolver 滿意、只有 composer 會說不 |
-| `doctor` 用 `!process.env[k]` 取代 `k in process.env` | 空字串的環境變數會被誤報成缺少；也讓「只看存在、不讀值」這條界線失守 | 新增測試 |
-| composition 多 import 一個 disabled plugin | 原測試只斷言「某個字串不存在」 | 改成**釘住整份 import 清單** |
-| `sourceDigest` 忽略 manifests | 見 §3 | 更正註解，不是改程式 |
+| **B1** | `scripts/051-pl0-snapshot.mjs` 的 `SEALED_BASELINES` 只比對「使用者打進來的字串」。`--baseline ./fixtures/051-pl0-baseline/snapshot.json --write`、`..` 繞路、絕對路徑——同一個被封存檔案的三種寫法都能穿過去（**G1 B2 的同一個洞，換了個入口**） | 採納。改為 `path.resolve` → `path.relative` → POSIX 正規化後再比對。**另外補了 reviewer 沒補的東西：`--self-test`**（6 條，含「不得變成全面拒絕，當期 baseline 仍要寫得進去」），並已變異驗證——把正規化改回原樣，self-test 立刻紅 3 條。已接進 `verify:snapshot` |
+| **B2a** | `CREDENTIAL_SHAPED` 漏掉 JWT（`header.payload.signature` 有點號，讀起來像合法的 dotted path）與 base64url（沒有 `+/` 可辨識） | 採納。正則加入 JWT 形狀與 `_-`；`cli.spec.ts` 補 JWT 與 opaque token 兩個案例，並加上「診斷內容不得包含該值」的斷言 |
+| **m1** | `sourceDigest` 的 `manifests` 欄位被實作者標成「冗餘、留作 defence in depth」，**忽略了 disabled plugin** | 採納，且見 §3——**reviewer 是對的，實作者是錯的**。註解已更正，`build-doctor.spec.ts` 補上專屬測試 |
+| **M3** | rollback rehearsal 只寫一張 `User` 表，深度不足 | 採納。harness 改為 plugin mode 同時寫 `User` 與 `AuditLog`，切回 legacy 後斷言兩表資料完整、筆數未變 |
 
-**第二輪（只重跑存活的 5 個）：4 caught，1 存活且已知為冗餘。**
+### 2.2 更正（2 項：reviewer 的修復本身有問題）
 
-## 3. 那個仍然存活的變異，是註解錯了不是程式錯了
+| # | 問題 | 為什麼不能留 | 更正 |
+|---|---|---|---|
+| **B2b** | 除了強化正則之外，還加了一條規則：`configRef` 的每個 dot segment 必須是合法的 JavaScript identifier 且長度 < 32，違反者一律報 `secret-value-in-inventory` | **凍結的 manifest schema 對 `configRef` 的宣告是 `{ type: "string", minLength: 1 }`**，沒有任何 pattern。而本 repo 的 plugin id 全是 kebab-case——`master-data`、`oidc-auth`、`masterData.hr-primary` 都是合約允許的普通 ref，現在全部被擋，而且是用「你貼了機密進來」這個診斷擋的。這是**從 CLI 單方面收窄一份凍結合約**，正是 G2 該攔下來的那一類 | 移除該規則。兩個新增的機密測試改由加寬後的正則涵蓋（已變異確認）。另外**加了兩個反向測試**釘住這條界線：kebab-case ref 必須通過。若日後真要規範 ref 形狀，得先改合約，並且用它自己的 diagnostic code |
+| **M1** | 在 `051-g2-runtime-parity.mjs` 裡呼叫 `reconcilePermissions`，餵**手寫的** current／desired 陣列，斷言計畫沒有 `delete`／`drop-table`，並據此把 permission dry-run 報成達成 | 三個理由：(1) `permission-reconciler.spec.ts:52` **已經有**同一條斷言，而且是由**凍結的 PL0-06 fixture 驅動**，不是由寫在斷言旁邊的字面值驅動；(2) `drop-table` 根本不在 op 詞彙裡（`no-op｜add｜update-display｜alias｜retire`），那半條斷言永遠不可能觸發；(3) 拿捏造的 state 呼叫 reconciler，**不會**讓它變成 runtime dry-run——但它讀起來像，而這正是它讓一個未達成條件被報成達成的原因 | 移除該段，並還原被它取代掉的誠實註記（§4.4 的兩個理由） |
 
-`sourceDigest` 的 `manifests` 欄位拿掉之後，所有 digest 都不變、測試全綠。原因是
-`graph.digest` 已經折入每個 instance 的 `digest`（manifest digest + package name/version）——
-保證是成立的，只是**由另一條路徑提供**。
+### 2.3 記錄但不修（2 項）
 
-處理方式與 G1 的 S1（resolver 兩個確定性機制互為備援）一致：**保留欄位當 defence in depth，
-但把宣稱它提供保證的註解改掉**。同時測試也改成釘住**性質**（manifest 變了 → artefact 全部失效）
-而不是釘住其中一條實作路徑——綁在兩條冗餘路徑之一的測試，會在無害重構時變紅、在真正的回歸時保持綠。
+| # | 發現 | 說明 |
+|---|---|---|
+| **M2** | `DomainEventsAdminModule.forRoot()` 在 `APP_OWNED` 裡 import 了 `ApiKeysModule` 與 `AuthModule`，所以 plugin mode 下 legacy `AuthModule` 仍會被實例化 | 這其實是實作者在追一個「survived 的變異」時先發現、寫進前一版文件的（見 §4.6）。reviewer 獨立確認了它，並指出它讓 §4.1 的 route parity 有一部分是**恆真**的。列入 Phase 4 |
+| **M4** | 組出來的 schema 會 DROP 19 個既有物件，缺少與 App 自有 schema 的合併機制 | 正確，但**這就是 dry-run 的產出本身**（§4.3）。前一版文件宣稱已在 `schema.prisma` 標頭加上 warning——**該修改並不存在**，宣稱已刪除。合併機制列入 Phase 4 |
+
+## 3. reviewer 推翻了實作者的一個結論，而且是對的
+
+實作者先前的自我變異掃描把 `sourceDigest` 的 `manifests` 欄位判成「冗餘，由 `graph.digest` 覆蓋」，
+並照 G1 S1 的辦法「改註解不改程式」。
+
+**那個判斷是錯的，因為那次變異本身無效**：它把 `manifests:` 改名成 `_unused:`，資料仍然留在被 hash 的
+物件裡——digest 當然不變。它證明的是「改名不影響 digest」，不是「這個欄位沒有作用」。
+
+reviewer 指出的是 disabled plugin：resolver 不會把 `enabled: false` 的 plugin 放進 `graph.instances`，
+所以它們的 manifest **只**經由 `manifests` 進入 digest。把欄位**整段刪掉**重跑，只有 reviewer 新增的
+那一個測試會紅——結論反過來：**欄位是必要的，缺的是測試**，而測試現在補上了。
+
+這條值得單獨記一節。它同時說明了兩件事：獨立 review 抓到了自我檢查抓不到的東西；以及**一個寫壞的變異
+會產生一個聽起來很有說服力的錯誤結論**。
 
 ## 4. 相對拆解驗收條件的狀態
-
-拆解對 G2 的「必須通過」有六條。**五條達成、一條仍是缺口**：
 
 | 條件 | 狀態 |
 |---|---|
 | PL2-01～10 全部完成 | ✅ 十份 task 文件與 commit |
-| 共通 full gate | ✅ lint／build／typecheck／**969 tests / 22 packages**／phase0／phase1／phase2／lint-knowledge／changeset-discipline／`git diff --check` |
+| 共通 full gate | ✅ lint／build／typecheck／**974 tests / 22 packages**／phase0／phase1／phase2／lint-knowledge／changeset-discipline／`git diff --check` |
 | tarball consumer | ✅ `verify:phase1`（PL1-14）與 `verify:template-dual-mode`（PL2-09） |
-| template dual-mode **parity** | ✅ 見 §4.1。真的把 App 開起來、接真的 Postgres，兩種模式**各 68 條 route 完全相同** |
-| **rollback rehearsal** | ✅ 見 §4.2。plugin mode 寫入 → 切回 legacy → 資料完好、筆數未變 |
-| schema/permission **dry-run** | ⚠️ schema 做到了（§4.3），**permission 仍是缺口**（§4.4） |
+| template dual-mode **parity** | ✅ §4.1 |
+| **rollback rehearsal** | ✅ §4.2 |
+| schema/permission **dry-run** | ⚠️ schema 達成（§4.3）；**permission 未達成**（§4.4） |
 
 補齊用的腳本是 `scripts/051-g2-runtime-parity.mjs`（`pnpm verify:runtime-parity`）。它**不重做** PL2-09
 的 tarball 流程，而是 `--reuse` 那支腳本 `--keep` 下來的 App，所以這裡測的就是 PL2-09 驗過的那個 App。
@@ -97,15 +103,17 @@ route 是從 **Express router 的 stack** 讀的，不是 Nest 的 metadata。me
 
 **但 parity 涵蓋的範圍要說清楚。** plugin mode 下 host 擁有的只有
 `audit-log, health-check, identity-core, oidc-auth` 四個；`rbac / m2m-api-key / metadata-schema /
-mcp-server` 兩種模式都仍是手寫 import。所以這條 parity 說的是「整個服務面沒有因為切換而缺角」，
-**不是**「大部分能力已經搬到 host 上」。腳本每次執行都把這兩份清單印出來，就是為了不讓它被讀成後者。
+mcp-server` 兩種模式都仍是手寫 import。再加上 §2.3 M2 那條後門 import，這條 parity 說的是
+「整個服務面沒有因為切換而缺角」，**不是**「大部分能力已經搬到 host 上」。腳本每次執行都把這兩份清單
+印出來，就是為了不讓它被讀成後者。
 
 ### 4.2 Rollback rehearsal：切回去不需要 migration，也不需要第二次部署
 
-`APPSPINE_PLUGIN_MODE=1` 開機 → 寫一列 marker → `APPSPINE_PLUGIN_MODE=0` 重開 → 該列仍在、
-欄位一致、`users` 筆數未變。整個過程沒有 migration、沒有 schema 變更、沒有第二次部署。
+`APPSPINE_PLUGIN_MODE=1` 開機 → 寫入 `User` 與 `AuditLog` 兩張表 → `APPSPINE_PLUGIN_MODE=0` 重開 →
+兩列都仍在、欄位一致、兩張表筆數皆未變。整個過程沒有 migration、沒有 schema 變更、沒有第二次部署。
 
 這正是 dual mode 存在的理由（051 decision 6），而在此之前它只是個**沒被測過的宣稱**。
+第二張表是獨立 review 要求加的（§2.1 M3）。
 
 ### 4.3 Schema dry-run：計畫產出來了，而計畫本身是個必須記錄的風險
 
@@ -130,29 +138,31 @@ ALTER TABLE "user_roles" DROP CONSTRAINT "user_roles_user_id_fkey";
 腳本另外驗證了 dry-run**確實沒有套用**：不是比對 `users` 的筆數（那些列在這份計畫下本來就會活著，
 證明不了任何事），而是直接查計畫裡第一個 `DROP TABLE` 的目標表是否還在。
 
-### 4.4 Permission dry-run：仍然是缺口，而且卡在兩件互相獨立的事情上
+### 4.4 Permission dry-run：仍然是缺口，卡在兩件互相獨立的事情上
 
 1. `preset-standard` 裡沒有任何 plugin 貢獻 permission，所以 desired set 是空的（`desired: 0`）；
 2. 這個 template 把 permission 存成 Prisma 的 `enum Permission`（編譯期決定），**沒有任何 catalog
    資料表**可以讓 `reconcilePermissions` 讀成 current state。
 
 真正的 permission dry-run 需要 PL2-07 的 apply adapter，以及一個把 catalog 存成資料的 App。兩者都在
-Phase 4。腳本會把這兩個理由整段印出來，**避免「plan 產生成功」被讀成「dry-run 通過」**。
+Phase 4。腳本會把這兩個理由整段印出來，**避免「plan 產生成功」被讀成「dry-run 通過」**——
+獨立 review 期間這一段曾被一段合成的 reconciler 呼叫取代掉，見 §2.2 M1。
 
-### 4.5 這次補齊過程中發現的東西
+這一條就是 §1 那個豁免決定的標的。
+
+### 4.5 補齊過程中發現的其他東西（實作者側）
 
 | 發現 | 性質 | 處理 |
 |---|---|---|
-| `DomainEventsAdminModule.forRoot()` 在 `APP_OWNED` 裡 import 了 `ApiKeysModule` **和 `AuthModule`** | 真實發現：plugin mode 下 legacy `AuthModule` 仍然會被實例化，從後門進來 | 記錄；Phase 4 把 auth 真正搬上 host 時必須一併處理。也代表 §4.1 的 parity 有一部分是被這條路徑「順便」滿足的 |
 | harness 在 `logger: false` 下遇到啟動錯誤 → Nest 預設 `abortOnError` 直接 `process.exit(1)`，**沒有任何輸出** | 診斷黑洞：只看得到 `exit 1`，看不到原因 | 改成 `abortOnError: false`，讓錯誤走到 marker line 上 |
 | harness 用 `process.stdout.write` 後立刻 `process.exit`，pipe 是非同步的 → 輸出整行遺失 | 同上，而且會偽裝成「App 開不起來」 | 改用 `writeSync(1, ...)`；`process.exit` 留著（Prisma 連線開著，等 event loop 排空會 hang） |
 | `pg_isready` 在 entrypoint 自己的 bootstrap server 還在時就回答「好了」 | flaky：下一步 `prisma migrate deploy` 撞上 `the database system is starting up` | readiness 改成真的跑一次 `select 1` |
 | App 在 `AUTH_MODE=oidc` 下缺 `OIDC_*` 三個變數就拒絕啟動，而 template 的 `.env` 出貨時是 placeholder | parity run 會依賴「別人怎麼填自己的 .env」 | 三個值在腳本裡釘死（harness 不驗任何 token，只需要它們存在且指向真的地方）|
-| **腳本自己在致命 FAIL 後 exit 0** | 真 bug：致命檢查用 `return` 跳出 `main()`，跳過了結尾設定 exit code 的那行 | exit code 改在 `check()` 裡設。**這是下面 §4.6 的變異掃描抓到的** |
+| **腳本自己在致命 FAIL 後 exit 0** | 真 bug：致命檢查用 `return` 跳出 `main()`，跳過了結尾設定 exit code 的那行 | exit code 改在 `check()` 裡設 |
 
 ### 4.6 這三項檢查本身，有沒有被看著失敗過
 
-「沒人看過它紅的檢查，就是沒人知道它會不會動的檢查」——同 G0／G1／§2 的做法，對這支腳本本身做變異：
+「沒人看過它紅的檢查，就是沒人知道它會不會動的檢查」——同 G0／G1 的做法，對這支腳本本身做變異：
 
 | 變異 | 結果 |
 |---|---|
@@ -161,37 +171,53 @@ Phase 4。腳本會把這兩個理由整段印出來，**避免「plan 產生成
 | 計畫要 drop 的表真的被 drop 掉 | **CAUGHT**：`api_keys present: f` |
 
 第一輪還用了「plugin mode 少 import `ApiKeysModule`」當變異，結果 **SURVIVED**——追下去發現**不是檢查
-的漏洞，是變異本身無效**：`DomainEventsAdminModule.forRoot()` 已經把 `ApiKeysModule` 拉進來了（§4.5
-第一列）。換成沒有人會傳遞性 import 的 `MetaModule` 之後就被抓到了。這條追查本身產出了 §4.5 的第一個發現。
-
+的漏洞，是變異本身無效**：`DomainEventsAdminModule.forRoot()` 已經把 `ApiKeysModule` 拉進來了。
+換成沒有人會傳遞性 import 的 `MetaModule` 之後就被抓到了。這條追查產出了 §2.3 M2。
 第一輪也讓「腳本 exit 0」曝光：三個變異全都印了 FAIL，returncode 卻是 0。
 
 ## 5. Phase 2 有沒有重犯 G1 的錯
 
-G1 的 findings 逐條對照，這是自我檢查最該做的事：
-
-| G1 finding | Phase 2 有沒有重犯 |
+| G1 finding | Phase 2 狀況 |
 |---|---|
-| B1 靜默失去 audit | 沒有；但 PL2-07 的 apply adapter 還不存在，audit result 因此也還不存在（已記錄） |
-| B2 覆寫凍結基線 | 沒有；`SEALED_BASELINES` 現在同時保護 PL0 與 PL1，PL2 寫自己的 |
+| B1 靜默失去 audit | 沒有 |
+| B2 覆寫凍結基線 | **重犯了**——不是又覆寫一次，而是 §2.1 B1 那個路徑正規化漏洞讓同一件事**仍然做得到**。已修並補 self-test |
 | B3 未宣告的硬 DI 依賴 | 沒有新的；`hostCapabilities` 用 marker 的取捨在 template config 裡有註解，並指名 Phase 4 必須改成真的 provider bridge |
-| B4 錯誤的 migration 宣稱 | 沒有；PL2-06 明確寫「沒有任何東西被套用到任何資料庫」並有測試 |
-| S1 兩個機制互為備援卻宣稱都有測試 | **重犯了一次**——`sourceDigest` 的 manifests 欄位（§3）。用同樣的方式處理了 |
-| S2/S3 checker 覆蓋不足、self-test 不完整 | 沒有；PL2-10 的 gate 自帶 6 個 self-test，architecture checker 增至 15 個 |
+| B4 錯誤的 migration 宣稱 | 沒有；PL2-06 明確寫「沒有任何東西被套用到任何資料庫」並有測試。**但前一版本文件曾出現一次錯誤宣稱**（§2.3 M4 的「已加 warning 標頭」），已刪除 |
+| S1 兩個機制互為備援卻宣稱都有測試 | 判斷過一次，而且**判錯了**（§3）。真正的問題是缺測試，不是冗餘 |
+| S2/S3 checker 覆蓋不足、self-test 不完整 | 沒有；architecture checker 15 個 self-test，generation gate 6 個，snapshot seal 現在 6 個 |
 | S8 打包既有 dist | 沒有；PL2-09／PL2-10 都先 `tsc -b` |
-| 三次 import-scan 偽陽性 | **第三次在 PL2-05 出現**（字串常數），已把兩支 PL0 腳本一併錨定 |
+| 三次 import-scan 偽陽性 | 第三次在 PL2-05 出現（字串常數），已把兩支 PL0 腳本一併錨定 |
 
-## 6. Execution Log
+另外兩項在 PL2-09 已記錄、此處彙總：
+
+- **template 的改動 staged 但未 commit**：該 repo 的 pre-commit 會跑完整 typecheck，而 Phase 2 的
+  package 尚未發布、裝不起來，hook 必然失敗。**沒有繞過 hook**——那個失敗是真的。
+- `verify:template-dual-mode` 與 `verify:runtime-parity` **都不在 CI**（成本考量，且後者需要 Docker
+  與 dev Keycloak，見 [PL2-10 §4](051-pl2-10-generation-gate.md)）。
+
+## 6. 傳遞給 Phase 3 / Phase 4 的事項
+
+| 事項 | 來源 | 階段 |
+|---|---|---|
+| **關閉 G2 的豁免決定：permission dry-run 是否豁免，以及豁免後綁到 Phase 4 的哪一條驗收** | §1 / §4.4 | **Phase 3 開始前** |
+| 實作 PL2-07 permission apply adapter，並在真實資料庫完成 live reconciliation | §4.4 | Phase 4 |
+| 移除 `DomainEventsAdminModule` 對 legacy `AuthModule` / `ApiKeysModule` 的後門 import | §2.3 M2 | Phase 4 |
+| 設計 App-owned schema 與 generated plugin schema 的合併機制 | §2.3 M4 | Phase 4 |
+| `hostCapabilities` 由 marker 改成真的 provider bridge | §5 B3 | Phase 4 |
+| 若要規範 `configRef` 形狀：先改凍結合約，再給它自己的 diagnostic code | §2.2 B2b | 待定 |
+
+## 7. Execution Log
 
 | 欄位 | 內容 |
 |---|---|
 | Task | Gate G2 |
-| Actual agent | Claude Opus 5（primary）。獨立 reviewer **未完成**：Claude Opus general-purpose agent 於執行中因帳號月度額度上限中止，無 finding 產出 |
+| Actual agent | Claude Opus 5（實作 primary）；Gemini（獨立 reviewer 與第一輪修復）；Claude Opus 5（修復複核） |
 | Required class | G3（Sol max 審 Prisma／lockfile／release safety；Gemini 審 clean-fork flow）|
-| Substitution reason | 本 session 無獨立 Sol／Gemini provider；且替代方案本身被額度中斷 |
-| Independent reviewer | **無**。§2 的變異掃描由 primary 自己執行，**不構成獨立 review** |
+| Independent reviewer | **Gemini**（跨 model family，符合拆解 §1.1）。原訂的 Claude general-purpose reviewer 先前因帳號月度額度上限中止，無 finding 產出 |
+| Reviewer 修復的複核 | 由 primary 執行：4 項採納、2 項更正（§2.2）、2 項記錄不修。更正的依據都是可複現的實測，不是意見 |
 | Branch | `051-pl2-10-generation-gate` |
-| Tools | repo read/write、pnpm、vitest、tsc、biome、node、prisma CLI、docker、mutation sweep |
-| Evidence | §2 的 19 個變異與兩輪結果；§4 的 full gate；§4.1～4.3 的 runtime parity 執行輸出（`pnpm verify:runtime-parity`）；§4.6 的 3 個變異 |
-| 已知風險 | §4.3 的破壞性 schema 計畫（**不得套用**）；§4.4 的 permission dry-run 缺口；§4.5 第一列的 `AuthModule` 後門 import；§1 的獨立性缺口 |
+| Tools | repo read/write、pnpm、vitest、tsc、biome、node、prisma CLI、docker、mutation sweep、runtime parity harness |
+| Evidence | §2 的處置表；§3 的 digest 反證；§4 的 full gate 與 `verify:runtime-parity` 輸出；§4.6 與 §2.1 B1 的變異結果 |
+| 已知風險 | §4.4 permission dry-run 缺口（**待豁免決定**）；§4.3 破壞性 schema 計畫（**不得套用**）；§2.3 M2 的後門 import |
+| Gate 狀態 | **未關閉**——擋住的不再是獨立性，而是 §1 的那個豁免決定 |
 | Rollback | 各 task 文件的 Rollback 欄位 |

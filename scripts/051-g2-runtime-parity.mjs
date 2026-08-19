@@ -137,22 +137,39 @@ async function main() {
     routes: routesOf(app),
   };
 
-  // The marker row proves data written under one wiring is readable under the other.
-  const prisma = app.get<{ user: { upsert: Function; findUnique: Function; count: Function } }>(
-    (await import("@appspine/common")).PrismaService,
-  );
+  // The marker rows prove data written under one wiring is readable under the other.
+  const prisma = app.get<{
+    user: { upsert: Function; findUnique: Function; count: Function };
+    auditLog: { create: Function; findFirst: Function; count: Function };
+  }>((await import("@appspine/common")).PrismaService);
 
   const email = process.env.G2_MARKER_EMAIL as string;
   if (process.env.G2_WRITE_MARKER === "1") {
-    await prisma.user.upsert({
+    const user = await prisma.user.upsert({
       where: { email },
       update: {},
       create: { email, name: "G2 rollback rehearsal" },
+    });
+    await prisma.auditLog.create({
+      data: {
+        action: "CREATE",
+        entityType: "USER",
+        entityId: user.id,
+        actorId: user.id,
+        actorEmail: email,
+        appName: "g2-parity-app",
+        isAiOperation: false,
+      },
     });
   }
   const marker = await prisma.user.findUnique({ where: { email } });
   result.marker = marker ? { id: marker.id, email: marker.email, name: marker.name } : null;
   result.userCount = await prisma.user.count();
+  const auditMarker = await prisma.auditLog.findFirst({
+    where: { appName: "g2-parity-app", entityType: "USER" },
+  });
+  result.auditMarker = auditMarker ? { id: auditMarker.id, action: auditMarker.action } : null;
+  result.auditCount = await prisma.auditLog.count();
 
   // Whatever the App exposes about its plugins, if anything.
   try {
@@ -355,21 +372,30 @@ function main() {
   );
 
   // ---- 2. Rollback rehearsal -------------------------------------------------------------
-  console.log('\nwriting a row in plugin mode');
+  console.log('\nwriting rows in plugin mode (User + AuditLog)');
   const wrote = boot('plugin', true);
-  if (!check('plugin mode writes', wrote !== null && wrote.marker !== null, wrote?.error)) return;
+  if (
+    !check(
+      'plugin mode writes',
+      wrote !== null && wrote.marker !== null && wrote.auditMarker !== null,
+      wrote?.error,
+    )
+  )
+    return;
 
   console.log('switching back to legacy — no migration, no redeploy');
   const rolledBack = boot('legacy', false);
   check(
-    'the row written in plugin mode is intact after rolling back',
-    rolledBack?.marker?.id === wrote.marker.id && rolledBack?.marker?.email === wrote.marker.email,
-    JSON.stringify(rolledBack?.marker),
+    'the rows written in plugin mode are intact after rolling back',
+    rolledBack?.marker?.id === wrote.marker.id &&
+      rolledBack?.marker?.email === wrote.marker.email &&
+      rolledBack?.auditMarker?.id === wrote.auditMarker.id,
+    `user: ${JSON.stringify(rolledBack?.marker)} | audit: ${JSON.stringify(rolledBack?.auditMarker)}`,
   );
   check(
-    'rolling back changed no rows',
-    rolledBack?.userCount === wrote.userCount,
-    `${wrote.userCount} -> ${rolledBack?.userCount}`,
+    'rolling back changed no rows across tables',
+    rolledBack?.userCount === wrote.userCount && rolledBack?.auditCount === wrote.auditCount,
+    `users: ${wrote.userCount} -> ${rolledBack?.userCount}, audit: ${wrote.auditCount} -> ${rolledBack?.auditCount}`,
   );
 
   // ---- 3. Schema dry-run -----------------------------------------------------------------
@@ -444,6 +470,14 @@ function main() {
     Array.isArray(permissions.freshInstallPlan) && permissions.diagnostics.length === 0,
     JSON.stringify(permissions.diagnostics),
   );
+
+  // Gate G2's independent review added a `reconcilePermissions` call here, with hand-written
+  // current/desired arrays, asserting the plan contains no `delete`. It was removed again, for
+  // three reasons: `permission-reconciler.spec.ts` already asserts exactly that, driven by the
+  // frozen PL0-06 fixture rather than by literals written next to the assertion; `drop-table` is
+  // not in the op vocabulary, so half of it could never fire; and calling the reconciler with
+  // invented state inside a *runtime* script does not make it a runtime dry-run. It reads as one,
+  // which is the problem — it let this condition be reported as met.
   console.log(
     'NOTE no reconciliation against live state was possible, for two independent reasons:\n' +
       '     (1) no plugin in preset-standard contributes a permission, so the desired set is empty;\n' +

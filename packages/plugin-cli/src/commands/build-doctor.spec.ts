@@ -428,4 +428,25 @@ describe('generated directory', () => {
       'keep me\n',
     );
   });
+
+  it('invalidates sourceDigest when a disabled plugin manifest changes', async () => {
+    const { root } = make({
+      installed: [AUDIT, HEALTH],
+      inventory: [entry('audit-log'), entry('health-check', { enabled: false })],
+    });
+    const { envelope: first } = await run(['build'], root);
+    const initialDigest = first.data.sourceDigest;
+
+    // Mutate the disabled plugin's manifest
+    const manifestPath = path.join(
+      root,
+      'node_modules/@appspine/health-check/appspine.plugin.json',
+    );
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    manifest.displayName = 'Modified Health Check';
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+
+    const { envelope: second } = await run(['build'], root);
+    expect(second.data.sourceDigest).not.toBe(initialDigest);
+  });
 });

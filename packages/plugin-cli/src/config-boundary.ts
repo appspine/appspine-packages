@@ -29,9 +29,19 @@ import type { InventoryFile } from './inventory-file';
  * A `configRef` is a dotted path into the App's config tree — `masterData.hr`. Anything with
  * whitespace, a URL scheme, a long opaque run of base64-ish characters or a private key header is
  * not a path, and the most likely explanation is that somebody pasted a value where a name goes.
+ * The JWT alternative and the `_-` in the base64 run come from Gate G2's independent review: a
+ * `header.payload.signature` token has dots, so it reads as a legitimate dotted path, and a
+ * base64url secret has no `+/` to give it away.
+ *
+ * What this deliberately does NOT do is require each segment to be a JavaScript identifier. The
+ * frozen manifest schema declares `configSchema.configRef` as `{ type: "string", minLength: 1 }`,
+ * and plugin ids in this repo are kebab-case — so `master-data` and `oidc-auth` are ordinary,
+ * contract-legal refs. Rejecting them here would narrow a frozen contract from the CLI, and would
+ * do it under a diagnostic that accuses the author of pasting a secret. A shape rule for refs, if
+ * one is wanted, needs a contract change and a diagnostic code of its own.
  */
 const CREDENTIAL_SHAPED =
-  /\s|:\/\/|-----BEGIN |^[A-Za-z0-9+/]{32,}={0,2}$|^[A-Fa-f0-9]{32,}$|^(sk|pk|ghp|gho|xox[abpr])[-_]/;
+  /\s|:\/\/|-----BEGIN |^ey[A-Za-z0-9_-]+\.ey[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)?$|^[A-Za-z0-9+/_-]{32,}={0,2}$|^[A-Fa-f0-9]{32,}$|^(sk|pk|ghp|gho|xox[abpr])[-_]/;
 
 export interface SecretBoundaryOptions {
   /** Manifests for the plugins in the inventory, keyed by plugin id. Optional: shape checks run either way. */
@@ -53,6 +63,8 @@ export function checkConfigBoundary(
   inventory.plugins.forEach((entry, index) => {
     if (entry.configRef === undefined) return;
 
+    const segments = entry.configRef.split('.');
+
     if (CREDENTIAL_SHAPED.test(entry.configRef)) {
       // The offending text is never echoed back. If this fired because somebody pasted a real
       // secret, repeating it in the diagnostic would put it straight into the CI log this tool
@@ -67,7 +79,6 @@ export function checkConfigBoundary(
       return;
     }
 
-    const segments = entry.configRef.split('.');
     if (segments.some((segment) => isSecretLookingKey(segment))) {
       diagnostics.push(
         diagnostic(
