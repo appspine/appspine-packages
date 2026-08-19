@@ -7,10 +7,7 @@
   },
   "references": [
     {
-      "path": "../audit-log/tsconfig.build.json"
-    },
-    {
-      "path": "../m2m-api-key/tsconfig.build.json"
+      "path": "../plugin-api/tsconfig.build.json"
     },
     {
       "path": "../plugin-host-nest/tsconfig.build.json"

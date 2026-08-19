@@ -1,3 +1,4 @@
+export { MCP_TOOLS, type McpToolsPort } from '@appspine/plugin-api';
 export * from './discovery-push.service';
 export * from './mcp.controller';
 export * from './mcp.module';

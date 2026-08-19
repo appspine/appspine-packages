@@ -83,7 +83,10 @@
 | [051-pl4-02-rbac-plugin.md](topics/051-pl4-02-rbac-plugin.md) | topic | active | 051 PL4-02 — 遷移 `rbac` plugin（4A） |
 | [051-pl4-03-m2m-api-key-plugin.md](topics/051-pl4-03-m2m-api-key-plugin.md) | topic | active | 051 PL4-03 — 遷移 `m2m-api-key` plugin（4A） |
 | [051-pl4-04-metadata-schema-plugin.md](topics/051-pl4-04-metadata-schema-plugin.md) | topic | active | 051 PL4-04 — 遷移 `metadata-schema` plugin（4B） |
+| [051-pl4-05-domain-events-plugin.md](topics/051-pl4-05-domain-events-plugin.md) | topic | active | 051 PL4-05 — 遷移 `domain-events` plugin（4B） |
+| [051-pl4-06-mcp-server-plugin.md](topics/051-pl4-06-mcp-server-plugin.md) | topic | active | 051 PL4-06 — 遷移 `mcp-server` plugin（4B） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
+
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |

@@ -1,17 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-
-vi.mock('@appspine/m2m-api-key', () => ({
-  matchScope: (grantedScopes: string[], requiredScope: string) => {
-    if (grantedScopes.includes('*')) return true;
-    const [requiredModule, requiredAction] = requiredScope.split(':');
-    return grantedScopes.some((scope) => {
-      const [module, action] = scope.split(':');
-      return module === requiredModule && (action === '*' || action === requiredAction);
-    });
-  },
-}));
-
 import { McpService } from './mcp.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext, McpToolDefinition } from './types';

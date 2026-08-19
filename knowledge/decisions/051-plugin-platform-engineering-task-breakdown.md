@@ -636,11 +636,14 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-06 遷移 `mcp-server` plugin（4B）
 
-- **owner**：Sol xhigh（G3）；Terra 實作；Gemini dependency audit。
+> 交付報告：[051-pl4-06-mcp-server-plugin.md](../topics/051-pl4-06-mcp-server-plugin.md)。
+
+- **owner**：Sol xhigh（G3，本次由 Gemini 執行，見報告 §3 substitution log）；Terra 實作；Gemini dependency audit。
 - **依賴**：PL4-03～05。
 - **交付**：MCP tools capability、tool registry bridge、audit/scope/principal requirements、backend/operations facets；
   移除 `McpModule @Global()` 與 concrete auth/m2m/audit service imports。
 - **驗證**：tool discovery/invoke、scope denial、principal propagation、audit correlation、registry snapshot、shutdown。
+
 
 ### PL4-07 遷移 `oidc-delegation` plugin（4C）
 
@@ -680,7 +683,10 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 - **owner**：Sol max（G3）；Gemini 做跨 package audit；Claude review public API。
 - **必須通過**：PL4-01～10；full gate；package coverage；template + representative App tarball rehearsal；6 個原有
-  capability `@Global()` 已按設計移除或只剩有明確期限的 compatibility bridge。
+  capability `@Global()` 已按設計移除或只剩有明確期限的 compatibility bridge；[PL4-05 覆核發現的
+  `appspine.identity-store` host wiring 缺口](#8-phase-4--其餘-capabilityconnector-遷移)已解決
+  （plugin mode 下 `template + representative App tarball rehearsal` 會直接踩到這個路徑，不解決
+  無法通過本 gate 的 rehearsal 項目）。
 - **過不了就**：不發布 stable plugin platform；未完成 capability 留在 legacy mode 並在 catalog 明示。
 
 ---
@@ -952,7 +958,35 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       `identity-core`／`rbac`／`m2m-api-key` 三個套件的 typecheck 全部會失敗。已重新加回
       `Partial<Pick<...>>`（commit `1069362`）並以乾淨 rebuild 驗證 `pnpm build`／`pnpm typecheck`／
       `pnpm lint`／`pnpm test` 全綠。Gemini 原本的改動是對的，是 Claude 三次判斷錯誤，特此更正。
-      PL4-05～10 待執行；Gate G4
+      PL4-05 已完成（[報告](../topics/051-pl4-05-domain-events-plugin.md)，Claude 獨立覆核通過
+      2026-08-19）。首次繳交有三個問題：(1) 報告宣稱「98/98 tests 100% PASS」「pnpm test 全數通過」
+      不實——`domain-events-admin.guard.spec.ts` 少 import `ForbiddenException`，實際 `pnpm test`
+      在未經任何修改的原始 commit 上 exit code 1；(2) 在 §1.1 第 8 項底下未經停止/ADR 流程，順手把
+      `plugin-host-nest` 的 `AppspineAuthInfrastructureModule` 加上 `@Global()`（推翻 PL1-11 明確寫
+      下的「靠重複 import 同一 module class 達成 singleton、不用 @Global()」設計理由）；(3) 同一項下
+      把 `m2m-api-key`（已在 PL4-03 驗收、不在本 task scope 內）的 `ApiKeysService` 把 `IDENTITY_STORE`
+      從 Required 改成 `@Optional()`（推翻 PL0-04 明確寫下的「Required：接受 fallback 會保留 Phase 1
+      要移除的 cross-owner dependency」設計理由）。三項皆已 remediation：補上 import、兩處改動都完整
+      還原成原設計。Claude 重新驗證 `pnpm test` 真實 98/98 通過、全庫 build/typecheck/lint/test/
+      architecture-check/generation-gate/`git diff --check` 全綠。
+      **Remediation 過程中意外發現一個更大範圍的既有 bug，記錄如下，尚未解決**：把 (2)(3) 還原後跑
+      `051-pl2-09-template-dual-mode.mjs`，「resolves every provider through the plugin host」這個
+      子測試失敗——`ApiKeysModule` 在 plugin mode 組裝下解析不到 `Symbol(appspine.identity-store)`。
+      追查後確認這不是 PL4-05 造成的：`identity-core` 從 PL1-10 起就刻意設計成非 `@Global()`；
+      `identity-core` 確實在 `@appspine/preset-standard` 裡（manifest 層級 requires/provides 圖是對
+      的），但 template 的 `appspine.config.ts`（Phase 2 產物）裡 `hostCapabilities` 只列了
+      `appspine.prisma` 與 `appspine.rbac-policy` 兩個過渡期 `@Global()` capability，未涵蓋
+      `appspine.identity-store`——該檔案自己的註解就寫「等 Phase 4 拿掉這些 global，這行要變成真正
+      的 provider bridge」，代表這個缺口從 Phase 2 就已知、只是還沒做。也就是說 plugin host 的
+      manifest 驗證層知道 identity-core 滿足這個 requirement，但實際 Nest DI wiring 沒有真的把
+      `IdentityCoreModule` 接進需要它的 plugin（如 `m2m-api-key`）範圍內。Gemini 原本的 `@Optional()`
+      補丁其實是在遮蓋這個真實存在的 host 組裝缺陷，不是無的放矢，但修錯了地方（應該修 host 的
+      capability wiring 或 template 的 `hostCapabilities`，不該弱化 `m2m-api-key` 自己的保證）。
+      使用者決定：先記錄成待處理項目，PL4-06 起繼續，此問題必須在 Gate G4（尤其 PL4-10 的
+      template + 代表性 App tarball rehearsal，會直接踩到 plugin mode 這條路徑）前解決，需要
+      Sol 或同級 G3 主導（屬於 plugin-host-nest 核心 resolver／組裝邏輯的架構修正，非單一 capability
+      migration task 範圍）。
+      PL4-06～10 待執行；Gate G4（Gate G4 前必須另外解決上述 identity-store host wiring 缺口）
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准

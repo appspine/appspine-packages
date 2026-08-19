@@ -1,8 +1,7 @@
 /**
- * Minimal interfaces behind the stable tokens in `tokens.ts`.
+ * Ports for capabilities a plugin might depend on.
  *
- * Each port is the *smallest* shape a consumer needs — deliberately narrower than the concrete
- * service it will be bound to, so a capability plugin can depend on the contract without
+ * Each port is a pure TypeScript interface that specifies what a consumer needs without
  * importing the provider (051 plan section 6.1). Every port here is structurally satisfied by
  * the service that exists today, so binding one is a wiring change, not a behaviour change.
  */
@@ -251,4 +250,32 @@ export interface RecordDomainEventPortInput {
  */
 export interface DomainEventsPort {
   record(tx: unknown, input: RecordDomainEventPortInput): Promise<unknown>;
+}
+
+export interface McpCatalogEntryPort {
+  name: string;
+  description: string;
+  requiredScopes: string[];
+  readOnlyHint: boolean;
+}
+
+export interface McpToolDefinitionPort<TArgs = unknown, TCtx = unknown> {
+  name: string;
+  description: string;
+  inputSchema: unknown;
+  outputSchema?: unknown;
+  requiredScopes: string[];
+  handler: (args: TArgs, ctx: TCtx) => Promise<unknown>;
+}
+
+/**
+ * `appspine.mcp-tools` — satisfied by `@appspine/mcp-server`'s `McpToolRegistry`.
+ */
+export interface McpToolsPort<
+  TTool extends McpToolDefinitionPort<never, never> = McpToolDefinitionPort<unknown, unknown>,
+> {
+  registerTool(tool: TTool): void;
+  getTool(name: string): TTool | undefined;
+  getToolCount(): number;
+  getCatalogSnapshot(): McpCatalogEntryPort[];
 }

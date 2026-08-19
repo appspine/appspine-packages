@@ -471,12 +471,12 @@ importers:
 
   packages/mcp-server:
     dependencies:
-      '@appspine/audit-log':
+      '@appspine/plugin-api':
         specifier: workspace:*
-        version: link:../audit-log
-      '@appspine/m2m-api-key':
+        version: link:../plugin-api
+      '@appspine/plugin-host-nest':
         specifier: workspace:*
-        version: link:../m2m-api-key
+        version: link:../plugin-host-nest
       '@modelcontextprotocol/node':
         specifier: 2.0.0
         version: 2.0.0(@modelcontextprotocol/server@2.0.0)(hono@4.13.2)
@@ -487,15 +487,21 @@ importers:
         specifier: ^4.12.34
         version: 4.13.2
     devDependencies:
-      '@appspine/plugin-host-nest':
+      '@appspine/plugin-testkit':
         specifier: workspace:*
-        version: link:../plugin-host-nest
+        version: link:../plugin-testkit
       '@nestjs/common':
         specifier: ^11.0.5
         version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.0.5
         version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.2.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.0.5
+        version: 11.2.1(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/testing':
+        specifier: ^11.0.5
+        version: 11.2.1(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.2.1)
       '@prisma/client':
         specifier: ^6.2.0
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)

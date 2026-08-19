@@ -1,5 +1,10 @@
-import { matchScope } from '@appspine/m2m-api-key';
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  type McpCatalogEntryPort,
+  type McpToolsPort,
+  SCOPE_MATCHER,
+  type ScopeMatcherPort,
+} from '@appspine/plugin-api';
+import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import type { McpCallContext, McpToolDefinition } from './types';
 
 // Cross-app tool naming prefix (dev_docs 002 "跨 app 統一的 app 前綴", dev_docs 023 §2.2) —
@@ -41,15 +46,10 @@ export function classifyToolAsReadOnly(requiredScopes: string[]): boolean {
 // Tools are registered exclusively by the app via @McpTool() + registerMcpToolsFromInstance()
 // — this framework package does not auto-generate CRUD tools from the Prisma schema
 // (dev_docs 001 "MCP tool 產生方式：By app 自行產生").
-export interface McpCatalogEntry {
-  name: string;
-  description: string;
-  requiredScopes: string[];
-  readOnlyHint: boolean;
-}
+export interface McpCatalogEntry extends McpCatalogEntryPort {}
 
 @Injectable()
-export class McpToolRegistry {
+export class McpToolRegistry implements McpToolsPort<McpToolDefinition> {
   private readonly logger = new Logger(McpToolRegistry.name);
   private readonly toolMap = new Map<string, McpToolDefinition>();
   // One entry per @McpTool(), pre-prefixing — the source list getCatalogSnapshot() derives
@@ -57,9 +57,15 @@ export class McpToolRegistry {
   // discovery push, T-9700).
   private readonly logicalTools: McpToolDefinition[] = [];
 
+  constructor(
+    @Optional()
+    @Inject(SCOPE_MATCHER)
+    private readonly scopeMatcher?: ScopeMatcherPort,
+  ) {}
+
   listTools(ctx: McpCallContext): McpToolDefinition[] {
     return Array.from(this.toolMap.values()).filter((tool) =>
-      tool.requiredScopes.every((scope) => matchScope(ctx.scopes, scope)),
+      tool.requiredScopes.every((scope) => this.matchesScope(ctx.scopes, scope)),
     );
   }
 
@@ -100,6 +106,21 @@ export class McpToolRegistry {
       requiredScopes: tool.requiredScopes,
       readOnlyHint: classifyToolAsReadOnly(tool.requiredScopes),
     }));
+  }
+
+  private matchesScope(grantedScopes: string[], requiredScope: string): boolean {
+    if (this.scopeMatcher) {
+      return this.scopeMatcher.matches(grantedScopes, requiredScope);
+    }
+    // Neutral fallback scope matching logic when SCOPE_MATCHER capability provider is not bound
+    if (grantedScopes.includes('*')) return true;
+    const [reqModule, reqAction] = requiredScope.split(':');
+    return grantedScopes.some((g) => {
+      if (g === '*') return true;
+      const [gModule, gAction] = g.split(':');
+      if (gModule !== reqModule) return false;
+      return gAction === '*' || gAction === reqAction;
+    });
   }
 
   private registerSingle(tool: McpToolDefinition): void {

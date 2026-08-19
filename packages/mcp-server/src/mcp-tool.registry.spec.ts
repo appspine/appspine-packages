@@ -1,24 +1,11 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@appspine/m2m-api-key', () => ({
-  matchScope: (grantedScopes: string[], requiredScope: string) => {
-    if (grantedScopes.includes('*')) return true;
-    const [reqModule, reqAction] = requiredScope.split(':');
-    return grantedScopes.some((g) => {
-      if (g === '*') return true;
-      const [gModule, gAction] = g.split(':');
-      if (gModule !== reqModule) return false;
-      return gAction === '*' || gAction === reqAction;
-    });
-  },
-}));
-
+import type { ScopeMatcherPort } from '@appspine/plugin-api';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   classifyToolAsReadOnly,
   getConfiguredToolPrefix,
   McpToolRegistry,
 } from './mcp-tool.registry';
-import type { McpToolDefinition } from './types';
+import type { McpCallContext, McpToolDefinition } from './types';
 
 function makeTool(overrides: Partial<McpToolDefinition> = {}): McpToolDefinition {
   return {
@@ -30,6 +17,15 @@ function makeTool(overrides: Partial<McpToolDefinition> = {}): McpToolDefinition
     ...overrides,
   };
 }
+
+const baseCtx: McpCallContext = {
+  scopes: ['pages:read'],
+  isApiKey: true,
+  roleNames: [],
+  actingUserId: null,
+  sub: 'key-1',
+  workflowId: null,
+};
 
 describe('classifyToolAsReadOnly', () => {
   it('classifies read/list/get actions as read-only', () => {
@@ -111,6 +107,43 @@ describe('McpToolRegistry dual registration', () => {
     process.env.MCP_TOOL_PREFIX = 'wiki!';
     const registry = new McpToolRegistry();
     expect(() => registry.registerTool(makeTool())).toThrow(/MCP_TOOL_PREFIX/);
+  });
+});
+
+describe('McpToolRegistry.listTools and scope matching', () => {
+  it('filters tools based on default neutral scope matching', () => {
+    const registry = new McpToolRegistry();
+    registry.registerTool(makeTool({ name: 'read_tool', requiredScopes: ['pages:read'] }));
+    registry.registerTool(makeTool({ name: 'write_tool', requiredScopes: ['pages:write'] }));
+
+    const readOnlyCtx: McpCallContext = { ...baseCtx, scopes: ['pages:read'] };
+    const writeCtx: McpCallContext = { ...baseCtx, scopes: ['pages:write'] };
+    const wildcardCtx: McpCallContext = { ...baseCtx, scopes: ['*'] };
+    const emptyCtx: McpCallContext = { ...baseCtx, scopes: [] };
+
+    expect(registry.listTools(readOnlyCtx).map((t) => t.name)).toEqual(['read_tool']);
+    expect(registry.listTools(writeCtx).map((t) => t.name)).toEqual(['write_tool']);
+    expect(registry.listTools(wildcardCtx).map((t) => t.name)).toEqual(['read_tool', 'write_tool']);
+    expect(registry.listTools(emptyCtx)).toEqual([]);
+  });
+
+  it('delegates to injected ScopeMatcherPort when provided', () => {
+    const mockScopeMatcher: ScopeMatcherPort = {
+      matches: (granted, required) => granted.includes(required),
+    };
+    const registry = new McpToolRegistry(mockScopeMatcher);
+    registry.registerTool(makeTool({ name: 'custom_tool', requiredScopes: ['admin:custom'] }));
+
+    expect(registry.listTools({ ...baseCtx, scopes: ['admin:custom'] })).toHaveLength(1);
+    expect(registry.listTools({ ...baseCtx, scopes: ['other:scope'] })).toHaveLength(0);
+  });
+
+  it('denies access (excludes from listTools) when caller lacks required scopes', () => {
+    const registry = new McpToolRegistry();
+    registry.registerTool(makeTool({ name: 'secured_tool', requiredScopes: ['secret:read'] }));
+
+    const deniedCtx: McpCallContext = { ...baseCtx, scopes: ['public:read'] };
+    expect(registry.listTools(deniedCtx)).toHaveLength(0);
   });
 });
 

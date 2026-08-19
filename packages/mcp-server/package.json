@@ -13,7 +13,10 @@
   "type": "commonjs",
   "files": [
     "dist",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "appspine.plugin.json",
+    "plugin.js",
+    "plugin.d.ts"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -22,6 +25,11 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./appspine.plugin.json": "./appspine.plugin.json",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -31,8 +39,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@appspine/audit-log": "workspace:*",
-    "@appspine/m2m-api-key": "workspace:*",
+    "@appspine/plugin-api": "workspace:*",
+    "@appspine/plugin-host-nest": "workspace:*",
     "@modelcontextprotocol/node": "2.0.0",
     "@modelcontextprotocol/server": "2.0.0",
     "hono": "^4.12.34"
@@ -46,9 +54,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@appspine/plugin-host-nest": "workspace:*",
+    "@appspine/plugin-testkit": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
+    "@nestjs/platform-express": "^11.0.5",
+    "@nestjs/testing": "^11.0.5",
     "@prisma/client": "^6.2.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.0",
