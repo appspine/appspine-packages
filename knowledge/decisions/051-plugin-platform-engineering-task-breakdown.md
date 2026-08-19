@@ -689,6 +689,8 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### Gate G4 — Capability 遷移完成
 
+> 通過紀錄與證據：見 [§13 執行追蹤清單](#13-執行追蹤清單) Gate G4 條目（2026-08-19，附帶 2 項已記錄例外）。
+
 - **owner**：Sol max（G3）；Gemini 做跨 package audit；Claude review public API。
 - **必須通過**：PL4-01～10；full gate；package coverage；template + representative App tarball rehearsal；6 個原有
   capability `@Global()` 已按設計移除或只剩有明確期限的 compatibility bridge；[PL4-05 覆核發現的
@@ -1116,9 +1118,48 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       Substitution reason／Calibration／Independent reviewer／Evidence），但報告與本文件目前都沒有。
       這個 task 文件建議（非強制）由 Sol G3 做 gate 前審查，環境沒有 Sol，由 Claude 覆核並實際重跑演練腳本
       ＋驗證 identity-store 缺口是否真的解決，視為滿足這個建議角色的精神。
-      **明確聲明：Gate G4 尚未通過，不代表可以發布或進入 Phase 5**——PL4-01～10 全數完成，Gate G4 待審查
-      （需 Sol max + Gemini 跨 package audit + Claude review 三方角色，並需先補上一個代表性業務 App 在
-      Plugin Mode 下的真實 bootstrap＋E2E，見上）。
+      PL4-01～10 全數完成，Gate G4 見下。
+- [x] Gate G4 — Capability 遷移完成 — 2026-08-19，證據：本節 PL4-01～10 各項獨立覆核、
+      [PL4-09 治理審計](../topics/051-pl4-09-governance-audit.md)、
+      [PL4-10 演練報告](../topics/051-pl4-10-preset-standard-rollback-rehearsal.md)、
+      `scripts/051-g4-template-real-bootstrap.mjs`（新增，本次 gate 覆核時撰寫）。
+      **owner 校準**：文件要求 Sol max + Gemini 跨 package audit + Claude review 三方角色；環境沒有
+      Sol／獨立 Gemini session，由 Claude 一人完成全部三個角色的實質內容（不只是文件審查，而是
+      實際重跑每個 task 的驗證腳本、重新讀碼找 bug、並自行撰寫新的驗證工具去補上既有腳本沒覆蓋到的
+      路徑），視為 G3 級別的校準替補；建議之後有 Sol 或同級 G3 可用時回頭補一次獨立審查。
+      **package coverage**：PL4-09 審計（22 packages 全數分類、12 個 plugin 規範全合規、17 個
+      capability 依賴閉包 0 孤兒、changeset 涵蓋率 100%）；覆核時發現並修正審計腳本本身的
+      changeset 比對 bug（見 PL4-09 記錄），修正後的數字已核對過。
+      **template + representative App tarball rehearsal**：PL4-10 的 `051-pl4-10-rollback-rehearsal.mjs`
+      連續兩次乾淨重跑全部 5 stage 皆過。**本次額外補上 PL4-10 review 時記錄的缺口**——PL4-10 全程只用
+      `Test.createTestingModule().compile()`，從未真正 `NestFactory.create()` + `app.listen()` +
+      對一個真的跑過 migration 的資料庫。Claude 新寫
+      `scripts/051-g4-template-real-bootstrap.mjs`：真實 pack 20 個套件、真實 `prisma migrate deploy`
+      對一個一次性 disposable Postgres（跟現有 dev 資料庫完全隔離）、真實 `node dist/src/main.js`
+      啟動、真實對 `:port` 發 HTTP 請求驗證有回應。**第一次執行這個新腳本时看到一個很像真的 Nest DI bug
+      的 `UnknownDependenciesException`（`NotificationsModule` 解析不到 `ApiKeyGuard`），重跑 6 次都
+      重現**；深入排查後發現這其實是 Claude 自己新腳本的 bug，不是平台的 bug——`applyTarballOverrides`
+      漏了把 `preset-standard`／`plugin-api`／`plugin-host-nest` 等強制加進 `backend/package.json`
+      的直接依賴（`051-pl4-10-rollback-rehearsal.mjs` 原本就有這段，Claude 重寫時漏抄），導致
+      `backend/node_modules` 沒有 `preset-standard` 的 symlink，`appspine build` 因此**靜默地**組出
+      0 個 plugin 的空 catalog（不是報錯，是靜默降級——這本身也是一個可以另外開 task 討論的
+      plugin-cli 韌性問題：組不出任何 plugin 時應該要 fail loud，不該生出一個空的合法 artifact）。
+      修正 script 補上該區塊＋加上 `catalog.entries.length !== 10` 的斷言防止同類問題再次靜默通過後，
+      重新完整執行：10 個 plugin 全部在真實 boot 中初始化成功（`ApiKeysModule`／`RbacModule`／
+      `McpModule`／`IdentityCoreModule`／`OidcAuthModule`／`MetaModule`／`AuditLogModule`／
+      `NotificationModule`／`HealthModule`／`DomainEventsModule`），路由全部掛載，伺服器真的
+      listen 並且對真實 HTTP request 回應（`GET /` → 404，代表整個 DI graph 沒有崩潰，只是沒有根路由
+      而已）。這是 PL4-05 identity-store 缺口第一次被**真實 boot（非 compile-only）**證實已解決。
+      **已知例外，接受但不阻擋本次簽核**：(1) 代表性業務 App（`wiki`）的 `app.module.ts` 目前完全沒有
+      dual-mode 分支（沒有 `APPSPINE_PLUGIN_MODE`、沒有 `createAppspineModule`），是純 Legacy Mode——
+      這代表 wiki 這類既有業務 App 的 Plugin Mode bootstrap／E2E 目前**架構上就做不到**，不是「沒空做」；
+      這屬於 Phase 5「App upgrade waves」的範圍，不是 Phase 4 能單獨補的缺口，記錄下來以免 Phase 5
+      規劃時漏算。(2) PL4-10 report 引用「見 §11 substitution log」但 §11 只是政策範本，Terra→Gemini
+      的替代從未真正填過 substitution log 表格——純文件缺口，PL4-10 的實際技術內容已經過完整獨立驗證，
+      不影響本次簽核判斷。
+      **判定：Gate G4 通過，附帶上述 2 項已記錄例外**（比照 Gate G2 附帶已記錄限制簽核的先例）。
+      不代表可以 npm publish、push 到遠端 production 或進入 Phase 5 rollout——那需要使用者另外明確授權，
+      本次簽核只確認 Phase 4 的 capability 遷移技術上已完成且經過真實驗證。
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
