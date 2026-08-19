@@ -77,6 +77,7 @@ export const identityCoreManifest: PluginManifestV1 = {
       augmentedBy: [
         { plugin: 'rbac', field: 'userRoles' },
         { plugin: 'm2m-api-key', field: 'actingApiKeys' },
+        { plugin: 'notification', field: 'notifications' },
       ],
       schemaFragment: 'prisma/user.prisma',
       schemaDigest: 'sha256:b47f2c095a634912f8fc2520c5d679b55599d1076e00295be0eb0efa2479530d',

@@ -103,14 +103,16 @@ describe('manifest', () => {
   it('owns User without declaring the relations optional plugins contribute', () => {
     const fragment = readFileSync(path.join(packageRoot, 'prisma/user.prisma'), 'utf8');
     expect(fragment).toContain('model User {');
-    // PL0-04 §2: identity-core must not reverse-depend on RBAC or API keys. These fields come back
+    // PL0-04 §2: identity-core must not reverse-depend on RBAC, API keys, or notifications. These fields come back
     // as Prisma augmentations from the plugins that own them.
     expect(fragment).not.toMatch(/userRoles\s+UserRole\[]/);
     expect(fragment).not.toMatch(/actingApiKeys\s+ApiKey\[]/);
+    expect(fragment).not.toMatch(/notifications\s+Notification\[]/);
     // ...and the manifest says who will add them, so the composer has something to check against.
     expect((identityCoreManifest.facets.prisma as { augmentedBy: unknown[] }).augmentedBy).toEqual([
       { plugin: 'rbac', field: 'userRoles' },
       { plugin: 'm2m-api-key', field: 'actingApiKeys' },
+      { plugin: 'notification', field: 'notifications' },
     ]);
   });
 

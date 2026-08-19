@@ -79,6 +79,7 @@
 | [051-pl3-10-plugin-catalog-health.md](topics/051-pl3-10-plugin-catalog-health.md) | topic | active | 051 PL3-10 — 建立 plugin catalog／health 管理面與實際路由保護 |
 | [051-pl3-11-template-frontend-integration.md](topics/051-pl3-11-template-frontend-integration.md) | topic | active | 051 PL3-11 — Template frontend integration 與 E2E |
 | [051-pl3-gate-g3.md](topics/051-pl3-gate-g3.md) | topic | active | 051 Gate G3 — Frontend Facet／Slots 與 Capability UI Ownership 驗收報告 |
+| [051-pl4-01-notification-plugin.md](topics/051-pl4-01-notification-plugin.md) | topic | active | 051 PL4-01 — 遷移 `notification` plugin（4A） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

@@ -86,6 +86,10 @@ describe('resolution', () => {
 describe('descriptor', () => {
   it('exposes the backend factory returning ApiKeysModule', () => {
     expect(m2mApiKeyPlugin.manifest.id).toBe('m2m-api-key');
-    expect(m2mApiKeyPlugin.backend?.()).toBeDefined();
+    expect(
+      m2mApiKeyPlugin.backend?.(
+        {} as unknown as import('@appspine/plugin-api').PluginRuntimeContext,
+      ),
+    ).toBeDefined();
   });
 });

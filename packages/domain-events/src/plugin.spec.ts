@@ -79,6 +79,10 @@ describe('resolution', () => {
 describe('descriptor', () => {
   it('exposes the backend factory returning DomainEventsAdminModule', () => {
     expect(domainEventsPlugin.manifest.id).toBe('domain-events');
-    expect(domainEventsPlugin.backend?.()).toBeDefined();
+    expect(
+      domainEventsPlugin.backend?.(
+        {} as unknown as import('@appspine/plugin-api').PluginRuntimeContext,
+      ),
+    ).toBeDefined();
   });
 });

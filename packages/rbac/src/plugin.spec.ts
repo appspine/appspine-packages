@@ -83,6 +83,8 @@ describe('resolution', () => {
 describe('descriptor', () => {
   it('exposes the backend factory returning RbacModule', () => {
     expect(rbacPlugin.manifest.id).toBe('rbac');
-    expect(rbacPlugin.backend?.()).toBeDefined();
+    expect(
+      rbacPlugin.backend?.({} as unknown as import('@appspine/plugin-api').PluginRuntimeContext),
+    ).toBeDefined();
   });
 });

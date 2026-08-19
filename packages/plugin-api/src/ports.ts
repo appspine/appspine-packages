@@ -122,3 +122,93 @@ export interface PrincipalContextPort {
   /** Throws rather than returning `null`; use on routes a guard has already protected. */
   require(): Principal;
 }
+
+export type NotificationSeverityName = 'info' | 'success' | 'warning' | 'critical';
+
+export interface NotificationRecord {
+  id: string;
+  recipientUserId: string;
+  idempotencyKey: string;
+  type: string;
+  category: string | null;
+  severity: NotificationSeverityName;
+  title: string;
+  body: string | null;
+  sourceApp: string;
+  sourceEventId: string | null;
+  sourceEntityType: string | null;
+  sourceEntityId: string | null;
+  targetPath: string | null;
+  readAt: Date | null;
+  archivedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateNotificationInput {
+  recipientUserId: string;
+  idempotencyKey: string;
+  type: string;
+  category?: string | null;
+  severity?: NotificationSeverityName;
+  title: string;
+  body?: string | null;
+  sourceApp: string;
+  sourceEventId?: string | null;
+  sourceEntityType?: string | null;
+  sourceEntityId?: string | null;
+  targetPath?: string | null;
+}
+
+export interface NotificationQuery {
+  page?: number;
+  limit?: number;
+}
+
+export interface NotificationPage {
+  data: NotificationRecord[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface NotificationPortOptions {
+  tx?: unknown;
+}
+
+/**
+ * `appspine.notification-inbox` — satisfied by `@appspine/notification`'s `NotificationService`.
+ */
+export interface NotificationInboxPort {
+  notify(
+    input: CreateNotificationInput,
+    options?: NotificationPortOptions,
+  ): Promise<NotificationRecord>;
+  notifyMany(
+    inputs: CreateNotificationInput[],
+    options?: NotificationPortOptions,
+  ): Promise<NotificationRecord[]>;
+  getInbox(
+    recipientUserId: string,
+    query?: NotificationQuery,
+    options?: NotificationPortOptions,
+  ): Promise<NotificationPage>;
+  getUnreadCount(
+    recipientUserId: string,
+    options?: NotificationPortOptions,
+  ): Promise<{ count: number }>;
+  markRead(
+    notificationId: string,
+    recipientUserId: string,
+    options?: NotificationPortOptions,
+  ): Promise<NotificationRecord>;
+  markAllRead(
+    recipientUserId: string,
+    options?: NotificationPortOptions,
+  ): Promise<{ count: number }>;
+  archive(
+    notificationId: string,
+    recipientUserId: string,
+    options?: NotificationPortOptions,
+  ): Promise<NotificationRecord>;
+}

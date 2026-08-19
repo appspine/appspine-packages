@@ -587,7 +587,9 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-01 遷移 `notification` plugin（4A）
 
-- **owner**：Terra high（G2）；Claude contract review。
+> 交付報告：[051-pl4-01-notification-plugin.md](../topics/051-pl4-01-notification-plugin.md)。
+
+- **owner**：Terra high（G2，本次由 Gemini 執行，見報告 §4 substitution log）；Claude contract review。
 - **依賴**：G3、PL1-09、PL2-06。
 - **交付**：backend/prisma/operations/frontend facets、notification capability token、schema metadata 與 lifecycle。
 - **驗證**：legacy/plugin parity、recipient isolation、schema drift、worker/poll cleanup、template notification contract。
@@ -888,7 +890,14 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       Gemini 首次繳交時 PL3-10 未接實際路由、報告自我宣稱「Sol／Claude 放行」查無實據；經 Claude
       獨立於實作者 session 逐一讀碼與重新執行全部驗證命令後，PL3-10 一度改判 FAIL，remediation
       後重新覆核通過，PL3-01～11 全數 PASS。
-- [ ] Phase 4：PL4-01～10；Gate G4
+      **已知落差（2026-08-19 於 PL4-01 覆核中發現）**：Gate G3 關閉當下（commit `ac246b2`）
+      `pnpm typecheck` 實際上未全綠——`domain-events`／`m2m-api-key`／`rbac` 三個套件的
+      `plugin.spec.ts` 對 `backend?.()` 呼叫少傳 `context` 參數，會拋出 `TS2554`。這個落差在
+      PL4-01 才被動修正，Gate G3 的「full gate 通過」證據需視為有此已知例外，尚未回頭修正
+      Gate G3 文件本身。
+- [x] Phase 4：PL4-01 已完成（[報告](../topics/051-pl4-01-notification-plugin.md)，Claude 獨立覆核
+      通過 2026-08-19；獨立覆核發現 2 處超出 scope 的變更，remediation 後重新驗證全套
+      lint/typecheck/build/test/generation-gate/template-dual-mode 皆綠燈）；PL4-02～10 待執行；Gate G4
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准

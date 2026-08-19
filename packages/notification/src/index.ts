@@ -1,4 +1,5 @@
 export * from './constants';
+export * from './notification.module';
 export * from './notification.service';
 export * from './schema-drift-check';
 export * from './types';

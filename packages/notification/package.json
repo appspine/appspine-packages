@@ -5,6 +5,7 @@
   "files": [
     "dist",
     "docs",
+    "prisma",
     "appspine.plugin.json",
     "plugin.js",
     "plugin.d.ts",
@@ -27,6 +28,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./prisma/notification.prisma": "./prisma/notification.prisma",
     "./testing": {
       "types": "./dist/testing.d.ts",
       "default": "./dist/testing.js"

@@ -1,5 +1,7 @@
 import { PrismaService } from '@appspine/common';
+import type { NotificationInboxPort } from '@appspine/plugin-api';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+
 import type { ZodType } from 'zod';
 
 import {
@@ -24,7 +26,7 @@ import {
 } from './validation';
 
 @Injectable()
-export class NotificationService {
+export class NotificationService implements NotificationInboxPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async notify(
@@ -159,8 +161,14 @@ export class NotificationService {
     return this.findOwnedOrThrow(delegate, id, owner);
   }
 
-  private delegate(tx?: NotificationTxClient): NotificationDelegate {
-    return tx?.notification ?? this.prisma.notification;
+  private delegate(tx?: NotificationTxClient | unknown): NotificationDelegate {
+    if (!tx) return this.prisma.notification;
+    if (typeof tx === 'object' && tx !== null) {
+      if ('notification' in tx && (tx as { notification?: unknown }).notification) {
+        return (tx as NotificationTxClient).notification;
+      }
+    }
+    return (tx as NotificationDelegate) ?? this.prisma.notification;
   }
 
   private async findOwnedOrThrow(
