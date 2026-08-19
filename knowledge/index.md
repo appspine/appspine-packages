@@ -95,6 +95,7 @@
 | [051-pl5-03-template-canary-plugin-mode.md](topics/051-pl5-03-template-canary-plugin-mode.md) | topic | active | 051 PL5-03 — App Template 切換至 Canary Plugin Mode 報告 |
 | [051-pl5-04-wiki-canary-rollout.md](topics/051-pl5-04-wiki-canary-rollout.md) | topic | active | 051 PL5-04 — Wiki Canary Rollout 報告 |
 | [051-pl5-05-calendar-wave-a-rollout.md](topics/051-pl5-05-calendar-wave-a-rollout.md) | topic | active | 051 PL5-05 — Calendar Wave A Canary Rollout 報告 |
+| [051-pl5-06-chat-wave-a-rollout.md](topics/051-pl5-06-chat-wave-a-rollout.md) | topic | active | 051 PL5-06 — Chat Wave A Canary Rollout 與 Realtime Lifecycle 報告 |
 | [051-pl5-gemini-dispatch-prompts.md](topics/051-pl5-gemini-dispatch-prompts.md) | topic | active | 051 Phase 5 派工 Prompt — 給 Gemini 執行（PL5-01～06，不含 Gate G5A） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
