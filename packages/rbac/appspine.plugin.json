@@ -54,19 +54,12 @@
     },
     "prisma": {
       "owns": ["Role", "RolePermission", "UserRole"],
-      "augments": [
-        { "targetModel": "User", "field": "userRoles", "owner": "identity-core" }
-      ],
+      "augments": [{ "targetModel": "User", "field": "userRoles", "owner": "identity-core" }],
       "schemaFragment": "prisma/role.prisma",
       "schemaDigest": "sha256:bcecd51f14428efcbb36fa3ee65971459228741b0cfbb940f2883e2b3379cb5e"
     },
     "permissions": {
-      "definitions": [
-        "rbac:role:create",
-        "rbac:role:update",
-        "rbac:role:delete",
-        "rbac:role:read"
-      ]
+      "definitions": ["rbac:role:create", "rbac:role:update", "rbac:role:delete", "rbac:role:read"]
     }
   }
 }

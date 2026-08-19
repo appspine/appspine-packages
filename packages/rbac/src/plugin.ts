@@ -66,19 +66,12 @@ export const rbacManifest: PluginManifestV1 = {
     },
     prisma: {
       owns: ['Role', 'RolePermission', 'UserRole'],
-      augments: [
-        { targetModel: 'User', field: 'userRoles', owner: 'identity-core' },
-      ],
+      augments: [{ targetModel: 'User', field: 'userRoles', owner: 'identity-core' }],
       schemaFragment: 'prisma/role.prisma',
       schemaDigest: RBAC_SCHEMA_DIGEST,
     },
     permissions: {
-      definitions: [
-        'rbac:role:create',
-        'rbac:role:update',
-        'rbac:role:delete',
-        'rbac:role:read',
-      ],
+      definitions: ['rbac:role:create', 'rbac:role:update', 'rbac:role:delete', 'rbac:role:read'],
     },
   },
 };

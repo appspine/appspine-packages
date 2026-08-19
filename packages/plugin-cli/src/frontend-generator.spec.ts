@@ -215,7 +215,7 @@ describe('Next.js build-time frontend generator', () => {
       inventory: [entry('identity-core'), entry('custom-admin')],
     });
 
-    const { code, envelope } = await run(['build'], root);
+    const { code } = await run(['build'], root);
     expect(code).not.toBe(0);
   });
 

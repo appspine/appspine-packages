@@ -3,10 +3,7 @@ import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import {
-  PluginCatalogTable,
-  type PluginCatalogSummary,
-} from './plugin-catalog-table.js';
+import { type PluginCatalogSummary, PluginCatalogTable } from './plugin-catalog-table.js';
 
 describe('PluginCatalogTable', () => {
   beforeAll(() => {

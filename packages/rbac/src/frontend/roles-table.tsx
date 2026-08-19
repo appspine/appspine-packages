@@ -94,9 +94,7 @@ export function RolesTable({
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{role.displayName}</span>
-                    {role.isSystem && (
-                      <Badge variant="secondary">{t('systemBadge')}</Badge>
-                    )}
+                    {role.isSystem && <Badge variant="secondary">{t('systemBadge')}</Badge>}
                   </div>
                   <div className="text-xs text-muted-foreground">{role.name}</div>
                 </TableCell>

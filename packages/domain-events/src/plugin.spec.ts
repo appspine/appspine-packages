@@ -1,11 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defaultHostEngine, parsePluginManifest } from '@appspine/plugin-api/loader';
-import {
-  expectResolutionOk,
-  inventoryEntry,
-  resolveHarness,
-} from '@appspine/plugin-testkit';
+import { expectResolutionOk, inventoryEntry, resolveHarness } from '@appspine/plugin-testkit';
 import { describe, expect, it, vi } from 'vitest';
 
 import { z } from 'zod';
@@ -26,10 +22,7 @@ vi.mock('@appspine/common', () => ({
   ZodValidationPipe: class {},
 }));
 
-import {
-  domainEventsManifest,
-  domainEventsPlugin,
-} from './plugin';
+import { domainEventsManifest, domainEventsPlugin } from './plugin';
 
 const packageRoot = process.cwd();
 

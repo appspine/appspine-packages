@@ -1,11 +1,7 @@
 import { Badge } from '@appspine/frontend-shell';
 import type { DomainEventDetailPanelProps } from './types.js';
 
-export function DomainEventDetailPanel({
-  event,
-  t,
-  renderEnumLabel,
-}: DomainEventDetailPanelProps) {
+export function DomainEventDetailPanel({ event, t, renderEnumLabel }: DomainEventDetailPanelProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">

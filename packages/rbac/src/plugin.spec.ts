@@ -2,11 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defaultHostEngine, parsePluginManifest } from '@appspine/plugin-api/loader';
-import {
-  expectResolutionOk,
-  inventoryEntry,
-  resolveHarness,
-} from '@appspine/plugin-testkit';
+import { expectResolutionOk, inventoryEntry, resolveHarness } from '@appspine/plugin-testkit';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@appspine/common', () => ({
@@ -21,11 +17,7 @@ vi.mock('@appspine/common', () => ({
   ZodValidationPipe: class {},
 }));
 
-import {
-  RBAC_SCHEMA_DIGEST,
-  rbacManifest,
-  rbacPlugin,
-} from './plugin';
+import { RBAC_SCHEMA_DIGEST, rbacManifest, rbacPlugin } from './plugin';
 
 const packageRoot = process.cwd();
 

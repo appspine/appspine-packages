@@ -55,8 +55,17 @@ describe('shipped manifest schema vs. the PL0-05 frozen contract', () => {
       .properties as SchemaNode;
     const frontend = facets.frontend as SchemaNode;
     expect(frontend.additionalProperties).toBe(false);
-    expect(Object.keys((frontend.properties as SchemaNode)).sort()).toEqual(
-      ['adminPages', 'clientEntry', 'i18n', 'i18nNamespace', 'loginProviderUi', 'navigationItems', 'serverEntry', 'slots'].sort(),
+    expect(Object.keys(frontend.properties as SchemaNode).sort()).toEqual(
+      [
+        'adminPages',
+        'clientEntry',
+        'i18n',
+        'i18nNamespace',
+        'loginProviderUi',
+        'navigationItems',
+        'serverEntry',
+        'slots',
+      ].sort(),
     );
     const adminPages = (frontend.properties as SchemaNode).adminPages as SchemaNode;
     const adminPageItems = (adminPages.items as SchemaNode).oneOf as SchemaNode[];

@@ -42,9 +42,7 @@ export function ApiKeyRowActions({
   const tCommon = useTranslations('common');
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [actingUserOpen, setActingUserOpen] = useState(false);
-  const [selectedActingUserId, setSelectedActingUserId] = useState(
-    apiKey.actingUserId ?? '__none',
-  );
+  const [selectedActingUserId, setSelectedActingUserId] = useState(apiKey.actingUserId ?? '__none');
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -110,10 +108,7 @@ export function ApiKeyRowActions({
             <DialogTitle>{t('setActingUser')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <Select
-              value={selectedActingUserId}
-              onValueChange={setSelectedActingUserId}
-            >
+            <Select value={selectedActingUserId} onValueChange={setSelectedActingUserId}>
               <SelectTrigger>
                 <SelectValue placeholder={t('actingUserNone')} />
               </SelectTrigger>

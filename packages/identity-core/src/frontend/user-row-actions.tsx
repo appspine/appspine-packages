@@ -96,16 +96,12 @@ export function UserRowActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setRolesOpen(true)}>
-            {t('editRoles')}
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setRolesOpen(true)}>{t('editRoles')}</DropdownMenuItem>
           <DropdownMenuItem onClick={toggleActive} disabled={isPending}>
             {user.isActive ? t('deactivate') : t('activate')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={toggleServiceAccount} disabled={isPending}>
-            {user.isServiceAccount
-              ? t('unsetServiceAccount')
-              : t('setServiceAccount')}
+            {user.isServiceAccount ? t('unsetServiceAccount') : t('setServiceAccount')}
           </DropdownMenuItem>
           {!isSelf && (
             <DropdownMenuItem

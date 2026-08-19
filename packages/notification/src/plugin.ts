@@ -39,10 +39,7 @@ export const notificationManifest: PluginManifestV1 = {
       clientEntry: './dist/frontend.js',
     },
     permissions: {
-      definitions: [
-        'notification:inbox:read',
-        'notification:inbox:update',
-      ],
+      definitions: ['notification:inbox:read', 'notification:inbox:update'],
     },
   },
 };

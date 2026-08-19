@@ -56,15 +56,15 @@ export function sortWithDependencies<T extends SortableItem>(items: readonly T[]
   for (const item of items) {
     if (item.before && itemMap.has(item.before)) {
       // item must come before item.before: item -> item.before
-      const targets = adj.get(item.id)!;
-      if (!targets.has(item.before)) {
+      const targets = adj.get(item.id);
+      if (targets && !targets.has(item.before)) {
         targets.add(item.before);
       }
     }
     if (item.after && itemMap.has(item.after)) {
       // item.after must come before item: item.after -> item
-      const targets = adj.get(item.after)!;
-      if (!targets.has(item.id)) {
+      const targets = adj.get(item.after);
+      if (targets && !targets.has(item.id)) {
         targets.add(item.id);
       }
     }
@@ -97,7 +97,8 @@ export function sortWithDependencies<T extends SortableItem>(items: readonly T[]
 
   const result: T[] = [];
   while (ready.length > 0) {
-    const current = ready.shift()!;
+    const current = ready.shift();
+    if (!current) break;
     result.push(current);
 
     const neighbors = adj.get(current.id) ?? new Set();
@@ -105,7 +106,10 @@ export function sortWithDependencies<T extends SortableItem>(items: readonly T[]
       const nextDegree = (inDegree.get(nextId) ?? 1) - 1;
       inDegree.set(nextId, nextDegree);
       if (nextDegree === 0) {
-        ready.push(itemMap.get(nextId)!);
+        const nextItem = itemMap.get(nextId);
+        if (nextItem) {
+          ready.push(nextItem);
+        }
       }
     }
     sortReady(ready);
@@ -136,7 +140,7 @@ function getActiveFrontendPlugins(input: GenerationInput): ActiveFrontendPlugin[
     const instance = graph.instances.find((candidate) => candidate.key === key);
     if (!instance) continue;
     const loaded = manifests.byRef.get(instance.packageName);
-    if (!loaded || !loaded.manifest.facets.frontend) continue;
+    if (!loaded?.manifest.facets.frontend) continue;
 
     result.push({
       key: instance.key,
@@ -250,12 +254,13 @@ export function generateFrontendAdminRoutes(input: GenerationInput): GeneratedAr
               order: page.order ?? 0,
             };
 
-      if (seenRoutePaths.has(parsed.routePath!)) {
+      const routePath = parsed.routePath ?? `/dashboard/${parsed.id}`;
+      if (seenRoutePaths.has(routePath)) {
         throw new Error(
-          `Duplicate admin route path "${parsed.routePath}" declared by plugins "${seenRoutePaths.get(parsed.routePath!)}" and "${plugin.pluginId}"`,
+          `Duplicate admin route path "${routePath}" declared by plugins "${seenRoutePaths.get(routePath)}" and "${plugin.pluginId}"`,
         );
       }
-      seenRoutePaths.set(parsed.routePath!, plugin.pluginId);
+      seenRoutePaths.set(routePath, plugin.pluginId);
 
       if (seenIds.has(parsed.id)) {
         throw new Error(
@@ -337,10 +342,11 @@ export function generateFrontendSlots(input: GenerationInput): GeneratedArtifact
     for (let i = 0; i < slots.length; i++) {
       const slotContrib = slots[i];
       const slotName = slotContrib.slot;
-      if (!slotGroups.has(slotName)) {
-        slotGroups.set(slotName, []);
+      let list = slotGroups.get(slotName);
+      if (!list) {
+        list = [];
+        slotGroups.set(slotName, list);
       }
-      const list = slotGroups.get(slotName)!;
       list.push({
         ...slotContrib,
         id: `${plugin.pluginId}.${slotContrib.componentExport}`,
@@ -442,16 +448,12 @@ export function generateFrontendI18n(input: GenerationInput): GeneratedArtifact 
   lines.push('  locales?: readonly string[];');
   lines.push('}');
   lines.push('');
-  lines.push(
-    'export const i18nNamespaces: readonly GeneratedI18nNamespace[] = Object.freeze([',
-  );
+  lines.push('export const i18nNamespaces: readonly GeneratedI18nNamespace[] = Object.freeze([');
   for (const item of namespaces) {
     const fields: string[] = [
       `namespace: ${JSON.stringify(item.namespace)}`,
       `pluginId: ${JSON.stringify(item.pluginId)}`,
-      ...(item.locales
-        ? [`locales: Object.freeze(${JSON.stringify(item.locales)})`]
-        : []),
+      ...(item.locales ? [`locales: Object.freeze(${JSON.stringify(item.locales)})`] : []),
     ];
     lines.push(`  { ${fields.join(', ')} },`);
   }

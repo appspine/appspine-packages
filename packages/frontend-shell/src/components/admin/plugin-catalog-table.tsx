@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, AlertTriangle, XCircle, Info, Layers, Clock, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '../ui/badge.js';
@@ -12,14 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog.js';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../ui/table.js';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
 
 export type PluginBootOutcome = 'ready' | 'degraded-ready' | 'boot-aborted';
 export type PluginStatus = 'ready' | 'degraded' | 'failed' | 'not-reached';
@@ -100,7 +93,9 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
   const plugins = catalog.plugins ?? [];
   const readyCount = plugins.filter((p) => p.status === 'ready').length;
   const degradedCount = plugins.filter((p) => p.status === 'degraded').length;
-  const failedCount = plugins.filter((p) => p.status === 'failed' || p.status === 'not-reached').length;
+  const failedCount = plugins.filter(
+    (p) => p.status === 'failed' || p.status === 'not-reached',
+  ).length;
   const totalStartup = plugins.reduce((acc, p) => acc + (p.startupMs || 0), 0);
 
   const renderStatusBadge = (status: PluginStatus) => {
@@ -168,7 +163,7 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
         <div>{renderOutcomeBadge(catalog.outcome)}</div>
       </div>
 
-      <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <section className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <div className="rounded-lg border p-4 flex flex-col gap-1 bg-card">
           <span className="text-muted-foreground text-xs font-medium">{t('metrics.total')}</span>
           <span className="text-2xl font-bold">{plugins.length}</span>
@@ -182,7 +177,13 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
           <span className="text-2xl font-bold text-amber-500">{degradedCount}</span>
         </div>
         <div className="rounded-lg border p-4 flex flex-col gap-1 bg-card">
-          <span className="text-muted-foreground text-xs font-medium">{t('metrics.totalStartup')}</span>
+          <span className="text-muted-foreground text-xs font-medium">{t('metrics.failed')}</span>
+          <span className="text-2xl font-bold text-rose-600">{failedCount}</span>
+        </div>
+        <div className="rounded-lg border p-4 flex flex-col gap-1 bg-card">
+          <span className="text-muted-foreground text-xs font-medium">
+            {t('metrics.totalStartup')}
+          </span>
           <span className="text-2xl font-bold font-mono">{totalStartup}ms</span>
         </div>
       </section>
@@ -212,7 +213,9 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
                 <TableCell>
                   <div className="flex flex-col gap-0.5">
                     <span className="font-semibold text-sm">{plugin.key}</span>
-                    <span className="text-xs text-muted-foreground font-mono">{plugin.package}</span>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      {plugin.package}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>{renderStatusBadge(plugin.status)}</TableCell>
@@ -237,13 +240,18 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
                       </Badge>
                     ))}
                     {plugin.unresolvedOptional?.map((cap) => (
-                      <Badge key={cap} variant="outline" className="font-mono text-[10px] opacity-60 border-dashed">
+                      <Badge
+                        key={cap}
+                        variant="outline"
+                        className="font-mono text-[10px] opacity-60 border-dashed"
+                      >
                         {cap} (optional)
                       </Badge>
                     ))}
-                    {plugin.requires.length === 0 && (!plugin.unresolvedOptional || plugin.unresolvedOptional.length === 0) && (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
+                    {plugin.requires.length === 0 &&
+                      (!plugin.unresolvedOptional || plugin.unresolvedOptional.length === 0) && (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
                   </div>
                 </TableCell>
                 <TableCell className="font-mono text-xs text-muted-foreground">
@@ -266,7 +274,10 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
         </Table>
       </div>
 
-      <Dialog open={Boolean(inspectingPlugin)} onOpenChange={(open) => !open && setInspectingPlugin(null)}>
+      <Dialog
+        open={Boolean(inspectingPlugin)}
+        onOpenChange={(open) => !open && setInspectingPlugin(null)}
+      >
         <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -281,28 +292,41 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-md border p-3">
                   <div className="text-muted-foreground text-xs">Package</div>
-                  <div className="font-mono font-medium text-xs mt-0.5">{inspectingPlugin.package}</div>
+                  <div className="font-mono font-medium text-xs mt-0.5">
+                    {inspectingPlugin.package}
+                  </div>
                 </div>
                 <div className="rounded-md border p-3">
                   <div className="text-muted-foreground text-xs">Instance ID</div>
-                  <div className="font-mono font-medium text-xs mt-0.5">{inspectingPlugin.instanceId}</div>
+                  <div className="font-mono font-medium text-xs mt-0.5">
+                    {inspectingPlugin.instanceId}
+                  </div>
                 </div>
                 <div className="rounded-md border p-3">
                   <div className="text-muted-foreground text-xs">Schema / Code Digest</div>
-                  <div className="font-mono text-[11px] truncate mt-0.5" title={inspectingPlugin.digest}>
+                  <div
+                    className="font-mono text-[11px] truncate mt-0.5"
+                    title={inspectingPlugin.digest}
+                  >
                     {inspectingPlugin.digest}
                   </div>
                 </div>
                 <div className="rounded-md border p-3">
                   <div className="text-muted-foreground text-xs">Startup Duration</div>
-                  <div className="font-mono font-medium text-xs mt-0.5">{inspectingPlugin.startupMs}ms</div>
+                  <div className="font-mono font-medium text-xs mt-0.5">
+                    {inspectingPlugin.startupMs}ms
+                  </div>
                 </div>
               </div>
 
               {inspectingPlugin.error && (
                 <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive flex flex-col gap-1">
-                  <span className="font-semibold">Error at stage: {inspectingPlugin.error.stage}</span>
-                  <span className="font-mono whitespace-pre-wrap">{inspectingPlugin.error.message}</span>
+                  <span className="font-semibold">
+                    Error at stage: {inspectingPlugin.error.stage}
+                  </span>
+                  <span className="font-mono whitespace-pre-wrap">
+                    {inspectingPlugin.error.message}
+                  </span>
                 </div>
               )}
 
@@ -340,20 +364,25 @@ export function PluginCatalogTable({ catalog, t: customT }: PluginCatalogTablePr
                 </div>
               </div>
 
-              {inspectingPlugin.unresolvedOptional && inspectingPlugin.unresolvedOptional.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <span className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                    Unresolved Optional Capabilities
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {inspectingPlugin.unresolvedOptional.map((c) => (
-                      <Badge key={c} variant="outline" className="font-mono text-xs border-dashed opacity-75">
-                        {c}
-                      </Badge>
-                    ))}
+              {inspectingPlugin.unresolvedOptional &&
+                inspectingPlugin.unresolvedOptional.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <span className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      Unresolved Optional Capabilities
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {inspectingPlugin.unresolvedOptional.map((c) => (
+                        <Badge
+                          key={c}
+                          variant="outline"
+                          className="font-mono text-xs border-dashed opacity-75"
+                        >
+                          {c}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {inspectingPlugin.config !== undefined && (
                 <div className="flex flex-col gap-2">

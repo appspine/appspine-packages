@@ -83,9 +83,7 @@ export function UsersTable({
                 </Badge>
               </TableCell>
               <TableCell>
-                {user.isServiceAccount && (
-                  <Badge variant="outline">{t('serviceAccount')}</Badge>
-                )}
+                {user.isServiceAccount && <Badge variant="outline">{t('serviceAccount')}</Badge>}
               </TableCell>
               <TableCell>
                 <UserRowActions

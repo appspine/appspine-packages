@@ -3,19 +3,16 @@
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Skeleton,
-  cn,
 } from '@appspine/frontend-shell';
 import { Bell, CircleCheck, Info, OctagonAlert, RefreshCw, TriangleAlert } from 'lucide-react';
 import * as React from 'react';
-import type {
-  NotificationBellProps,
-  NotificationSummary,
-} from './types.js';
+import type { NotificationBellProps, NotificationSummary } from './types.js';
 import { useNotificationPolling } from './use-notification-polling.js';
 
 type RecentState = {
@@ -43,7 +40,6 @@ export function NotificationBell({
   const [optimisticItems, setOptimisticItems] = React.useState<NotificationSummary[] | null>(null);
   const {
     count,
-    isLoading: countLoading,
     error: pollingError,
     refresh: refreshCount,
   } = useNotificationPolling({
@@ -144,7 +140,6 @@ export function NotificationBell({
         return <TriangleAlert className="size-4 text-warning" />;
       case 'success':
         return <CircleCheck className="size-4 text-success" />;
-      case 'info':
       default:
         return <Info className="size-4 text-muted-foreground" />;
     }
@@ -191,9 +186,7 @@ export function NotificationBell({
         </div>
 
         {actionError && (
-          <div className="bg-destructive/10 px-3 py-2 text-destructive text-xs">
-            {actionError}
-          </div>
+          <div className="bg-destructive/10 px-3 py-2 text-destructive text-xs">{actionError}</div>
         )}
 
         <div className="max-h-80 overflow-y-auto">

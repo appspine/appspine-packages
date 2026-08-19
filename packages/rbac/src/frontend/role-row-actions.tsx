@@ -139,17 +139,13 @@ export function RoleRowActions({
                   </SelectContent>
                 </Select>
                 {isAdmin && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('adminPolicyFixed')}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t('adminPolicyFixed')}</p>
                 )}
               </Field>
               <Field>
                 <FieldLabel>{t('permissions')}</FieldLabel>
                 {isAdmin ? (
-                  <p className="text-xs text-muted-foreground">
-                    {t('adminPermissionsFixed')}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t('adminPermissionsFixed')}</p>
                 ) : (
                   <div className="max-h-48 overflow-y-auto rounded-md border p-3">
                     <div className="flex flex-col gap-2">

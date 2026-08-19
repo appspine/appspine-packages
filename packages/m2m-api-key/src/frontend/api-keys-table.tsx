@@ -82,13 +82,10 @@ export function ApiKeysTable({
               <TableCell>
                 {apiKey.actingUserId ? (
                   <span className="text-sm">
-                    {serviceAccountEmailById.get(apiKey.actingUserId) ??
-                      apiKey.actingUserId}
+                    {serviceAccountEmailById.get(apiKey.actingUserId) ?? apiKey.actingUserId}
                   </span>
                 ) : (
-                  <span className="text-xs text-muted-foreground">
-                    {t('actingUserNone')}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{t('actingUserNone')}</span>
                 )}
               </TableCell>
               <TableCell>
@@ -110,9 +107,7 @@ export function ApiKeysTable({
                 </Badge>
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">
-                {apiKey.lastUsedAt
-                  ? new Date(apiKey.lastUsedAt).toLocaleDateString()
-                  : t('never')}
+                {apiKey.lastUsedAt ? new Date(apiKey.lastUsedAt).toLocaleDateString() : t('never')}
               </TableCell>
               <TableCell>
                 <ApiKeyRowActions

@@ -31,6 +31,7 @@ updated: 2026-08-19
 | **PL3-09** `frontend-shell` 收斂 | Shell 零 capability 逆向依賴，納入 `FOUNDATION_PACKAGES`，提供 codemod | 架構檢查器 0 findings，51/51 tests 通過，codemod self-test 通過 | **PASS** |
 | **PL3-10** Plugin Catalog & Health (Sol Security) | `PluginCatalogTable` 支援健康狀態、能力清單、敏感設定遮蔽與診斷 | 53/53 tests 通過，Sol security review 放行 | **PASS** |
 | **PL3-11** Template 前端整合與 Dual-mode | `appspine-app-template` 整合 plugin frontend facets，tarball dual-mode 驗證通過 | `051-pl2-09` 與 `051-pl2-10` 測試全部 0 findings 通過 | **PASS** |
+| **§2.2 Code Quality & Discipline** | 全 Monorepo 執行 `pnpm lint` 程式碼格式、import 排序與規範檢查 | 624 檔案 checked，0 errors，0 warnings | **PASS** |
 
 **最終審查結論：Gate G3 判定通過（PASS）。**
 
@@ -75,6 +76,6 @@ updated: 2026-08-19
 | Independent reviewer | Sol (Security & module format review) & Claude (UX & frontend architecture review) |
 | Repos / Branches | `appspine-packages` (`051-pl3-01-frontend-contract`), `appspine-app-template` (`051-pl2-09-dual-mode-host`) |
 | Tools | repo read/write, pnpm, vitest, tsc, node, git |
-| Evidence | 22 packages architecture check 0 findings; 051-pl2-10 generation gate 0 findings; 051-pl2-09 dual-mode 0 findings; all unit tests green |
+| Evidence | 22 packages architecture check 0 findings; 051-pl2-10 generation gate 0 findings; 051-pl2-09 dual-mode 0 findings; pnpm lint 624 files 0 errors/0 warnings; all unit tests green |
 | 已知風險 | 無 |
 | Phase 4 準備 | 可進入 Phase 4 — 其餘 capability / connector 遷移（PL4-01～PL4-08） |

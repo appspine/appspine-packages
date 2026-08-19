@@ -66,9 +66,7 @@ export const m2mApiKeyManifest: PluginManifestV1 = {
     },
     prisma: {
       owns: ['ApiKey'],
-      augments: [
-        { targetModel: 'User', field: 'actingApiKeys', owner: 'identity-core' },
-      ],
+      augments: [{ targetModel: 'User', field: 'actingApiKeys', owner: 'identity-core' }],
       schemaFragment: 'prisma/api-key.prisma',
       schemaDigest: M2M_API_KEY_SCHEMA_DIGEST,
     },

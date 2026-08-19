@@ -92,7 +92,8 @@ export function transformSource(source) {
   let modified = source;
 
   // Pattern for import { ... } from '@appspine/frontend-shell' or '@appspine/frontend-shell/notification'
-  const importRegex = /import\s*\{([^}]+)\}\s*from\s*['"](@appspine\/frontend-shell(?:\/notification)?)['"];?/g;
+  const importRegex =
+    /import\s*\{([^}]+)\}\s*from\s*['"](@appspine\/frontend-shell(?:\/notification)?)['"];?/g;
 
   modified = modified.replace(importRegex, (fullMatch, specifiersStr, sourcePkg) => {
     const specifiers = specifiersStr
@@ -168,7 +169,9 @@ function main() {
   const apply = args.includes('--apply');
 
   if (!targetDir) {
-    console.log('Usage: node scripts/051-pl3-frontend-migration-codemod.mjs <target-directory> [--apply]');
+    console.log(
+      'Usage: node scripts/051-pl3-frontend-migration-codemod.mjs <target-directory> [--apply]',
+    );
     return;
   }
 
@@ -205,6 +208,9 @@ function main() {
   console.log('Done.');
 }
 
-if (process.argv[1] && path.basename(process.argv[1]).includes('051-pl3-frontend-migration-codemod')) {
+if (
+  process.argv[1] &&
+  path.basename(process.argv[1]).includes('051-pl3-frontend-migration-codemod')
+) {
   main();
 }

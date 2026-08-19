@@ -79,15 +79,10 @@ export function DomainEventCatalogTable({
                     {subscriber.stats.lastStatus ? (
                       <Badge
                         variant={
-                          subscriber.stats.lastStatus === 'DEAD_LETTER'
-                            ? 'destructive'
-                            : 'outline'
+                          subscriber.stats.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'
                         }
                       >
-                        {renderEnumLabel(
-                          'DomainEventDeliveryStatus',
-                          subscriber.stats.lastStatus,
-                        )}
+                        {renderEnumLabel('DomainEventDeliveryStatus', subscriber.stats.lastStatus)}
                       </Badge>
                     ) : (
                       <span className="text-muted-foreground text-xs">
@@ -111,9 +106,7 @@ export function DomainEventCatalogTable({
         <section className="flex flex-col gap-2">
           <div className="flex flex-col gap-1">
             <h2 className="font-semibold text-lg">{t('catalog.dataDrivenTitle')}</h2>
-            <p className="text-muted-foreground text-sm">
-              {t('catalog.dataDrivenSubtitle')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('catalog.dataDrivenSubtitle')}</p>
           </div>
           <div className="overflow-x-auto rounded-md border">
             <Table>
@@ -137,9 +130,7 @@ export function DomainEventCatalogTable({
                 )}
                 {catalog.dataDrivenDeliveries.map((delivery) => (
                   <TableRow key={delivery.handlerKey}>
-                    <TableCell className="font-mono text-xs">
-                      {delivery.handlerKey}
-                    </TableCell>
+                    <TableCell className="font-mono text-xs">{delivery.handlerKey}</TableCell>
                     <TableCell>{delivery.total}</TableCell>
                     <TableCell>{delivery.processed}</TableCell>
                     <TableCell>
@@ -153,15 +144,10 @@ export function DomainEventCatalogTable({
                       {delivery.lastStatus ? (
                         <Badge
                           variant={
-                            delivery.lastStatus === 'DEAD_LETTER'
-                              ? 'destructive'
-                              : 'outline'
+                            delivery.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'
                           }
                         >
-                          {renderEnumLabel(
-                            'DomainEventDeliveryStatus',
-                            delivery.lastStatus,
-                          )}
+                          {renderEnumLabel('DomainEventDeliveryStatus', delivery.lastStatus)}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground text-xs">
@@ -186,9 +172,7 @@ export function DomainEventCatalogTable({
         <section className="flex flex-col gap-2">
           <div className="flex flex-col gap-1">
             <h2 className="font-semibold text-lg">{t('catalog.unresolvedTitle')}</h2>
-            <p className="text-muted-foreground text-sm">
-              {t('catalog.unresolvedSubtitle')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('catalog.unresolvedSubtitle')}</p>
           </div>
           <div className="overflow-x-auto rounded-md border">
             <Table>
@@ -205,9 +189,7 @@ export function DomainEventCatalogTable({
               <TableBody>
                 {unresolvedDeliveries.map((delivery) => (
                   <TableRow key={delivery.handlerKey}>
-                    <TableCell className="font-mono text-xs">
-                      {delivery.handlerKey}
-                    </TableCell>
+                    <TableCell className="font-mono text-xs">{delivery.handlerKey}</TableCell>
                     <TableCell>{delivery.total}</TableCell>
                     <TableCell>{delivery.processed}</TableCell>
                     <TableCell>
@@ -221,15 +203,10 @@ export function DomainEventCatalogTable({
                       {delivery.lastStatus ? (
                         <Badge
                           variant={
-                            delivery.lastStatus === 'DEAD_LETTER'
-                              ? 'destructive'
-                              : 'outline'
+                            delivery.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'
                           }
                         >
-                          {renderEnumLabel(
-                            'DomainEventDeliveryStatus',
-                            delivery.lastStatus,
-                          )}
+                          {renderEnumLabel('DomainEventDeliveryStatus', delivery.lastStatus)}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground text-xs">
