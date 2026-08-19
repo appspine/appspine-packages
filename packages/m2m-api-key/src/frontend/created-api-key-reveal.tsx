@@ -1,24 +1,17 @@
 'use client';
 
+import {
+  Button,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  useTranslations,
+} from '@appspine/frontend-shell';
 import { useState } from 'react';
+import type { CreatedApiKeyRevealProps } from './types.js';
 
-import { useTranslations } from '../../i18n/index.js';
-
-import { Button } from '../ui/button.js';
-import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog.js';
-
-import type { CreateApiKeyResponse } from './types.js';
-
-/**
- * @deprecated Moved to `@appspine/m2m-api-key/frontend` in Phase 3 (PL3-06).
- */
-export function CreatedApiKeyReveal({
-  created,
-  onDone,
-}: {
-  created: CreateApiKeyResponse;
-  onDone: () => void;
-}) {
+export function CreatedApiKeyReveal({ created, onDone }: CreatedApiKeyRevealProps) {
   const t = useTranslations('apiKeys');
   const [copied, setCopied] = useState(false);
 

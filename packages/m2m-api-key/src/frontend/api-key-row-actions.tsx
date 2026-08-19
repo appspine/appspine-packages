@@ -1,9 +1,5 @@
 'use client';
 
-import { MoreHorizontal } from 'lucide-react';
-import { useState, useTransition } from 'react';
-import { useTranslations } from '../../i18n/index.js';
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,44 +9,42 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../ui/alert-dialog.js';
-import { Button } from '../ui/button.js';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog.js';
-import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu.js';
-import { FieldError } from '../ui/field.js';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
+  FieldError,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  useTranslations,
+} from '@appspine/frontend-shell';
+import { MoreHorizontal } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import type { ApiKeyRowActionsProps } from './types.js';
 
-import type { ApiKeyRow, ServiceAccountOption } from './types.js';
-
-/**
- * @deprecated Moved to `@appspine/m2m-api-key/frontend` in Phase 3 (PL3-06).
- */
 export function ApiKeyRowActions({
   apiKey,
   serviceAccounts,
   setApiKeyActiveAction,
   deleteApiKeyAction,
   updateApiKeyActingUserAction,
-}: {
-  apiKey: ApiKeyRow;
-  serviceAccounts: ServiceAccountOption[];
-  setApiKeyActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
-  deleteApiKeyAction: (id: string) => Promise<{ error?: string }>;
-  updateApiKeyActingUserAction: (
-    id: string,
-    actingUserId: string | null,
-  ) => Promise<{ error?: string }>;
-}) {
+}: ApiKeyRowActionsProps) {
   const t = useTranslations('apiKeys');
   const tCommon = useTranslations('common');
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [actingUserOpen, setActingUserOpen] = useState(false);
-  const [selectedActingUserId, setSelectedActingUserId] = useState(apiKey.actingUserId ?? '__none');
+  const [selectedActingUserId, setSelectedActingUserId] = useState(
+    apiKey.actingUserId ?? '__none',
+  );
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -102,10 +96,10 @@ export function ApiKeyRowActions({
             {apiKey.isActive ? t('deactivate') : t('activate')}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setActingUserOpen(true)}>
-            {t('editActingUser')}
+            {t('setActingUser')}
           </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-            {t('delete')}
+            {tCommon('delete')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -113,10 +107,13 @@ export function ApiKeyRowActions({
       <Dialog open={actingUserOpen} onOpenChange={setActingUserOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('editActingUser')}</DialogTitle>
+            <DialogTitle>{t('setActingUser')}</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3 py-4">
-            <Select value={selectedActingUserId} onValueChange={setSelectedActingUserId}>
+          <div className="py-4">
+            <Select
+              value={selectedActingUserId}
+              onValueChange={setSelectedActingUserId}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={t('actingUserNone')} />
               </SelectTrigger>
@@ -124,16 +121,24 @@ export function ApiKeyRowActions({
                 <SelectItem value="__none">{t('actingUserNone')}</SelectItem>
                 {serviceAccounts.map((account) => (
                   <SelectItem key={account.id} value={account.id}>
-                    {account.email}
+                    {account.email} {account.name ? `(${account.name})` : ''}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {error && <FieldError>{error}</FieldError>}
+            {error && <FieldError className="mt-2">{error}</FieldError>}
           </div>
           <DialogFooter>
-            <Button type="button" onClick={handleActingUserSubmit} disabled={isPending}>
-              {isPending ? t('saving') : tCommon('save')}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setActingUserOpen(false)}
+              disabled={isPending}
+            >
+              {t('cancel')}
+            </Button>
+            <Button onClick={handleActingUserSubmit} disabled={isPending}>
+              {isPending ? t('saving') : t('save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -142,16 +147,21 @@ export function ApiKeyRowActions({
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t('deleteApiKeyTitle').replace('{name}', apiKey.name)}
-            </AlertDialogTitle>
-            <AlertDialogDescription>{t('deleteWarning')}</AlertDialogDescription>
+            <AlertDialogTitle>{t('deleteApiKey')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('deleteApiKeyDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           {error && <FieldError>{error}</FieldError>}
           <AlertDialogFooter>
-            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
-              {isPending ? t('deleting') : t('delete')}
+            <AlertDialogCancel disabled={isPending}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? t('deleting') : tCommon('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

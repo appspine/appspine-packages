@@ -1,32 +1,16 @@
 import {
+  Badge,
   SortableColumnHeader,
-  type SortableLinkComponent,
-  type SortOrder,
-} from '../sortable-column-header.js';
-import { Badge } from '../ui/badge.js';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@appspine/frontend-shell';
 import { ApiKeyRowActions } from './api-key-row-actions.js';
-import type { ApiKeyRow, ServiceAccountOption } from './types.js';
+import type { ApiKeySortField, ApiKeysTableProps } from './types.js';
 
-type ApiKeySortField = 'name' | 'lastUsedAt';
-
-type ApiKeysTableKey =
-  | 'actingUser'
-  | 'actingUserNone'
-  | 'active'
-  | 'inactive'
-  | 'key'
-  | 'lastUsed'
-  | 'name'
-  | 'never'
-  | 'noApiKeys'
-  | 'role'
-  | 'scopes'
-  | 'status';
-
-/**
- * @deprecated Moved to `@appspine/m2m-api-key/frontend` in Phase 3 (PL3-06).
- */
 export function ApiKeysTable({
   apiKeys,
   serviceAccounts,
@@ -38,21 +22,7 @@ export function ApiKeysTable({
   setApiKeyActiveAction,
   deleteApiKeyAction,
   updateApiKeyActingUserAction,
-}: {
-  apiKeys: ApiKeyRow[];
-  serviceAccounts: ServiceAccountOption[];
-  sortField: string | undefined;
-  sortOrder: SortOrder | undefined;
-  LinkComponent: SortableLinkComponent;
-  buildSortHref: (field: ApiKeySortField, order: SortOrder) => string;
-  t: (key: ApiKeysTableKey) => string;
-  setApiKeyActiveAction: (id: string, isActive: boolean) => Promise<{ error?: string }>;
-  deleteApiKeyAction: (id: string) => Promise<{ error?: string }>;
-  updateApiKeyActingUserAction: (
-    id: string,
-    actingUserId: string | null,
-  ) => Promise<{ error?: string }>;
-}) {
+}: ApiKeysTableProps) {
   const serviceAccountEmailById = new Map(
     serviceAccounts.map((account) => [account.id, account.email]),
   );
@@ -101,31 +71,48 @@ export function ApiKeysTable({
           {apiKeys.map((apiKey) => (
             <TableRow key={apiKey.id}>
               <TableCell>{apiKey.name}</TableCell>
-              <TableCell className="font-mono text-muted-foreground text-xs">
-                {apiKey.prefix}
-              </TableCell>
-              <TableCell>{apiKey.role.displayName}</TableCell>
               <TableCell>
-                {(apiKey.actingUserId
-                  ? serviceAccountEmailById.get(apiKey.actingUserId)
-                  : undefined) ?? t('actingUserNone')}
+                <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">
+                  {apiKey.prefix}…
+                </code>
               </TableCell>
               <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {apiKey.scopes.map((scope) => (
-                    <Badge key={scope} variant="secondary">
-                      {scope}
-                    </Badge>
-                  ))}
-                </div>
+                <Badge variant="secondary">{apiKey.role.displayName}</Badge>
+              </TableCell>
+              <TableCell>
+                {apiKey.actingUserId ? (
+                  <span className="text-sm">
+                    {serviceAccountEmailById.get(apiKey.actingUserId) ??
+                      apiKey.actingUserId}
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {t('actingUserNone')}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell>
+                {apiKey.scopes.length === 0 ? (
+                  <span className="text-xs text-muted-foreground">-</span>
+                ) : (
+                  <div className="flex max-w-xs flex-wrap gap-1">
+                    {apiKey.scopes.map((s) => (
+                      <Badge key={s} variant="outline" className="text-xs font-mono">
+                        {s}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </TableCell>
               <TableCell>
                 <Badge variant={apiKey.isActive ? 'default' : 'outline'}>
                   {apiKey.isActive ? t('active') : t('inactive')}
                 </Badge>
               </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {apiKey.lastUsedAt ? new Date(apiKey.lastUsedAt).toLocaleString() : t('never')}
+              <TableCell className="text-xs text-muted-foreground">
+                {apiKey.lastUsedAt
+                  ? new Date(apiKey.lastUsedAt).toLocaleDateString()
+                  : t('never')}
               </TableCell>
               <TableCell>
                 <ApiKeyRowActions

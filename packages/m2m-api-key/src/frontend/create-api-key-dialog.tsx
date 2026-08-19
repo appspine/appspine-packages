@@ -1,49 +1,39 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-
-import { useTranslations } from '../../i18n/index.js';
-import { DateTimePicker } from '../date-time-picker.js';
-
-import { Button } from '../ui/button.js';
-import { Checkbox } from '../ui/checkbox.js';
 import {
+  Button,
+  Checkbox,
+  DateTimePicker,
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog.js';
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field.js';
-import { Input } from '../ui/input.js';
-import { Label } from '../ui/label.js';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
-import type { CreateApiKeyResult } from './actions-core.js';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  useTranslations,
+} from '@appspine/frontend-shell';
+import { useState, useTransition } from 'react';
 import { CreatedApiKeyReveal } from './created-api-key-reveal.js';
-import type {
-  ApiKeyRoleOption,
-  ApiKeyScopeOption,
-  CreateApiKeyResponse,
-  ServiceAccountOption,
-} from './types.js';
+import type { CreateApiKeyDialogProps, CreateApiKeyResponse } from './types.js';
 import { SCOPE_ACTIONS, SCOPE_RESOURCES } from './types.js';
 
-/**
- * @deprecated Moved to `@appspine/m2m-api-key/frontend` in Phase 3 (PL3-06).
- */
 export function CreateApiKeyDialog({
   roles,
   serviceAccounts,
   scopeOptions,
   createApiKeyAction,
-}: {
-  roles: ApiKeyRoleOption[];
-  serviceAccounts: ServiceAccountOption[];
-  scopeOptions?: ApiKeyScopeOption[];
-  createApiKeyAction: (formData: FormData) => Promise<CreateApiKeyResult>;
-}) {
+}: CreateApiKeyDialogProps) {
   const t = useTranslations('apiKeys');
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -115,26 +105,7 @@ export function CreateApiKeyDialog({
                 </Select>
               </Field>
               <Field>
-                <FieldLabel>{t('scopes')}</FieldLabel>
-                <div className="flex flex-col gap-2">
-                  <Label className="flex items-center gap-2 font-normal">
-                    <Checkbox name="scopes" value="*" />
-                    {t('fullAccess')}
-                  </Label>
-                  {resolvedScopeOptions.map((scope) => (
-                    <Label key={scope.value} className="flex items-center gap-2 font-normal">
-                      <Checkbox name="scopes" value={scope.value} />
-                      {scope.label}
-                    </Label>
-                  ))}
-                </div>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="new-key-rate-limit">{t('rateLimit')}</FieldLabel>
-                <Input id="new-key-rate-limit" name="rateLimit" type="number" min={1} max={600} />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="new-key-acting-user">{t('actingUserOptional')}</FieldLabel>
+                <FieldLabel htmlFor="new-key-acting-user">{t('actingUser')}</FieldLabel>
                 <Select name="actingUserId" defaultValue="__none">
                   <SelectTrigger id="new-key-acting-user">
                     <SelectValue placeholder={t('actingUserNone')} />
@@ -143,23 +114,54 @@ export function CreateApiKeyDialog({
                     <SelectItem value="__none">{t('actingUserNone')}</SelectItem>
                     {serviceAccounts.map((account) => (
                       <SelectItem key={account.id} value={account.id}>
-                        {account.email}
+                        {account.email} {account.name ? `(${account.name})` : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Field>
               <Field>
-                <FieldLabel htmlFor="new-key-expires-at">{t('expiresAt')}</FieldLabel>
-                <DateTimePicker name="expiresAt" placeholder={t('expiresAt')} />
+                <FieldLabel>{t('scopes')}</FieldLabel>
+                <div className="max-h-40 overflow-y-auto rounded-md border p-3">
+                  <div className="flex flex-col gap-2">
+                    {resolvedScopeOptions.map((scope) => (
+                      <Label key={scope.value} className="flex items-center gap-2 font-normal">
+                        <Checkbox name="scopes" value={scope.value} />
+                        <span className="font-mono text-xs">{scope.label}</span>
+                      </Label>
+                    ))}
+                  </div>
+                </div>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="new-key-rate-limit">{t('rateLimit')}</FieldLabel>
+                <Input
+                  id="new-key-rate-limit"
+                  name="rateLimit"
+                  type="number"
+                  min={1}
+                  placeholder={t('rateLimitPlaceholder')}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="new-key-expires">{t('expiresAt')}</FieldLabel>
+                <DateTimePicker name="expiresAt" />
               </Field>
               {error && <FieldError>{error}</FieldError>}
             </FieldGroup>
-            <DialogFooter>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isPending}
+              >
+                {t('cancel')}
+              </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? t('creating') : t('create')}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         )}
       </DialogContent>
