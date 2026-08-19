@@ -136,7 +136,7 @@ function AlertDialogAction({
   size = 'default',
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action> &
-  Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>) {
+  Partial<Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>>) {
   return (
     <Button variant={variant} size={size} asChild>
       <AlertDialogPrimitive.Action
@@ -154,7 +154,7 @@ function AlertDialogCancel({
   size = 'default',
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel> &
-  Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>) {
+  Partial<Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>>) {
   return (
     <Button variant={variant} size={size} asChild>
       <AlertDialogPrimitive.Cancel

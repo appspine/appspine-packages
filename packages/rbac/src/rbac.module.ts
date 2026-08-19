@@ -1,6 +1,6 @@
 import { RBAC_POLICY } from '@appspine/plugin-api';
 import { AppspineAuthInfrastructureModule } from '@appspine/plugin-host-nest';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { RbacAdminGuard } from './guards/admin.guard';
 import { PermissionGuard } from './guards/permission.guard';
 import { RbacPolicyService } from './rbac-policy.service';
@@ -10,11 +10,17 @@ import { RolesService } from './roles/roles.service';
 /**
  * Role-Based Access Control module (PL4-02).
  *
- * Not `@Global()`. `@Global()` was removed in Phase 4 (051 plan section 5.1). An App or a plugin
- * that needs RBAC policy or role management imports this module or injects `RBAC_POLICY`. When
- * wired via `createAppspineModule()`, the host assembles this module dynamically into the root
- * application container.
+ * Provides RBAC policy and role administration behind the stable `RBAC_POLICY` token as well as
+ * the concrete `RbacPolicyService`, `RolesService`, `PermissionGuard`, and `RbacAdminGuard`.
+ *
+ * Retained as `@Global()` during the Phase 4 transition window (Gate G4 compatibility bridge).
+ * Downstream business applications (e.g. calendar, wiki, drive, chat, etc.) currently use
+ * `@UseGuards(PermissionGuard)` across 40+ feature controllers without explicit module-level
+ * imports. Removing `@Global()` immediately in package migration would cause runtime
+ * `UnknownDependenciesException` at application bootstrap. True removal is scheduled for Phase 5
+ * when downstream App modules complete feature-level wiring and codemod adoption.
  */
+@Global()
 @Module({
   imports: [AppspineAuthInfrastructureModule],
   controllers: [RolesController],
