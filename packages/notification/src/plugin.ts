@@ -1,0 +1,56 @@
+/**
+ * `@appspine/notification/plugin` — manifest and plugin descriptor (PL3-08).
+ */
+
+import { definePlugin, type PluginManifestV1 } from '@appspine/plugin-api';
+
+/** Mirrors `appspine.plugin.json`. */
+export const notificationManifest: PluginManifestV1 = {
+  schemaVersion: 'appspine.plugin/v1',
+  id: 'notification',
+  displayName: 'Notification Inbox',
+  cardinality: 'singleton',
+  distribution: 'official',
+  engine: {
+    appspinePluginApi: '^1.0.0',
+    node: '>=22.0.0',
+    frameworks: {
+      '@nestjs/common': '^11.0.5',
+      '@nestjs/core': '^11.0.5',
+      '@prisma/client': '^6.2.0',
+      'lucide-react': '^1.22.0',
+      react: '^19.0.0',
+      'react-dom': '^19.0.0',
+    },
+  },
+  provides: ['appspine.notification-inbox'],
+  requires: ['appspine.prisma', 'appspine.principal-context'],
+  optionalRequires: ['appspine.audit-sink', 'appspine.rbac-policy'],
+  facets: {
+    frontend: {
+      slots: [
+        {
+          slot: 'header.actions',
+          componentExport: 'NotificationBell',
+          order: 10,
+        },
+      ],
+      i18nNamespace: 'notification',
+      clientEntry: './dist/frontend.js',
+    },
+    permissions: {
+      definitions: [
+        'notification:inbox:read',
+        'notification:inbox:update',
+      ],
+    },
+  },
+};
+
+export const notificationPlugin = definePlugin({
+  manifest: notificationManifest,
+});
+
+export function notification() {
+  return notificationPlugin;
+}
