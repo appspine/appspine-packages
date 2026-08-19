@@ -596,7 +596,9 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-02 遷移 `rbac` plugin（4A）
 
-- **owner**：Terra xhigh（G2）；Claude permission review；Sol G3 審 authorization。
+> 交付報告：[051-pl4-02-rbac-plugin.md](../topics/051-pl4-02-rbac-plugin.md)。
+
+- **owner**：Terra xhigh（G2，本次由 Gemini 執行，見報告 §4 substitution log）；Claude permission review；Sol G3 審 authorization。
 - **依賴**：PL4-01、PL2-07、PL1-10。
 - **交付**：manifest、`./plugin`、permission/prisma/backend/frontend facets、stable authorization tokens；逐步移除
   `RbacModule @Global()` 與 concrete `auth` imports。

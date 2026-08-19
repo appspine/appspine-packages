@@ -84,3 +84,14 @@ export const rbacPlugin = definePlugin({
 export function rbac() {
   return rbacPlugin;
 }
+
+export type { PrincipalAuthorization, RbacPolicyPort, RoleGrant } from '@appspine/plugin-api';
+export { RBAC_POLICY, SYSTEM_ADMIN_ROLE, SYSTEM_USER_ROLE } from '@appspine/plugin-api';
+export { PERMISSIONS_KEY, RequirePermissions } from './decorators/require-permissions.decorator';
+export { RbacAdminGuard } from './guards/admin.guard';
+export { PermissionGuard } from './guards/permission.guard';
+export { RbacModule } from './rbac.module';
+export { RbacPolicyService } from './rbac-policy.service';
+export { RolesController } from './roles/roles.controller';
+export { RolesService } from './roles/roles.service';
+export { buildUserContext } from './user-context.util';

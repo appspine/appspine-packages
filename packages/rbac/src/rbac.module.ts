@@ -1,6 +1,6 @@
 import { RBAC_POLICY } from '@appspine/plugin-api';
 import { AppspineAuthInfrastructureModule } from '@appspine/plugin-host-nest';
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { RbacAdminGuard } from './guards/admin.guard';
 import { PermissionGuard } from './guards/permission.guard';
 import { RbacPolicyService } from './rbac-policy.service';
@@ -8,11 +8,13 @@ import { RolesController } from './roles/roles.controller';
 import { RolesService } from './roles/roles.service';
 
 /**
- * Still `@Global()` during the transition (051 decision 3 removes it in Phase 4); what is new is
- * `RBAC_POLICY`, the token through which `identity-core` and `oidc-auth` reach role policy without
- * importing this package (PL0-04 section 2).
+ * Role-Based Access Control module (PL4-02).
+ *
+ * Not `@Global()`. `@Global()` was removed in Phase 4 (051 plan section 5.1). An App or a plugin
+ * that needs RBAC policy or role management imports this module or injects `RBAC_POLICY`. When
+ * wired via `createAppspineModule()`, the host assembles this module dynamically into the root
+ * application container.
  */
-@Global()
 @Module({
   imports: [AppspineAuthInfrastructureModule],
   controllers: [RolesController],
@@ -23,6 +25,6 @@ import { RolesService } from './roles/roles.service';
     RbacPolicyService,
     { provide: RBAC_POLICY, useExisting: RbacPolicyService },
   ],
-  exports: [RolesService, PermissionGuard, RbacPolicyService, RBAC_POLICY],
+  exports: [RolesService, PermissionGuard, RbacAdminGuard, RbacPolicyService, RBAC_POLICY],
 })
 export class RbacModule {}
