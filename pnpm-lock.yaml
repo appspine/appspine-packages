@@ -136,9 +136,15 @@ importers:
 
   packages/domain-events:
     dependencies:
+      '@appspine/frontend-shell':
+        specifier: workspace:*
+        version: link:../frontend-shell
       '@appspine/integration-contracts':
         specifier: 0.4.0
         version: 0.4.0
+      '@appspine/plugin-api':
+        specifier: workspace:*
+        version: link:../plugin-api
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -152,6 +158,12 @@ importers:
       '@appspine/m2m-api-key':
         specifier: workspace:*
         version: link:../m2m-api-key
+      '@appspine/plugin-host-nest':
+        specifier: workspace:*
+        version: link:../plugin-host-nest
+      '@appspine/plugin-testkit':
+        specifier: workspace:*
+        version: link:../plugin-testkit
       '@nestjs/common':
         specifier: ^11.0.5
         version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -164,6 +176,21 @@ importers:
       '@types/node':
         specifier: ^22.10.0
         version: 22.20.0
+      '@types/react':
+        specifier: ^19.2.17
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.17)
+      lucide-react:
+        specifier: ^1.22.0
+        version: 1.22.0(react@19.2.7)
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.7)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

@@ -1,48 +1,19 @@
-import { Badge } from '../ui/badge.js';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
-import type { DomainEventCatalogView, DomainEventEnumKind } from './types.js';
+import {
+  Badge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@appspine/frontend-shell';
+import type { DomainEventCatalogTableProps } from './types.js';
 
-/**
- * New in dev_docs 028 (no approve precedent to generalize from — the catalog endpoint didn't
- * exist before T-11210). This is the "human oversight" screen: `registry.describe()`'s
- * code-registered subscribers LEFT JOINed with delivery stats (subscribers with zero deliveries
- * still show, per plan §3.3), plus a separate data-driven-deliveries section for handler keys
- * with no `describe()` entry (e.g. `webhook.post:<id>`) — those must not be invisible here just
- * because they're operations-time routing rather than a code-registered subscription.
- */
-type DomainEventCatalogTableKey =
-  | 'catalog.columns.deadLetter'
-  | 'catalog.columns.description'
-  | 'catalog.columns.eventTypes'
-  | 'catalog.columns.handlerKey'
-  | 'catalog.columns.key'
-  | 'catalog.columns.lastAttemptAt'
-  | 'catalog.columns.lastStatus'
-  | 'catalog.columns.processed'
-  | 'catalog.columns.total'
-  | 'catalog.dataDrivenSubtitle'
-  | 'catalog.dataDrivenTitle'
-  | 'catalog.emptyDataDriven'
-  | 'catalog.emptySubscribers'
-  | 'catalog.emptyUnresolved'
-  | 'catalog.neverFired'
-  | 'catalog.subtitle'
-  | 'catalog.title'
-  | 'catalog.unresolvedSubtitle'
-  | 'catalog.unresolvedTitle';
-
-/**
- * @deprecated Moved to `@appspine/domain-events/frontend` in Phase 3 (PL3-07).
- */
 export function DomainEventCatalogTable({
   catalog,
   t,
   renderEnumLabel,
-}: {
-  catalog: DomainEventCatalogView;
-  t: (key: DomainEventCatalogTableKey) => string;
-  renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
-}) {
+}: DomainEventCatalogTableProps) {
   const unresolvedDeliveries = catalog.unresolvedDeliveries ?? [];
   const showDataDrivenSection =
     catalog.dataDrivenPrefixes.length > 0 ||
@@ -101,17 +72,22 @@ export function DomainEventCatalogTable({
                     {subscriber.stats.deadLetter > 0 ? (
                       <Badge variant="destructive">{subscriber.stats.deadLetter}</Badge>
                     ) : (
-                      subscriber.stats.deadLetter
+                      <Badge variant="outline">0</Badge>
                     )}
                   </TableCell>
                   <TableCell>
                     {subscriber.stats.lastStatus ? (
                       <Badge
                         variant={
-                          subscriber.stats.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'
+                          subscriber.stats.lastStatus === 'DEAD_LETTER'
+                            ? 'destructive'
+                            : 'outline'
                         }
                       >
-                        {renderEnumLabel('DomainEventDeliveryStatus', subscriber.stats.lastStatus)}
+                        {renderEnumLabel(
+                          'DomainEventDeliveryStatus',
+                          subscriber.stats.lastStatus,
+                        )}
                       </Badge>
                     ) : (
                       <span className="text-muted-foreground text-xs">
@@ -133,8 +109,12 @@ export function DomainEventCatalogTable({
 
       {showDataDrivenSection && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-base">{t('catalog.dataDrivenTitle')}</h2>
-          <p className="text-muted-foreground text-sm">{t('catalog.dataDrivenSubtitle')}</p>
+          <div className="flex flex-col gap-1">
+            <h2 className="font-semibold text-lg">{t('catalog.dataDrivenTitle')}</h2>
+            <p className="text-muted-foreground text-sm">
+              {t('catalog.dataDrivenSubtitle')}
+            </p>
+          </div>
           <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
@@ -155,31 +135,44 @@ export function DomainEventCatalogTable({
                     </TableCell>
                   </TableRow>
                 )}
-                {catalog.dataDrivenDeliveries.map((entry) => (
-                  <TableRow key={entry.handlerKey}>
-                    <TableCell className="font-mono text-xs">{entry.handlerKey}</TableCell>
-                    <TableCell>{entry.total}</TableCell>
-                    <TableCell>{entry.processed}</TableCell>
+                {catalog.dataDrivenDeliveries.map((delivery) => (
+                  <TableRow key={delivery.handlerKey}>
+                    <TableCell className="font-mono text-xs">
+                      {delivery.handlerKey}
+                    </TableCell>
+                    <TableCell>{delivery.total}</TableCell>
+                    <TableCell>{delivery.processed}</TableCell>
                     <TableCell>
-                      {entry.deadLetter > 0 ? (
-                        <Badge variant="destructive">{entry.deadLetter}</Badge>
+                      {delivery.deadLetter > 0 ? (
+                        <Badge variant="destructive">{delivery.deadLetter}</Badge>
                       ) : (
-                        entry.deadLetter
+                        <Badge variant="outline">0</Badge>
                       )}
                     </TableCell>
                     <TableCell>
-                      {entry.lastStatus ? (
+                      {delivery.lastStatus ? (
                         <Badge
-                          variant={entry.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'}
+                          variant={
+                            delivery.lastStatus === 'DEAD_LETTER'
+                              ? 'destructive'
+                              : 'outline'
+                          }
                         >
-                          {renderEnumLabel('DomainEventDeliveryStatus', entry.lastStatus)}
+                          {renderEnumLabel(
+                            'DomainEventDeliveryStatus',
+                            delivery.lastStatus,
+                          )}
                         </Badge>
                       ) : (
-                        '-'
+                        <span className="text-muted-foreground text-xs">
+                          {t('catalog.neverFired')}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-sm">
-                      {entry.lastAttemptAt ? new Date(entry.lastAttemptAt).toLocaleString() : '-'}
+                      {delivery.lastAttemptAt
+                        ? new Date(delivery.lastAttemptAt).toLocaleString()
+                        : '-'}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -191,8 +184,12 @@ export function DomainEventCatalogTable({
 
       {showUnresolvedSection && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-base">{t('catalog.unresolvedTitle')}</h2>
-          <p className="text-muted-foreground text-sm">{t('catalog.unresolvedSubtitle')}</p>
+          <div className="flex flex-col gap-1">
+            <h2 className="font-semibold text-lg">{t('catalog.unresolvedTitle')}</h2>
+            <p className="text-muted-foreground text-sm">
+              {t('catalog.unresolvedSubtitle')}
+            </p>
+          </div>
           <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
@@ -206,38 +203,44 @@ export function DomainEventCatalogTable({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {unresolvedDeliveries.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
-                      {t('catalog.emptyUnresolved')}
+                {unresolvedDeliveries.map((delivery) => (
+                  <TableRow key={delivery.handlerKey}>
+                    <TableCell className="font-mono text-xs">
+                      {delivery.handlerKey}
                     </TableCell>
-                  </TableRow>
-                )}
-                {unresolvedDeliveries.map((entry) => (
-                  <TableRow key={entry.handlerKey}>
-                    <TableCell className="font-mono text-xs">{entry.handlerKey}</TableCell>
-                    <TableCell>{entry.total}</TableCell>
-                    <TableCell>{entry.processed}</TableCell>
+                    <TableCell>{delivery.total}</TableCell>
+                    <TableCell>{delivery.processed}</TableCell>
                     <TableCell>
-                      {entry.deadLetter > 0 ? (
-                        <Badge variant="destructive">{entry.deadLetter}</Badge>
+                      {delivery.deadLetter > 0 ? (
+                        <Badge variant="destructive">{delivery.deadLetter}</Badge>
                       ) : (
-                        entry.deadLetter
+                        <Badge variant="outline">0</Badge>
                       )}
                     </TableCell>
                     <TableCell>
-                      {entry.lastStatus ? (
+                      {delivery.lastStatus ? (
                         <Badge
-                          variant={entry.lastStatus === 'DEAD_LETTER' ? 'destructive' : 'outline'}
+                          variant={
+                            delivery.lastStatus === 'DEAD_LETTER'
+                              ? 'destructive'
+                              : 'outline'
+                          }
                         >
-                          {renderEnumLabel('DomainEventDeliveryStatus', entry.lastStatus)}
+                          {renderEnumLabel(
+                            'DomainEventDeliveryStatus',
+                            delivery.lastStatus,
+                          )}
                         </Badge>
                       ) : (
-                        '-'
+                        <span className="text-muted-foreground text-xs">
+                          {t('catalog.neverFired')}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-sm">
-                      {entry.lastAttemptAt ? new Date(entry.lastAttemptAt).toLocaleString() : '-'}
+                      {delivery.lastAttemptAt
+                        ? new Date(delivery.lastAttemptAt).toLocaleString()
+                        : '-'}
                     </TableCell>
                   </TableRow>
                 ))}

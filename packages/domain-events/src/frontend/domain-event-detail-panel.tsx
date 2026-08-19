@@ -1,35 +1,11 @@
-import { Badge } from '../ui/badge.js';
-import type { DomainEventEnumKind, DomainEventRow } from './types.js';
+import { Badge } from '@appspine/frontend-shell';
+import type { DomainEventDetailPanelProps } from './types.js';
 
-/**
- * Generalized from `apps/approve`'s bespoke domain event detail page (dev_docs 028 §3.4) — the
- * event-fact half of the page (operation/aggregate/changedFields/before/after/metadata). The
- * deliveries table is `DomainEventDeliveriesPanel` (a separate component so the list page's
- * compact per-row view and this page's full view share one implementation), composed alongside
- * this panel by the app's own page.
- */
-type DomainEventDetailPanelKey =
-  | 'columns.changedFields'
-  | 'columns.createdAt'
-  | 'columns.event'
-  | 'columns.operation'
-  | 'detail.after'
-  | 'detail.before'
-  | 'detail.metadata'
-  | 'detail.title';
-
-/**
- * @deprecated Moved to `@appspine/domain-events/frontend` in Phase 3 (PL3-07).
- */
 export function DomainEventDetailPanel({
   event,
   t,
   renderEnumLabel,
-}: {
-  event: DomainEventRow;
-  t: (key: DomainEventDetailPanelKey) => string;
-  renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
-}) {
+}: DomainEventDetailPanelProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">

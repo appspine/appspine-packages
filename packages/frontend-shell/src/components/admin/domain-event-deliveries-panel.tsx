@@ -27,6 +27,8 @@ import type { DomainEventDeliveryRow } from './types.js';
  * a Client Component, and React Server Components reject plain functions (as opposed to
  * "use server" Server Actions) passed down from a Server Component parent. `RoleRowActions`
  * in this same directory hits the identical constraint and resolves it the same way.
+ *
+ * @deprecated Moved to `@appspine/domain-events/frontend` in Phase 3 (PL3-07).
  */
 export function DomainEventDeliveriesPanel({
   deliveries,

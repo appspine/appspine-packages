@@ -1,26 +1,15 @@
-import type { SortableLinkComponent } from '../sortable-column-header.js';
-import { Badge } from '../ui/badge.js';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
+import {
+  Badge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@appspine/frontend-shell';
 import { DomainEventDeliveriesPanel } from './domain-event-deliveries-panel.js';
-import type { DomainEventEnumKind, DomainEventRow } from './types.js';
+import type { DomainEventsTableProps } from './types.js';
 
-/**
- * Generalized from `apps/approve`'s bespoke domain events list page (dev_docs 028 §3.4). Always
- * ordered by `seq desc` server-side (matches `DomainEventsAdminService.findAll()`) — no sortable
- * columns needed here, unlike UsersTable/RolesTable.
- */
-type DomainEventsTableKey =
-  | 'columns.aggregate'
-  | 'columns.changedFields'
-  | 'columns.createdAt'
-  | 'columns.deliveries'
-  | 'columns.event'
-  | 'columns.seq'
-  | 'empty';
-
-/**
- * @deprecated Moved to `@appspine/domain-events/frontend` in Phase 3 (PL3-07).
- */
 export function DomainEventsTable({
   events,
   t,
@@ -29,15 +18,7 @@ export function DomainEventsTable({
   buildDetailHref,
   retryDeliveryAction,
   ignoreDeliveryAction,
-}: {
-  events: DomainEventRow[];
-  t: (key: DomainEventsTableKey) => string;
-  renderEnumLabel: (kind: DomainEventEnumKind, value: string) => string;
-  LinkComponent: SortableLinkComponent;
-  buildDetailHref: (id: string) => string;
-  retryDeliveryAction: (id: string) => Promise<{ error?: string }>;
-  ignoreDeliveryAction: (id: string) => Promise<{ error?: string }>;
-}) {
+}: DomainEventsTableProps) {
   return (
     <div className="overflow-x-auto rounded-md border">
       <Table>
