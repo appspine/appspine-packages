@@ -1,9 +1,12 @@
 /**
- * `@appspine/domain-events/plugin` — manifest and plugin descriptor (PL3-07).
+ * `@appspine/domain-events/plugin` — manifest and plugin descriptor (PL4-05).
  */
 
 import { definePlugin, type PluginManifestV1 } from '@appspine/plugin-api';
-import { DomainEventsAdminModule } from './admin/domain-events-admin.module';
+import { DomainEventsModule } from './domain-events.module';
+
+export const DOMAIN_EVENTS_SCHEMA_DIGEST =
+  'sha256:9c007fb569beb870e2b6d1e41e0a4e187e8ed6bb7c05e0599c748ce7b83fa351';
 
 /** Mirrors `appspine.plugin.json`. */
 export const domainEventsManifest: PluginManifestV1 = {
@@ -30,11 +33,12 @@ export const domainEventsManifest: PluginManifestV1 = {
     'appspine.audit-sink',
     'appspine.machine-auth-provider',
     'appspine.rbac-policy',
+    'appspine.scope-matcher',
   ],
   facets: {
     backend: {
-      modulePath: './dist/admin/domain-events-admin.module.js',
-      exportName: 'DomainEventsAdminModule',
+      modulePath: './dist/domain-events.module.js',
+      exportName: 'DomainEventsModule',
       controllerRoutes: ['domain-events'],
       providerTokens: ['appspine.domain-events'],
     },
@@ -64,6 +68,12 @@ export const domainEventsManifest: PluginManifestV1 = {
       i18nNamespace: 'domainEvents',
       clientEntry: './dist/frontend.js',
     },
+    prisma: {
+      owns: ['DomainEvent', 'DomainEventDelivery', 'IntegrationEventReceipt'],
+      ownsEnums: ['DomainEventOperation', 'DomainEventDeliveryStatus'],
+      schemaFragment: 'prisma/domain-events.prisma',
+      schemaDigest: DOMAIN_EVENTS_SCHEMA_DIGEST,
+    },
     permissions: {
       definitions: [
         'domain-events:event:read',
@@ -71,12 +81,17 @@ export const domainEventsManifest: PluginManifestV1 = {
         'domain-events:event:ignore',
       ],
     },
+    operations: {
+      healthIndicatorId: 'domain-events',
+      metricsPrefix: 'domain_events',
+      shutdownTimeoutMs: 5000,
+    },
   },
 };
 
 export const domainEventsPlugin = definePlugin({
   manifest: domainEventsManifest,
-  backend: () => DomainEventsAdminModule,
+  backend: () => DomainEventsModule,
 });
 
 export function domainEvents() {

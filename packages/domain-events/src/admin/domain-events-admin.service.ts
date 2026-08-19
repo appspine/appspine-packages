@@ -36,8 +36,8 @@ function isRecordNotFoundError(error: unknown): boolean {
 @Injectable()
 export class DomainEventsAdminService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly registry: DomainEventRegistry,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(DomainEventRegistry) private readonly registry: DomainEventRegistry,
     @Optional()
     @Inject(DOMAIN_EVENTS_ADMIN_AUDIT_HOOK)
     private readonly auditHook?: DomainEventsAdminAuditHook,

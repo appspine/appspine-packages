@@ -626,7 +626,9 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-05 遷移 `domain-events` plugin（4B）
 
-- **owner**：Sol xhigh（G3）；Claude public API review；Gemini capability audit。
+> 交付報告：[051-pl4-05-domain-events-plugin.md](../topics/051-pl4-05-domain-events-plugin.md)。
+
+- **owner**：Sol xhigh（G3，本次由 Gemini 執行，見報告 §7 substitution log）；Claude public API review；Gemini capability audit。
 - **依賴**：PL4-02～04。
 - **交付**：backend/prisma/frontend/operations facets、subscriber registry bridge、integration contract references、
   admin contribution；host 不吞併 domain registry。
@@ -924,12 +926,32 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       開了一個獨立 commit（`d10178c`）主動把前次 revert 的內容改回來，不是被動殘留。已再次由
       Claude revert（commit `d8b5350`），並在 dispatch prompt 檔案加入明確排除說明，避免
       PL4-04 起繼續發生。
-      PL4-04 已完成（[報告](../topics/051-pl4-04-metadata-schema-plugin.md)）。徹底解除對
-      `@appspine/m2m-api-key` 具體 guard/controller 的直接依賴，改用主機中立的 `AppspineAuthGuard`
-      與 `MetadataScopeGuard`（注入 `SCOPE_MATCHER` token）；綁定並匯出 `METADATA_SCHEMA` token；
-      宣告 backend 與 permissions facets；補齊 28/28 tests（含 missing optional capability 測試、
-      authorization negative tests、schema drift 動態自適應與極端情況測試）；執行者自查 Dependency Audit
-      全數 PASS。
+      PL4-04 已完成（[報告](../topics/051-pl4-04-metadata-schema-plugin.md)，Claude 獨立覆核通過
+      2026-08-19）。徹底解除對 `@appspine/m2m-api-key` 具體 guard/controller 的直接依賴，改用主機
+      中立的 `AppspineAuthGuard` 與 `MetadataScopeGuard`（注入 `SCOPE_MATCHER` token）；綁定並匯出
+      `METADATA_SCHEMA` token；宣告 backend 與 permissions facets；補齊 28/28 tests（含 missing
+      optional capability 測試、authorization negative tests、schema drift 動態自適應與極端情況
+      測試）；執行者自查 Dependency Audit 全數 PASS。
+      首次繳交有一個可重現的真實 bug（不是架構判斷題）：`meta.module.ts` 漏了
+      `imports: [AppspineAuthInfrastructureModule]`，導致 `AppspineAuthGuard` 需要的
+      `AuthenticationStrategyRegistry`／`PrincipalContextService` 在 `MetaModule` 範圍內解析不到。
+      交付時附的測試全部繞過這個問題——`meta.controller.spec.ts` 直接 `new MetadataScopeGuard(...)`
+      跳過 DI，template 的 `app.module.spec.ts` 只呼叫 `.compile()` 沒呼叫 `.init()`，controller
+      guard 剛好是在 `.init()` 綁 route 時才真正解析，所以「全套 gates 綠燈」完全沒抓到。Claude 自己
+      寫了一個會真的 `createNestApplication().init()` 的臨時測試重現出錯誤，remediation 補上該行
+      import，並把這個臨時測試轉成正式的 `meta.module.boot.spec.ts` 留在套件裡。
+      **修正記錄（2026-08-19，同一輪覆核中發現並修正）**：PL4-01～03 覆核期間，Claude 三次把
+      Gemini 對 `frontend-shell/alert-dialog.tsx` 的 `Pick<...>` → `Partial<Pick<...>>` 改動判定為
+      「無效改動」並 revert 掉（commit `d94b95f`、`d8b5350`，以及 dispatch prompt 檔案裡一度寫過
+      「不要碰這個檔案」），**這是 reviewer 的誤判**。原因：只用
+      `pnpm --filter @appspine/frontend-shell typecheck` 驗證，沒測到下游消費者
+      （`identity-core`／`rbac`／`m2m-api-key` 各自的 `*-row-actions.tsx` 都呼叫
+      `<AlertDialogCancel disabled={...}>` 沒帶 `variant`/`size`）；且後續用「全庫 `pnpm typecheck`」
+      重驗時，因為沒清除 `tsconfig.build.tsbuildinfo` incremental cache，誤判為綠燈。已在 PL4-04
+      branch 用完全乾淨的 rebuild（清空所有 `dist/` 與 `*.tsbuildinfo` 後重跑）證實：沒有這個改動，
+      `identity-core`／`rbac`／`m2m-api-key` 三個套件的 typecheck 全部會失敗。已重新加回
+      `Partial<Pick<...>>`（commit `1069362`）並以乾淨 rebuild 驗證 `pnpm build`／`pnpm typecheck`／
+      `pnpm lint`／`pnpm test` 全綠。Gemini 原本的改動是對的，是 Claude 三次判斷錯誤，特此更正。
       PL4-05～10 待執行；Gate G4
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 

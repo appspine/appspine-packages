@@ -219,3 +219,36 @@ export interface NotificationInboxPort {
 export interface MetadataSchemaPort {
   buildMeta(): unknown;
 }
+
+export interface RecordDomainEventPortInput {
+  aggregateType: string;
+  aggregateId: string;
+  eventType: string;
+  operation: 'CREATE' | 'UPDATE' | 'DELETE';
+  schemaVersion?: number;
+  actorUserId?: string | null;
+  correlationId?: string | null;
+  workflowId?: string | null;
+  before?: Record<string, unknown> | null;
+  after?: Record<string, unknown> | null;
+  changedFields?: string[];
+  metadata?: Record<string, unknown> | null;
+  integration?: {
+    capabilityId: string;
+    capabilityVersion: string;
+    bindingId: string;
+    bindingVersion: string;
+    envelopeVersion?: string;
+    sourceApp?: string;
+    payload: unknown;
+    payloadDigest?: string;
+    payloadSchema?: unknown;
+  } | null;
+}
+
+/**
+ * `appspine.domain-events` — satisfied by `@appspine/domain-events`'s `DomainEventsService`.
+ */
+export interface DomainEventsPort {
+  record(tx: unknown, input: RecordDomainEventPortInput): Promise<unknown>;
+}

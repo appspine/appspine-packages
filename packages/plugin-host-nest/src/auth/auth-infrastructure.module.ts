@@ -1,5 +1,5 @@
 import { AUTHENTICATION_STRATEGY_REGISTRY, PRINCIPAL_CONTEXT } from '@appspine/plugin-api';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppspineAuthGuard, InteractiveAuthGuard, MachineAuthGuard } from './guards';
 import { PrincipalContextInterceptor, PrincipalContextService } from './principal-context';
@@ -17,6 +17,7 @@ import { AuthenticationStrategyRegistry } from './strategy-registry';
  *
  * The principal-context interceptor is registered here for the same reason.
  */
+@Global()
 @Module({
   providers: [
     AuthenticationStrategyRegistry,

@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../auth/tsconfig.build.json"
-    },
-    {
       "path": "../common/tsconfig.build.json"
     },
     {
@@ -19,10 +16,10 @@
       "path": "../integration-contracts/tsconfig.build.json"
     },
     {
-      "path": "../m2m-api-key/tsconfig.build.json"
+      "path": "../plugin-api/tsconfig.build.json"
     },
     {
-      "path": "../plugin-api/tsconfig.build.json"
+      "path": "../plugin-host-nest/tsconfig.build.json"
     }
   ]
 }

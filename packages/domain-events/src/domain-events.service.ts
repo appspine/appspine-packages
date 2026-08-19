@@ -23,7 +23,7 @@ export const DOMAIN_EVENT_CONTRACT_RESOLVER = 'DOMAIN_EVENT_CONTRACT_RESOLVER';
 @Injectable()
 export class DomainEventsService {
   constructor(
-    private readonly registry: DomainEventRegistry,
+    @Inject(DomainEventRegistry) private readonly registry: DomainEventRegistry,
     @Optional()
     @Inject(DOMAIN_EVENT_CONTRACT_RESOLVER)
     private readonly contractResolver?: DomainEventContractResolver,

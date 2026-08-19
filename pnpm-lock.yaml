@@ -149,15 +149,9 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2
     devDependencies:
-      '@appspine/auth':
-        specifier: workspace:*
-        version: link:../auth
       '@appspine/common':
         specifier: workspace:*
         version: link:../common
-      '@appspine/m2m-api-key':
-        specifier: workspace:*
-        version: link:../m2m-api-key
       '@appspine/plugin-host-nest':
         specifier: workspace:*
         version: link:../plugin-host-nest
@@ -170,6 +164,12 @@ importers:
       '@nestjs/core':
         specifier: ^11.0.5
         version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.2.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.0.5
+        version: 11.2.1(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/testing':
+        specifier: ^11.0.5
+        version: 11.2.1(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.2.1)
       '@prisma/client':
         specifier: ^6.2.0
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
