@@ -523,10 +523,19 @@ importers:
       '@appspine/common':
         specifier: workspace:*
         version: link:../common
+      '@appspine/plugin-api':
+        specifier: workspace:*
+        version: link:../plugin-api
+      '@appspine/plugin-host-nest':
+        specifier: workspace:*
+        version: link:../plugin-host-nest
+    devDependencies:
       '@appspine/m2m-api-key':
         specifier: workspace:*
         version: link:../m2m-api-key
-    devDependencies:
+      '@appspine/plugin-testkit':
+        specifier: workspace:*
+        version: link:../plugin-testkit
       '@nestjs/common':
         specifier: ^11.0.5
         version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)

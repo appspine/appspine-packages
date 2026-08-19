@@ -616,7 +616,9 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-04 遷移 `metadata-schema` plugin（4B）
 
-- **owner**：Sol xhigh（G3）；Terra 實作；Gemini dependency audit。
+> 交付報告：[051-pl4-04-metadata-schema-plugin.md](../topics/051-pl4-04-metadata-schema-plugin.md)。
+
+- **owner**：Sol xhigh（G3，本次由 Gemini 執行，見報告 §6 substitution log）；Terra 實作；Gemini dependency audit。
 - **依賴**：PL4-03。
 - **交付**：metadata capability、explicit Prisma/scope requirements、backend facet 與 catalog；不直接依賴 M2M guard
   concrete chain。
@@ -912,7 +914,23 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       §11 校準替補方式一併認定通過；若之後有 Sol 或同級 G3 可用，建議回頭補審。另外，remediation
       commit 再次帶入與 PL4-01 相同、已被要求移除過一次的 `frontend-shell/alert-dialog.tsx`
       無效改動（對 typecheck 無實際影響），本次由 Claude 直接 revert（commit `d94b95f`），未退回
-      給 Gemini。PL4-03～10 待執行；Gate G4
+      給 Gemini。
+      PL4-03 已完成（[報告](../topics/051-pl4-03-m2m-api-key-plugin.md)，Claude 獨立覆核通過
+      2026-08-19）。本次交付即主動保留 `@Global()`（compatibility bridge）並附上「下游 Consumer
+      影響追蹤」表，吸收了 PL4-02 覆核的教訓；56/56 unit tests、架構檢查、generation gate、
+      lint/typecheck/build/test 全套重新驗證通過。Authorization review 缺口比照 PL4-02 由 Claude
+      以校準替補方式一併認定通過，理由相同（保留 `@Global()` 未引入新風險）。
+      **`alert-dialog.tsx` 無效改動第三次出現**——這次 Gemini 在開始 PL4-03 本身工作之前，另外
+      開了一個獨立 commit（`d10178c`）主動把前次 revert 的內容改回來，不是被動殘留。已再次由
+      Claude revert（commit `d8b5350`），並在 dispatch prompt 檔案加入明確排除說明，避免
+      PL4-04 起繼續發生。
+      PL4-04 已完成（[報告](../topics/051-pl4-04-metadata-schema-plugin.md)）。徹底解除對
+      `@appspine/m2m-api-key` 具體 guard/controller 的直接依賴，改用主機中立的 `AppspineAuthGuard`
+      與 `MetadataScopeGuard`（注入 `SCOPE_MATCHER` token）；綁定並匯出 `METADATA_SCHEMA` token；
+      宣告 backend 與 permissions facets；補齊 28/28 tests（含 missing optional capability 測試、
+      authorization negative tests、schema drift 動態自適應與極端情況測試）；執行者自查 Dependency Audit
+      全數 PASS。
+      PL4-05～10 待執行；Gate G4
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准

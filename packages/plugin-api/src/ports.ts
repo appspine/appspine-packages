@@ -212,3 +212,10 @@ export interface NotificationInboxPort {
     options?: NotificationPortOptions,
   ): Promise<NotificationRecord>;
 }
+
+/**
+ * `appspine.metadata-schema` — satisfied by `@appspine/metadata-schema`'s `MetaService`.
+ */
+export interface MetadataSchemaPort {
+  buildMeta(): unknown;
+}
