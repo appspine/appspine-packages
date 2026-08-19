@@ -92,6 +92,7 @@
 | [051-pl4-gemini-dispatch-prompts.md](topics/051-pl4-gemini-dispatch-prompts.md) | topic | active | 051 Phase 4 派工 Prompt — 給 Gemini 執行（PL4-01～10，不含 Gate G4） |
 | [051-pl5-01-release-manifest.md](topics/051-pl5-01-release-manifest.md) | topic | active | 051 PL5-01 — Release Manifest 與外部操作授權準備報告 |
 | [051-pl5-02-canary-publish.md](topics/051-pl5-02-canary-publish.md) | topic | active | 051 PL5-02 — Canary Publish 與 Clean Consumer 驗證報告 |
+| [051-pl5-03-template-canary-plugin-mode.md](topics/051-pl5-03-template-canary-plugin-mode.md) | topic | active | 051 PL5-03 — App Template 切換至 Canary Plugin Mode 報告 |
 | [051-pl5-gemini-dispatch-prompts.md](topics/051-pl5-gemini-dispatch-prompts.md) | topic | active | 051 Phase 5 派工 Prompt — 給 Gemini 執行（PL5-01～06，不含 Gate G5A） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
