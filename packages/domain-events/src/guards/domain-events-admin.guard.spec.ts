@@ -1,6 +1,6 @@
 import type { ScopeMatcherPort } from '@appspine/plugin-api';
 import { SYSTEM_ADMIN_ROLE } from '@appspine/plugin-api';
-import type { ExecutionContext } from '@nestjs/common';
+import { type ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 import {
   DOMAIN_EVENTS_SCOPES_KEY,

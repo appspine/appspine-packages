@@ -2,13 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import type { PaginatedResult, PaginationQuery } from '@appspine/common';
 import { PrismaService, paginate, toPrismaOrderBy, toPrismaPage } from '@appspine/common';
 import { IDENTITY_STORE, type IdentityStorePort } from '@appspine/plugin-api';
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-  Optional,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateApiKeyDto, CreateApiKeyResponse, RoleRef, UpdateApiKeyDto } from './dto/api-key.dto';
 
 export interface ApiKeyRecord {
@@ -66,12 +60,10 @@ export class ApiKeysService {
      * acting user — a cross-owner query the 051 split replaces with the
      * `appspine.identity-store` capability.
      *
-     * In Phase 4 transition, this is @Optional() so ApiKeysModule can bootstrap when
-     * identity providers are encapsulated in non-global host modules.
+     * Required: accepting a fallback direct query would preserve the cross-owner dependency the
+     * Phase 1 split is specifically removing.
      */
-    @Optional()
-    @Inject(IDENTITY_STORE)
-    private readonly identityStore?: IdentityStorePort,
+    @Inject(IDENTITY_STORE) private readonly identityStore: IdentityStorePort,
   ) {}
 
   async create(dto: CreateApiKeyDto, createdBy?: string): Promise<CreateApiKeyResponse> {
@@ -169,9 +161,6 @@ export class ApiKeysService {
   }
 
   private async assertActingUser(actingUserId: string): Promise<void> {
-    if (!this.identityStore) {
-      throw new BadRequestException('Identity store provider is not available');
-    }
     const user = await this.identityStore.findById(actingUserId);
     if (!user) throw new BadRequestException(`Acting user ${actingUserId} not found`);
     if (!user.isServiceAccount) {
