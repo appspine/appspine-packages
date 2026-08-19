@@ -1,6 +1,6 @@
 {
   "name": "@appspine/plugin-api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": false,
   "description": "Appspine plugin contract: manifest v1 types and JSON Schema, stable capability tokens, definePlugin(), lifecycle/diagnostic contracts, manifest loader and dependency resolver.",
   "files": [

@@ -1,6 +1,6 @@
 {
   "name": "@appspine/identity-core",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": false,
   "description": "Provider-neutral user and service-account identity for Appspine apps: the User model, Users CRUD and the appspine.identity-store capability.",
   "files": [
@@ -55,8 +55,8 @@
   },
   "peerDependencies": {
     "@appspine/common": "^0.3.4",
-    "@appspine/frontend-shell": "^0.16.3",
-    "@appspine/plugin-host-nest": "^1.0.0",
+    "@appspine/frontend-shell": "^0.16.4",
+    "@appspine/plugin-host-nest": "^2.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

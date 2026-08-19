@@ -1,6 +1,6 @@
 {
   "name": "@appspine/preset-standard",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": false,
   "description": "The standard Appspine capability set as one versioned preset: the plugins appspine-app-template wires by hand today, named once so an App does not restate them.",
   "files": [
@@ -38,7 +38,7 @@
     "node": ">=22.0.0"
   },
   "peerDependencies": {
-    "@appspine/plugin-api": "^1.0.0"
+    "@appspine/plugin-api": "^1.1.0"
   },
   "devDependencies": {
     "@appspine/plugin-api": "workspace:*",

@@ -1,5 +1,31 @@
 # @appspine/domain-events
 
+## 9.0.0
+
+### Minor Changes
+
+- 0eaf69d: Migrate Domain Events capability package to full plugin model (051 PL4-05).
+
+  - `@appspine/domain-events`: declare all 5 facets (backend, frontend, prisma, permissions, operations) in `appspine.plugin.json` and `./plugin`; create `prisma/domain-events.prisma` schema fragment and compute LF-normalized sha256 digest; implement `DomainEventsAdminGuard` injecting `@appspine/plugin-api`'s `SCOPE_MATCHER` port; refactor `DomainEventsAdminController` to use neutral `AppspineAuthGuard` and `DomainEventsAdminGuard` with strict fail-closed authorization; introduce `DomainEventsModule` standard capability module providing `DomainEventRegistry`, `DomainEventsService`, `DOMAIN_EVENTS` token, and `DomainEventDispatcherService`; decouple `DomainEventsAdminModule` and dependencies/tsconfig references from concrete `@appspine/auth` and `@appspine/m2m-api-key`; add classic/node10 `moduleResolution` compatibility shims (`plugin.js`, `plugin.d.ts`).
+  - `@appspine/plugin-api`: add `DomainEventsPort` and `RecordDomainEventPortInput` interfaces to `./ports`.
+
+### Patch Changes
+
+- Updated dependencies [4c0ce5f]
+- Updated dependencies [8e67a05]
+- Updated dependencies [b75516d]
+- Updated dependencies [b92c1c3]
+- Updated dependencies [0eaf69d]
+- Updated dependencies [9cd2838]
+- Updated dependencies [a41aab9]
+- Updated dependencies [aeb861d]
+- Updated dependencies [96f92e8]
+- Updated dependencies [fdff215]
+- Updated dependencies [6a0e839]
+  - @appspine/plugin-api@1.1.0
+  - @appspine/plugin-host-nest@2.0.0
+  - @appspine/frontend-shell@0.16.4
+
 ## 8.0.0
 
 ### Minor Changes

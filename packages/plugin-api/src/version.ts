@@ -5,7 +5,7 @@
  * `rootDir` into the build and put a giant literal type in the emitted `.d.ts`. `version.spec.ts`
  * fails if the two ever disagree, so the duplication cannot rot.
  */
-export const PLUGIN_API_VERSION = '1.0.0';
+export const PLUGIN_API_VERSION = '1.1.0';
 
 /** The manifest format this package implements. Bumped only on a breaking format change. */
 export const PLUGIN_MANIFEST_FILENAME = 'appspine.plugin.json';

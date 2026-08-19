@@ -1,5 +1,34 @@
 # @appspine/audit-log
 
+## 1.1.0
+
+### Minor Changes
+
+- 4c0ce5f: Ship the first two capability plugins (051 PL1-08, PL1-09).
+
+  Both packages now publish an `appspine.plugin.json` manifest and a `./plugin` subpath exporting a
+  `definePlugin()` descriptor. Plugin mode contributes the very same Nest module the package root
+  already exported, so legacy wiring and plugin wiring cannot diverge in behaviour.
+
+  `@appspine/audit-log` additionally binds its service to the stable `AUDIT_SINK` token and declares
+  its Prisma facet with a digest of the shipped fragment, so a consumer can depend on the audit
+  capability without importing the package. The concrete `AuditLogService` export and the module's
+  `@Global()` marker are unchanged during the transition window.
+
+### Patch Changes
+
+- Updated dependencies [4c0ce5f]
+- Updated dependencies [8e67a05]
+- Updated dependencies [b75516d]
+- Updated dependencies [b92c1c3]
+- Updated dependencies [0eaf69d]
+- Updated dependencies [9cd2838]
+- Updated dependencies [a41aab9]
+- Updated dependencies [aeb861d]
+- Updated dependencies [96f92e8]
+- Updated dependencies [fdff215]
+  - @appspine/plugin-api@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

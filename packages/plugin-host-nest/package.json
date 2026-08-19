@@ -1,6 +1,6 @@
 {
   "name": "@appspine/plugin-host-nest",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": false,
   "description": "NestJS host for Appspine plugins: composition from a resolved inventory, lifecycle, catalog and diagnostics, plus the host-owned authentication strategy registry and principal context.",
   "files": [
@@ -36,7 +36,7 @@
     "node": ">=22.0.0"
   },
   "peerDependencies": {
-    "@appspine/plugin-api": "^1.0.0",
+    "@appspine/plugin-api": "^1.1.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "rxjs": "^7.8.1"

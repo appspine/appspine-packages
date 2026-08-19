@@ -1,6 +1,6 @@
 {
   "name": "@appspine/m2m-api-key",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": false,
   "files": [
     "dist",
@@ -51,11 +51,11 @@
     "@appspine/plugin-api": "workspace:*"
   },
   "peerDependencies": {
-    "@appspine/audit-log": "^1.0.1",
+    "@appspine/audit-log": "^1.1.0",
     "@appspine/common": "^0.3.4",
-    "@appspine/frontend-shell": "^0.16.3",
-    "@appspine/plugin-host-nest": "^1.0.0",
-    "@appspine/rbac": "^4.0.8",
+    "@appspine/frontend-shell": "^0.16.4",
+    "@appspine/plugin-host-nest": "^2.0.0",
+    "@appspine/rbac": "^5.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",

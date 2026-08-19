@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.0.0
+
+### Minor Changes
+
+- 96f92e8: Migrate notification capability package to full plugin model (051 PL4-01).
+
+  - `@appspine/notification`: declare backend, prisma, operations, frontend, and permissions facets in `appspine.plugin.json` and `./plugin`; export `NotificationModule` binding `NotificationService` to `NOTIFICATION_INBOX`; ship `prisma/notification.prisma` with schema digest and User model augmentation; implement full 4-stage lifecycle (`validate` -> `register` -> `ready` -> `shutdown`) and resource cleanup registry.
+  - `@appspine/plugin-api`: define `NotificationInboxPort` and related types in `ports.ts`.
+  - `@appspine/identity-core`: declare `notification` plugin as authorized augmenter of `User.notifications` relation in `augmentedBy`.
+
+### Patch Changes
+
+- Updated dependencies [4c0ce5f]
+- Updated dependencies [8e67a05]
+- Updated dependencies [b75516d]
+- Updated dependencies [b92c1c3]
+- Updated dependencies [0eaf69d]
+- Updated dependencies [9cd2838]
+- Updated dependencies [a41aab9]
+- Updated dependencies [aeb861d]
+- Updated dependencies [96f92e8]
+- Updated dependencies [fdff215]
+- Updated dependencies [6a0e839]
+  - @appspine/plugin-api@1.1.0
+  - @appspine/plugin-host-nest@2.0.0
+  - @appspine/frontend-shell@0.16.4
+
 ## 0.2.2
 
 ### Patch Changes
