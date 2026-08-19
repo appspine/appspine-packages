@@ -29,6 +29,8 @@ export const oidcAuthManifest: PluginManifestV1 = {
       '@nestjs/common': '^11.0.5',
       '@nestjs/core': '^11.0.5',
       '@prisma/client': '^6.2.0',
+      react: '^19.0.0',
+      'react-dom': '^19.0.0',
     },
   },
   provides: ['appspine.interactive-auth-provider', 'appspine.delegated-identity-verifier'],
@@ -54,6 +56,11 @@ export const oidcAuthManifest: PluginManifestV1 = {
       modulePath: './dist/oidc-auth.module.js',
       exportName: 'OidcAuthModule',
       controllerRoutes: ['auth'],
+    },
+    frontend: {
+      loginProviderUi: true,
+      i18nNamespace: 'oidc-auth',
+      clientEntry: './dist/frontend.js',
     },
     prisma: {
       owns: ['OidcIdentity'],

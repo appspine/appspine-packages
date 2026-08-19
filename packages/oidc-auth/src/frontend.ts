@@ -1,7 +1,8 @@
 /**
- * Reserved Phase 1 public boundary. Phase 3 adds the login contribution without changing the
- * package subpath consumers and tooling already validate.
+ * Phase 3 frontend facet exports for `@appspine/oidc-auth/frontend` (PL3-04).
  */
 export interface OidcAuthFrontendContribution {
   readonly kind: 'appspine.oidc-auth.frontend';
 }
+
+export * from './frontend/index.js';

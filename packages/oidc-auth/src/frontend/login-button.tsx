@@ -1,17 +1,12 @@
 'use client';
 
+import { Button, FieldError, FieldGroup } from '@appspine/frontend-shell';
 import { useState, useTransition } from 'react';
-
-import { Button } from '../ui/button.js';
-import { FieldError, FieldGroup } from '../ui/field.js';
 
 // next-auth's signIn() completes a successful redirect by throwing Next.js's internal
 // "NEXT_REDIRECT" error (identified by its `digest`, per Next's own redirect-error
 // implementation) — this must propagate untouched or navigation silently breaks.
-// Reimplemented inline (rather than importing `unstable_rethrow` from
-// `next/navigation`) because this package's `moduleResolution: NodeNext` can't resolve
-// that subpath against Next.js's own empty `exports` map.
-function isNextRedirectError(error: unknown): boolean {
+export function isNextRedirectError(error: unknown): boolean {
   const digest = (error as { digest?: unknown } | null)?.digest;
   return typeof digest === 'string' && digest.startsWith('NEXT_REDIRECT');
 }
@@ -33,13 +28,9 @@ export interface LoginButtonProps {
   readonly unexpectedErrorMessage?: string;
 }
 
-/**
- * Redirect-style OIDC sign-in button (dev_docs/framework/035 §4.1) — wraps the
+/** Redirect-style OIDC sign-in button (dev_docs/framework/035 §4.1) — wraps the
  * loading/error presentation every app's login page needs around next-auth's
- * `signIn()`, which throws a framework redirect rather than resolving normally.
- *
- * @deprecated Moved to `@appspine/oidc-auth/frontend` in Phase 3 (PL3-04).
- */
+ * `signIn()`, which throws a framework redirect rather than resolving normally. */
 export function LoginButton({
   onSignIn,
   label,

@@ -50,6 +50,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "@appspine/frontend-shell": "workspace:*",
     "@appspine/plugin-api": "workspace:*",
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
@@ -60,15 +61,30 @@
   },
   "peerDependencies": {
     "@appspine/common": "^0.3.4",
+    "@appspine/frontend-shell": "^0.16.3",
     "@appspine/plugin-host-nest": "^1.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "zod": "^4.4.3"
+  },
+  "peerDependenciesMeta": {
+    "@appspine/frontend-shell": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@appspine/common": "workspace:*",
+    "@appspine/frontend-shell": "workspace:*",
     "@appspine/plugin-host-nest": "workspace:*",
     "@appspine/plugin-testkit": "workspace:*",
     "@nestjs/common": "^11.0.5",
@@ -77,6 +93,10 @@
     "@prisma/client": "^6.2.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4",
     "zod": "^4.4.3"

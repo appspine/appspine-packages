@@ -3,9 +3,6 @@
 // translation *key* — each app owns its own message catalog (dev_docs/framework/035
 // §4.1's pilot-first note: only framework-level shape is shared, not app-specific copy)
 // — so callers do `t(mapAuthErrorKey(error))`.
-/**
- * @deprecated Moved to `@appspine/oidc-auth/frontend` in Phase 3 (PL3-04).
- */
 export type AuthErrorKey = 'errorAccessDenied' | 'errorOAuthCallback' | 'errorDefault';
 
 const KNOWN_ERROR_CODES: Record<string, AuthErrorKey> = {
@@ -13,9 +10,6 @@ const KNOWN_ERROR_CODES: Record<string, AuthErrorKey> = {
   OAuthCallback: 'errorOAuthCallback',
 };
 
-/**
- * @deprecated Moved to `@appspine/oidc-auth/frontend` in Phase 3 (PL3-04).
- */
 export function mapAuthErrorKey(error: string | undefined): AuthErrorKey | undefined {
   if (!error) return undefined;
   return KNOWN_ERROR_CODES[error] ?? 'errorDefault';

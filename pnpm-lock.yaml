@@ -509,6 +509,9 @@ importers:
 
   packages/oidc-auth:
     dependencies:
+      '@appspine/frontend-shell':
+        specifier: workspace:*
+        version: link:../frontend-shell
       '@appspine/plugin-api':
         specifier: workspace:*
         version: link:../plugin-api
@@ -558,6 +561,18 @@ importers:
       '@types/node':
         specifier: ^22.10.0
         version: 22.20.0
+      '@types/react':
+        specifier: ^19.2.17
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.17)
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.7)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
