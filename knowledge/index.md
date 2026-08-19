@@ -76,6 +76,8 @@
 | [051-pl3-08-notification-frontend.md](topics/051-pl3-08-notification-frontend.md) | topic | active | 051 PL3-08 — 遷移 Notification Bell／Inbox 到 `notification/frontend` |
 | [051-pl3-09-frontend-shell-convergence.md](topics/051-pl3-09-frontend-shell-convergence.md) | topic | active | 051 PL3-09 — 收斂 `frontend-shell` 並執行 migration codemod |
 | [051-pl3-10-plugin-catalog-health.md](topics/051-pl3-10-plugin-catalog-health.md) | topic | active | 051 PL3-10 — 建立 plugin catalog／health 管理面 |
+| [051-pl3-11-template-frontend-integration.md](topics/051-pl3-11-template-frontend-integration.md) | topic | active | 051 PL3-11 — Template frontend integration 與 E2E |
+| [051-pl3-gate-g3.md](topics/051-pl3-gate-g3.md) | topic | active | 051 Gate G3 — Frontend Facet／Slots 與 Capability UI Ownership 驗收報告 |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

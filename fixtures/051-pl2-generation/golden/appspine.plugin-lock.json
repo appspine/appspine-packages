@@ -157,6 +157,22 @@
       "digest": "sha256:0e7c44f84ee5470fcca9772530d36324ccbb8fd91a7c610035bafafc82c709be"
     },
     {
+      "path": ".appspine/generated/frontend/admin-routes.ts",
+      "digest": "sha256:f93941d43f3ad5a724f1abdb167e079a9689f9abbe3b1ed9eebae19ef2b4ed7a"
+    },
+    {
+      "path": ".appspine/generated/frontend/i18n.ts",
+      "digest": "sha256:3a3e4ddb6d9a610aa5f1d44e7dbc4296fd87d5a0dacee45b4062a4b546ca8be6"
+    },
+    {
+      "path": ".appspine/generated/frontend/navigation.ts",
+      "digest": "sha256:d6d5b43d61751bbcd281106b5e1a6dd631f597cfc2c6eddb039be6309d61f8e9"
+    },
+    {
+      "path": ".appspine/generated/frontend/slots.tsx",
+      "digest": "sha256:9a8aae6e8e735e3931ed30a526d2f36446d4f482596db2d69e01decdd8f8526c"
+    },
+    {
       "path": ".appspine/generated/permissions.json",
       "digest": "sha256:36a0bfba804c4f15c8a09208cbb773f871943923cd9e07faf9af875ea1937931"
     },
