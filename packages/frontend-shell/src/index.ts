@@ -9,6 +9,7 @@ export * from './components/admin/domain-event-catalog-table.js';
 export * from './components/admin/domain-event-deliveries-panel.js';
 export * from './components/admin/domain-event-detail-panel.js';
 export * from './components/admin/domain-events-table.js';
+export * from './components/admin/plugin-catalog-table.js';
 export * from './components/admin/role-row-actions.js';
 export * from './components/admin/roles-table.js';
 export * from './components/admin/types.js';
