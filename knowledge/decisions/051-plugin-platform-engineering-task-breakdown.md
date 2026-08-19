@@ -16,9 +16,13 @@ updated: 2026-08-19
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：Phase 0 與 Phase 1 已完成並通過各自的 Gate。Phase 2 的 PL2-01～10 已完成，但
-> Gate G2 尚未關閉（獨立 review 未執行）——因此不得把 generator 接入 frontend、不得在 App 套用
-> migration、Phase 3 不得開始。本文件不授權 push、publish、production migration 或舊 API 移除。**
+> **目前狀態：Phase 0～2 已完成並通過各自的 Gate（G2 於 2026-08-19 關閉）。Phase 3 可以開始。**
+> G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
+> 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
+> publish、production migration 或舊 API 移除。另外，Phase 2 目前**組出來的** schema 會 DROP 19 個
+> 既有物件，[Gate G2 §4.3](../topics/051-pl2-gate-g2.md) 記錄了它**不得原樣套用**——那是技術事實，
+> 不是 gate 條件。Gate G2 簽核時接受了四項已記錄限制（同文件 §1），Phase 3 不得把它們當成已完成的
+> 事情引用。
 > 外部可見或難以回復的動作必須在對應 Gate 再取得授權。
 
 ---
@@ -875,8 +879,10 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
 - [x] Phase 0：PL0-01～07；Gate G0 — 2026-08-18，證據 [Gate G0](../topics/051-pl0-gate-g0.md)
 - [x] Phase 1：PL1-01～14；Gate G1 — 2026-08-18，證據 [Gate G1](../topics/051-pl1-gate-g1.md)、
       [PL1 執行紀錄](../topics/051-pl1-execution-log.md)
-- [ ] Phase 2：PL2-01～10 已完成（見 [Gate G2](../topics/051-pl2-gate-g2.md)）；**Gate G2 未關閉**——
-      獨立 review 未執行，且 template E2E parity 與 rollback rehearsal 未做。Phase 3 不得開始。
+- [x] Phase 2：PL2-01～10；Gate G2 — 2026-08-19，證據 [Gate G2](../topics/051-pl2-gate-g2.md)。
+      獨立 review 由 Gemini（跨 model family）執行，2 BLOCKER 已修；六項驗收條件全數達成，
+      其中 template dual-mode parity、rollback rehearsal 與 schema/permission dry-run 由
+      `pnpm verify:runtime-parity` 對真實 Postgres 驗證。簽核接受四項已記錄限制（Gate G2 §1）。
 - [ ] Phase 3：PL3-01～11；Gate G3
 - [ ] Phase 4：PL4-01～10；Gate G4
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5

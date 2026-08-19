@@ -8,7 +8,7 @@ created: 2026-08-19
 updated: 2026-08-19
 ---
 
-# 051 Gate G2 — 可重現的安裝與組裝（**六項驗收全數達成，待簽核**）
+# 051 Gate G2 — 可重現的安裝與組裝（**已關閉**）
 
 > Gate：`G2`（見 [051 拆解 §6](../decisions/051-plugin-platform-engineering-task-breakdown.md#gate-g2--可重現的安裝與組裝)）。
 > 涵蓋：[PL2-01](051-pl2-01-plugin-cli.md)～[PL2-10](051-pl2-10-generation-gate.md)。
@@ -16,7 +16,7 @@ updated: 2026-08-19
 
 ---
 
-## 1. 結論：六項驗收條件全數達成，獨立性也滿足了
+## 1. 結論：Gate G2 **已關閉**（2026-08-19 由專案負責人簽核）
 
 擋住 G2 的原本是**獨立性**：拆解 §1.1 規定 task owner 不得擔任自己的唯一 reviewer，而原訂的
 reviewer agent 執行到一半因帳號額度上限中止。這件事已由 Gemini（跨 model family）補上，它找出
@@ -25,9 +25,24 @@ reviewer agent 執行到一半因帳號額度上限中止。這件事已由 Gemi
 第二個缺口是 **permission dry-run**——六項驗收條件裡唯一未達成的一項。它現在也達成了（§4.4）：
 對**真實部署的資料庫狀態**計算 reconciliation plan，並證明資料庫前後完全未變。
 
-所以**六項驗收條件全數達成，獨立 review 已完成**。本文件仍不自行宣告關閉——那是專案負責人的簽核，
-不是實作者或 reviewer 任一方的判斷——但**已經沒有已知的技術阻礙**。簽核前請一併看過 §4.4 的兩項
-限制與 §2.3 的兩項 Phase 4 事項，它們是「已知且已記錄」，不是「已解決」。
+**六項驗收條件全數達成，獨立 review 已完成，專案負責人已於 2026-08-19 簽核關閉。**
+
+簽核**接受**了以下已記錄的限制——它們是「已知且已排入 Phase 4」，不是「已解決」，因此不得在
+Phase 3 被當成已完成的事情引用：
+
+- §4.4 限制 1：permission 的 desired set 結構性為 0（`rbac` 尚未 plugin 化）；
+- §4.4 限制 2：permission catalog 是 Prisma enum，只有 id，`update-display` 無法有意義觸發；
+- §2.3 M2：`DomainEventsAdminModule` 對 legacy `AuthModule`／`ApiKeysModule` 的後門 import；
+- §2.3 M4：組出來的 schema 缺少與 App 自有 schema 的合併機制。
+
+**關閉後解除的限制**：拆解 §6 對 G2 寫的「過不了就」是**不得把 generator 接入 frontend，也不得在
+App 套用 migration**——兩項都隨 gate 關閉解除，Phase 3 得以開始。
+
+**仍然有效的限制**（與 G2 無關，來源不同，別混在一起）：
+- 拆解 §2.3：實際套用 migration 由 App owner 在 rollout task 核准；本拆解不授權 push、publish、
+  production migration 或移除 `@appspine/auth` 舊 API。
+- §4.3 的技術事實：目前組出來的 schema 會 DROP 19 個既有物件，**不得原樣套用**。這不是 gate 條件，
+  是這份 artefact 現在的狀態——合併機制在 Phase 4。
 
 三輪工作的分工是這樣的，記在這裡是因為它本身就是這個 gate 的證據：
 
@@ -266,5 +281,5 @@ WHERE t.typname = 'Permission' ORDER BY e.enumsortorder;
 | Tools | repo read/write、pnpm、vitest、tsc、biome、node、prisma CLI、docker、mutation sweep、runtime parity harness |
 | Evidence | §2 的三輪處置表；§3 的 digest 反證；§4 的 full gate（**974 tests / 22 packages**）與 `verify:runtime-parity` 22 條全綠；§2.1 B1、§2.4 R2、§4.4 與 §4.6 的變異結果 |
 | 已知風險 | §4.3 破壞性 schema 計畫（**不得套用**）；§4.4 的兩項限制（desired 恆為 0、enum 只有 id）；§2.3 M2 的後門 import |
-| Gate 狀態 | **六項驗收全數達成、獨立 review 已完成，待負責人簽核**。無已知技術阻礙 |
+| Gate 狀態 | **已關閉** — 2026-08-19 由專案負責人簽核，接受 §1 所列四項已記錄限制 |
 | Rollback | 各 task 文件的 Rollback 欄位 |
