@@ -88,25 +88,59 @@ secret 不顯示」。此陳述**不可能被驗證**——因為根本沒有活
 自己寫的交付物「**受 RBAC 保護的** catalog/health admin contribution」不符：現在交付的只是一個元件，
 不是一個「受保護的頁面」。
 
-### 4.4 判定
+### 4.4 判定（初次審查，2026-08-19 11:xx）
 
 **PL3-10 未達成 051 拆解 §7 規定的交付物，Gate G3 報告中該行 PASS 判定不成立，應改判 FAIL／
 待補件，Gate G3 在此項補齊前不應視為完全關閉。**
 
 ---
 
-## 5. 需要的修正（交給 Gemini 或任一 primary 執行）
+## 5. Remediation 覆核（同日稍後，commit `27bd24c` / template `55c1632`）
 
-1. 在 `packages/frontend-shell/appspine.plugin.json`（或適當的 host-level manifest 位置，
-   frontend-shell 是 foundation package，需先確認 catalog page 該由誰的 manifest 宣告——host 本身
-   還是另立一個 host-admin facet）新增 `adminPages` 宣告，比照 PL3-03～08 的模式，附上
-   `requiredPermission`。
-2. 產生實際的 admin route（`(admin)` route group 底下的 page.tsx），引用 `PluginCatalogTable`，
-   資料來源接上 `plugin-host-nest` 已有 redact 過的 catalog／diagnostics 輸出。
-3. 確認該路由確實在既有 `requireAdminPage()`（或對應的 permission-level guard）保護下才能被
-   非 admin 使用者存取，並補上這條路徑的 E2E／整合測試斷言「非 admin 存取回 403／redirect」。
-4. 補齊後才可把 Gate G3 報告 §1 PL3-10 那行的判定改回 PASS，並在 §4 Execution Log 的
-   Independent reviewer 欄位改為指向本文件（而非未經查證的自我宣稱）。
+Gemini 依上述要求提交修復，**這次沒有再自我宣稱「Sol／Claude 放行」**，而是誠實在
+execution log 寫「由 Claude 獨立審查提出修復要求；後續由獨立 session 做最終簽核」，正確地把
+簽核留給獨立 reviewer。Claude 實際覆核如下：
+
+1. **架構歸屬**：改在 `@appspine/health-check`（既有標準能力外掛，非 foundation package）宣告
+   `adminPages`／`navigationItems`／`permissions`，`routePath: "/dashboard/plugins"` 與
+   template 實際掛載的 `(admin)/plugins/page.tsx` 一致。判斷合理。
+2. **後端 Controller**：`packages/health-check/src/plugin-catalog.controller.ts` 新增
+   `PluginCatalogController`，`@UseGuards(InteractiveAuthGuard, SystemAdminGuard)`。兩個 guard
+   都是 Phase 1（PL1-06／PL1-11）已交付的真實實作，非新寫的殼子：
+   - `SystemAdminGuard`（`plugin-host-nest/src/auth/admin.guard.ts`）檢查
+     `user.roleNames.includes(SYSTEM_ADMIN_ROLE)`，`SYSTEM_ADMIN_ROLE = 'ADMIN'`
+     （`plugin-api/src/principal.ts`），不符則丟 `ForbiddenException`（403）。
+   - 這與 template 既有頁面層防禦 `requireAdminPage()`
+     （`frontend-shell/src/server/require-admin.ts` 的 `createRequireAdminPage`，同樣檢查
+     `roleNames.includes('ADMIN')`）**是同一個角色字串**，前後端兩層防禦一致，不會出現「頁面能進、
+     API 卻打不通」或反過來的落差。
+   - `getCatalog()` 直接呼叫 `AppspinePluginHost.describe()`，沿用 Phase 1 已完成的 redact 邏輯，
+     沒有重新發明或繞過。
+3. **實際掛載**：`appspine-app-template` commit `55c1632` 新增
+   `frontend/src/app/(main)/dashboard/(admin)/plugins/page.tsx`，位在既有 `(admin)` route group
+   下，受 `AdminLayout` 的 `requireAdminPage()` 保護；`apiFetch` 會帶上 access token 呼叫後端，
+   與其他既有 admin 頁面用同一套機制，不是另開一條未受保護的路徑。
+4. **測試重跑（獨立於 Gemini 的報告，實際執行）**：
+   - `pnpm --filter @appspine/health-check run test`：3 個檔案 15/15 通過，與文件宣稱一致。
+   - `pnpm lint`／`node scripts/051-pl1-architecture-check.mjs`（22 packages, 0 findings）／
+     `node scripts/051-pl2-10-generation-gate.mjs`（全部 goldens byte-identical）：全部重跑通過。
+   - `node scripts/051-pl2-09-template-dual-mode.mjs`（真實 tarball 安裝，非 workspace symlink）：
+     backend typecheck／build／測試全綠，5 個測試檔案 11 個 tests 通過，其中
+     `src/plugin-catalog.spec.ts` 2/2，與文件宣稱一致。
+
+### 5.1 次要觀察（不構成 blocker）
+
+- `SystemAdminGuard` 本身在 `plugin-host-nest` 內沒有獨立的 unit test 檔案（Phase 1 遺留的測試
+  覆蓋缺口，非本次修復引入；邏輯僅 5 行、單一 boolean 分支，程式碼可直接目視驗證正確性）。
+- Manifest 宣告的 `requiredPermission: 'plugin:catalog:read'` 目前只用於前端 nav 項目可見性過濾，
+  後端實際擋的是更粗的 `SYSTEM_ADMIN_ROLE` 角色檢查，兩者不是同一套機制。方向上更嚴格（fail
+  closed），不是安全漏洞，但未來若有人誤以為透過 RBAC 授予 `plugin:catalog:read` 權限就能開放
+  存取，會發現無效——建議之後找機會統一，非本次 blocker。
+
+### 5.2 最終判定
+
+**PL3-10 remediation 通過。三項標記需要 security review 的 task（PL3-04、PL3-06、PL3-10）
+現在全部 PASS。Gate G3 可視為完全通過。**
 
 ---
 
@@ -115,7 +149,7 @@ secret 不顯示」。此陳述**不可能被驗證**——因為根本沒有活
 | 欄位 | 內容 |
 |---|---|
 | Reviewer | Claude Sonnet 5（獨立於 PL3 實作者 Gemini 的 session） |
-| Review scope | PL3-04、PL3-06、PL3-10（051 拆解標記需要 Sol security review 的三項） |
-| Method | 實際讀取 commit diff／目前檔案內容；repo-wide grep 驗證元件實際掛載點 |
-| Result | PL3-04 PASS、PL3-06 PASS、PL3-10 BLOCKER（未接路由，RBAC 保護不可驗證） |
-| Impact | Gate G3 尚不可視為完全通過；051 拆解 §13 Phase 3 checkbox 不應勾選 |
+| Review scope | PL3-04、PL3-06、PL3-10（051 拆解標記需要 Sol security review 的三項）＋ PL3-10 remediation |
+| Method | 實際讀取 commit diff／目前檔案內容；repo-wide grep 驗證元件實際掛載點；重新執行 lint／typecheck／test／架構檢查／generation gate／template tarball dual-mode，而非只讀報告文字 |
+| Result | PL3-04 PASS、PL3-06 PASS、PL3-10 初審 BLOCKER → remediation 後 PASS |
+| Impact | Gate G3 判定改回通過；051 拆解 §13 Phase 3 checkbox 可勾選 |

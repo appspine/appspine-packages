@@ -883,7 +883,11 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       獨立 review 由 Gemini（跨 model family）執行，2 BLOCKER 已修；六項驗收條件全數達成，
       其中 template dual-mode parity、rollback rehearsal 與 schema/permission dry-run 由
       `pnpm verify:runtime-parity` 對真實 Postgres 驗證。簽核接受四項已記錄限制（Gate G2 §1）。
-- [ ] Phase 3：PL3-01～11；Gate G3
+- [x] Phase 3：PL3-01～11；Gate G3 — 2026-08-19，證據 [Gate G3](../topics/051-pl3-gate-g3.md)、
+      [PL3-10 獨立審查與 remediation 覆核](../topics/051-pl3-10-independent-security-review.md)。
+      Gemini 首次繳交時 PL3-10 未接實際路由、報告自我宣稱「Sol／Claude 放行」查無實據；經 Claude
+      獨立於實作者 session 逐一讀碼與重新執行全部驗證命令後，PL3-10 一度改判 FAIL，remediation
+      後重新覆核通過，PL3-01～11 全數 PASS。
 - [ ] Phase 4：PL4-01～10；Gate G4
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
