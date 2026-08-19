@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "rbac",
+  "displayName": "Role-Based Access Control",
+  "cardinality": "singleton",
+  "distribution": "official",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0",
+    "frameworks": {
+      "@nestjs/common": "^11.0.5",
+      "@nestjs/core": "^11.0.5",
+      "@prisma/client": "^6.2.0",
+      "lucide-react": "^1.22.0",
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    }
+  },
+  "provides": ["appspine.rbac-policy"],
+  "requires": ["appspine.identity-store", "appspine.prisma", "appspine.principal-context"],
+  "optionalRequires": ["appspine.audit-sink"],
+  "facets": {
+    "backend": {
+      "modulePath": "./dist/rbac.module.js",
+      "exportName": "RbacModule",
+      "controllerRoutes": ["roles"],
+      "providerTokens": ["appspine.rbac-policy"]
+    },
+    "frontend": {
+      "adminPages": [
+        {
+          "id": "roles",
+          "routePath": "/dashboard/roles",
+          "title": "roles",
+          "componentExport": "RolesTable",
+          "requiredPermission": "rbac:role:read",
+          "order": 20
+        }
+      ],
+      "navigationItems": [
+        {
+          "id": "roles",
+          "title": "roles",
+          "href": "/dashboard/roles",
+          "icon": "ShieldCheck",
+          "order": 20,
+          "section": "admin",
+          "requiredPermission": "rbac:role:read",
+          "after": "users"
+        }
+      ],
+      "i18nNamespace": "rbac",
+      "clientEntry": "./dist/frontend.js"
+    },
+    "prisma": {
+      "owns": ["Role", "RolePermission", "UserRole"],
+      "augments": [
+        { "targetModel": "User", "field": "userRoles", "owner": "identity-core" }
+      ],
+      "schemaFragment": "prisma/role.prisma",
+      "schemaDigest": "sha256:bcecd51f14428efcbb36fa3ee65971459228741b0cfbb940f2883e2b3379cb5e"
+    },
+    "permissions": {
+      "definitions": [
+        "rbac:role:create",
+        "rbac:role:update",
+        "rbac:role:delete",
+        "rbac:role:read"
+      ]
+    }
+  }
+}

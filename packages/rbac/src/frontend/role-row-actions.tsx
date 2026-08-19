@@ -1,9 +1,5 @@
 'use client';
 
-import { MoreHorizontal } from 'lucide-react';
-import { useState, useTransition } from 'react';
-import { useTranslations } from '../../i18n/index.js';
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,39 +9,41 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../ui/alert-dialog.js';
-import { Button } from '../ui/button.js';
-import { Checkbox } from '../ui/checkbox.js';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog.js';
-import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu.js';
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field.js';
-import { Input } from '../ui/input.js';
-import { Label } from '../ui/label.js';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  useTranslations,
+} from '@appspine/frontend-shell';
+import { MoreHorizontal } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import type { RoleRowActionsProps } from './types.js';
 
-import type { EnumOption, RoleRow } from './types.js';
-
-/**
- * @deprecated Moved to `@appspine/rbac/frontend` in Phase 3 (PL3-05).
- */
 export function RoleRowActions({
   role,
   policyOptions,
   permissionOptions,
   updateRoleAction,
   deleteRoleAction,
-}: {
-  role: RoleRow;
-  policyOptions: EnumOption[];
-  permissionOptions: EnumOption[];
-  updateRoleAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
-  deleteRoleAction: (id: string) => Promise<{ error?: string }>;
-}) {
+}: RoleRowActionsProps) {
   const t = useTranslations('roles');
   const tCommon = useTranslations('common');
   const [editOpen, setEditOpen] = useState(false);
@@ -102,41 +100,34 @@ export function RoleRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog
-        open={editOpen}
-        onOpenChange={(next) => {
-          setEditOpen(next);
-          if (next) setError(null);
-        }}
-      >
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <form action={handleEditSubmit}>
             <DialogHeader>
-              <DialogTitle>{t('editRoleTitle').replace('{name}', role.name)}</DialogTitle>
+              <DialogTitle>{t('editRole')}</DialogTitle>
             </DialogHeader>
             <FieldGroup className="py-4">
               <Field>
-                <FieldLabel htmlFor={`edit-role-display-name-${role.id}`}>
-                  {t('displayName')}
-                </FieldLabel>
+                <FieldLabel>{t('name')}</FieldLabel>
+                <Input value={role.name} disabled readOnly className="bg-muted" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="edit-role-display-name">{t('displayName')}</FieldLabel>
                 <Input
-                  id={`edit-role-display-name-${role.id}`}
+                  id="edit-role-display-name"
                   name="displayName"
-                  type="text"
                   defaultValue={role.displayName}
                   required
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor={`edit-role-policy-${role.id}`}>
-                  {t('permissionPolicy')}
-                </FieldLabel>
+                <FieldLabel htmlFor="edit-role-policy">{t('permissionPolicy')}</FieldLabel>
                 <Select
                   name="permissionPolicy"
                   defaultValue={role.permissionPolicy}
                   disabled={isAdmin}
                 >
-                  <SelectTrigger id={`edit-role-policy-${role.id}`}>
+                  <SelectTrigger id="edit-role-policy">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -147,35 +138,51 @@ export function RoleRowActions({
                     ))}
                   </SelectContent>
                 </Select>
+                {isAdmin && (
+                  <p className="text-xs text-muted-foreground">
+                    {t('adminPolicyFixed')}
+                  </p>
+                )}
               </Field>
               <Field>
-                <FieldLabel>
-                  {t('permissions')}
-                  {isAdmin && (
-                    <span className="font-normal text-muted-foreground">
-                      {t('permissionsManagedForAdmin')}
-                    </span>
-                  )}
-                </FieldLabel>
-                <div className="flex flex-col gap-2">
-                  {permissionOptions.map(({ value, label }) => (
-                    <Label key={value} className="flex items-center gap-2 font-normal">
-                      <Checkbox
-                        name="permissions"
-                        value={value}
-                        disabled={isAdmin}
-                        defaultChecked={role.permissions.includes(value)}
-                      />
-                      {label}
-                    </Label>
-                  ))}
-                </div>
+                <FieldLabel>{t('permissions')}</FieldLabel>
+                {isAdmin ? (
+                  <p className="text-xs text-muted-foreground">
+                    {t('adminPermissionsFixed')}
+                  </p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto rounded-md border p-3">
+                    <div className="flex flex-col gap-2">
+                      {permissionOptions.map(({ value, label }) => {
+                        const isAssigned = role.permissions.includes(value);
+                        return (
+                          <Label key={value} className="flex items-center gap-2 font-normal">
+                            <Checkbox
+                              name="permissions"
+                              value={value}
+                              defaultChecked={isAssigned}
+                            />
+                            <span className="font-mono text-xs">{label}</span>
+                          </Label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </Field>
               {error && <FieldError>{error}</FieldError>}
             </FieldGroup>
             <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditOpen(false)}
+                disabled={isPending}
+              >
+                {t('cancel')}
+              </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? t('saving') : tCommon('save')}
+                {isPending ? t('saving') : t('save')}
               </Button>
             </DialogFooter>
           </form>
@@ -185,16 +192,21 @@ export function RoleRowActions({
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t('deleteRoleTitle').replace('{name}', role.displayName)}
-            </AlertDialogTitle>
-            <AlertDialogDescription>{t('deleteWarning')}</AlertDialogDescription>
+            <AlertDialogTitle>{t('deleteRole')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('deleteRoleDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           {error && <FieldError>{error}</FieldError>}
           <AlertDialogFooter>
-            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
-              {isPending ? t('deleting') : t('delete')}
+            <AlertDialogCancel disabled={isPending}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? t('deleting') : tCommon('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

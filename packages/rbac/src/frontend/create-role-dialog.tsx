@@ -1,12 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-
-import { useTranslations } from '../../i18n/index.js';
-
-import { Button } from '../ui/button.js';
-import { Checkbox } from '../ui/checkbox.js';
 import {
+  Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -14,26 +10,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog.js';
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field.js';
-import { Input } from '../ui/input.js';
-import { Label } from '../ui/label.js';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.js';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  useTranslations,
+} from '@appspine/frontend-shell';
+import { useState, useTransition } from 'react';
+import type { CreateRoleDialogProps } from './types.js';
 
-import type { EnumOption } from './types.js';
-
-/**
- * @deprecated Moved to `@appspine/rbac/frontend` in Phase 3 (PL3-05).
- */
 export function CreateRoleDialog({
   policyOptions,
   permissionOptions,
   createRoleAction,
-}: {
-  policyOptions: EnumOption[];
-  permissionOptions: EnumOption[];
-  createRoleAction: (formData: FormData) => Promise<{ error?: string }>;
-}) {
+}: CreateRoleDialogProps) {
   const t = useTranslations('roles');
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -102,18 +99,28 @@ export function CreateRoleDialog({
             </Field>
             <Field>
               <FieldLabel>{t('permissions')}</FieldLabel>
-              <div className="flex flex-col gap-2">
-                {permissionOptions.map(({ value, label }) => (
-                  <Label key={value} className="flex items-center gap-2 font-normal">
-                    <Checkbox name="permissions" value={value} />
-                    {label}
-                  </Label>
-                ))}
+              <div className="max-h-48 overflow-y-auto rounded-md border p-3">
+                <div className="flex flex-col gap-2">
+                  {permissionOptions.map(({ value, label }) => (
+                    <Label key={value} className="flex items-center gap-2 font-normal">
+                      <Checkbox name="permissions" value={value} />
+                      <span className="font-mono text-xs">{label}</span>
+                    </Label>
+                  ))}
+                </div>
               </div>
             </Field>
             {error && <FieldError>{error}</FieldError>}
           </FieldGroup>
           <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+            >
+              {t('cancel')}
+            </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? t('creating') : t('create')}
             </Button>

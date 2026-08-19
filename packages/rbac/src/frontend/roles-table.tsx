@@ -1,28 +1,16 @@
 import {
+  Badge,
   SortableColumnHeader,
-  type SortableLinkComponent,
-  type SortOrder,
-} from '../sortable-column-header.js';
-import { Badge } from '../ui/badge.js';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table.js';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@appspine/frontend-shell';
 import { RoleRowActions } from './role-row-actions.js';
-import type { RoleRow } from './types.js';
+import type { RoleSortField, RolesTableProps } from './types.js';
 
-type RoleSortField = 'displayName' | 'userCount' | 'apiKeyCount';
-
-type RolesTableKey =
-  | 'apiKeys'
-  | 'name'
-  | 'noRoles'
-  | 'permissions'
-  | 'policy'
-  | 'systemBadge'
-  | 'systemRoleDeleteWarning'
-  | 'users';
-
-/**
- * @deprecated Moved to `@appspine/rbac/frontend` in Phase 3 (PL3-05).
- */
 export function RolesTable({
   roles,
   policyOptions,
@@ -35,19 +23,7 @@ export function RolesTable({
   renderEnumLabel,
   updateRoleAction,
   deleteRoleAction,
-}: {
-  roles: RoleRow[];
-  policyOptions: readonly string[];
-  permissionOptions: readonly string[];
-  sortField: string | undefined;
-  sortOrder: SortOrder | undefined;
-  LinkComponent: SortableLinkComponent;
-  buildSortHref: (field: RoleSortField, order: SortOrder) => string;
-  t: (key: RolesTableKey) => string;
-  renderEnumLabel: (kind: 'PermissionPolicy' | 'Permission', value: string) => string;
-  updateRoleAction: (id: string, formData: FormData) => Promise<{ error?: string }>;
-  deleteRoleAction: (id: string) => Promise<{ error?: string }>;
-}) {
+}: RolesTableProps) {
   // RolesTable itself has no 'use client' directive, so it renders as a Server
   // Component — calling `renderEnumLabel` (a plain function passed down from
   // another Server Component) here is fine, no serialization boundary is
@@ -111,42 +87,55 @@ export function RolesTable({
               </TableCell>
             </TableRow>
           )}
-          {roles.map((role) => (
-            <TableRow key={role.id}>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  {role.displayName}
-                  {role.isSystem && (
-                    <Badge variant="outline" title={t('systemRoleDeleteWarning')}>
-                      {t('systemBadge')}
-                    </Badge>
+          {roles.map((role) => {
+            const isAdmin = role.name === 'ADMIN';
+            return (
+              <TableRow key={role.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{role.displayName}</span>
+                    {role.isSystem && (
+                      <Badge variant="secondary">{t('systemBadge')}</Badge>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{role.name}</div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">
+                    {renderEnumLabel('PermissionPolicy', role.permissionPolicy)}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {isAdmin ? (
+                    <span className="text-xs text-muted-foreground">
+                      {renderEnumLabel('PermissionPolicy', 'ALLOW_ALL')}
+                    </span>
+                  ) : role.permissions.length === 0 ? (
+                    <span className="text-xs text-muted-foreground">-</span>
+                  ) : (
+                    <div className="flex max-w-md flex-wrap gap-1">
+                      {role.permissions.map((p) => (
+                        <Badge key={p} variant="outline" className="text-xs font-mono">
+                          {renderEnumLabel('Permission', p)}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
-                </div>
-                <div className="text-muted-foreground text-xs">{role.name}</div>
-              </TableCell>
-              <TableCell>{renderEnumLabel('PermissionPolicy', role.permissionPolicy)}</TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {role.permissions.map((permission) => (
-                    <Badge key={permission} variant="secondary">
-                      {renderEnumLabel('Permission', permission)}
-                    </Badge>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell>{role.userCount}</TableCell>
-              <TableCell>{role.apiKeyCount}</TableCell>
-              <TableCell>
-                <RoleRowActions
-                  role={role}
-                  policyOptions={policyOptionsWithLabels}
-                  permissionOptions={permissionOptionsWithLabels}
-                  updateRoleAction={updateRoleAction}
-                  deleteRoleAction={deleteRoleAction}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
+                </TableCell>
+                <TableCell>{role.userCount}</TableCell>
+                <TableCell>{role.apiKeyCount}</TableCell>
+                <TableCell>
+                  <RoleRowActions
+                    role={role}
+                    policyOptions={policyOptionsWithLabels}
+                    permissionOptions={permissionOptionsWithLabels}
+                    updateRoleAction={updateRoleAction}
+                    deleteRoleAction={deleteRoleAction}
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

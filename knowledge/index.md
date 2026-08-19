@@ -70,6 +70,7 @@
 | [051-pl3-02-frontend-generator.md](topics/051-pl3-02-frontend-generator.md) | topic | active | 051 PL3-02 — Next.js build-time generator |
 | [051-pl3-03-identity-core-frontend.md](topics/051-pl3-03-identity-core-frontend.md) | topic | active | 051 PL3-03 — 遷移 Users Admin 到 `identity-core/frontend` |
 | [051-pl3-04-oidc-auth-frontend.md](topics/051-pl3-04-oidc-auth-frontend.md) | topic | active | 051 PL3-04 — 遷移 OIDC Login 到 `oidc-auth/frontend` |
+| [051-pl3-05-rbac-frontend.md](topics/051-pl3-05-rbac-frontend.md) | topic | active | 051 PL3-05 — 遷移 Roles Admin 到 `rbac/frontend` |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
