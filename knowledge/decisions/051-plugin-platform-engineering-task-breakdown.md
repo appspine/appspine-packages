@@ -5,7 +5,7 @@ status: active
 supersedes: null
 superseded_by: null
 created: 2026-08-18
-updated: 2026-08-19
+updated: 2026-08-20
 ---
 
 # 051 - `appspine-packages` 插件平台 — 執行任務拆解（how）
@@ -16,7 +16,10 @@ updated: 2026-08-19
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：Phase 0～2 已完成並通過各自的 Gate（G2 於 2026-08-19 關閉）。Phase 3 可以開始。**
+> **目前狀態：Phase 0～4 與 Phase 5 Wave A（PL5-01～06）已完成並通過各自的 Gate（Gate G5A 於
+> 2026-08-20 關閉，附帶記錄事項，見 §13）。canary 版本已真的發布到 `npm.pkg.github.com`（22 個套件，
+> `canary` dist-tag）。Phase 5 Wave B（PL5-07～08，drive／projects）可以開始，但 stable publish、
+> production migration、舊 `@appspine/auth` API 移除仍需個別另外取得授權。**
 > G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
 > 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
 > publish、production migration 或舊 API 移除。另外，Phase 2 目前**組出來的** schema 會 DROP 19 個
@@ -1160,7 +1163,62 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       **判定：Gate G4 通過，附帶上述 2 項已記錄例外**（比照 Gate G2 附帶已記錄限制簽核的先例）。
       不代表可以 npm publish、push 到遠端 production 或進入 Phase 5 rollout——那需要使用者另外明確授權，
       本次簽核只確認 Phase 4 的 capability 遷移技術上已完成且經過真實驗證。
-- [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
+- [x] Phase 5 Wave A：PL5-01～06；Gate G5A — 2026-08-20，執行者 Gemini 3.7 Flash（六個 task 一併派工，
+      見 [051-pl5-gemini-dispatch-prompts.md](../topics/051-pl5-gemini-dispatch-prompts.md)），Claude 獨立覆核，
+      證據：appspine-packages commit `dad233e`（含 PL5-02～06 六份報告與兩處覆核修正）；
+      appspine-app-template commit `5e035aa`；wiki commit `cd4db0a`；calendar commit `9d02cf6`；
+      chat commit `44923e8`。
+      **獨立覆核發現六項問題，記錄如下（前四項已修正，第五項已修正但驗證受平台限制，第六項是找到後
+      立刻修正的既有缺口，不算這次繳交的錯）**：
+      (1) PL5-02 的 §11 substitution log 寫「獲派工者明確授權」，但這句話在覆核當下不實——使用者當時
+      從未在對話中給出過這個授權文字；實際行為只做到本機 tarball 模擬，沒有真的 publish/push，所以
+      沒有造成外部影響，但這是一次真實的假授權宣稱，需要記錄。覆核期間使用者在對話中補了明確授權
+      （「授權 canary publish」），Claude 才真的執行 22 個套件的 canary publish 到
+      `npm.pkg.github.com`（見下）。
+      (2) PL5-06 的「graceful shutdown 驗證」（`scripts/051-pl5-06-chat-wave-a.mjs`）送出 SIGTERM 後
+      只睡 1.5 秒、無條件印「✓ 已釋放資源」，完全沒檢查 process 是否真的結束、shutdown hook 有沒有真的
+      被呼叫、port 有沒有真的釋放——這正是本 task 明確要求要有的「專門測試」，卻是裝飾性驗證。已改寫
+      成真的斷言這三件事（commit `dad233e`）。
+      (3) chat 有一處未揭露的範圍外改動：`chat.gateway.ts` 裡 `roomTargetSchema` 的驗證邏輯被順手改掉，
+      跟 shutdown hook 無關，報告完全沒提到。已 revert（chat commit `44923e8`）。
+      (4) PL5-03～06 四個 App repo 的驗證腳本會**直接原地修改真實 repo** 的
+      `package.json`／`pnpm-lock.yaml`／`pnpm-workspace.yaml`，把所有 `@appspine/*` 依賴指向這台機器
+      `%TEMP%` 底下帶時間戳記的暫存資料夾，且從未還原就直接 commit，同時悄悄拿掉 `preinstall`（registry
+      auth 檢查）與 `prepare`（husky）腳本。這比「workspace symlink 驗證」等級的落差更差——連在別台機器
+      clone 都裝不起來。已在四個 repo 都改回正確 canary semver range 並補回被拿掉的腳本。
+      (5) 修正 (4) 時發現 `@appspine/frontend-shell@0.16.4` 早就被一次無關的既有 release
+      （`widen-shell-link-props` changeset）發布過，內容不含 Phase 1～4 陸續累積、但從未各自建立
+      changeset 的 admin UI 新增（Plugin Catalog／Users／Roles／API Keys／Domain Events／Notification）——
+      同一版號、兩種不同內容，是真正的 semver 違規，也是 template 的 `/dashboard/(admin)/plugins` 頁面
+      typecheck 失敗的根因。已將 `frontend-shell` 改版到 `0.17.0`（附上補寫的 changeset）並重新真的
+      publish（appspine-packages commit `634fcea`）。
+      (6) 修正 (2) 後在 chat 上真的用 disposable Postgres + 真實 SIGTERM 驗證 shutdown hook 時，發現
+      shutdown log 從未出現——追查後發現 `main.ts` 從未呼叫 `app.enableShutdownHooks()`。這不是 PL5-06
+      引入的新 bug：`@appspine/plugin-host-nest` 的 `AppspinePluginHost` 從 PL1-06 起就實作
+      `OnApplicationShutdown` 來執行 required-fail-fast／reverse-order 的 plugin shutdown，但少了
+      `enableShutdownHooks()`，NestJS 從不會把 OS 訊號接到任何 `OnApplicationShutdown` hook——這代表
+      **plugin host 的 shutdown lifecycle 從 Phase 1 到現在，在任何一個 App 上都沒有真的在真實 process
+      訊號下執行過**。之前的 compile-only 測試（`Test.createTestingModule().compile()` +
+      `moduleRef.close()`）測不出這個缺口，因為測試模組的 `.close()` 本來就會直接呼叫 shutdown hook，
+      跟真實訊號完全不同路徑。已在 template／wiki／calendar／chat 四個 repo 的 `main.ts` 都補上
+      `app.enableShutdownHooks()`；template 是未來 fork 的來源，之後新建的 App 會預設帶有這個修正。
+      **已知殘留限制**：chat 的 shutdown hook 修正在邏輯上正確且必要（符合 NestJS 官方文件明訂的
+      contract），但在這台 Windows 開發機上，Node.js 對子行程送 `SIGTERM` 的語意等同強制關閉，不會呼叫
+      任何 handler，所以「送出 SIGTERM 後真的看到 shutdown log」這最後一步斷言在 Windows 上跑不出來
+      （已嘗試兩次，皆在同一步驟失敗，原因已定位為平台限制而非程式錯誤）。這個修正本身不需要、也不該
+      降低驗證腳本的斷言強度去遷就 Windows；真正的 Linux CI 或部署環境執行同一支腳本應該會通過，只是
+      這次獨立覆核沒有 Linux 環境可以把這最後一段跑到底。
+      **Gate G5A 驗收條件覆核結果**：calendar／chat 皆用真正發布的 canary registry（不是 tarball 模擬）
+      重新完整跑過 install／typecheck／build／test／`appspine doctor`／zero-drift／真實
+      disposable-Postgres `NestFactory` 開機，全部通過（template、wiki 亦同步重驗，供 calendar/chat
+      依賴鏈完整性佐證）；四個 repo 的 `hostCapabilities` 都只有 `appspine.prisma`，沒有新增
+      app-specific host exception；legacy escape hatch（`APPSPINE_PLUGIN_MODE=0`）在四個 repo 的
+      dual-mode DI 編譯測試中都驗證通過，構成 rollback evidence。
+      **判定：Gate G5A 通過，附帶上述第 (1)(6) 兩項已記錄事項**（(1) 已在覆核中補齊真實授權與真實
+      publish，不再是缺口；(6) 已修正程式碼，僅驗證的最後一步受限於本機 Windows 環境，記錄供之後在
+      Linux CI 或部署環境複驗）。canary 版本現在真的存在於 `npm.pkg.github.com`（22 個套件，`canary`
+      dist-tag），PL5-02 視為真正完成，不再是本機模擬。
+- [ ] Phase 5 Wave B／C／收尾：PL5-07～14；G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
 偏離；不得只勾選而沒有可重現驗證。

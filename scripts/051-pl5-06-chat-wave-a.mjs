@@ -362,7 +362,9 @@ async function main() {
         portStillOpen = false;
       }
       if (portStillOpen) {
-        throw new Error('Port 3996 still accepts HTTP connections after shutdown — server did not release it.');
+        throw new Error(
+          'Port 3996 still accepts HTTP connections after shutdown — server did not release it.',
+        );
       }
       console.log(
         `✓ Process exited (code=${exitResult.code}, signal=${exitResult.signal}); shutdown hook log observed; port 3996 released.`,
