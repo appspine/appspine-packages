@@ -221,11 +221,18 @@ async function main() {
 
     console.log('\n=== 5. Starting a disposable Postgres for this rehearsal only ===');
     run('docker', [
-      'run', '-d', '--name', DB_CONTAINER,
-      '-p', `127.0.0.1:${DB_PORT}:5432`,
-      '-e', 'POSTGRES_USER=postgres',
-      '-e', 'POSTGRES_PASSWORD=rehearsal',
-      '-e', 'POSTGRES_DB=app_db',
+      'run',
+      '-d',
+      '--name',
+      DB_CONTAINER,
+      '-p',
+      `127.0.0.1:${DB_PORT}:5432`,
+      '-e',
+      'POSTGRES_USER=postgres',
+      '-e',
+      'POSTGRES_PASSWORD=rehearsal',
+      '-e',
+      'POSTGRES_DB=app_db',
       'postgres:17-alpine',
     ]);
 
@@ -268,7 +275,10 @@ async function main() {
     });
 
     console.log('\n=== 7. prisma generate + backend build ===');
-    run('npx', ['prisma', 'generate', '--schema', 'prisma/schema'], { cwd: backendDir, env: backendEnv });
+    run('npx', ['prisma', 'generate', '--schema', 'prisma/schema'], {
+      cwd: backendDir,
+      env: backendEnv,
+    });
     run('pnpm', ['-C', 'backend', 'build'], { cwd: appDir });
 
     console.log('\n=== 8. Real bootstrap: node dist/src/main.js against the migrated database ===');
@@ -297,8 +307,12 @@ async function main() {
       console.log(`Waiting for backend to listen on :${BACKEND_PORT}...`);
       const status = await waitForHttp(`http://localhost:${BACKEND_PORT}/`, 30000);
       if (crashed) throw new Error('Server process exited before responding');
-      console.log(`✓ Backend responded with HTTP ${status} — real app.listen() succeeded against a real migrated database in Plugin Mode.`);
-      console.log('✓ This means every REQUIRED capability token (including appspine.identity-store for m2m-api-key) resolved for real — not just in a .compile()-only test.');
+      console.log(
+        `✓ Backend responded with HTTP ${status} — real app.listen() succeeded against a real migrated database in Plugin Mode.`,
+      );
+      console.log(
+        '✓ This means every REQUIRED capability token (including appspine.identity-store for m2m-api-key) resolved for real — not just in a .compile()-only test.',
+      );
     } finally {
       child.kill();
       await new Promise((r) => setTimeout(r, 500));
