@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "master-data-client",
+  "displayName": "Master Data Client",
+  "cardinality": "multiple",
+  "distribution": "official",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0",
+    "frameworks": {
+      "@nestjs/common": "^11.0.5"
+    }
+  },
+  "provides": ["appspine.master-data-client"],
+  "requires": ["appspine.identity-delegation"],
+  "optionalRequires": ["appspine.audit-sink"],
+  "configSchema": { "configRef": "masterData" },
+  "environment": [
+    {
+      "key": "MASTER_DATA_ENDPOINT",
+      "required": false,
+      "secret": false,
+      "description": "Base URL of the master-data source app."
+    },
+    {
+      "key": "MASTER_DATA_API_KEY",
+      "required": false,
+      "secret": true,
+      "description": "M2M API key credential used to call master-data."
+    }
+  ],
+  "optionalFailurePolicy": {
+    "isolationBoundary": "instance",
+    "degradedBehavior": {
+      "readiness": "degraded",
+      "catalog": "degraded",
+      "alert": "required"
+    }
+  },
+  "facets": {
+    "backend": {
+      "modulePath": "./dist/master-data-client.module.js",
+      "exportName": "MasterDataClientModule"
+    },
+    "operations": {
+      "healthIndicatorId": "master-data-client",
+      "metricsPrefix": "master_data_client",
+      "shutdownTimeoutMs": 5000
+    }
+  }
+}

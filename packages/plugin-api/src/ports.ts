@@ -297,3 +297,12 @@ export interface ExchangeDelegatedTokenPortInput {
 export interface IdentityDelegationPort {
   exchange(input: ExchangeDelegatedTokenPortInput): Promise<DelegatedAccessTokenResult>;
 }
+
+/**
+ * `appspine.master-data-client` — satisfied by `@appspine/master-data-client`'s `MasterDataReconciliationService`.
+ */
+export interface MasterDataClientPort {
+  start(): void;
+  stop(): void;
+  reconcileAll(): Promise<void>;
+}

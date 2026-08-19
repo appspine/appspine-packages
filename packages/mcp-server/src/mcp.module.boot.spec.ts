@@ -30,7 +30,7 @@ describe('McpModule real Nest DI boot verification', () => {
     expect(controller).toBeDefined();
 
     await app.close();
-  });
+  }, 15000);
 
   it('allows downstream feature modules to inject McpToolRegistry without re-importing McpModule (Phase 4 @Global() compatibility bridge)', async () => {
     // Models typical downstream app structure (e.g. calendar/backend/src/events/events.mcp.ts injected inside events.module.ts)

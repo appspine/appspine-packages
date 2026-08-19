@@ -70,6 +70,9 @@ export type MasterDataReconciliationEntity<
 };
 
 export type MasterDataClientModuleOptions = {
+  endpoint?: string;
+  apiKey?: string;
+  masterDataApiKey?: string;
   intervalMs?: number;
   autoStart?: boolean;
   entities: MasterDataReconciliationEntity<Record<string, unknown>, MirrorRecord>[];

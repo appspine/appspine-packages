@@ -1,3 +1,4 @@
+import type { MasterDataClientPort } from '@appspine/plugin-api';
 import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { toComparableSeq } from '../sync-handler.factory';
 import type {
@@ -10,7 +11,9 @@ import type {
 export const MASTER_DATA_CLIENT_OPTIONS = 'MASTER_DATA_CLIENT_OPTIONS';
 
 @Injectable()
-export class MasterDataReconciliationService implements OnModuleInit, OnModuleDestroy {
+export class MasterDataReconciliationService
+  implements OnModuleInit, OnModuleDestroy, MasterDataClientPort
+{
   private readonly logger = new Logger(MasterDataReconciliationService.name);
   private timer: NodeJS.Timeout | undefined;
   private running = false;

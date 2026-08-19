@@ -86,6 +86,8 @@
 | [051-pl4-05-domain-events-plugin.md](topics/051-pl4-05-domain-events-plugin.md) | topic | active | 051 PL4-05 — 遷移 `domain-events` plugin（4B） |
 | [051-pl4-06-mcp-server-plugin.md](topics/051-pl4-06-mcp-server-plugin.md) | topic | active | 051 PL4-06 — 遷移 `mcp-server` plugin（4B） |
 | [051-pl4-07-oidc-delegation-plugin.md](topics/051-pl4-07-oidc-delegation-plugin.md) | topic | active | 051 PL4-07 — 遷移 `oidc-delegation` plugin（4C） |
+| [051-pl4-08-master-data-client-plugin.md](topics/051-pl4-08-master-data-client-plugin.md) | topic | active | 051 PL4-08 — 遷移 `master-data-client` multi-instance plugin（4C） |
+| [051-pl4-gemini-dispatch-prompts.md](topics/051-pl4-gemini-dispatch-prompts.md) | topic | active | 051 Phase 4 派工 Prompt — 給 Gemini 執行（PL4-01～10，不含 Gate G4） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

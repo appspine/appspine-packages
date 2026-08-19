@@ -647,6 +647,8 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-07 遷移 `oidc-delegation` plugin（4C）
 
+> 交付報告：[051-pl4-07-oidc-delegation-plugin.md](../topics/051-pl4-07-oidc-delegation-plugin.md)。
+
 - **owner**：Gemini（G2 `repo-integration`）；Terra high 實作；Sol G3 審 identity/security。
 - **依賴**：PL1-12、PL4-05。
 - **交付**：connector config schema、backend/operations facets、delegated principal contract、integration contract refs
@@ -654,6 +656,8 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 - **驗證**：既有 delegation positive/negative verification、issuer/audience/mapping、secret redaction、legacy parity。
 
 ### PL4-08 遷移 `master-data-client` multi-instance plugin（4C）
+
+> 交付報告：[051-pl4-08-master-data-client-plugin.md](../topics/051-pl4-08-master-data-client-plugin.md)。
 
 - **owner**：Gemini（G2）；Terra high 實作；Claude contract review。
 - **依賴**：PL4-07、PL1-05。
