@@ -13,7 +13,7 @@ updated: 2026-08-20
 > Task：`PL5-07`（見 [051 拆解 §9](../decisions/051-plugin-platform-engineering-task-breakdown.md#9-phase-5--release全-app-rollout-與-transition-window)）。  
 > 建議 Owner：Terra high 執行／Luna 維護版本差異；實際執行：Gemini 3.7 Flash High（見 [§8 substitution log](#8-agent-替代與校準紀錄-substitution-log)）。  
 > 依賴：[Gate G5A](051-pl5-02-canary-publish.md)（已通過，真實 Canary 套件發布在 `npm.pkg.github.com`）、[PL5-06](051-pl5-06-chat-wave-a-rollout.md)（Wave A 已完成）。  
-> Drive 目標分支：`051-pl5-07-drive-wave-b`（Commit: `bfa7875`）。  
+> Drive 目標分支：`051-pl5-07-drive-wave-b`（Commit: `91cb8bb`）。  
 > 驗證腳本：[`scripts/051-pl5-07-drive-real-bootstrap.mjs`](file:///D:/Source/Private/appspine/drive/scripts/051-pl5-07-drive-real-bootstrap.mjs)。  
 
 ---
@@ -101,4 +101,4 @@ updated: 2026-08-20
 | **Calibration** | 嚴格遵循真實 Registry 安裝規範（無 tarball override、不繞過 preinstall/prepare）；建立真實 Disposable Docker Postgres 驗證腳本執行 `app.listen()` 與 HTTP 200 檢查；完成 Zero Drift 與 Doctor 診斷。 |
 | **Tools** | Repo read/write, Terminal, Git, PNPM, Docker, Vitest, TypeScript, Prisma |
 | **Independent reviewer** | *(留白，待獨立審查者 Claude 填寫)* |
-| **Evidence** | Drive 分支 `051-pl5-07-drive-wave-b` (Commit `bfa7875`)、本報告 `051-pl5-07-drive-wave-b.md`、開機腳本 `scripts/051-pl5-07-drive-real-bootstrap.mjs`。 |
+| **Evidence** | Drive 分支 `051-pl5-07-drive-wave-b` (Commit `91cb8bb`)、本報告 `051-pl5-07-drive-wave-b.md`、開機腳本 `scripts/051-pl5-07-drive-real-bootstrap.mjs`。 |
