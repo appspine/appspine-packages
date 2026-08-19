@@ -34,10 +34,9 @@ export const identityCoreManifest: PluginManifestV1 = {
   },
   provides: ['appspine.identity-store'],
   requires: ['appspine.prisma', 'appspine.principal-context'],
-  // Audit and RBAC are genuinely optional: identity works without either, it just stops recording
-  // administrative changes and stops assigning default roles. Both degrade visibly rather than
-  // silently, which is why they are declared here instead of being injected on a hope.
-  optionalRequires: ['appspine.audit-sink', 'appspine.rbac-policy'],
+  // Audit is genuinely optional: identity works without it, it just stops recording
+  // administrative changes.
+  optionalRequires: ['appspine.audit-sink'],
   facets: {
     backend: {
       modulePath: './dist/identity-core.module.js',

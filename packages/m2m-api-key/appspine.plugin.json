@@ -60,7 +60,14 @@
     },
     "prisma": {
       "owns": ["ApiKey"],
-      "augments": [{ "targetModel": "User", "field": "actingApiKeys", "owner": "identity-core" }],
+      "augments": [
+        {
+          "targetModel": "User",
+          "field": "actingApiKeys",
+          "owner": "identity-core",
+          "type": "ApiKey[] @relation(\"ApiKeyActingUser\")"
+        }
+      ],
       "schemaFragment": "prisma/api-key.prisma",
       "schemaDigest": "sha256:e35d38ae46d2a8700bc78623dd2acfbb395c7cc60ec0bee1805d2694dedb6bb1"
     },

@@ -97,9 +97,13 @@ describe('manifest', () => {
     expect(facets?.frontend?.i18nNamespace).toBe('rbac');
 
     // Prisma facet
-    expect(facets?.prisma?.owns).toEqual(['Role', 'RolePermission', 'UserRole']);
     expect(facets?.prisma?.augments).toEqual([
-      { targetModel: 'User', field: 'userRoles', owner: 'identity-core' },
+      {
+        targetModel: 'User',
+        field: 'userRoles',
+        owner: 'identity-core',
+        type: 'UserRole[]',
+      },
     ]);
 
     // Permissions facet

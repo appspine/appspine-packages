@@ -55,6 +55,12 @@ export const standardPreset: AppspinePreset = {
     { plugin: '@appspine/audit-log', instanceId: 'default', required: true },
     { plugin: '@appspine/identity-core', instanceId: 'default', required: true },
     { plugin: '@appspine/oidc-auth', instanceId: 'default', required: true, configRef: 'oidc' },
+    { plugin: '@appspine/notification', instanceId: 'default', required: true },
+    { plugin: '@appspine/rbac', instanceId: 'default', required: true },
+    { plugin: '@appspine/m2m-api-key', instanceId: 'default', required: true },
+    { plugin: '@appspine/metadata-schema', instanceId: 'default', required: true },
+    { plugin: '@appspine/domain-events', instanceId: 'default', required: true },
+    { plugin: '@appspine/mcp-server', instanceId: 'default', required: true },
   ],
 };
 

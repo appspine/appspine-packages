@@ -26,12 +26,18 @@ describe('the JSON and the constant are one document', () => {
 });
 
 describe('the standard set', () => {
-  it('names the four Phase 1 pilots, in dependency-friendly form', () => {
+  it('names all ten Phase 1-4 standard capabilities, in dependency-friendly form', () => {
     expect(standardPreset.plugins.map((entry) => entry.plugin)).toEqual([
       '@appspine/health-check',
       '@appspine/audit-log',
       '@appspine/identity-core',
       '@appspine/oidc-auth',
+      '@appspine/notification',
+      '@appspine/rbac',
+      '@appspine/m2m-api-key',
+      '@appspine/metadata-schema',
+      '@appspine/domain-events',
+      '@appspine/mcp-server',
     ]);
   });
 
@@ -49,7 +55,7 @@ describe('the standard set', () => {
 
   it('expands into ordinary inventory entries', () => {
     const entries = presetEntries();
-    expect(entries).toHaveLength(4);
+    expect(entries).toHaveLength(10);
     for (const entry of entries) {
       expect(entry.enabled).toBe(true);
       expect(Object.keys(entry).sort()).toEqual(

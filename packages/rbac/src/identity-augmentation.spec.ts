@@ -47,7 +47,12 @@ describe('identity augmentation & user role persistence', () => {
       expect(prismaFacet).toBeDefined();
       expect(prismaFacet?.owns).toEqual(['Role', 'RolePermission', 'UserRole']);
       expect(prismaFacet?.augments).toEqual([
-        { targetModel: 'User', field: 'userRoles', owner: 'identity-core' },
+        {
+          targetModel: 'User',
+          field: 'userRoles',
+          owner: 'identity-core',
+          type: 'UserRole[]',
+        },
       ]);
     });
   });
