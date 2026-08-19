@@ -37,6 +37,7 @@ const HOST_SINGLETON_PEERS = [
 /** Foundation and platform packages must never depend on a capability plugin (051 plan §6.1). */
 const FOUNDATION_PACKAGES = new Set([
   '@appspine/common',
+  '@appspine/frontend-shell',
   '@appspine/integration-contracts',
   '@appspine/e2e-kit',
   '@appspine/plugin-api',

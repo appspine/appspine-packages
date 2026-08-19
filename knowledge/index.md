@@ -74,6 +74,7 @@
 | [051-pl3-06-m2m-api-key-frontend.md](topics/051-pl3-06-m2m-api-key-frontend.md) | topic | active | 051 PL3-06 — 遷移 API Keys Admin 到 `m2m-api-key/frontend` |
 | [051-pl3-07-domain-events-frontend.md](topics/051-pl3-07-domain-events-frontend.md) | topic | active | 051 PL3-07 — 遷移 Domain Events Admin 到 `domain-events/frontend` |
 | [051-pl3-08-notification-frontend.md](topics/051-pl3-08-notification-frontend.md) | topic | active | 051 PL3-08 — 遷移 Notification Bell／Inbox 到 `notification/frontend` |
+| [051-pl3-09-frontend-shell-convergence.md](topics/051-pl3-09-frontend-shell-convergence.md) | topic | active | 051 PL3-09 — 收斂 `frontend-shell` 並執行 migration codemod |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
