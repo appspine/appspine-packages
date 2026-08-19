@@ -173,3 +173,15 @@ export {
   SCHEMA_ARTIFACT,
   validateContributions,
 } from './prisma-composer';
+export {
+  FRONTEND_ADMIN_ROUTES_ARTIFACT,
+  FRONTEND_DIR,
+  FRONTEND_I18N_ARTIFACT,
+  FRONTEND_NAVIGATION_ARTIFACT,
+  FRONTEND_SLOTS_ARTIFACT,
+  generateFrontendAdminRoutes,
+  generateFrontendI18n,
+  generateFrontendNavigation,
+  generateFrontendSlots,
+  sortWithDependencies,
+} from './frontend-generator';

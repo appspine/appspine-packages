@@ -185,6 +185,10 @@ describe('lockfile contents', () => {
     expect(lock.artifacts.map((a) => a.path)).toEqual([
       '.appspine/generated/backend/composition.ts',
       '.appspine/generated/catalog.json',
+      '.appspine/generated/frontend/admin-routes.ts',
+      '.appspine/generated/frontend/i18n.ts',
+      '.appspine/generated/frontend/navigation.ts',
+      '.appspine/generated/frontend/slots.tsx',
       '.appspine/generated/permissions.json',
       '.appspine/generated/schema.prisma',
     ]);

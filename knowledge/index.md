@@ -67,6 +67,7 @@
 | [051-pl2-10-generation-gate.md](topics/051-pl2-10-generation-gate.md) | topic | active | 051 PL2-10 — deterministic generation 與 CI gate |
 | [051-pl2-gate-g2.md](topics/051-pl2-gate-g2.md) | topic | active | 051 Gate G2 — 可重現的安裝與組裝（**已關閉**） |
 | [051-pl3-01-frontend-contract.md](topics/051-pl3-01-frontend-contract.md) | topic | active | 051 PL3-01 — 固定 frontend facet 與 package export contract |
+| [051-pl3-02-frontend-generator.md](topics/051-pl3-02-frontend-generator.md) | topic | active | 051 PL3-02 — Next.js build-time generator |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |

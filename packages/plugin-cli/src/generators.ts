@@ -7,6 +7,12 @@
  */
 
 import { generateComposition } from './composition';
+import {
+  generateFrontendAdminRoutes,
+  generateFrontendI18n,
+  generateFrontendNavigation,
+  generateFrontendSlots,
+} from './frontend-generator';
 import type { GeneratedArtifact, GenerationInput, Generator } from './generate';
 import { generateCatalog } from './generate';
 import { generatePermissionPlan } from './permission-reconciler';
@@ -17,6 +23,10 @@ export const GENERATORS: readonly Generator[] = [
   generateComposition,
   generatePrismaSchema,
   generatePermissionPlan,
+  generateFrontendNavigation,
+  generateFrontendAdminRoutes,
+  generateFrontendSlots,
+  generateFrontendI18n,
 ];
 
 /** Sorted by path, so the artefact list — and the lockfile that digests it — is order-independent. */
