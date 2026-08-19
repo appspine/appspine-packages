@@ -331,11 +331,42 @@ async function main() {
       );
       console.log(`✓ WebSocket handshake endpoint responded with HTTP ${wsStatus}.`);
 
-      // Verify graceful shutdown
+      // Verify graceful shutdown: the process must actually exit, the
+      // OnApplicationShutdown hook must actually log, and the port must
+      // actually stop accepting connections. Printing success unconditionally
+      // after a fixed sleep proves nothing — this must fail loud if any of
+      // those three things doesn't really happen.
       console.log('Triggering graceful shutdown (SIGTERM)...');
+      const exitPromise = new Promise((resolve) => {
+        child.once('exit', (code, signal) => resolve({ code, signal }));
+      });
       child.kill('SIGTERM');
-      await new Promise((r) => setTimeout(r, 1500));
-      console.log('✓ Realtime server released resources cleanly via shutdown hook.');
+      const exitResult = await Promise.race([
+        exitPromise,
+        new Promise((resolve) => setTimeout(() => resolve('timeout'), 8000)),
+      ]);
+      if (exitResult === 'timeout') {
+        throw new Error(
+          'Process did not exit within 8000ms of SIGTERM — shutdown hook did not complete or hung.',
+        );
+      }
+      if (!stdout.includes('ChatGateway closing socket server on application shutdown')) {
+        throw new Error(
+          `OnApplicationShutdown hook log line not found in stdout — shutdown hook was not actually invoked.\nStdout:\n${stdout}`,
+        );
+      }
+      let portStillOpen = true;
+      try {
+        await waitForHttp('http://localhost:3996/', 1500);
+      } catch {
+        portStillOpen = false;
+      }
+      if (portStillOpen) {
+        throw new Error('Port 3996 still accepts HTTP connections after shutdown — server did not release it.');
+      }
+      console.log(
+        `✓ Process exited (code=${exitResult.code}, signal=${exitResult.signal}); shutdown hook log observed; port 3996 released.`,
+      );
     } catch (err) {
       if (crashed) {
         console.log('Stdout:\n', stdout);
