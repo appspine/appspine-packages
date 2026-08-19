@@ -5,13 +5,12 @@ import { ApiKeyGuard } from '../api-key.guard';
 /**
  * Accepts either an API key or an interactive login.
  *
- * The interactive half no longer names OIDC: it goes through the host's strategy registry
- * (051 PL1-11), so an App that swaps its login provider does not have to touch this guard. The
- * ordering is unchanged — API key first, because `ApiKeyGuard` returning `false` means "no
- * X-Api-Key header", not "bad key".
+ * @deprecated 051 PL4-03: Use `@appspine/plugin-host-nest`'s `AppspineAuthGuard` for neutral cross-plugin
+ * authentication instead. This guard is retained for backward compatibility with legacy controllers.
  *
- * `@appspine/plugin-host-nest`'s `AppspineAuthGuard` covers the same ground generically; this
- * class stays because it is public API of this package and existing controllers reference it.
+ * The interactive half goes through the host's strategy registry (051 PL1-11), so an App that swaps
+ * its login provider does not have to touch this guard. The ordering is unchanged — API key first,
+ * because `ApiKeyGuard` returning `false` means "no X-Api-Key header", not "bad key".
  */
 @Injectable()
 export class JwtOrApiKeyGuard implements CanActivate {

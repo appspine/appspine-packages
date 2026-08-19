@@ -16,7 +16,14 @@ vi.mock('@appspine/common', () => ({
   ZodValidationPipe: class {},
 }));
 
-import { M2M_API_KEY_SCHEMA_DIGEST, m2mApiKeyManifest, m2mApiKeyPlugin } from './plugin';
+import {
+  ApiKeyMachineStrategy,
+  M2M_API_KEY_SCHEMA_DIGEST,
+  m2mApiKeyManifest,
+  m2mApiKeyPlugin,
+  SCOPE_MATCHER,
+  ScopeMatcherService,
+} from './plugin';
 
 const packageRoot = process.cwd();
 
@@ -32,6 +39,7 @@ const HOST = {
   'appspine.identity-store': {},
   'appspine.prisma': {},
   'appspine.principal-context': {},
+  'appspine.authentication-strategy-registry': {},
 };
 
 describe('manifest', () => {
@@ -66,10 +74,23 @@ describe('manifest', () => {
     expect(computed).toBe(M2M_API_KEY_SCHEMA_DIGEST);
     expect(m2mApiKeyManifest.facets?.prisma?.schemaDigest).toBe(computed);
   });
+
+  it('declares full backend, frontend, prisma, and permissions facets', () => {
+    expect(m2mApiKeyManifest.facets?.backend).toMatchObject({
+      modulePath: './dist/api-keys.module.js',
+      exportName: 'ApiKeysModule',
+      global: true,
+      controllerRoutes: ['api-keys'],
+      providerTokens: ['appspine.scope-matcher'],
+    });
+    expect(m2mApiKeyManifest.facets?.frontend).toBeDefined();
+    expect(m2mApiKeyManifest.facets?.prisma?.owns).toEqual(['ApiKey']);
+    expect(m2mApiKeyManifest.facets?.permissions?.definitions).toContain('m2m:api-key:read');
+  });
 });
 
 describe('resolution', () => {
-  it('resolves against a host that supplies identity-store, prisma, and principal-context', () => {
+  it('resolves against a host that supplies identity-store, prisma, principal-context, and authentication-strategy-registry', () => {
     const graph = expectResolutionOk(
       resolveHarness({
         plugins: [{ plugin: m2mApiKeyPlugin }],
@@ -83,7 +104,7 @@ describe('resolution', () => {
   });
 });
 
-describe('descriptor', () => {
+describe('descriptor and exports', () => {
   it('exposes the backend factory returning ApiKeysModule', () => {
     expect(m2mApiKeyPlugin.manifest.id).toBe('m2m-api-key');
     expect(
@@ -91,5 +112,11 @@ describe('descriptor', () => {
         {} as unknown as import('@appspine/plugin-api').PluginRuntimeContext,
       ),
     ).toBeDefined();
+  });
+
+  it('exports stable tokens and services', () => {
+    expect(SCOPE_MATCHER).toBe(Symbol.for('appspine.scope-matcher'));
+    expect(ApiKeyMachineStrategy).toBeDefined();
+    expect(ScopeMatcherService).toBeDefined();
   });
 });

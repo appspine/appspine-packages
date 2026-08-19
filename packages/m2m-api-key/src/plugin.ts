@@ -1,9 +1,25 @@
 /**
- * `@appspine/m2m-api-key/plugin` — manifest and plugin descriptor (PL3-06).
+ * `@appspine/m2m-api-key/plugin` — manifest and plugin descriptor (PL3-06, PL4-03).
  */
 
-import { definePlugin, type PluginManifestV1 } from '@appspine/plugin-api';
+import {
+  definePlugin,
+  type PluginManifestV1,
+  SCOPE_MATCHER,
+  type ScopeMatcherPort,
+} from '@appspine/plugin-api';
+import { ApiKeyMachineStrategy } from './api-key-machine.strategy';
 import { ApiKeysModule } from './api-keys.module';
+import { matchScope } from './guards/scope.guard';
+import { ScopeMatcherService } from './scope-matcher.service';
+
+export {
+  ApiKeyMachineStrategy,
+  matchScope,
+  SCOPE_MATCHER,
+  type ScopeMatcherPort,
+  ScopeMatcherService,
+};
 
 /** SHA-256 of `prisma/api-key.prisma` with LF endings. */
 export const M2M_API_KEY_SCHEMA_DIGEST =
@@ -29,14 +45,20 @@ export const m2mApiKeyManifest: PluginManifestV1 = {
     },
   },
   provides: ['appspine.machine-auth-provider', 'appspine.scope-matcher'],
-  requires: ['appspine.identity-store', 'appspine.prisma', 'appspine.principal-context'],
+  requires: [
+    'appspine.identity-store',
+    'appspine.prisma',
+    'appspine.principal-context',
+    'appspine.authentication-strategy-registry',
+  ],
   optionalRequires: ['appspine.audit-sink', 'appspine.rbac-policy'],
   facets: {
     backend: {
       modulePath: './dist/api-keys.module.js',
       exportName: 'ApiKeysModule',
+      global: true,
       controllerRoutes: ['api-keys'],
-      providerTokens: ['appspine.machine-auth-provider', 'appspine.scope-matcher'],
+      providerTokens: ['appspine.scope-matcher'],
     },
     frontend: {
       adminPages: [

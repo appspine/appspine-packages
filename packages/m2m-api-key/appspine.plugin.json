@@ -17,14 +17,20 @@
     }
   },
   "provides": ["appspine.machine-auth-provider", "appspine.scope-matcher"],
-  "requires": ["appspine.identity-store", "appspine.prisma", "appspine.principal-context"],
+  "requires": [
+    "appspine.identity-store",
+    "appspine.prisma",
+    "appspine.principal-context",
+    "appspine.authentication-strategy-registry"
+  ],
   "optionalRequires": ["appspine.audit-sink", "appspine.rbac-policy"],
   "facets": {
     "backend": {
       "modulePath": "./dist/api-keys.module.js",
       "exportName": "ApiKeysModule",
+      "global": true,
       "controllerRoutes": ["api-keys"],
-      "providerTokens": ["appspine.machine-auth-provider", "appspine.scope-matcher"]
+      "providerTokens": ["appspine.scope-matcher"]
     },
     "frontend": {
       "adminPages": [
