@@ -668,7 +668,9 @@ Phase 5: authorized release → template → wiki canary → App waves → depre
 
 ### PL4-09 完成 package coverage／governance audit
 
-- **owner**：Gemini（G2）；Luna 產生 matrix；Sol review exceptions。
+> 交付報告：[051-pl4-09-governance-audit.md](../topics/051-pl4-09-governance-audit.md)。
+
+- **owner**：Gemini（G2，實際執行由 Gemini 3.7 Flash 透過自動化腳本產出 matrix，見報告 §9 substitution log）；Sol review exceptions。
 - **依賴**：PL4-01～08。
 - **交付**：15 現有 + 新 packages 的分類、owner、support/deprecation/security class、manifest/facet/export/peer/
   changeset coverage；記錄哪些 foundation package 刻意不是 plugin。
@@ -1022,7 +1024,58 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       風險與 PL4-02/03/06 那種隱性 `@Global()` 依賴斷裂完全不同等級，Claude 以校準替補方式一併認定
       通過；oidc-delegation 涉及 OAuth token exchange／secret 處理，若之後有 Sol 或同級 G3 可用，
       仍建議回頭補一次 security-focused 覆核。
-      PL4-08～10 待執行；Gate G4（Gate G4 前必須另外解決 PL4-05 記錄的 identity-store host wiring
+      PL4-08 已完成（[報告](../topics/051-pl4-08-master-data-client-plugin.md)，Claude 獨立覆核通過
+      2026-08-19）。完成 `master-data-client` 遷移為標準 `cardinality: multiple` Connector Plugin：
+      依 `instanceId` 動態綁定 `capabilityInstanceToken('appspine.master-data-client', instanceId)`
+      與通用 `MASTER_DATA_CLIENT` token、在 `plugin-api` 新增 `MasterDataClientPort`、宣告
+      `optionalFailurePolicy`（instance isolation boundary + degraded behavior）、保留
+      `MasterDataClientModule.forRoot()`／`forRootAsync()` 完整相容性。Claude 重新驗證 28/28
+      package tests、全 22 個 package build/typecheck/lint/test、architecture check、generation
+      gate、build graph、manifest fixtures、changeset discipline、`git diff --check` 全綠。
+      **報告 §4.1 宣稱「無未解架構風險」不實，已由 Claude 找到並修正一個真實的正確性缺口**：
+      manifest 把 `MASTER_DATA_ENDPOINT`／`MASTER_DATA_API_KEY` 宣告為 `required: true`，但實際
+      `MasterDataReconciliationService.reconcileAll()` 只透過 consumer 自帶的
+      `entities[].listFetcher()` 抓資料（`sync-handler.factory.ts` 也是純事件驅動、不打任何
+      HTTP endpoint）——這兩個環境變數在 `plugin.ts` 組裝 `MASTER_DATA_CLIENT_OPTIONS` 時就被
+      丟棄，從未真正傳進服務。結果是 `plugin doctor` 的 `missing-required-env-key` 檢查
+      （`packages/plugin-cli/src/commands/doctor.ts:88`）會對每一個啟用中的 instance 要求設定
+      兩個完全沒有作用的必填 secret。已將兩者改為 `required: false`（`MASTER_DATA_API_KEY` 仍保留
+      `secret: true` 供 redaction），並在 `plugin.ts` 加註說明原因；修正後重新驗證全套仍然全綠。
+      另外，diff 裡夾帶一個範圍外但無害的改動——`packages/mcp-server/src/mcp.module.boot.spec.ts`
+      一個既有測試加了 `15000` ms timeout，判斷是修 flaky test、對行為無影響，予以保留未 revert。
+      這個 task 要求的「Claude contract review」即由本次覆核滿足，無缺角色問題。
+      **本輪覆核與修正是在使用者手動核准前，被一個外部流程（推測是驅動 Gemini 派工的自動化腳本）
+      直接以 `9cd2838` commit 走的**——Claude 覆核時 working tree 仍是未 commit 狀態，覆核／remediation
+      做完準備要記錄時，發現同一份檔案已經被該外部流程連同其他變更一起 commit 掉，內容與 Claude
+      的修正版本一致（已核對 `appspine.plugin.json` 内 `required: false` 確實在該 commit 裡），但
+      這個 commit 動作本身不是 Claude 執行的、也未經使用者在這個 conversation 裡明確核准；記錄於此
+      供使用者知悉，若這個自動 commit 行為不是預期中的，需要另外檢查該流程的權限設定。
+      PL4-09 已完成（[報告](../topics/051-pl4-09-governance-audit.md)，Claude 獨立覆核通過
+      2026-08-19）。產出全 22 套件的治理矩陣（分類/owner/support tier/deprecation/security class）、
+      12 個 plugin packages 的 facet／export 涵蓋率、10 個 non-plugin packages 的邊界理由、17 個
+      capability 的完整依賴閉包（0 orphan requirements）與 changeset 涵蓋盤點，皆由專屬審計腳本
+      `scripts/051-pl4-09-governance-audit.mjs` 產生並可重跑。此 task 本身是唯讀掃描+文件產出，
+      git diff 範圍乾淨（只新增審計腳本與報告，未動任何既有 package 程式碼）。
+      **獨立覆核發現腳本本身有一個真實的比對邏輯 bug，已修正**：changeset 涵蓋率的判斷原本是
+      `cs.content.includes(pkgName)`——對 changeset **全文（含 prose 說明）** 做子字串搜尋，不是只看
+      YAML frontmatter 的套件清單。結果任何 changeset 只要在說明文字裡「提到」某套件名稱就會被誤判成
+      涵蓋該套件（例如 `051-phase4-mcp-server-plugin.md` 內文寫到「移除對 `@appspine/audit-log`
+      的依賴」，就讓 audit-log 被誤記一筆不存在的 changeset）。已修正為只解析 frontmatter
+      （新增 `extractChangesetPackages()`），並用 `grep` 直接核對 `.changeset/*.md` frontmatter 逐一
+      驗證修正後的數字全部正確。**更值得注意的是，即使照原本有 bug 的邏輯重新執行，得到的結果也跟
+      報告原始表格對不上**（例如 `plugin-host-nest` 報告寫 3 份、bug 版重跑是 2 份、正確答案其實是
+      1 份；`plugin-api` 報告寫 1 份、正確答案是 10 份；`plugin-cli` 報告寫 5 份、正確答案是 9
+      份），代表報告 §6 的原始表格並非由腳本實際產出，與報告 §8「100% 確定性且可隨時重跑」的宣稱
+      不符。已將 §6 表格更新為修正後腳本的即時重跑＋人工 grep 交叉核對結果；§1 執行摘要「Changeset
+      變更涵蓋率 100%」（19 個套件有 changeset、3 個穩定 Foundation SDK 無變動）這個頂層結論本身在
+      重新核對後仍然成立，只有各套件的關聯檔案清單／份數是錯的。修正後重新驗證
+      `--self-test`（2/2 通過）、architecture check（22 packages, 0 findings）、changeset
+      discipline、`pnpm lint`（維持與先前相同的 2 個既有允許警告）、`lint-knowledge.js` 全部通過。
+      §2 治理矩陣、§4 facet 涵蓋率、§5 capability 依賴閉包三張表經比對即時重跑輸出後內容一致，未發現
+      問題，只有 §6 changeset 表格是壞的。這個 task 文件建議（非強制）由 Sol review exceptions，
+      環境沒有 Sol，由 Claude 覆核並實際抓出＋修正一個會誤導 Gate G4 判斷的真實 bug，視為滿足這個
+      建議角色的精神。
+      PL4-10 待執行；Gate G4（Gate G4 前必須另外解決 PL4-05 記錄的 identity-store host wiring
       缺口，見上）
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
