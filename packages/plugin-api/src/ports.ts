@@ -279,3 +279,21 @@ export interface McpToolsPort<
   getToolCount(): number;
   getCatalogSnapshot(): McpCatalogEntryPort[];
 }
+
+export interface DelegatedAccessTokenResult {
+  accessToken: string;
+  tokenType: 'Bearer';
+  expiresInSeconds: number;
+}
+
+export interface ExchangeDelegatedTokenPortInput {
+  subjectToken: string;
+  policy: string;
+}
+
+/**
+ * `appspine.identity-delegation` — satisfied by `@appspine/oidc-delegation`'s `OidcDelegationService`.
+ */
+export interface IdentityDelegationPort {
+  exchange(input: ExchangeDelegatedTokenPortInput): Promise<DelegatedAccessTokenResult>;
+}

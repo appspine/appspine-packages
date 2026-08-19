@@ -70,3 +70,15 @@ export function isInteractivePrincipal(principal: Principal): principal is Inter
 export function actingUserIdOf(principal: Principal): string | null {
   return isMachinePrincipal(principal) ? principal.actingUserId : principal.sub;
 }
+
+/**
+ * Metadata attached when a request arrives through an inbound delegated token (042 plan §9, Z31 §9).
+ * Preserves the upstream delegation context for audit and security tracking.
+ */
+export interface DelegatedPrincipalContext {
+  issuer: string;
+  externalSubject: string;
+  sourceClientId: string;
+  audience: string;
+  scopes: readonly string[];
+}

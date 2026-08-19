@@ -986,7 +986,40 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       template + 代表性 App tarball rehearsal，會直接踩到 plugin mode 這條路徑）前解決，需要
       Sol 或同級 G3 主導（屬於 plugin-host-nest 核心 resolver／組裝邏輯的架構修正，非單一 capability
       migration task 範圍）。
-      PL4-06～10 待執行；Gate G4（Gate G4 前必須另外解決上述 identity-store host wiring 缺口）
+      PL4-06 已完成（[報告](../topics/051-pl4-06-mcp-server-plugin.md)，Claude 獨立覆核通過
+      2026-08-19）。首次繳交把 `McpModule` 的 `@Global()` 徹底拿掉，沒有 compatibility bridge，
+      §4.1 還寫「無未解風險」——實際追查下游 8 個 App + template 有 30+ 個 `*.mcp.ts` 檔案在
+      feature module 層直接注入 `McpToolRegistry`（如 `calendar/events.mcp.ts`），所屬 feature
+      module 未顯式 import `McpModule`，跟 PL4-02 第一次交付時同一種錯誤，而且完全沒有比照
+      PL4-02 remediation／PL4-03 已經驗證過的 compatibility bridge 做法。remediation 後：
+      `McpModule` 保留 `@Global()`、manifest 加註 `facets.backend.global: true`，補上「下游
+      Consumer 影響追蹤」章節，並新增 `mcp.module.boot.spec.ts` 裡一個直接模擬
+      `events.module.ts`／`events.mcp.ts` 組裝模式（sibling module 不 import `McpModule`）的真
+      開機測試，證明 compatibility bridge 真的有效。Claude 重新驗證 70/70 tests、全庫
+      build/typecheck/lint/test、architecture check、generation gate、`git diff --check` 全綠。
+      mcp-server 是原本 6 個 `@Global()` 名單裡最後一個，至此 Phase 4 已遷移的 6 個 capability
+      （notification 除外，其餘 5 個原本就在名單中）全部採 compatibility bridge 而非直接移除。
+      PL4-07 已完成（[報告](../topics/051-pl4-07-oidc-delegation-plugin.md)，Claude 獨立覆核通過
+      2026-08-19）。完成 `oidc-delegation` 遷移為標準 Connector Plugin，宣告 `backend` 與 `operations`
+      facets，實作 `IdentityDelegationPort`，在 `plugin-api` 新增 `DelegatedPrincipalContext` 契約，
+      完成 config schema 驗證與環境變數 `OIDC_DELEGATION_SOURCE_CLIENT_SECRET` 之 secret redaction，
+      引用跨 App Integration Contracts（`approve.submit-knowledge-document-change` 與
+      `wiki-to-approve.submit-knowledge-document-change`），保留 `OidcDelegationModule.forRoot()`
+      完整相容性並綁定 `IDENTITY_DELEGATION` token。這個 task 本身不涉及 `@Global()`（`.forRoot()`
+      dynamic module 模式，consumer 各自顯式呼叫，不像 PL4-02/03/06 那種隱性全域依賴），變更範圍
+      乾淨、只影響 `oidc-delegation` 與 `plugin-api` 兩個 package。Claude 重新驗證 88/88 tests、
+      全 monorepo build/typecheck/lint/test、architecture check、generation gate、
+      `git diff --check` 全綠。
+      **兩個流程缺口記錄如下**：(1) 報告沒有附 §11 substitution log 表格（其他 PL4-xx 報告都有），
+      交付時直接在 checkbox 寫「已完成」並自報執行者，重複了先前提醒過的「不要自己勾 checkbox」
+      問題——這次是寫在文件裡但尚未 commit，內容已由 Claude 改寫成標準格式。(2) 這個 task 要求
+      Sol G3 審 identity/security，報告完全沒提到這個角色，也沒有像 PL4-02 那樣誠實揭露「未取得」。
+      鑑於實際變更是純新增（新 interface、新 token binding，未動任何既有行為或 `.forRoot()` 介面），
+      風險與 PL4-02/03/06 那種隱性 `@Global()` 依賴斷裂完全不同等級，Claude 以校準替補方式一併認定
+      通過；oidc-delegation 涉及 OAuth token exchange／secret 處理，若之後有 Sol 或同級 G3 可用，
+      仍建議回頭補一次 security-focused 覆核。
+      PL4-08～10 待執行；Gate G4（Gate G4 前必須另外解決 PL4-05 記錄的 identity-store host wiring
+      缺口，見上）
 - [ ] Phase 5：PL5-01～14；G5A、G5B、Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准

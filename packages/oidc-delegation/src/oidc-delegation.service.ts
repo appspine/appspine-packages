@@ -1,3 +1,4 @@
+import type { IdentityDelegationPort } from '@appspine/plugin-api';
 import type { OnModuleDestroy } from '@nestjs/common';
 import { OidcDelegationError } from './errors';
 import { validateOidcDelegationModuleOptions } from './module-options-validation';
@@ -23,7 +24,9 @@ export type OidcDelegationServiceDeps = {
   logger?: OidcDelegationLogger;
 };
 
-export class OidcDelegationService implements OidcDelegationClient, OnModuleDestroy {
+export class OidcDelegationService
+  implements OidcDelegationClient, IdentityDelegationPort, OnModuleDestroy
+{
   private readonly policyRegistry: PolicyRegistry;
   private readonly provider: TokenExchangeProvider;
   private readonly throttle: OutboundThrottle;

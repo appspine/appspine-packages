@@ -1,3 +1,4 @@
+import { IDENTITY_DELEGATION } from '@appspine/plugin-api';
 import { type DynamicModule, Module } from '@nestjs/common';
 import { OidcDelegationService } from './oidc-delegation.service';
 import type { OidcDelegationModuleOptions } from './types';
@@ -16,8 +17,12 @@ export class OidcDelegationModule {
           provide: OidcDelegationService,
           useFactory: () => new OidcDelegationService(options),
         },
+        {
+          provide: IDENTITY_DELEGATION,
+          useExisting: OidcDelegationService,
+        },
       ],
-      exports: [OidcDelegationService],
+      exports: [OidcDelegationService, IDENTITY_DELEGATION],
     };
   }
 }

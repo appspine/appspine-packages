@@ -4,5 +4,10 @@
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./tsconfig.build.tsbuildinfo"
-  }
+  },
+  "references": [
+    {
+      "path": "../plugin-api/tsconfig.build.json"
+    }
+  ]
 }
