@@ -1,5 +1,5 @@
 import { AppspineAuthGuard } from '@appspine/plugin-host-nest';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 import { MetaService, type SchemaMeta } from './meta.service';
 import { MetadataScopeGuard } from './meta-scope.guard';
 
@@ -9,7 +9,7 @@ import { MetadataScopeGuard } from './meta-scope.guard';
 @Controller('metadata')
 @UseGuards(AppspineAuthGuard, MetadataScopeGuard)
 export class MetaController {
-  constructor(private readonly metaService: MetaService) {}
+  constructor(@Inject(MetaService) private readonly metaService: MetaService) {}
 
   @Get('schema')
   schema(): SchemaMeta {
