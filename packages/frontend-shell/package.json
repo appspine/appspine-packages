@@ -1,6 +1,6 @@
 {
   "name": "@appspine/frontend-shell",
-  "version": "0.17.0",
+  "version": "1.0.0-canary.0",
   "private": false,
   "files": [
     "dist",
@@ -23,10 +23,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./notification": {
-      "types": "./dist/notification/index.d.ts",
-      "default": "./dist/notification/index.js"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",

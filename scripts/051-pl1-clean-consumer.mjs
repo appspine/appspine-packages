@@ -32,12 +32,14 @@ const PACKAGES = [
   'plugin-testkit',
   'plugin-host-nest',
   'common',
+  'frontend-shell',
   'audit-log',
   'health-check',
   'identity-core',
   'rbac',
   'oidc-auth',
-  'auth',
+  'm2m-api-key',
+  'mcp-server',
 ];
 
 /** Peers the consumer must provide itself. Pinned so a range change cannot silently alter the run. */
@@ -48,11 +50,15 @@ const RUNTIME_DEPS = {
   '@nestjs/terminus': '11.1.1',
   '@nestjs/testing': '11.1.27',
   '@prisma/client': '6.19.3',
+  '@types/react': '19.2.17',
+  '@types/react-dom': '19.2.3',
   express: '5.2.1',
   passport: '0.7.0',
   pino: '10.3.1',
   'pino-http': '11.0.0',
   'reflect-metadata': '0.2.2',
+  react: '19.2.7',
+  'react-dom': '19.2.7',
   rxjs: '7.8.2',
   zod: '4.4.3',
 };

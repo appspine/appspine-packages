@@ -80,7 +80,7 @@ describe('manifest', () => {
     // Backend facet
     expect(facets?.backend?.modulePath).toBe('./dist/rbac.module.js');
     expect(facets?.backend?.exportName).toBe('RbacModule');
-    expect(facets?.backend?.global).toBe(true);
+    expect(facets?.backend?.global).toBeUndefined();
     expect(facets?.backend?.controllerRoutes).toEqual(['roles']);
     expect(facets?.backend?.providerTokens).toEqual(['appspine.rbac-policy']);
 

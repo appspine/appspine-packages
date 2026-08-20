@@ -56,7 +56,6 @@ export const m2mApiKeyManifest: PluginManifestV1 = {
     backend: {
       modulePath: './dist/api-keys.module.js',
       exportName: 'ApiKeysModule',
-      global: true,
       controllerRoutes: ['api-keys'],
       providerTokens: ['appspine.scope-matcher'],
     },

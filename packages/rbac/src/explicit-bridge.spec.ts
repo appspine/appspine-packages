@@ -8,13 +8,13 @@ import { RbacPolicyService } from './rbac-policy.service';
 import { RolesController } from './roles/roles.controller';
 import { RolesService } from './roles/roles.service';
 
-describe('explicit bridge & compatibility transition', () => {
-  it('retains @Global() decorator during Phase 4 transition to prevent downstream app bootstrap failures', () => {
-    // NestJS @Global() decorator sets GLOBAL_MODULE_METADATA ('__module:global__') on the module class
+describe('explicit module boundary', () => {
+  it('does not expose RbacModule as a global module', () => {
     const isGlobal =
       Reflect.getMetadata('__module:global__', RbacModule) ??
       Reflect.getMetadata('global', RbacModule);
-    expect(isGlobal).toBe(true);
+    expect(isGlobal).toBeUndefined();
+    expect(rbac().manifest.facets.backend?.global).toBeUndefined();
   });
 
   it('declares complete providers and exports on RbacModule for explicit consumer imports', () => {

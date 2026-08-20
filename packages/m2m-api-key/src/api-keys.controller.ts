@@ -1,7 +1,7 @@
 import { AuditLogService, recordAuditSafely } from '@appspine/audit-log';
 import type { PaginationQuery } from '@appspine/common';
 import { AuditAction, paginationQuerySchema, ZodValidationPipe } from '@appspine/common';
-import { CurrentUser } from '@appspine/plugin-host-nest';
+import { AppspineAuthGuard, CurrentUser } from '@appspine/plugin-host-nest';
 import {
   Body,
   Controller,
@@ -19,11 +19,10 @@ import { ApiKeysService } from './api-keys.service';
 import type { CreateApiKeyDto, UpdateApiKeyDto } from './dto/api-key.dto';
 import { createApiKeySchema, updateApiKeySchema } from './dto/api-key.dto';
 import { ApiKeyAdminGuard } from './guards/admin.guard';
-import { JwtOrApiKeyGuard } from './guards/jwt-or-api-key.guard';
 
 // API key management is ADMIN-only per user requirement.
 @Controller('api-keys')
-@UseGuards(JwtOrApiKeyGuard, ApiKeyAdminGuard)
+@UseGuards(AppspineAuthGuard, ApiKeyAdminGuard)
 export class ApiKeysController {
   private readonly logger = new Logger(ApiKeysController.name);
 

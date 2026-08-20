@@ -14,6 +14,5 @@ export * from './decorators/scopes.decorator';
 export * from './dto/api-key.dto';
 // Guards
 export * from './guards/admin.guard';
-export * from './guards/jwt-or-api-key.guard';
 export * from './guards/scope.guard';
 export * from './scope-matcher.service';

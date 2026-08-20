@@ -37,10 +37,6 @@ export const auditLogManifest: PluginManifestV1 = {
     backend: {
       modulePath: './dist/audit-log.module.js',
       exportName: 'AuditLogModule',
-      // Transition-only: `AuditLogModule` is still `@Global()`. 051 decision 3 removes that, but
-      // not in the same change that introduces the token — a consumer that relies on the global
-      // today must keep working while it migrates to injecting AUDIT_SINK.
-      global: true,
       providerTokens: ['appspine.audit-sink'],
     },
     prisma: {

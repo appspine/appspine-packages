@@ -2,7 +2,7 @@
 /**
  * 051 PL4-09 — Package Coverage & Governance Audit Runner
  *
- * Scans all 22 packages in the monorepo, evaluates:
+ * Scans all 21 packages in the monorepo, evaluates:
  * 1. Governance classification (Role, Owner, Support Tier, Deprecation Window, Security Class)
  * 2. Plugin manifest & facet coverage (v1 schema, backend, frontend, prisma, permissions, operations)
  * 3. Export & peer dependency coverage (subpath exports, node10 shims, peer ranges)
@@ -61,18 +61,6 @@ const PACKAGE_GOVERNANCE_METADATA = {
     deprecationPolicy: 'Active (Standard SemVer, min 1 major notice)',
     securityClass: 'Class 2 (Sensitive / Core Operations)',
     nonPluginRationale: null,
-  },
-  auth: {
-    origin: 'legacy-15',
-    category: 'Transition Facade',
-    isPlugin: false,
-    pluginId: null,
-    owner: 'Security / Sol (G3)',
-    supportTier: 'Deprecated (Transition-only)',
-    deprecationPolicy: 'Deprecated in Phase 1; removed in v2.0 (1 major transition window)',
-    securityClass: 'Class 1 (Privileged / Critical)',
-    nonPluginRationale:
-      'Transition facade re-exporting identity-core and oidc-auth for backward compatibility; does not register independent capabilities.',
   },
   common: {
     origin: 'legacy-15',
@@ -458,19 +446,19 @@ function scanMonorepo() {
 function runAudit(data = scanMonorepo()) {
   const issues = [];
 
-  // Check 1: Count of packages (expect 22)
-  if (data.packages.length !== 22) {
-    issues.push(`Expected 22 packages, found ${data.packages.length}`);
+  // Check 1: Count of packages (expect 21 after the v3 auth-facade removal)
+  if (data.packages.length !== 21) {
+    issues.push(`Expected 21 packages, found ${data.packages.length}`);
   }
 
-  // Check 2: 12 plugins with manifest, 10 non-plugins
+  // Check 2: 12 plugins with manifest, 9 non-plugins
   const pluginPkgs = data.packages.filter((p) => p.hasManifest);
   const nonPluginPkgs = data.packages.filter((p) => !p.hasManifest);
   if (pluginPkgs.length !== 12) {
     issues.push(`Expected 12 plugin packages with manifest, found ${pluginPkgs.length}`);
   }
-  if (nonPluginPkgs.length !== 10) {
-    issues.push(`Expected 10 non-plugin packages, found ${nonPluginPkgs.length}`);
+  if (nonPluginPkgs.length !== 9) {
+    issues.push(`Expected 9 non-plugin packages, found ${nonPluginPkgs.length}`);
   }
 
   // Check 3: Orphan capabilities check
@@ -546,7 +534,7 @@ function runSelfTest() {
 function generateMarkdownMatrix(data) {
   let md = '';
 
-  md += `## 1. 22 套件全維度治理矩陣 (Monorepo Governance Matrix)\n\n`;
+  md += `## 1. 21 套件全維度治理矩陣 (Monorepo Governance Matrix)\n\n`;
   md += `| Package | 來源群組 | 角色分類 | Plugin ID | Owner | Support Tier | Deprecation 策略 | Security 等級 |\n`;
   md += `|---|---|---|---|---|---|---|---|\n`;
 
@@ -650,7 +638,7 @@ if (args.includes('--json')) {
   console.log('===============================================================');
   console.log('  051 PL4-09 Package Coverage & Governance Audit');
   console.log('===============================================================');
-  console.log(`Packages Scanned        : ${auditResult.data.packages.length} / 22`);
+  console.log(`Packages Scanned        : ${auditResult.data.packages.length} / 21`);
   console.log(
     `Plugin Packages (Manifest): ${auditResult.data.packages.filter((p) => p.hasManifest).length} / 12`,
   );

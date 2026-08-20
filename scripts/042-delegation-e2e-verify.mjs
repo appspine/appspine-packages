@@ -2,7 +2,7 @@
 
 // Real Keycloak, real build-artifact integration verification for
 // 042-oidc-delegation-package-plan.md T-17000: exercises the actual published shape of
-// both @appspine/oidc-delegation and @appspine/auth's delegated crypto/claim verifier
+// both @appspine/oidc-delegation and @appspine/oidc-auth's delegated crypto/claim verifier
 // (their compiled dist/ output, not source) against the real dev-infra Keycloak realm.
 //
 // Deliberately stops before DelegatedPrincipalMapperService: that class's constructor
@@ -27,7 +27,7 @@
 // Config: KC_BASE_URL is required; the remaining variables default to the checked-in dev realm.
 //   KC_REALM, WIKI_SECRET, WIKI_DELEGATION_SECRET, WIKI_USER_PASSWORD
 
-import { DelegatedJwtVerifierService } from '../packages/auth/dist/delegated/delegated-jwt-verifier.service.js';
+import { DelegatedJwtVerifierService } from '../packages/oidc-auth/dist/delegated/delegated-jwt-verifier.service.js';
 import { OidcDelegationService } from '../packages/oidc-delegation/dist/index.js';
 
 const KC_BASE_URL = process.env.KC_BASE_URL;
@@ -115,7 +115,7 @@ async function main() {
   const verifier = new DelegatedJwtVerifierService();
   const verified = await verifier.verify(delegated.accessToken, trustProfile);
   console.log(
-    `[3/4] inbound verification succeeded via @appspine/auth: ${JSON.stringify(redactedClaimSummary(verified.claims))}`,
+    `[3/4] inbound verification succeeded via @appspine/oidc-auth: ${JSON.stringify(redactedClaimSummary(verified.claims))}`,
   );
 
   const assertions = [

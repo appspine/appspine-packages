@@ -1,0 +1,28 @@
+{
+  "mode": "pre",
+  "tag": "canary",
+  "initialVersions": {
+    "@appspine/audit-log": "1.1.1",
+    "@appspine/common": "0.3.4",
+    "@appspine/domain-events": "9.0.1",
+    "@appspine/e2e-kit": "1.0.2",
+    "@appspine/frontend-shell": "0.17.0",
+    "@appspine/health-check": "1.0.1",
+    "@appspine/identity-core": "2.0.1",
+    "@appspine/integration-contracts": "0.4.0",
+    "@appspine/m2m-api-key": "6.0.1",
+    "@appspine/master-data-client": "0.2.1",
+    "@appspine/mcp-server": "1.0.1",
+    "@appspine/metadata-schema": "1.0.1",
+    "@appspine/notification": "1.0.1",
+    "@appspine/oidc-auth": "2.0.1",
+    "@appspine/oidc-delegation": "0.4.1",
+    "@appspine/plugin-api": "1.1.0",
+    "@appspine/plugin-cli": "2.0.0",
+    "@appspine/plugin-host-nest": "2.0.0",
+    "@appspine/plugin-testkit": "2.0.0",
+    "@appspine/preset-standard": "2.0.0",
+    "@appspine/rbac": "5.0.1"
+  },
+  "changesets": ["051-v3-frontend-peer-range", "051-v3-m3-legacy-removal"]
+}

@@ -32,20 +32,21 @@ describe('McpModule real Nest DI boot verification', () => {
     await app.close();
   }, 15000);
 
-  it('allows downstream feature modules to inject McpToolRegistry without re-importing McpModule (Phase 4 @Global() compatibility bridge)', async () => {
-    // Models typical downstream app structure (e.g. calendar/backend/src/events/events.mcp.ts injected inside events.module.ts)
+  it('allows a downstream feature module with an explicit McpModule import to inject McpToolRegistry', async () => {
+    // Models downstream feature modules that own MCP providers after the v3 global bridge removal.
     @Injectable()
     class FeatureEventsMcp {
       constructor(@Inject(McpToolRegistry) public readonly registry: McpToolRegistry) {}
     }
 
     @Module({
+      imports: [McpModule],
       providers: [FeatureEventsMcp],
     })
     class FeatureEventsModule {}
 
     @Module({
-      imports: [McpModule, FeatureEventsModule],
+      imports: [FeatureEventsModule],
     })
     class RootAppModule {}
 

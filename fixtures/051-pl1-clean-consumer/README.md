@@ -25,7 +25,8 @@ Proves the Phase 1 packages work **as published**, not as workspace links.
   pilots, produces the expected registration and shutdown order, reports `ready`, and shows OIDC
   registered as the single interactive strategy;
 - composition of a plugin whose required capability is absent fails before Nest starts;
-- the legacy **`@appspine/auth` wiring** still boots and still exposes its pre-split surface.
+- the v3 transition-only surfaces are absent: no auth facade, capability UI re-exports,
+  `JwtOrApiKeyGuard`, notification compatibility subpath, or capability `@Global()` metadata.
 
 ## Why a hand-written schema
 
@@ -36,5 +37,5 @@ fragment's digest separately.
 
 ## Not covered here
 
-Frontend facets (Phase 3), the plugin lockfile (PL2-04) and generated composition (PL2-05) have no
-implementation yet, so this fixture wires plugins by hand the way `appspine.config.ts` will.
+Full frontend rendering, plugin lockfile generation, and Fleet boot are covered by their dedicated
+gates; this fixture focuses on what a clean tarball consumer can resolve and compose.

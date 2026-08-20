@@ -1,6 +1,6 @@
 import { MCP_TOOLS } from '@appspine/plugin-api';
 import { AppspineAuthInfrastructureModule } from '@appspine/plugin-host-nest';
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { DiscoveryPushService } from './discovery-push.service';
 import { McpController } from './mcp.controller';
 import { McpService } from './mcp.service';
@@ -9,15 +9,9 @@ import { McpToolRegistry } from './mcp-tool.registry';
 /**
  * Model Context Protocol Server capability module (051 PL4-06).
  *
- * In Phase 4 transition, `@Global()` is retained (and declared as `facets.backend.global: true` in
- * the manifest) so downstream applications whose feature modules (`*.mcp.ts`) inject `McpToolRegistry`
- * continue booting without immediate feature-level import changes. True removal of `@Global()` is
- * scheduled for Phase 5 when consumer apps are migrated to explicit module imports / generated composition.
- *
- * @deprecated 051 PL5-13: The `@Global()` decorator on `McpModule` is a compatibility bridge scheduled for removal in the next major version.
- * In plugin mode, declare feature MCP tools via `MCP_TOOLS` multi-provider or import `McpModule` explicitly.
+ * The module is deliberately scoped. Feature modules that inject `McpToolRegistry` must import it
+ * explicitly or import a generated plugin composition module that exports it.
  */
-@Global()
 @Module({
   imports: [AppspineAuthInfrastructureModule],
   controllers: [McpController],

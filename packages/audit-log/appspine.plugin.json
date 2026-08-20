@@ -19,7 +19,6 @@
     "backend": {
       "modulePath": "./dist/audit-log.module.js",
       "exportName": "AuditLogModule",
-      "global": true,
       "providerTokens": ["appspine.audit-sink"]
     },
     "prisma": {

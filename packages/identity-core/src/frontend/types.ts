@@ -1,4 +1,6 @@
-import type { SortableLinkComponent, SortOrder } from '@appspine/frontend-shell';
+import type { SortableLinkComponent, SortOrder } from '@appspine/frontend-shell' with {
+  'resolution-mode': 'import',
+};
 
 export type UserSortField = 'email' | 'name';
 

@@ -59,10 +59,10 @@ describe('manifest', () => {
     expect(mcpServerManifest.facets?.backend).toMatchObject({
       modulePath: './dist/mcp.module.js',
       exportName: 'McpModule',
-      global: true,
       controllerRoutes: ['mcp'],
       providerTokens: ['appspine.mcp-tools'],
     });
+    expect(mcpServerManifest.facets?.backend?.global).toBeUndefined();
     expect(mcpServerManifest.facets?.operations).toMatchObject({
       healthIndicatorId: 'mcp-server',
       shutdownTimeoutMs: 5000,

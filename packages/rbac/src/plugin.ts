@@ -35,7 +35,6 @@ export const rbacManifest: PluginManifestV1 = {
     backend: {
       modulePath: './dist/rbac.module.js',
       exportName: 'RbacModule',
-      global: true,
       controllerRoutes: ['roles'],
       providerTokens: ['appspine.rbac-policy'],
     },

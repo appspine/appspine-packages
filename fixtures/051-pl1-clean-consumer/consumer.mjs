@@ -10,12 +10,12 @@
  *   2. each plugin's `appspine.plugin.json` and Prisma fragment are actually in the tarball;
  *   3. a real Nest App boots in *plugin mode* through `createAppspineModule`, with all four
  *      pilots wired, and reports a catalog;
- *   4. the same App boots in *legacy mode* through `@appspine/auth`'s `AuthModule`, proving the
- *      compatibility facade still composes.
+ *   4. v3 no longer publishes the transition-only auth, capability UI, mixed guard, or global
+ *      module bridges.
  */
 
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
@@ -133,7 +133,9 @@ check('a real Nest App boots through the plugin host and reports a catalog', asy
   const { auditLogPlugin } = await import('@appspine/audit-log/plugin');
   const { identityCorePlugin } = await import('@appspine/identity-core/plugin');
   const { oidcAuthPlugin } = await import('@appspine/oidc-auth/plugin');
-  const { RbacModule } = await import('@appspine/rbac');
+  const { rbacPlugin } = await import('@appspine/rbac/plugin');
+  const { m2mApiKeyPlugin } = await import('@appspine/m2m-api-key/plugin');
+  const { mcpServerPlugin } = await import('@appspine/mcp-server/plugin');
   const { PrismaClient } = require('@prisma/client');
 
   const appspine = createAppspineModule({
@@ -148,6 +150,9 @@ check('a real Nest App boots through the plugin host and reports a catalog', asy
         required: true,
         configRef: 'oidc',
       },
+      { plugin: '@appspine/rbac', instanceId: 'default', enabled: true, required: true },
+      { plugin: '@appspine/m2m-api-key', instanceId: 'default', enabled: true, required: true },
+      { plugin: '@appspine/mcp-server', instanceId: 'default', enabled: true, required: true },
     ],
     plugins: [
       {
@@ -166,6 +171,18 @@ check('a real Nest App boots through the plugin host and reports a catalog', asy
         plugin: oidcAuthPlugin,
         packageVersion: require('@appspine/oidc-auth/package.json').version,
       },
+      {
+        plugin: rbacPlugin,
+        packageVersion: require('@appspine/rbac/package.json').version,
+      },
+      {
+        plugin: m2mApiKeyPlugin,
+        packageVersion: require('@appspine/m2m-api-key/package.json').version,
+      },
+      {
+        plugin: mcpServerPlugin,
+        packageVersion: require('@appspine/mcp-server/package.json').version,
+      },
     ],
     hostCapabilities: { 'appspine.prisma': new PrismaClient() },
     runtime: {
@@ -178,7 +195,7 @@ check('a real Nest App boots through the plugin host and reports a catalog', asy
   });
 
   const moduleRef = await Test.createTestingModule({
-    imports: [PrismaModule, appspine, RbacModule],
+    imports: [PrismaModule, appspine],
   }).compile();
   await moduleRef.init();
 
@@ -186,14 +203,29 @@ check('a real Nest App boots through the plugin host and reports a catalog', asy
   const described = host.describe();
 
   assert.equal(described.outcome, 'ready');
-  // audit-log, health-check and identity-core each depend only on host capabilities, so they form
-  // one tier and are ordered lexicographically; oidc-auth follows because it requires identity.
-  assert.deepEqual(described.order, ['audit-log', 'health-check', 'identity-core', 'oidc-auth']);
+  assert.deepEqual([...described.order].sort(), [
+    'audit-log',
+    'health-check',
+    'identity-core',
+    'm2m-api-key',
+    'mcp-server',
+    'oidc-auth',
+    'rbac',
+  ]);
+  assert.ok(described.order.indexOf('audit-log') < described.order.indexOf('rbac'));
+  assert.ok(described.order.indexOf('identity-core') < described.order.indexOf('oidc-auth'));
+  assert.ok(described.order.indexOf('rbac') < described.order.indexOf('m2m-api-key'));
   assert.deepEqual(described.shutdownOrder, [...described.order].reverse());
   assert.deepEqual(host.health(), { status: 'ready', degraded: [], failed: [] });
 
   // The strategy registry is the host-owned capability oidc-auth registered into (PL1-11).
-  assert.deepEqual(described.authenticationStrategies, [{ id: 'oidc', kind: 'interactive' }]);
+  assert.deepEqual(
+    [...described.authenticationStrategies].sort((left, right) => left.id.localeCompare(right.id)),
+    [
+      { id: 'api-key', kind: 'machine' },
+      { id: 'oidc', kind: 'interactive' },
+    ],
+  );
 
   // Every plugin reports the version that was actually installed, not a workspace placeholder.
   for (const entry of described.plugins) {
@@ -221,43 +253,45 @@ check('a required plugin whose capability is missing aborts composition', async 
   );
 });
 
-// --- 4. legacy mode --------------------------------------------------------------------------
+// --- 4. v3 removal boundaries ----------------------------------------------------------------
 
-check('the legacy @appspine/auth wiring still boots and exposes its old surface', async () => {
+check('v3 packages expose no transition-only capability surfaces or global bridges', async () => {
   await import('reflect-metadata');
-  const { Test } = await import('@nestjs/testing');
-  const { PrismaModule } = await import('@appspine/common');
-  const auth = await import('@appspine/auth');
+  const frontendShellEntry = require.resolve('@appspine/frontend-shell');
+  const frontendShellBarrel = readFileSync(frontendShellEntry, 'utf8');
+  for (const removedPath of [
+    'users-table',
+    'roles-table',
+    'api-keys-table',
+    'domain-events-table',
+    'login-button',
+    'auth-error',
+    '/notification/',
+  ]) {
+    assert.equal(
+      frontendShellBarrel.includes(removedPath),
+      false,
+      `frontend-shell still exports ${removedPath}`,
+    );
+  }
+  assert.throws(
+    () => require.resolve('@appspine/frontend-shell/notification'),
+    /not defined by "exports"|Package subpath/,
+  );
+
+  const m2m = await import('@appspine/m2m-api-key');
+  assert.equal(m2m.JwtOrApiKeyGuard, undefined);
+
   const { AuditLogModule } = await import('@appspine/audit-log');
   const { RbacModule } = await import('@appspine/rbac');
-
-  for (const name of [
-    'AuthModule',
-    'AuthController',
-    'AdminGuard',
-    'JwtAuthGuard',
-    'JwtVerifierService',
-    'UsersService',
-    'UsersController',
-    'CurrentUser',
-    'buildUserContext',
-    'resolveActingUserId',
-    'SYSTEM_ADMIN_ROLE',
-  ]) {
-    assert.ok(auth[name], `@appspine/auth no longer exports ${name}`);
+  const { ApiKeysModule } = m2m;
+  const { McpModule } = await import('@appspine/mcp-server');
+  for (const moduleClass of [AuditLogModule, RbacModule, ApiKeysModule, McpModule]) {
+    const isGlobal =
+      Reflect.getMetadata('__module:global__', moduleClass) ??
+      Reflect.getMetadata('global', moduleClass);
+    assert.equal(isGlobal, undefined, `${moduleClass.name} is still global`);
   }
-
-  const moduleRef = await Test.createTestingModule({
-    imports: [PrismaModule, AuditLogModule, RbacModule, auth.AuthModule],
-  }).compile();
-  await moduleRef.init();
-
-  // Same providers an App got before the split, now sourced from the two new packages.
-  assert.ok(moduleRef.get(auth.UsersService, { strict: false }));
-  assert.ok(moduleRef.get(auth.JwtVerifierService, { strict: false }));
-  assert.ok(moduleRef.get(auth.AdminGuard, { strict: false }));
-
-  await moduleRef.close();
 });
 
 // --- run ----------------------------------------------------------------------------------------

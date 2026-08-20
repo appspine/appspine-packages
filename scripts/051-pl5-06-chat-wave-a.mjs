@@ -3,7 +3,7 @@
  * PL5-06 — Chat Wave A Canary Plugin Mode Verification Script
  *
  * Validates:
- *  1. Builds and packs all 22 monorepo packages into clean canary tarballs.
+ *  1. Builds and packs all 21 monorepo packages into clean canary tarballs.
  *  2. Installs canary tarballs into chat via concrete tarball overrides.
  *  3. Runs `appspine build` to generate backend composition, catalog, frontend artifacts, schema, and plugin-lock.
  *  4. Validates zero drift with `appspine build --check`.
@@ -159,7 +159,6 @@ async function main() {
     'packages/identity-core',
     'packages/rbac',
     'packages/oidc-auth',
-    'packages/auth',
     'packages/m2m-api-key',
     'packages/metadata-schema',
     'packages/notification',

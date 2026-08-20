@@ -1,6 +1,6 @@
 {
   "name": "@appspine/identity-core",
-  "version": "2.0.1",
+  "version": "2.0.2-canary.0",
   "private": false,
   "description": "Provider-neutral user and service-account identity for Appspine apps: the User model, Users CRUD and the appspine.identity-store capability.",
   "files": [
@@ -55,7 +55,7 @@
   },
   "peerDependencies": {
     "@appspine/common": "^0.3.4",
-    "@appspine/frontend-shell": "^0.16.4",
+    "@appspine/frontend-shell": "^0.16.4 || ^1.0.0-canary.0",
     "@appspine/plugin-host-nest": "^2.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",

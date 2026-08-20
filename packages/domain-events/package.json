@@ -1,6 +1,6 @@
 {
   "name": "@appspine/domain-events",
-  "version": "9.0.1",
+  "version": "10.0.0-canary.0",
   "files": [
     "dist",
     "docs",
@@ -66,7 +66,7 @@
   },
   "peerDependencies": {
     "@appspine/common": "^0.3.4",
-    "@appspine/frontend-shell": "^0.16.4",
+    "@appspine/frontend-shell": "^1.0.0-canary.0",
     "@appspine/plugin-host-nest": "^2.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",

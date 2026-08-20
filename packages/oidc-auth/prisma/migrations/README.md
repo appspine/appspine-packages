@@ -3,11 +3,10 @@
 This package introduces one new table, `oidc_identities`. It is **required**, not optional, and it
 is required by more Apps than it first appears:
 
-`@appspine/auth`'s `AuthModule` composes `OidcAuthModule`, so an App that only upgrades
-`@appspine/auth` — without knowingly adopting `@appspine/oidc-auth` — still reaches
-`prisma.oidcIdentity.findUnique()` on **every** interactive login. Upgrading the package before
-creating the table means every login fails. `./prisma/user.prisma` being byte-identical says
-nothing about this: the new dependency is a new table, not a change to `users`.
+`OidcAuthModule` reaches `prisma.oidcIdentity.findUnique()` on **every** interactive login.
+Upgrading the package before creating the table means every login fails. An unchanged
+`identity-core` user schema says nothing about this: the dependency is a separate table, not a
+change to `users`.
 
 051 拆解 §2.3 forbids *applying* a migration as part of installing or enabling a plugin. It does not
 forbid producing one, and shipping the statement with the package is what lets an App owner review
@@ -17,7 +16,7 @@ and apply it deliberately.
 
 1. Apply the migration below. It is additive: no existing table is touched, so it is safe to run
    against a database still serving the previous release.
-2. Deploy the new `@appspine/oidc-auth` / `@appspine/auth`.
+2. Deploy the new `@appspine/oidc-auth`.
 
 Reversing that order breaks all interactive login for the window between the two steps.
 

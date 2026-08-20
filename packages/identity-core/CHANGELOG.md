@@ -1,5 +1,12 @@
 # @appspine/identity-core
 
+## 2.0.2-canary.0
+
+### Patch Changes
+
+- Accept the v3 frontend-shell major while retaining compatibility with the final v2 transition
+  release. This lets the canary fleet consume the new shell without peer-dependency conflicts.
+
 ## 2.0.0
 
 ### Minor Changes

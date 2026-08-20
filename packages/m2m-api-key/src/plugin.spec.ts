@@ -79,10 +79,10 @@ describe('manifest', () => {
     expect(m2mApiKeyManifest.facets?.backend).toMatchObject({
       modulePath: './dist/api-keys.module.js',
       exportName: 'ApiKeysModule',
-      global: true,
       controllerRoutes: ['api-keys'],
       providerTokens: ['appspine.scope-matcher'],
     });
+    expect(m2mApiKeyManifest.facets?.backend?.global).toBeUndefined();
     expect(m2mApiKeyManifest.facets?.frontend).toBeDefined();
     expect(m2mApiKeyManifest.facets?.prisma?.owns).toEqual(['ApiKey']);
     expect(m2mApiKeyManifest.facets?.permissions?.definitions).toContain('m2m:api-key:read');

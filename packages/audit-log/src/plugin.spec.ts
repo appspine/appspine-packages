@@ -37,6 +37,7 @@ const HOST = { 'appspine.prisma': {} };
 describe('manifest', () => {
   it('matches the appspine.plugin.json shipped in the package', () => {
     expect(manifestFile).toEqual(auditLogManifest);
+    expect(auditLogManifest.facets.backend?.global).toBeUndefined();
   });
 
   it('passes the real loader with a strict capability registry', () => {
@@ -91,7 +92,7 @@ describe('audit token inversion', () => {
 
     expect(providers).toContainEqual({ provide: AUDIT_SINK, useExisting: AuditLogService });
     expect(exports).toContain(AUDIT_SINK);
-    // Still exported concretely: a consumer mid-migration must not break.
+    // Concrete imports remain supported when the consumer explicitly imports this module.
     expect(exports).toContain(AuditLogService);
   });
 

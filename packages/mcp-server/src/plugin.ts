@@ -43,7 +43,6 @@ export const mcpServerManifest: PluginManifestV1 = {
     backend: {
       modulePath: './dist/mcp.module.js',
       exportName: 'McpModule',
-      global: true,
       controllerRoutes: ['mcp'],
       providerTokens: ['appspine.mcp-tools'],
     },

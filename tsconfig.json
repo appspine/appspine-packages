@@ -11,9 +11,6 @@
       "path": "packages/audit-log/tsconfig.build.json"
     },
     {
-      "path": "packages/auth/tsconfig.build.json"
-    },
-    {
       "path": "packages/common/tsconfig.build.json"
     },
     {

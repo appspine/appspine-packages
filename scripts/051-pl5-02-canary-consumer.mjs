@@ -3,7 +3,7 @@
  * PL5-02 — Canary Publish & Clean Registry Consumer Validation
  *
  * Validates:
- *  1. Tarball integrity, exports, manifests, and types for all 22 packages.
+ *  1. Tarball integrity, exports, manifests, and types for all 21 packages.
  *  2. Clean Consumer Isolation: Installs unpacked tarballs into an external, isolated workspace without workspace symlinks.
  *  3. Verifies CJS/ESM loading, exports resolution, and schema contracts.
  *  4. Template Clean Bootstrap: Runs template codegen (appspine build) and dual-mode runtime verification against tarballs.
@@ -57,7 +57,6 @@ async function main() {
     'packages/identity-core',
     'packages/rbac',
     'packages/oidc-auth',
-    'packages/auth',
     'packages/m2m-api-key',
     'packages/metadata-schema',
     'packages/notification',
