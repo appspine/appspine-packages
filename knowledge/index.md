@@ -116,6 +116,7 @@
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | completed | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [051-release-notes.md](decisions/051-release-notes.md) | decision | active | 051 - `appspine` 插件平台 2.0.0 Release Notes |
 | [051-v3-legacy-removal-codex-dispatch-prompt.md](topics/051-v3-legacy-removal-codex-dispatch-prompt.md) | topic | active | 051 v3.0.0 Legacy Removal — M1/M2 執行提示詞（Codex） |
+| [051-v3-m1-m2-legacy-removal-report.md](decisions/051-v3-m1-m2-legacy-removal-report.md) | decision | active | 051 v3.0.0 Legacy Removal：M1／M2 執行報告 |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
 | [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
