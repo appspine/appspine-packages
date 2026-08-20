@@ -10,7 +10,7 @@ transport: webhook
 capability_ref:
   contract_id: approve.knowledge-document-change-approved
   version: 1.0.0
-  digest: sha256:0f5dca78bb357e806c9ea13f45fbc5a0b746ce7f475d037a07ad028a9ccecf95
+  digest: sha256:28896c7a209f49c430e74565f00058d4cac11475f8000421668dc502b9108742
 source_app: approve
 destination_app: wiki
 destination_key: wiki.integration.events

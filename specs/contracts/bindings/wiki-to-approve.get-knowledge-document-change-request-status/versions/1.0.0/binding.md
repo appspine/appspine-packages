@@ -10,7 +10,7 @@ transport: http
 capability_ref:
   contract_id: approve.get-knowledge-document-change-request-status
   version: 1.0.0
-  digest: sha256:170352c088e811953462ec38588e0dc915944a3b74b746133ce7202eb2347ff3
+  digest: sha256:b97dc750830d83532922877ce543437053cc8f6da64a2ee27bf21e01d7d2fbbe
 source_app: wiki
 destination_app: approve
 destination_key: approve.integration.query

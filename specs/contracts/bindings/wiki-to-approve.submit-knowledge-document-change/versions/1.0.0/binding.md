@@ -10,7 +10,7 @@ transport: http
 capability_ref:
   contract_id: approve.submit-knowledge-document-change
   version: 1.0.0
-  digest: sha256:0ec574ad13381a13908f65db8bba68184d09fdca8ad41c74158340195853706c
+  digest: sha256:6b022f160e3035d8a609128bf84189f87f9230e5edb6ebd493435d78d8f47c66
 source_app: wiki
 destination_app: approve
 destination_key: approve.integration.command

@@ -14,7 +14,9 @@ import { createRequire } from 'node:module';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 
 const root = resolve(process.env.APPSPINE_WORKSPACE_ROOT ?? process.cwd());
-const contractsRoot = join(root, 'knowledge', 'contracts');
+const contractsRoot = existsSync(join(root, 'specs', 'contracts'))
+  ? join(root, 'specs', 'contracts')
+  : join(root, 'knowledge', 'contracts');
 const META_SCHEMA = JSON.parse(readFileSync(join(contractsRoot, 'meta-schema.json'), 'utf8'));
 const CLI_SCHEMA_KEYWORDS = new Set([
   '$schema',
