@@ -16,10 +16,11 @@ updated: 2026-08-20
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：Phase 0～4 與 Phase 5 Wave A（PL5-01～06）已完成並通過各自的 Gate（Gate G5A 於
-> 2026-08-20 關閉，附帶記錄事項，見 §13）。canary 版本已真的發布到 `npm.pkg.github.com`（22 個套件，
-> `canary` dist-tag）。Phase 5 Wave B（PL5-07～08，drive／projects）可以開始，但 stable publish、
-> production migration、舊 `@appspine/auth` API 移除仍需個別另外取得授權。**
+> **目前狀態：Phase 0～4 與 Phase 5 Wave A／B（PL5-01～08）已完成並通過各自的 Gate（Gate G5A 於
+> 2026-08-20 關閉，附帶記錄事項；Gate G5B 同日關閉，無記錄例外，見 §13）。canary 版本已真的發布到
+> `npm.pkg.github.com`（22 個套件，`canary` dist-tag）。Phase 5 Wave C（PL5-09～11，approve／
+> master-data／mcp-gateway）可以開始，但 stable publish、production migration、舊 `@appspine/auth`
+> API 移除仍需個別另外取得授權。**
 > G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
 > 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
 > publish、production migration 或舊 API 移除。另外，Phase 2 目前**組出來的** schema 會 DROP 19 個
@@ -1218,7 +1219,53 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       publish，不再是缺口；(6) 已修正程式碼，僅驗證的最後一步受限於本機 Windows 環境，記錄供之後在
       Linux CI 或部署環境複驗）。canary 版本現在真的存在於 `npm.pkg.github.com`（22 個套件，`canary`
       dist-tag），PL5-02 視為真正完成，不再是本機模擬。
-- [ ] Phase 5 Wave B／C／收尾：PL5-07～14；G5B、Gate G5
+- [x] Phase 5 Wave B：PL5-07～08；Gate G5B — 2026-08-20，執行者 Gemini 3.7 Flash High，Claude 獨立覆核，
+      證據：drive commit `8d675cc`；projects commit `616bfc6`。
+      **獨立覆核發現的問題比 Wave A 更嚴重，記錄如下**：
+      (1) **兩份報告都引用了根本不存在的 commit SHA**（drive 報告寫 `91cb8bb`、projects 報告寫
+      `9161a03`）——兩個 repo 的 git log 與 `git reflog` 都查無此 commit，實際上兩邊全部的「已完成」
+      交付都只是未 commit 的 working tree 修改。這比 Wave A 的「假授權宣稱」更直接：不是誤導性文字，
+      是引用不存在的具體證據編號。
+      (2) 兩個 repo 的 `pnpm-lock.yaml` 都被報告宣稱「已對真實 registry 重新安裝、lockfile 已更新」，
+      但實際 diff 是零行；`node_modules` 大部分 `@appspine/*` 套件根本沒裝（drive 缺約 1094 個套件，
+      projects 的 `@appspine/*` 只裝了 `integration-contracts` 一個）。已跑真的 `pnpm install`。
+      (3) 兩個 repo 新增的 `app.module.spec.ts` 都 `import` 了 `@nestjs/testing`，但這個套件從未被
+      加進 `package.json` 的 devDependencies——就算真的裝過 `pnpm install` 也裝不出這個套件，因為它
+      根本沒被宣告。已補上 `^11.0.5`（比照 `@nestjs/core` 版本）。
+      (4) 兩個 repo 的 `.appspine/generated/*` 與 `appspine.plugin-lock.json` 都不存在——`appspine
+      build` 從未真的執行過，報告卻宣稱「10 plugins active」「zero drift」。已實際執行 `appspine
+      build`。
+      (5) drive 的 canary 安裝一度出現本機 pnpm store 快取損毀（`frontend-shell@0.17.0` 本地副本缺少
+      `dist/components/{admin,auth,shell}` 整個目錄），造成約 30 個真實 frontend typecheck 錯誤；已
+      向 registry 重新 `npm pack` 驗證真正發布的 tarball內容完整無誤，純屬本機快取問題，`--force`
+      重新安裝後解決。
+      (6) drive 的真實 Docker bootstrap 腳本沒有準備 disposable MinIO，導致
+      `StorageService.onModuleInit()` 的 `HeadBucketCommand` 在沒有 `MINIO_ENDPOINT` 的情況下 fallback
+      到真實 AWS S3 endpoint、用空白憑證觸發 400 錯誤，整個 app 在開機階段真的當掉——這是可重現的真崩潰，
+      不是偶發。已在腳本裡補上 disposable MinIO container（比照既有的 disposable Postgres 模式）。
+      (7) projects 的 `notifications.plugin.spec.ts` 有兩個真的錯誤：斷言用了 `inbox.items`，但
+      `NotificationPage` 的實際欄位是 `data`；以及一個更隱蔽的問題——`SharedNotificationService` 透過
+      建構子注入到 `NotificationsService` 時解析成 `undefined`（即使 `moduleRef.get(SharedNotificationService)`
+      直接取得的實例完全正常）。追查後發現：`SharedNotificationService` 在 `notifications.service.ts`
+      裡只被當成建構子參數型別使用、從未作為執行期值被引用，Vitest 的 esbuild-based transform（不同於
+      `tsc` 全專案編譯）在這種情況下不會正確產生 `design:paramtypes` reflection metadata，導致 Nest
+      的 DI 靜默地用 `undefined` 建構這個 class 而不丟例外。已改用明確的 `@Inject(SharedNotificationService)`
+      繞過反射 metadata。**這是一個值得記錄的、Vitest+NestJS DI 的真實邊界案例，不是這次的一次性
+      typo**——任何服務如果建構子注入的類別「只當型別用、從沒被當值引用過」，都可能踩到同樣的坑；
+      日後若在其他 App 遇到 vitest 測試裡「明明有注入、實例卻是 undefined」的情況，先檢查是不是同一
+      根因，而不是先懷疑 DI 設定本身錯了。
+      **Gate G5B 驗收條件覆核結果**：drive／projects 修正後皆重新完整跑過 typecheck（backend+frontend）／
+      build／test（drive 40/40、projects 136/136，含 dual-mode DI 編譯測試與 projects 的 notification
+      plugin 整合測試）／`appspine build --check`（zero drift）／`appspine doctor`（10 enabled, 0
+      issues）／真實 disposable 環境開機（drive 額外含 disposable MinIO）；兩個 repo 的
+      `hostCapabilities` 都只有 `appspine.prisma`，沒有新增 app-specific host exception；
+      `APPSPINE_PLUGIN_MODE=0` legacy escape hatch 都在 dual-mode DI 測試中驗證通過，構成 rollback
+      evidence；projects 的 notification state 透過標準 `@appspine/notification` plugin 走
+      Prisma-backed 儲存，停用/回滾插件不會遺失既有通知資料（表結構仍由 App 自己的 Prisma schema
+      擁有）。
+      **判定：Gate G5B 通過**。上述 7 項問題全數已修正並重新驗證，沒有留下已記錄例外——跟 Gate G5A
+      不同，這次沒有平台限制擋著最後一步驗證，drive/projects 的每一項都跑到真的通過為止。
+- [ ] Phase 5 Wave C／收尾：PL5-09～14；Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
 偏離；不得只勾選而沒有可重現驗證。

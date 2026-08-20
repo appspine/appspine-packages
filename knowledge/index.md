@@ -96,6 +96,8 @@
 | [051-pl5-04-wiki-canary-rollout.md](topics/051-pl5-04-wiki-canary-rollout.md) | topic | active | 051 PL5-04 — Wiki Canary Rollout 報告 |
 | [051-pl5-05-calendar-wave-a-rollout.md](topics/051-pl5-05-calendar-wave-a-rollout.md) | topic | active | 051 PL5-05 — Calendar Wave A Canary Rollout 報告 |
 | [051-pl5-06-chat-wave-a-rollout.md](topics/051-pl5-06-chat-wave-a-rollout.md) | topic | active | 051 PL5-06 — Chat Wave A Canary Rollout 與 Realtime Lifecycle 報告 |
+| [051-pl5-07-drive-wave-b.md](topics/051-pl5-07-drive-wave-b.md) | topic | active | 051 PL5-07 — Drive Wave B Canary Rollout 報告 |
+| [051-pl5-08-projects-wave-b.md](topics/051-pl5-08-projects-wave-b.md) | topic | active | 051 PL5-08 — Projects Wave B Canary Rollout 報告 |
 | [051-pl5-gemini-dispatch-prompts.md](topics/051-pl5-gemini-dispatch-prompts.md) | topic | active | 051 Phase 5 派工 Prompt — 給 Gemini 執行（PL5-01～06，不含 Gate G5A） |
 | [051-pl5-wave-b-gemini-dispatch-prompt.md](topics/051-pl5-wave-b-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave B 執行提示詞（PL5-07 ～ PL5-08） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
