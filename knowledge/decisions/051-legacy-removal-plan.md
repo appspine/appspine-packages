@@ -1,7 +1,7 @@
 ---
 type: decision
 scope: cross-repo
-status: active
+status: completed
 supersedes: null
 superseded_by: null
 created: 2026-08-20
@@ -128,3 +128,23 @@ supersede 關係即可。往後任何提到這 9 個 repo「雙模式回滾」�
 **M3 判定**：技術面 telemetry 已收斂到 0，但在使用者針對上述雙模式移除做出決定、以及另外明確授權
 breaking M3 之前，不得執行任何刪除 legacy export、移除 `@Global()`、bump major、publish 或 push
 的動作。
+
+---
+
+## 6. M3 執行完成（2026-08-20）
+
+使用者在 Claude 完成 M1／M2 覆核後，明確要求 OpenAI Codex 接續執行 M3。技術執行與發布已完成，
+完整證據見 [051-v3-m3-legacy-removal-report.md](051-v3-m3-legacy-removal-report.md)。
+
+- `packages/auth`、四個 capability `@Global()` bridge、`JwtOrApiKeyGuard`、frontend-shell 過渡
+  capability UI／subpaths、deprecated v1 webhook sender 均已移除。
+- 10 個 canary 與 10 個 stable packages 已發布；stable `latest` 與 registry metadata 已核對。
+- template + 8 Apps 已切到 stable 精確版本；telemetry 為 0，18 個 typecheck、18 個 build、9 組
+  backend test、9 個 disposable runtime bootstrap 全部通過。
+- platform implementation commit：`057c121`；stable release commit：
+  `475a431ac466cfa624e0ea2b1d9ba9093088a2f6`。九個 consumer HEAD 見執行報告 §4。
+- 本輪未執行 `git push`。M3 未另行安排 independent review；不得把 Claude 的 M1／M2 覆核誤記為
+  M3 覆核。
+
+「v3.0.0」是 legacy-removal 平台里程碑名稱；套件仍依既有 Changesets independent-versioning
+治理，實際 stable versions 與連鎖 major bump 見執行報告 §3。

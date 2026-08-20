@@ -146,10 +146,10 @@ Bearer token，再依 template propagation 流程傳播到 `appspine-app-templat
 （見 §4 Phase 4）。這正是原 Z27 草稿刻意迴避的「改造每個業務 App 的內部認證」，本計畫既然
 決定移除 `VaultedAppKey`，就必須承擔這部分工作，不能假設 App 端零改動。
 
-**現成的 `JwtOrApiKeyGuard` 不能直接沿用**：
-[`jwt-or-api-key.guard.ts:14-18`](../../packages/m2m-api-key/src/guards/jwt-or-api-key.guard.ts)
-的語意是「API key 優先，沒有 API key 才 fallback 到 JWT」，與本計畫「`/mcp` 只認 EMA 委派
-token」的方向相反，需要另外實作或改造。
+**v3 前的 `JwtOrApiKeyGuard` 不能直接沿用**：其語意是「API key 優先，沒有 API key 才
+fallback 到 JWT」，與本計畫「`/mcp` 只認 EMA 委派 token」的方向相反，需要另外實作或改造。
+該 deprecated guard 已在 [051 v3 M3](../decisions/051-v3-m3-legacy-removal-report.md) 移除；此段保留
+作為當時可行性判斷的歷史脈絡。
 
 ### 2.2 兩個層級的 `/mcp` 必須分開討論
 

@@ -1392,6 +1392,19 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       是否要把這些分支推上 origin（merge 到 main 或開 PR），需要使用者另外明確授權，不在這次
       stable publish 授權的範圍內。
 
+### v3 Legacy Removal 後續執行紀錄（M1～M3）
+
+原 051 Gate G5 完成後的 transition window 已於 2026-08-20 依
+[051-legacy-removal-plan.md](051-legacy-removal-plan.md) 收斂：M1／M2 由 Codex 執行並經 Claude 獨立
+覆核，使用者接受移除 dual-mode rollback escape hatch，隨後明確要求 Codex 執行 breaking M3。
+
+M3 已完成 `packages/auth`／capability global bridges／deprecated public surfaces 移除、canary 與
+stable publish、九個 consumer stable migration，以及 zero-legacy／clean-consumer／full build／真實
+runtime fleet 驗收。證據：platform commits `057c121`、
+`475a431ac466cfa624e0ea2b1d9ba9093088a2f6`；完整版本矩陣、consumer HEAD、驗證結果與 substitution
+log 見 [051-v3-m3-legacy-removal-report.md](051-v3-m3-legacy-removal-report.md)。本紀錄不回寫或改變
+Gate G5 當時的歷史判定；M3 本輪未另行安排 independent review，且未執行任何 `git push`。
+
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
 偏離；不得只勾選而沒有可重現驗證。
 

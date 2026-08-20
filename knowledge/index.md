@@ -44,7 +44,7 @@
 | [051-compatibility-report.md](decisions/051-compatibility-report.md) | decision | active | 051 - `appspine` 插件平台 2.0.0 相容性報告 (Compatibility Report) |
 | [051-fleet-upgrade-conclusion.md](decisions/051-fleet-upgrade-conclusion.md) | decision | active | 051 - Fleet 升級結論與最終驗收總結 (Fleet Upgrade Conclusion) |
 | [051-incident-rollback-contacts.md](decisions/051-incident-rollback-contacts.md) | decision | active | 051 - 發布事故應變、回滾指南與緊急聯絡名冊 (Incident & Rollback Contacts) |
-| [051-legacy-removal-plan.md](decisions/051-legacy-removal-plan.md) | decision | active | 051 - 下一代 Major 版本 Legacy API 移除正式計畫 (Legacy Removal Plan) |
+| [051-legacy-removal-plan.md](decisions/051-legacy-removal-plan.md) | decision | completed | 051 - 下一代 Major 版本 Legacy API 移除正式計畫 (Legacy Removal Plan) |
 | [051-legacy-removal-proposal.md](decisions/051-legacy-removal-proposal.md) | decision | active | 051 - 下一個 Major 版本 Legacy API 移除提案 (Draft) |
 | [051-pl0-baseline.md](topics/051-pl0-baseline.md) | topic | active | 051 PL0-01 — Execution Baseline |
 | [051-pl0-build-graph.md](topics/051-pl0-build-graph.md) | topic | active | 051 PL0-07 — TypeScript Project References ／ Build Graph |
@@ -117,6 +117,7 @@
 | [051-release-notes.md](decisions/051-release-notes.md) | decision | active | 051 - `appspine` 插件平台 2.0.0 Release Notes |
 | [051-v3-legacy-removal-codex-dispatch-prompt.md](topics/051-v3-legacy-removal-codex-dispatch-prompt.md) | topic | active | 051 v3.0.0 Legacy Removal — M1/M2 執行提示詞（Codex） |
 | [051-v3-m1-m2-legacy-removal-report.md](decisions/051-v3-m1-m2-legacy-removal-report.md) | decision | active | 051 v3.0.0 Legacy Removal：M1／M2 執行報告 |
+| [051-v3-m3-legacy-removal-report.md](decisions/051-v3-m3-legacy-removal-report.md) | decision | completed | 051 v3 Legacy Removal：M3 執行報告 |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
 | [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
