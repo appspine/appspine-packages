@@ -1,6 +1,6 @@
 {
   "name": "@appspine/health-check",
-  "version": "1.0.2-canary.0",
+  "version": "2.0.0",
   "private": false,
   "files": [
     "dist",
@@ -49,7 +49,7 @@
     "@appspine/plugin-host-nest": "workspace:*"
   },
   "peerDependencies": {
-    "@appspine/frontend-shell": "^0.16.4 || ^1.0.0-canary.0",
+    "@appspine/frontend-shell": "^1.0.0",
     "@appspine/plugin-host-nest": "^2.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",

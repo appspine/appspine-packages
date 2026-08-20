@@ -1,6 +1,6 @@
 {
   "name": "@appspine/rbac",
-  "version": "6.0.0-canary.0",
+  "version": "6.0.0",
   "private": false,
   "files": [
     "dist",
@@ -51,9 +51,9 @@
     "@appspine/plugin-api": "workspace:*"
   },
   "peerDependencies": {
-    "@appspine/audit-log": "^2.0.0-canary.0",
+    "@appspine/audit-log": "^2.0.0",
     "@appspine/common": "^0.3.4",
-    "@appspine/frontend-shell": "^1.0.0-canary.0",
+    "@appspine/frontend-shell": "^1.0.0",
     "@appspine/plugin-host-nest": "^2.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",

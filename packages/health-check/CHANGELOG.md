@@ -1,5 +1,14 @@
 # @appspine/health-check
 
+## 2.0.0
+
+### Patch Changes
+
+- 057c121: Accept the v3 frontend-shell major while retaining compatibility with the final v2 transition
+  release. This lets the canary fleet consume the new shell without peer-dependency conflicts.
+- Updated dependencies [057c121]
+  - @appspine/frontend-shell@1.0.0
+
 ## 1.0.2-canary.0
 
 ### Patch Changes

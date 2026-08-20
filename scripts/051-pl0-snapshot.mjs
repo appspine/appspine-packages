@@ -81,7 +81,11 @@ const DEFAULT_BASELINE = 'fixtures/051-pl0-baseline/snapshot.json';
 // it afterwards; the *current* phase writes to its own file, which is what `verify:snapshot`
 // checks. Regenerating a sealed one deletes the evidence its gate was judged against — that is
 // what happened to the PL0 baseline during Phase 1 (Gate G1 review B2).
-const SEALED_BASELINES = new Set([DEFAULT_BASELINE, 'fixtures/051-pl1-baseline/snapshot.json']);
+const SEALED_BASELINES = new Set([
+  DEFAULT_BASELINE,
+  'fixtures/051-pl1-baseline/snapshot.json',
+  'fixtures/051-pl2-baseline/snapshot.json',
+]);
 
 /**
  * Which file --baseline names, and whether writing to it is allowed.
@@ -109,27 +113,28 @@ function resolveBaseline(argv, root, writing) {
 }
 
 if (process.argv.includes('--self-test')) {
-  const sealed = 'fixtures/051-pl0-baseline/snapshot.json';
-  const spellings = [
-    sealed,
-    `./${sealed}`,
-    `fixtures/../${sealed}`,
-    path.resolve(repoRoot, sealed),
-    toPosix(sealed).split('/').join(path.sep),
-  ];
   let failures = 0;
-  for (const spelling of spellings) {
-    let refused = false;
-    try {
-      resolveBaseline(['--baseline', spelling], repoRoot, true);
-    } catch {
-      refused = true;
+  for (const sealed of SEALED_BASELINES) {
+    const spellings = [
+      sealed,
+      `./${sealed}`,
+      `fixtures/../${sealed}`,
+      path.resolve(repoRoot, sealed),
+      toPosix(sealed).split('/').join(path.sep),
+    ];
+    for (const spelling of spellings) {
+      let refused = false;
+      try {
+        resolveBaseline(['--baseline', spelling], repoRoot, true);
+      } catch {
+        refused = true;
+      }
+      if (!refused) failures += 1;
+      console.log(`${refused ? 'PASS' : 'FAIL'} refuses --write to ${spelling}`);
     }
-    if (!refused) failures += 1;
-    console.log(`${refused ? 'PASS' : 'FAIL'} refuses --write to ${spelling}`);
   }
   // The seal must not become a blanket refusal: the current phase writes its own file.
-  const current = 'fixtures/051-pl2-baseline/snapshot.json';
+  const current = 'fixtures/051-v3-baseline/snapshot.json';
   let allowed = true;
   try {
     resolveBaseline(['--baseline', current], repoRoot, true);
