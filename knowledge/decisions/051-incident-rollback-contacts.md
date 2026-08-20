@@ -58,8 +58,9 @@ pnpm appspine doctor
 # 步驟 2: 檢查組裝產物與 Schema 是否飄移
 pnpm appspine build --check
 
-# 步驟 3: 驗證環境變數與資料庫連線
-node scripts/test-real-bootstrap.mjs
+# 步驟 3: 驗證環境變數與資料庫連線（各 App 有自己的腳本，不是共用檔名；例如）
+node scripts/051-pl5-04-wiki-canary.mjs        # wiki
+node scripts/051-pl5-07-drive-real-bootstrap.mjs   # drive
 ```
 
 ---

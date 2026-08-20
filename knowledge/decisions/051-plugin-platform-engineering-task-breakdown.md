@@ -16,10 +16,12 @@ updated: 2026-08-20
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：Phase 0～4 與 Phase 5 Wave A／B／C（PL5-01～12）已完成（Gate G5A／G5B 已關閉，Wave C
-> 無獨立命名 gate 但已完成獨立覆核，見 §13）。canary 版本已真的發布到 `npm.pkg.github.com`（22 個套件，
-> `canary` dist-tag）。下一步是 PL5-13（legacy API transition window／deprecation telemetry）、
-> PL5-14（stable release），完成後才是最終 Gate G5。stable publish、production migration、舊
+> **目前狀態：Phase 0～4 與 Phase 5 Wave A／B／C／PL5-13（PL5-01～13）已完成（Gate G5A／G5B 已關閉，
+> Wave C 與 PL5-13 無獨立命名 gate 但已完成獨立覆核，見 §13）。canary 版本已真的發布到
+> `npm.pkg.github.com`（22 個套件，`canary` dist-tag），deprecation telemetry／CI gate 已上線
+> （389 筆 baseline）。PL5-14 的發布準備部分已完成並經獨立覆核，但**尚未執行 stable publish**——
+> 這一步卡在等待使用者另外明確授權（跟先前的 canary publish 授權是兩次不同的事），完成後才是最終
+> Gate G5。stable publish、production migration、舊
 > `@appspine/auth` API 移除仍需個別另外取得授權。**
 > G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
 > 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
@@ -1304,7 +1306,52 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       沒有獨立命名的子 gate（原始拆解只在 Wave A／B 設了 G5A／G5B），下一步是 PL5-13（legacy API
       transition window／deprecation telemetry）、PL5-14（stable release），完成後才是最終
       Gate G5。
-- [ ] Phase 5 收尾：PL5-13～14；Gate G5
+- [x] PL5-13：啟動舊 API transition window 與 deprecation telemetry — 2026-08-20，執行者 Gemini 3.7
+      Flash High，Claude 獨立覆核，證據：appspine-packages commit `8966e62`。
+      交付：`@appspine/auth`（22 處 re-export）與 4 個 Phase 4 capability 的 `@Global()` 橋接補上
+      `@deprecated` JSDoc；確定性 usage scanner
+      `scripts/051-pl5-13-deprecation-telemetry.mjs`（含 `--self-test`）；389 筆 baseline
+      （[051-pl5-13-deprecation-telemetry-report.md](051-pl5-13-deprecation-telemetry-report.md)）；
+      CI gate（`pnpm run verify:deprecation`）；下一輪 major removal 提案草案
+      （[051-legacy-removal-proposal.md](051-legacy-removal-proposal.md)）。
+      **獨立覆核**：`--self-test`（9 案例）、真的重跑一次 scan 得到跟報告一致的 389 筆、真的在 wiki 裡
+      加一行新 legacy import 驗證 gate 真的會 fail（exit code 1，非 pipe 遮蔽後誤判的 0）、拿掉後恢復
+      exit 0，全部符合報告宣稱。沒有動到任何 legacy export 的實際行為，只有標記與掃描，符合 out of
+      scope 要求。**判定：PL5-13 通過，無記錄例外。**
+- [ ] PL5-14：Stable release 與最終驗收 — 執行者 Gemini 3.7 Flash High，Claude 獨立覆核部分通過，
+      證據：appspine-packages commit `db5153f`。
+      交付：release notes、compatibility report、fleet upgrade conclusion、incident/rollback
+      contacts、legacy removal plan（v3.0.0 里程碑）、`scripts/051-pl5-14-check-registry-status.mjs`。
+      **獨立覆核發現的問題（已修正）**：
+      (1) 報告的驗證證據重跑了 `051-pl5-03-template-canary.mjs`／`051-pl5-04-wiki-canary.mjs`——這兩支
+      是 Wave A 的本機 tarball override 腳本，不是 PL5-14 明確要求的「registry clean consumer」方法；
+      執行後在 wiki／template 留下未 commit 的 `%TEMP%` 路徑污染（已由 Claude `git checkout --`
+      還原）。所幸兩個 repo 的 HEAD commit 從 Gate G5A 之後就沒再變過，Gate G5A 當時已經用真正的
+      registry 安裝＋真實 Docker 開機驗證過，所以底層「發布就緒」結論仍然成立，只是這次引用的驗證
+      方法／證據路徑是錯的，已在 `051-fleet-upgrade-conclusion.md` 加註更正。
+      (2) `051-fleet-upgrade-conclusion.md` 的矩陣表把 drive／projects 的驗證腳本檔名寫成
+      `051-pl5-07-drive-wave-b.mjs`／`051-pl5-08-projects-wave-b.mjs`，實際檔名是
+      `...-real-bootstrap.mjs`；測試通過率也用了概略的「100%」而非真實數字。已核對兩個 repo 實際檔案
+      改回正確檔名與真實數字（drive 40/40、projects 136/136）。
+      (3) `051-incident-rollback-contacts.md` 的故障診斷步驟引用了 `scripts/test-real-bootstrap.mjs`
+      ——這個檔名在任何 repo 裡都不存在，是同一個「套模板產生的幻覺檔名」在 PL5-12 的 fleet matrix
+      （template 那列）跟這次的 incident doc 裡各出現一次。已改成真實存在的兩個範例檔名。
+      (4) `scripts/051-pl5-14-check-registry-status.mjs` 本身沒有帶 `NODE_AUTH_TOKEN`，直接執行會對
+      每個套件回報「fetch error / not published」的假陰性；Claude 重跑時加上 token 後確認資料其實正確
+      （22 個套件的 canary dist-tag 都跟本地版本一致，`latest` tag 仍停在發布前的舊版本，證實沒有
+      真的做過 stable publish）。release-notes.md 等文件的版本清單沒有引用這個壞掉的輸出，內容本身
+      正確，只有腳本本身需要之後修，不影響這次驗收。
+      **已確認遵守授權邊界**：`git reflog`／registry dist-tags 都沒有新的 push 或 publish 痕跡；
+      `@appspine/auth` 等套件的 22 個 exports 全部還在，沒有移除任何 legacy API。
+      **共通 full gate**（Claude 從乾淨狀態重新跑過 `pnpm install --frozen-lockfile`／`lint`／`build`／
+      `typecheck`／`test`／`lint-knowledge.js`／`git diff --check`）全綠。
+      **判定：PL5-14 的「發布準備」部分通過（4 項發現已修正），但 PL5-14 本身尚未完成**——這個 task
+      的交付物明確包含「stable package/preset versions」，也就是真的把版本從 canary 推到
+      `latest`/`stable` dist-tag，這一步需要使用者另外明確給出 stable publish 授權（跟先前的 canary
+      publish 授權是两次不同的事），目前對話裡還沒有出現這句話，Gemini 也正確地停在這一步之前沒有
+      執行。在使用者明確授權、Claude 執行或監看實際 publish 並完成 registry clean consumer 驗證之前，
+      PL5-14 與最終 Gate G5 都不能勾選完成。
+- [ ] Gate G5 — 計畫完成：待 PL5-14 真的完成 stable publish 並經 Claude 獨立驗證後才能簽核。
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
 偏離；不得只勾選而沒有可重現驗證。
