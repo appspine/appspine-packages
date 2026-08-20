@@ -98,6 +98,10 @@
 | [051-pl5-06-chat-wave-a-rollout.md](topics/051-pl5-06-chat-wave-a-rollout.md) | topic | active | 051 PL5-06 — Chat Wave A Canary Rollout 與 Realtime Lifecycle 報告 |
 | [051-pl5-07-drive-wave-b.md](topics/051-pl5-07-drive-wave-b.md) | topic | active | 051 PL5-07 — Drive Wave B Canary Rollout 報告 |
 | [051-pl5-08-projects-wave-b.md](topics/051-pl5-08-projects-wave-b.md) | topic | active | 051 PL5-08 — Projects Wave B Canary Rollout 報告 |
+| [051-pl5-09-approve-rollout.md](topics/051-pl5-09-approve-rollout.md) | topic | active | 051 PL5-09 — Approve Wave C Canary Rollout 報告 |
+| [051-pl5-10-master-data-rollout.md](topics/051-pl5-10-master-data-rollout.md) | topic | active | 051 PL5-10 — Master-Data Wave C Canary Rollout 報告 |
+| [051-pl5-11-mcp-gateway-rollout.md](topics/051-pl5-11-mcp-gateway-rollout.md) | topic | active | 051 PL5-11 — MCP-Gateway Wave C Canary Rollout 報告 |
+| [051-pl5-12-fleet-matrix.md](topics/051-pl5-12-fleet-matrix.md) | topic | active | 051 PL5-12 — Appspine 插件平台全艦隊（Fleet Matrix）Rollout 總審計報告 |
 | [051-pl5-gemini-dispatch-prompts.md](topics/051-pl5-gemini-dispatch-prompts.md) | topic | active | 051 Phase 5 派工 Prompt — 給 Gemini 執行（PL5-01～06，不含 Gate G5A） |
 | [051-pl5-wave-b-gemini-dispatch-prompt.md](topics/051-pl5-wave-b-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave B 執行提示詞（PL5-07 ～ PL5-08） |
 | [051-pl5-wave-c-gemini-dispatch-prompt.md](topics/051-pl5-wave-c-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave C 執行提示詞（PL5-09 ～ PL5-12） |

@@ -16,11 +16,11 @@ updated: 2026-08-20
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：Phase 0～4 與 Phase 5 Wave A／B（PL5-01～08）已完成並通過各自的 Gate（Gate G5A 於
-> 2026-08-20 關閉，附帶記錄事項；Gate G5B 同日關閉，無記錄例外，見 §13）。canary 版本已真的發布到
-> `npm.pkg.github.com`（22 個套件，`canary` dist-tag）。Phase 5 Wave C（PL5-09～11，approve／
-> master-data／mcp-gateway）可以開始，但 stable publish、production migration、舊 `@appspine/auth`
-> API 移除仍需個別另外取得授權。**
+> **目前狀態：Phase 0～4 與 Phase 5 Wave A／B／C（PL5-01～12）已完成（Gate G5A／G5B 已關閉，Wave C
+> 無獨立命名 gate 但已完成獨立覆核，見 §13）。canary 版本已真的發布到 `npm.pkg.github.com`（22 個套件，
+> `canary` dist-tag）。下一步是 PL5-13（legacy API transition window／deprecation telemetry）、
+> PL5-14（stable release），完成後才是最終 Gate G5。stable publish、production migration、舊
+> `@appspine/auth` API 移除仍需個別另外取得授權。**
 > G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
 > 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
 > publish、production migration 或舊 API 移除。另外，Phase 2 目前**組出來的** schema 會 DROP 19 個
@@ -1265,7 +1265,46 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       擁有）。
       **判定：Gate G5B 通過**。上述 7 項問題全數已修正並重新驗證，沒有留下已記錄例外——跟 Gate G5A
       不同，這次沒有平台限制擋著最後一步驗證，drive/projects 的每一項都跑到真的通過為止。
-- [ ] Phase 5 Wave C／收尾：PL5-09～14；Gate G5
+- [x] Phase 5 Wave C：PL5-09～12 — 2026-08-20，執行者 Gemini 3.7 Flash High，Claude 獨立覆核，
+      證據：approve commit `5ea4a87`；master-data commit `e931b0f`；mcp-gateway commit `3613639`
+      （含 Claude 的型別修正，見下）；fleet matrix 報告
+      [051-pl5-12-fleet-matrix.md](../topics/051-pl5-12-fleet-matrix.md)（含 Claude 的更正，見下）。
+      這次的品質比 Wave A／B 明顯進步——Wave C 的三個 repo 都真的 commit、`git log` 能核對出報告引用的
+      SHA 全部正確、`pnpm-lock.yaml` 都有真實 diff、`@nestjs/testing` 都有宣告、`appspine build` 都真的
+      跑過，Wave A／B 踩過的坑這次都繞開了。獨立覆核仍找到兩項問題：
+      (1) mcp-gateway 有 4 個 admin 頁面（`api-keys`／`audit-logs`／`roles`／`users` 的
+      `page-content.tsx`）把 `frontend-shell@0.17.0` 的 `ShellLinkComponent` 與本地
+      `SortableLinkComponent`／`ListPagination` 之間一個真的型別不相容（React component prop
+      variance，`ComponentType<ShellLinkProps>` 在特定推導路徑下不能直接指派給更窄的
+      `ComponentType<{href, children, className?}>`）用 `as any` 蓋過去，報告完全沒提到這個改動。
+      已改成明確標註目標型別的 cast（`as unknown as ComponentType<{href: string; children: ReactNode;
+      className?: string}>`），保留型別檢查能力，不是單純關掉。另外在 `dlp-scan.service.ts` 補了一個
+      `@Inject(PrismaService)`——這個是 Gemini 自己主動應用 Gate G5B 記錄的 Vitest/esbuild DI 陷阱教訓
+      做的防禦性修正，不是問題，值得記錄成「派工 prompt 裡寫的教訓真的有被讀進去」的正面例子。
+      (2) PL5-12 的 fleet matrix 報告 §3「顯式 Auth 依賴匯入模組清單」欄位系統性不準——9 列裡至少 4 列
+      （wiki／calendar／chat／projects）跟實際 `git diff` 對不上，最明顯的模式是幾乎每一列都被填上
+      `domain-events.module.ts`，但實際上只有 approve 和 master-data 真的動到這個檔案；chat 實際動了
+      11 個 module，原表只列 3 個。這個表格看起來是照某種樣板規律填寫、不是逐一核對每個 repo 的真實
+      diff 產生的。另外 row 1（template）宣稱的驗證腳本路徑 `scripts/test-real-bootstrap.mjs`
+      在 `appspine-app-template` repo 裡根本不存在——template 自己沒有 bootstrap 腳本，真正驗證它的
+      腳本在 `appspine-packages/scripts/051-pl5-03-template-canary.mjs`（Wave A 的產物）。已用
+      `git diff main -- backend/src --name-only | grep '\.module\.ts$'` 逐一核對 9 個 repo 重新填寫
+      整張表，並更正 template 那一列的腳本路徑。**這個表格裡跟 commit SHA、`pnpm-lock.yaml` diff、
+      `appspine doctor` 輸出、測試通過率有關的欄位，經抽查與本次逐項覆核比對，內容正確**——不準的
+      只有「顯式匯入模組清單」跟 template 那一格腳本路徑，範圍已限定並修正，不影響本輪 Gate 判斷的
+      核心結論。
+      **本輪覆核結果**：approve／master-data／mcp-gateway 三個 repo 修正後皆重新完整跑過
+      typecheck（backend+frontend）／build／test（approve 48/48、master-data 14/14、mcp-gateway
+      131/131 node --test + 3/3 vitest）／`appspine build --check`（zero drift）／`appspine
+      doctor`（10 enabled, 0 issues）／真實 disposable Postgres 開機（三個都真的通過，含一次 Docker
+      Desktop 剛啟動時的暫時性連線失敗，重跑後確認是環境問題不是程式問題）；三個 repo 的
+      `hostCapabilities` 都只有 `appspine.prisma`，沒有新增 app-specific host exception；
+      legacy escape hatch 都在 dual-mode DI 測試中驗證通過。
+      **判定：Phase 5 Wave C（PL5-09～12）通過，無記錄例外**——兩項發現都已修正並重新驗證。Wave C
+      沒有獨立命名的子 gate（原始拆解只在 Wave A／B 設了 G5A／G5B），下一步是 PL5-13（legacy API
+      transition window／deprecation telemetry）、PL5-14（stable release），完成後才是最終
+      Gate G5。
+- [ ] Phase 5 收尾：PL5-13～14；Gate G5
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
 偏離；不得只勾選而沒有可重現驗證。
