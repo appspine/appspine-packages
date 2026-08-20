@@ -293,6 +293,9 @@ function rehearseRepresentativeApp(workDir, tarballs) {
   console.log('2.2 Generating Prisma client in Wiki...');
   run('npx', ['prisma', 'generate', '--schema', 'prisma/schema'], { cwd: backendDir });
 
+  console.log('2.2.1 Running appspine build in Wiki backend...');
+  run('pnpm', ['-C', 'backend', 'appspine:build'], { cwd: appDir });
+
   console.log('2.3 Running Wiki backend typecheck & tests under legacy wiring...');
   run('pnpm', ['-C', 'backend', 'typecheck'], { cwd: appDir });
   run('pnpm', ['-C', 'backend', 'test'], { cwd: appDir });

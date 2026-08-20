@@ -285,6 +285,8 @@ async function main() {
       if (!ready) await new Promise((r) => setTimeout(r, 1000));
     }
     if (!ready) throw new Error('Disposable Postgres never became ready');
+    // Allow host port forwarding on Windows Docker Desktop to stabilize
+    await new Promise((r) => setTimeout(r, 1500));
 
     console.log('Deploying prisma schema to disposable postgres...');
     run('npx', ['prisma', 'db', 'push', '--schema', 'prisma/schema', '--skip-generate'], {

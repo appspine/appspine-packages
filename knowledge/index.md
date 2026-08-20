@@ -41,6 +41,10 @@
 | [049-business-apps-cleanup-scoping-plan.md](decisions/049-business-apps-cleanup-scoping-plan.md) | decision | active | 049 - 業務 App 清理計畫（第三階段：範圍界定與盤點交接） |
 | [050-mcp-gateway-sidebar-modal-plan.md](decisions/050-mcp-gateway-sidebar-modal-plan.md) | decision | completed | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal - 系統設計計畫 |
 | [050-mcp-gateway-sidebar-modal-task-breakdown.md](decisions/050-mcp-gateway-sidebar-modal-task-breakdown.md) | decision | completed | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal — 執行任務拆解（how） |
+| [051-compatibility-report.md](decisions/051-compatibility-report.md) | decision | active | 051 - `appspine` 插件平台 2.0.0 相容性報告 (Compatibility Report) |
+| [051-fleet-upgrade-conclusion.md](decisions/051-fleet-upgrade-conclusion.md) | decision | active | 051 - Fleet 升級結論與最終驗收總結 (Fleet Upgrade Conclusion) |
+| [051-incident-rollback-contacts.md](decisions/051-incident-rollback-contacts.md) | decision | active | 051 - 發布事故應變、回滾指南與緊急聯絡名冊 (Incident & Rollback Contacts) |
+| [051-legacy-removal-plan.md](decisions/051-legacy-removal-plan.md) | decision | active | 051 - 下一代 Major 版本 Legacy API 移除正式計畫 (Legacy Removal Plan) |
 | [051-legacy-removal-proposal.md](decisions/051-legacy-removal-proposal.md) | decision | active | 051 - 下一個 Major 版本 Legacy API 移除提案 (Draft) |
 | [051-pl0-baseline.md](topics/051-pl0-baseline.md) | topic | active | 051 PL0-01 — Execution Baseline |
 | [051-pl0-build-graph.md](topics/051-pl0-build-graph.md) | topic | active | 051 PL0-07 — TypeScript Project References ／ Build Graph |
@@ -110,6 +114,7 @@
 | [051-pl5-wave-c-gemini-dispatch-prompt.md](topics/051-pl5-wave-c-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave C 執行提示詞（PL5-09 ～ PL5-12） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
 | [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
+| [051-release-notes.md](decisions/051-release-notes.md) | decision | active | 051 - `appspine` 插件平台 2.0.0 Release Notes |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
 | [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
