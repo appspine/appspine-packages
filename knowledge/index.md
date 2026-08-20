@@ -41,6 +41,7 @@
 | [049-business-apps-cleanup-scoping-plan.md](decisions/049-business-apps-cleanup-scoping-plan.md) | decision | active | 049 - 業務 App 清理計畫（第三階段：範圍界定與盤點交接） |
 | [050-mcp-gateway-sidebar-modal-plan.md](decisions/050-mcp-gateway-sidebar-modal-plan.md) | decision | completed | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal - 系統設計計畫 |
 | [050-mcp-gateway-sidebar-modal-task-breakdown.md](decisions/050-mcp-gateway-sidebar-modal-task-breakdown.md) | decision | completed | 050 - mcp-gateway 側邊欄：帳號列置底修正 + Admin 選單改為 Modal — 執行任務拆解（how） |
+| [051-legacy-removal-proposal.md](decisions/051-legacy-removal-proposal.md) | decision | active | 051 - 下一個 Major 版本 Legacy API 移除提案 (Draft) |
 | [051-pl0-baseline.md](topics/051-pl0-baseline.md) | topic | active | 051 PL0-01 — Execution Baseline |
 | [051-pl0-build-graph.md](topics/051-pl0-build-graph.md) | topic | active | 051 PL0-07 — TypeScript Project References ／ Build Graph |
 | [051-pl0-gate-g0.md](topics/051-pl0-gate-g0.md) | topic | active | 051 Gate G0 — 規格與基線凍結 |
@@ -103,6 +104,7 @@
 | [051-pl5-11-mcp-gateway-rollout.md](topics/051-pl5-11-mcp-gateway-rollout.md) | topic | active | 051 PL5-11 — MCP-Gateway Wave C Canary Rollout 報告 |
 | [051-pl5-12-fleet-matrix.md](topics/051-pl5-12-fleet-matrix.md) | topic | active | 051 PL5-12 — Appspine 插件平台全艦隊（Fleet Matrix）Rollout 總審計報告 |
 | [051-pl5-13-14-gemini-dispatch-prompt.md](topics/051-pl5-13-14-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 收尾執行提示詞（PL5-13 ～ PL5-14） |
+| [051-pl5-13-deprecation-telemetry-report.md](decisions/051-pl5-13-deprecation-telemetry-report.md) | decision | active | 051 PL5-13 Deprecation Telemetry & Fleet Consumer Scan Report |
 | [051-pl5-gemini-dispatch-prompts.md](topics/051-pl5-gemini-dispatch-prompts.md) | topic | active | 051 Phase 5 派工 Prompt — 給 Gemini 執行（PL5-01～06，不含 Gate G5A） |
 | [051-pl5-wave-b-gemini-dispatch-prompt.md](topics/051-pl5-wave-b-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave B 執行提示詞（PL5-07 ～ PL5-08） |
 | [051-pl5-wave-c-gemini-dispatch-prompt.md](topics/051-pl5-wave-c-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave C 執行提示詞（PL5-09 ～ PL5-12） |

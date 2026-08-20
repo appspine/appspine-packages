@@ -25,6 +25,9 @@ import { ScopeMatcherService } from './scope-matcher.service';
  * In Phase 4 transition, `@Global()` is retained (and declared as `facets.backend.global: true` in
  * the manifest) so downstream applications relying on global `ApiKeyGuard`/`ScopeGuard`/`JwtOrApiKeyGuard`
  * continue booting without immediate feature-level import changes.
+ *
+ * @deprecated 051 PL5-13: The `@Global()` decorator on `ApiKeysModule` is a compatibility bridge scheduled for removal in the next major version.
+ * In plugin mode, use `@appspine/preset-standard` or import `ApiKeysModule` explicitly in consuming feature modules.
  */
 @Global()
 @Module({

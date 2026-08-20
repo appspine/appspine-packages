@@ -19,6 +19,9 @@ import { RolesService } from './roles/roles.service';
  * imports. Removing `@Global()` immediately in package migration would cause runtime
  * `UnknownDependenciesException` at application bootstrap. True removal is scheduled for Phase 5
  * when downstream App modules complete feature-level wiring and codemod adoption.
+ *
+ * @deprecated 051 PL5-13: The `@Global()` decorator on `RbacModule` is a compatibility bridge scheduled for removal in the next major version.
+ * In plugin mode, use `@appspine/preset-standard` or explicitly import `RbacModule` / inject `RBAC_POLICY` in consuming feature modules.
  */
 @Global()
 @Module({

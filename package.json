@@ -18,6 +18,7 @@
     "verify:phase2": "pnpm run verify:generation && pnpm run verify:snapshot",
     "verify:template-dual-mode": "node scripts/051-pl2-09-template-dual-mode.mjs",
     "verify:runtime-parity": "node scripts/051-g2-runtime-parity.mjs",
+    "verify:deprecation": "node scripts/051-pl5-13-deprecation-telemetry.mjs --self-test && node scripts/051-pl5-13-deprecation-telemetry.mjs --check --baseline fixtures/051-pl5-13-baseline/deprecation-baseline.json",
     "check:changeset-discipline": "node scripts/check-changeset-discipline.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",

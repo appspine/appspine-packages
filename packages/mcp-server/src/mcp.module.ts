@@ -13,6 +13,9 @@ import { McpToolRegistry } from './mcp-tool.registry';
  * the manifest) so downstream applications whose feature modules (`*.mcp.ts`) inject `McpToolRegistry`
  * continue booting without immediate feature-level import changes. True removal of `@Global()` is
  * scheduled for Phase 5 when consumer apps are migrated to explicit module imports / generated composition.
+ *
+ * @deprecated 051 PL5-13: The `@Global()` decorator on `McpModule` is a compatibility bridge scheduled for removal in the next major version.
+ * In plugin mode, declare feature MCP tools via `MCP_TOOLS` multi-provider or import `McpModule` explicitly.
  */
 @Global()
 @Module({

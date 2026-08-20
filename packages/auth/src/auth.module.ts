@@ -19,6 +19,9 @@ import { Global, Module } from '@nestjs/common';
  * `AppspineAuthInfrastructureModule` is imported so an App that has *not* adopted the plugin host
  * still gets the strategy registry and principal context `OidcAuthModule` now depends on. Nest
  * instantiates a module class once, so an App using both wirings shares one registry.
+ *
+ * @deprecated 051 PL5-13: `AuthModule` is a transition-only compatibility facade scheduled for removal in the next major version.
+ * Use `@appspine/identity-core`'s `IdentityCoreModule`, `@appspine/oidc-auth`'s `OidcAuthModule`, or `@appspine/preset-standard` in plugin mode instead.
  */
 @Global()
 @Module({

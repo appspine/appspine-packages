@@ -28,6 +28,11 @@
  */
 
 // Provider-neutral identity.
+/**
+ * @deprecated 051 PL5-13: `@appspine/auth` is a transition-only facade.
+ * Import identity components (`AdminGuard`, `UsersController`, `UsersService`, DTOs, roles) directly from `@appspine/identity-core`.
+ * Planned for removal in next major version.
+ */
 export {
   AdminGuard,
   type CreateUserDto,
@@ -43,6 +48,11 @@ export {
 } from '@appspine/identity-core';
 
 // OIDC verification, guards, strategy and the delegated inbound trust profile.
+/**
+ * @deprecated 051 PL5-13: `@appspine/auth` is a transition-only facade.
+ * Import OIDC and delegated auth components (`AuthController`, `JwtAuthGuard`, `JwtVerifierService`, `OidcStrategy`, `DelegatedAuthModule`, etc.) directly from `@appspine/oidc-auth`.
+ * Planned for removal in next major version.
+ */
 export {
   AUTH_AUDIT_LOG,
   type AuthAuditLog,
@@ -65,8 +75,14 @@ export {
   OidcStrategy,
   type VerifiedDelegatedClaims,
 } from '@appspine/oidc-auth';
+
 // Request identity. Host-owned since PL0-04 §2 — these were the types every capability package
 // used to reach into this package for.
+/**
+ * @deprecated 051 PL5-13: `@appspine/auth` is a transition-only facade.
+ * Import request identity context (`CurrentUser`, `resolveActingUserId`, `JwtUser`, `ApiKeyUser`, etc.) directly from `@appspine/plugin-host-nest`.
+ * Planned for removal in next major version.
+ */
 export {
   type ApiKeyUser,
   CurrentUser,
@@ -75,7 +91,14 @@ export {
   type JwtUser,
   resolveActingUserId,
 } from '@appspine/plugin-host-nest';
+
 // Role flattening. RBAC shapes in, RBAC shapes out — prefer the appspine.rbac-policy token.
+/**
+ * @deprecated 051 PL5-13: `@appspine/auth` is a transition-only facade.
+ * Import RBAC helper types (`buildUserContext`, `RoleWithPermissions`, `UserContext`) directly from `@appspine/rbac`.
+ * Planned for removal in next major version.
+ */
 export { buildUserContext, type RoleWithPermissions, type UserContext } from '@appspine/rbac';
+
 // Module
 export * from './auth.module';

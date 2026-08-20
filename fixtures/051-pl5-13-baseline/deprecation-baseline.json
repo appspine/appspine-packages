@@ -1,0 +1,3892 @@
+[
+  {
+    "app": "approve",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "approve",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/approval/approval-instances/approval-instances.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/approval/approval-instances/approval-instances.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/approval/approval-instances/approval-instances.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/approval/approval-instances/approval-instances.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/approval/approval-instances/approval-instances.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/expense-claims/expense-claims.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/expense-claims/expense-claims.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/expense-claims/expense-claims.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/expense-claims/expense-claims.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/expense-claims/expense-claims.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/leave-requests/leave-requests.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/leave-requests/leave-requests.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/leave-requests/leave-requests.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/leave-requests/leave-requests.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/leave-requests/leave-requests.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/user-delegations/user-delegations.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/user-delegations/user-delegations.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/user-delegations/user-delegations.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/user-delegations/user-delegations.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "approve",
+    "file": "backend/src/user-delegations/user-delegations.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDeliveriesPanel",
+    "rawSpecifier": "DomainEventDeliveriesPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDetailPanel",
+    "rawSpecifier": "DomainEventDetailPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventCatalogTable",
+    "rawSpecifier": "DomainEventCatalogTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventsTable",
+    "rawSpecifier": "DomainEventsTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "approve",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/calendars/calendars.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/calendars/calendars.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/calendars/calendars.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/calendars/calendars.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/calendars/calendars.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/calendars/calendars.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/events/events.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/events/events.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/events/events.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/events/events.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/events/events.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "calendar",
+    "file": "backend/src/events/events.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDeliveriesPanel",
+    "rawSpecifier": "DomainEventDeliveriesPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDetailPanel",
+    "rawSpecifier": "DomainEventDetailPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventCatalogTable",
+    "rawSpecifier": "DomainEventCatalogTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventsTable",
+    "rawSpecifier": "DomainEventsTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "calendar",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/attachments/attachments.controller.ts",
+    "line": 2,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/attachments/attachments.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channel-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channel-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channel-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channel-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channel-members.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channel-members.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channels.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channels.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channels.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channels.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channels.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/channels/channels.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/chat.gateway.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/chat.gateway.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtVerifierService",
+    "rawSpecifier": "JwtVerifierService",
+    "replacement": "@appspine/oidc-auth"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/chat.gateway.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/chat.module.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/dms/dms.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/dms/dms.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/dms/dms.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/dms/dms.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/dms/dms.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/messages/messages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/messages/messages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/messages/messages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/messages/messages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/messages/messages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/messages/messages.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/reactions/reactions.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/reactions/reactions.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/reactions/reactions.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/reactions/reactions.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/reactions/reactions.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/read-state/read-state.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/read-state/read-state.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/read-state/read-state.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/read-state/read-state.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/read-state/read-state.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/webhooks/webhooks.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/webhooks/webhooks.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/webhooks/webhooks.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/webhooks/webhooks.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/chat/webhooks/webhooks.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/push/push.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/push/push.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/push/push.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/push/push.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/push/push.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/users/user-directory.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/users/user-directory.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/users/user-directory.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/users/user-directory.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "chat",
+    "file": "backend/src/users/user-directory.controller.ts",
+    "line": 2,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDeliveriesPanel",
+    "rawSpecifier": "DomainEventDeliveriesPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDetailPanel",
+    "rawSpecifier": "DomainEventDetailPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventCatalogTable",
+    "rawSpecifier": "DomainEventCatalogTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventsTable",
+    "rawSpecifier": "DomainEventsTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "chat",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/files/files.mcp.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/folders/folders.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/folders/folders.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/folders/folders.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/folders/folders.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/folders/folders.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/folders/folders.mcp.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/shares/shares.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/shares/shares.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/shares/shares.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/shares/shares.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/drive/shares/shares.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/guards/space-member.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/guards/space-member.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/guards/space-member.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/guards/space-member.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/spaces/spaces.mcp.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/wopi/wopi.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/wopi/wopi.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/wopi/wopi.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/wopi/wopi.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/wopi/wopi.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "drive",
+    "file": "backend/src/wopi/wopi.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDeliveriesPanel",
+    "rawSpecifier": "DomainEventDeliveriesPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDetailPanel",
+    "rawSpecifier": "DomainEventDetailPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventCatalogTable",
+    "rawSpecifier": "DomainEventCatalogTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventsTable",
+    "rawSpecifier": "DomainEventsTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "drive",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/delegations/delegations.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/delegations/delegations.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/delegations/delegations.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/delegations/delegations.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/delegations/delegations.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AdminGuard",
+    "rawSpecifier": "AdminGuard",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/domain-events/webhook-subscriptions.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/org-units/org-units.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/org-units/org-units.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/org-units/org-units.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/org-units/org-units.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/org-units/org-units.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/user-profiles/user-profiles.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/user-profiles/user-profiles.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/user-profiles/user-profiles.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/user-profiles/user-profiles.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "master-data",
+    "file": "backend/src/user-profiles/user-profiles.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "master-data",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/discovery/discovery.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/discovery/discovery.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/discovery/discovery.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/discovery/discovery.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/discovery/discovery.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/dlp/dlp-rule.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AdminGuard",
+    "rawSpecifier": "AdminGuard",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/dlp/dlp-rule.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/dlp/dlp-rule.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/dlp/dlp-rule.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/dlp/dlp-rule.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/dlp/dlp-rule.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AdminGuard",
+    "rawSpecifier": "AdminGuard",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AdminGuard",
+    "rawSpecifier": "AdminGuard",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway-profile/gateway-profile.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway/gateway-audit-log.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AdminGuard",
+    "rawSpecifier": "AdminGuard",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/gateway/gateway-audit-log.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/vault/vaulted-app-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AdminGuard",
+    "rawSpecifier": "AdminGuard",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/vault/vaulted-app-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/vault/vaulted-app-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/vault/vaulted-app-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/vault/vaulted-app-key.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "backend/src/vault/vaulted-app-key.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page-content.tsx",
+    "line": 6,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page-content.tsx",
+    "line": 6,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page-content.tsx",
+    "line": 6,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page-content.tsx",
+    "line": 6,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page-content.tsx",
+    "line": 6,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "mcp-gateway",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page-content.tsx",
+    "line": 6,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/preferences/preferences.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/preferences/preferences.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/preferences/preferences.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/preferences/preferences.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/preferences/preferences.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/access/project-access.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/access/project-access.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/access/project-access.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/access/project-access.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/board/project-board.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/board/project-board.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/board/project-board.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/board/project-board.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/board/project-board.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/comments/project-comments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/comments/project-comments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/comments/project-comments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/comments/project-comments.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/comments/project-comments.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/common/projects-permission.guard.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/labels/project-label.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/labels/project-label.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/labels/project-label.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/labels/project-label.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/labels/project-label.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/members/project-members.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/members/project-members.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/members/project-members.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/members/project-members.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/members/project-members.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/projects/projects.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/project-tasks.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/project-tasks.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/project-tasks.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/project-tasks.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/project-tasks.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/tasks.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/tasks.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/tasks.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "projects",
+    "file": "backend/src/projects/tasks/tasks.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "projects",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "template",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "template",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "template",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "template",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "template",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "template",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "template",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "template",
+    "file": "backend/src/notifications/notifications.controller.ts",
+    "line": 3,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/prisma/seed.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_USER_ROLE",
+    "rawSpecifier": "SYSTEM_USER_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/app.module.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "AuthModule",
+    "rawSpecifier": "AuthModule",
+    "replacement": "@appspine/preset-standard (plugin mode) or @appspine/identity-core + @appspine/oidc-auth"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/attachments/attachments.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/attachments/attachments.controller.ts",
+    "line": 2,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/attachments/attachments.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/pages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/pages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/pages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/pages.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/pages.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/pages.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/trash.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/trash.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/trash.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/trash.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/trash.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/pages/trash.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/search/search.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/search/search.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/search/search.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/search/search.controller.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/search/search.controller.ts",
+    "line": 2,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/search/search.service.ts",
+    "line": 1,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/space-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/space-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/space-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/space-members.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/space-members.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/space-members.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "ApiKeyUser",
+    "rawSpecifier": "type ApiKeyUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "CurrentUser",
+    "rawSpecifier": "CurrentUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "JwtUser",
+    "rawSpecifier": "type JwtUser",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 2,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "resolveActingUserId",
+    "rawSpecifier": "resolveActingUserId",
+    "replacement": "@appspine/plugin-host-nest"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/spaces.controller.ts",
+    "line": 4,
+    "category": "M2M_DEPRECATED_EXPORT",
+    "importedFrom": "@appspine/m2m-api-key",
+    "specifier": "JwtOrApiKeyGuard",
+    "rawSpecifier": "JwtOrApiKeyGuard",
+    "replacement": "@appspine/plugin-host-nest's AppspineAuthGuard"
+  },
+  {
+    "app": "wiki",
+    "file": "backend/src/spaces/spaces.service.ts",
+    "line": 3,
+    "category": "AUTH_PACKAGE",
+    "importedFrom": "@appspine/auth",
+    "specifier": "SYSTEM_ADMIN_ROLE",
+    "rawSpecifier": "SYSTEM_ADMIN_ROLE",
+    "replacement": "@appspine/identity-core"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "LoginButton",
+    "rawSpecifier": "LoginButton",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(external)/login/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "mapAuthErrorKey",
+    "rawSpecifier": "mapAuthErrorKey",
+    "replacement": "@appspine/oidc-auth/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "ApiKeysTable",
+    "rawSpecifier": "ApiKeysTable",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateApiKeyDialog",
+    "rawSpecifier": "CreateApiKeyDialog",
+    "replacement": "@appspine/m2m-api-key/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDeliveriesPanel",
+    "rawSpecifier": "DomainEventDeliveriesPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventDetailPanel",
+    "rawSpecifier": "DomainEventDetailPanel",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+    "line": 1,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventCatalogTable",
+    "rawSpecifier": "DomainEventCatalogTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+    "line": 3,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "DomainEventsTable",
+    "rawSpecifier": "DomainEventsTable",
+    "replacement": "@appspine/domain-events/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateRoleDialog",
+    "rawSpecifier": "CreateRoleDialog",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "RolesTable",
+    "rawSpecifier": "RolesTable",
+    "replacement": "@appspine/rbac/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "CreateUserDialog",
+    "rawSpecifier": "CreateUserDialog",
+    "replacement": "@appspine/identity-core/frontend"
+  },
+  {
+    "app": "wiki",
+    "file": "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+    "line": 4,
+    "category": "FRONTEND_SHELL_CAPABILITY_UI",
+    "importedFrom": "@appspine/frontend-shell",
+    "specifier": "UsersTable",
+    "rawSpecifier": "UsersTable",
+    "replacement": "@appspine/identity-core/frontend"
+  }
+]

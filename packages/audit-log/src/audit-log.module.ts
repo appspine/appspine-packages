@@ -12,6 +12,9 @@ import { AuditLogService } from './audit-log.service';
  * Still `@Global()`. Removing that is 051 decision 3's job and belongs in its own change — doing
  * it here would mean every App that relies on the global picking up a breaking change in the same
  * release that introduces the token they need in order to stop relying on it.
+ *
+ * @deprecated 051 PL5-13: The `@Global()` decorator on `AuditLogModule` is a compatibility bridge scheduled for removal in the next major version.
+ * In plugin mode, inject the `AUDIT_SINK` port or import `AuditLogModule` explicitly.
  */
 @Global()
 @Module({
