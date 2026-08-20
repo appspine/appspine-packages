@@ -1,7 +1,7 @@
 ---
 type: decision
 scope: cross-repo
-status: active
+status: completed
 supersedes: null
 superseded_by: null
 created: 2026-08-18
@@ -16,13 +16,13 @@ updated: 2026-08-20
 > 文件中的 Sol、Terra、Luna、Claude Sonnet、Gemini 是目前的建議 roster；正式約束是 051 §15 定義的
 > G1／G2／G3 能力級別與專長角色，可使用校準過的同級或更高級 agent 替代。
 >
-> **目前狀態：Phase 0～4 與 Phase 5 Wave A／B／C／PL5-13（PL5-01～13）已完成（Gate G5A／G5B 已關閉，
-> Wave C 與 PL5-13 無獨立命名 gate 但已完成獨立覆核，見 §13）。canary 版本已真的發布到
-> `npm.pkg.github.com`（22 個套件，`canary` dist-tag），deprecation telemetry／CI gate 已上線
-> （389 筆 baseline）。PL5-14 的發布準備部分已完成並經獨立覆核，但**尚未執行 stable publish**——
-> 這一步卡在等待使用者另外明確授權（跟先前的 canary publish 授權是兩次不同的事），完成後才是最終
-> Gate G5。stable publish、production migration、舊
-> `@appspine/auth` API 移除仍需個別另外取得授權。**
+> **目前狀態：051 插件平台工程計畫全部完成，Gate G5 已於 2026-08-20 簽核（見 §13）。PL5-01～14
+> 全數通過各自的獨立覆核；22 個 `@appspine/*` 套件已真的 stable publish（`latest` dist-tag），過程中
+> 發現並修好一個會讓真實外部 consumer 完全裝不起來的 `workspace:*` protocol 洩漏缺陷（見 §13
+> PL5-14）；deprecation telemetry／CI gate 已上線（389 筆 baseline）。**尚未取得授權、因此還沒做**
+> 的兩件事：(1) 把 appspine-packages 與 9 個 repo 的本機分支 `git push` 到 origin；(2) v3.0.0 的
+> legacy API 正式移除（另立計畫，見
+> [051-legacy-removal-plan.md](051-legacy-removal-plan.md)）。這兩項都需要使用者另外明確授權。**
 > G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
 > 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
 > publish、production migration 或舊 API 移除。另外，Phase 2 目前**組出來的** schema 會 DROP 19 個
@@ -1318,8 +1318,9 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       加一行新 legacy import 驗證 gate 真的會 fail（exit code 1，非 pipe 遮蔽後誤判的 0）、拿掉後恢復
       exit 0，全部符合報告宣稱。沒有動到任何 legacy export 的實際行為，只有標記與掃描，符合 out of
       scope 要求。**判定：PL5-13 通過，無記錄例外。**
-- [ ] PL5-14：Stable release 與最終驗收 — 執行者 Gemini 3.7 Flash High，Claude 獨立覆核部分通過，
-      證據：appspine-packages commit `db5153f`。
+- [x] PL5-14：Stable release 與最終驗收 — 執行者 Gemini 3.7 Flash High（發布準備）＋ Claude（實際
+      stable publish 執行與缺陷修復），證據：appspine-packages commit `db5153f`（發布準備）、
+      `ee5244d`（workspace protocol 缺陷修復）。
       交付：release notes、compatibility report、fleet upgrade conclusion、incident/rollback
       contacts、legacy removal plan（v3.0.0 里程碑）、`scripts/051-pl5-14-check-registry-status.mjs`。
       **獨立覆核發現的問題（已修正）**：
@@ -1345,13 +1346,45 @@ checkbox 只有在 task handoff 被 reviewer 接受後才勾選：
       `@appspine/auth` 等套件的 22 個 exports 全部還在，沒有移除任何 legacy API。
       **共通 full gate**（Claude 從乾淨狀態重新跑過 `pnpm install --frozen-lockfile`／`lint`／`build`／
       `typecheck`／`test`／`lint-knowledge.js`／`git diff --check`）全綠。
-      **判定：PL5-14 的「發布準備」部分通過（4 項發現已修正），但 PL5-14 本身尚未完成**——這個 task
-      的交付物明確包含「stable package/preset versions」，也就是真的把版本從 canary 推到
-      `latest`/`stable` dist-tag，這一步需要使用者另外明確給出 stable publish 授權（跟先前的 canary
-      publish 授權是两次不同的事），目前對話裡還沒有出現這句話，Gemini 也正確地停在這一步之前沒有
-      執行。在使用者明確授權、Claude 執行或監看實際 publish 並完成 registry clean consumer 驗證之前，
-      PL5-14 與最終 Gate G5 都不能勾選完成。
-- [ ] Gate G5 — 計畫完成：待 PL5-14 真的完成 stable publish 並經 Claude 獨立驗證後才能簽核。
+      **使用者於 2026-08-20 在對話中明確給出 stable publish 授權後，由 Claude 執行實際發布**，過程中
+      發現一個會擋掉整個 stable release 的真實缺陷：
+      **重大發現——12 個套件發布出去的 `dependencies` 欄位還留著沒被轉換的 pnpm `workspace:*` 字串**。
+      根因是 Gate G5A 執行 canary publish 時用的是 `npm publish`（Claude 當時的操作，不是 Gemini 的
+      task），`npm publish` 不認得 pnpm 的 `workspace:` protocol、不會在發布前把它轉成真的版本號，
+      所以 `audit-log`、`domain-events`、`health-check`、`identity-core`、`m2m-api-key`、
+      `master-data-client`、`mcp-server`、`metadata-schema`、`notification`、`oidc-auth`、
+      `oidc-delegation`、`rbac` 這 12 個套件的 `dependencies`（不是會被 npm 略過的
+      `devDependencies`）裡，`@appspine/plugin-api`／`frontend-shell`／`plugin-host-nest`／`common`
+      這些內部依賴全部原封不動寫著 `workspace:*`。這代表任何真正的外部 consumer——不管是 `npm
+      install` 還是 `pnpm install`，只要不在這 9 個 App repo 自己的 `pnpm-workspace.yaml` override
+      保護傘下——會直接裝不起來（`npm` 回報 `EUNSUPPORTEDPROTOCOL`，`pnpm` 回報
+      `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`）。這個缺陷從 Gate G5A 就存在，之所以先前所有 Wave A／B／C
+      的「registry clean consumer」驗證都沒抓到，是因為驗證對象一律是這 9 個已經有 workspace
+      override 的 repo，而不是真正外部、沒有任何特殊設定的新 consumer——這正是「stable release」
+      要服務的對象，也是這次審查才第一次真的測到的路徑。
+      **修復**：確認 `pnpm pack`／`pnpm publish` 會正確把 `workspace:*` 轉成真實版本號（已用
+      `identity-core` 實測驗證），對這 12 個套件 patch bump（appspine-packages commit `ee5244d`，
+      附上 changeset）、重新用 `pnpm publish`（不是 `npm publish`）發到 canary，驗證修好後，再把這 12
+      個連同其餘 10 個一起推上 `latest` dist-tag。最後在一個完全乾淨、不屬於任何 App repo
+      的隔離目錄裡用 `pnpm install`（無版本後綴，純靠 `latest` tag 解析）真的裝了
+      `preset-standard`／`plugin-host-nest`／`identity-core`／`rbac`／`mcp-server`，全部裝好、
+      `require()` 得到、沒有任何 `workspace:` 相關錯誤——這是本次 stable publish 唯一真正有意義的
+      驗收證據，不是 22 個套件版本號清單本身。
+      **已確認遵守其餘授權邊界**：沒有執行任何 `git push`（這是另一項尚未取得的授權，跟 stable
+      publish 是两件事，appspine-packages 與所有 App repo 目前仍只在本機分支，從未推到 origin）；
+      沒有移除任何 legacy API。
+      **判定：PL5-14 通過**——stable publish 已真的執行、22 個套件的 `latest` dist-tag 都指向正確
+      內容、發布過程中發現並修好一個會讓真實新 consumer 完全裝不起來的重大缺陷、並用真正乾淨的
+      隔離環境重新驗證過。
+- [x] Gate G5 — 計畫完成 — 2026-08-20。PL5-01～14 全數完成並經 Claude 獨立覆核；051 §13 每一項都有
+      可點查的 commit／驗證證據；沒有任何 legacy API 被偷渡移除，`@appspine/auth` 等舊 export 仍完整
+      保留、只標了 `@deprecated`；未完成項目（v3.0.0 legacy removal、`git push` 到 origin）都已轉成
+      有明確 owner／前置條件的後續計畫，不是被忽略。
+      **簽核聲明**：本次簽核**不包含** `git push` 到 origin——appspine-packages 與全部 9 個
+      repo（template + 8 App）目前的所有 051 相關 commit 都只存在本機分支，從未推送到遠端；npm
+      registry 上的 22 個套件確實已經真的發布，但對應的原始碼歷史還沒有任何人能在 GitHub 上看到。
+      是否要把這些分支推上 origin（merge 到 main 或開 PR），需要使用者另外明確授權，不在這次
+      stable publish 授權的範圍內。
 
 每次更新 checkbox 時，同步更新本文件 `updated`、實際 agent mapping、accepted commit/evidence 與任何已核准
 偏離；不得只勾選而沒有可重現驗證。

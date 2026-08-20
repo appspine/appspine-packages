@@ -113,7 +113,7 @@
 | [051-pl5-wave-b-gemini-dispatch-prompt.md](topics/051-pl5-wave-b-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave B 執行提示詞（PL5-07 ～ PL5-08） |
 | [051-pl5-wave-c-gemini-dispatch-prompt.md](topics/051-pl5-wave-c-gemini-dispatch-prompt.md) | topic | active | 051 Phase 5 Wave C 執行提示詞（PL5-09 ～ PL5-12） |
 | [051-plugin-platform-engineering-plan.md](decisions/051-plugin-platform-engineering-plan.md) | decision | approved | 051 - `appspine-packages` 插件平台與工程化計畫 |
-| [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | active | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
+| [051-plugin-platform-engineering-task-breakdown.md](decisions/051-plugin-platform-engineering-task-breakdown.md) | decision | completed | 051 - `appspine-packages` 插件平台 — 執行任務拆解（how） |
 | [051-release-notes.md](decisions/051-release-notes.md) | decision | active | 051 - `appspine` 插件平台 2.0.0 Release Notes |
 | [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
 | [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
