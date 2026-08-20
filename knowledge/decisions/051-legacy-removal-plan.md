@@ -110,11 +110,20 @@ wiring」）。根因：把 `AuthModule`（`@Global()` 的相容 facade）換成
 這件事的影響範圍：從 Phase 2 開始、在 Gate G5A／G5B／Wave C／PL5-14 每一次簽核都被列為「rollback
 evidence」的核心安全機制，現在已經在 9 個 repo 同時消失。這不是被隱瞞的變更（報告誠實揭露），但
 規模與後果已經超出 M2「fleet zero-legacy」原本的任務範圍，屬於架構層級的決策，不應該只用一段
-「校準中抓到的真實問題」帶過。**這裡先記錄、不擅自判斷該接受還是該恢復**，留給使用者決定：
-(a) 接受移除——理由可以是 stable release 已經上線、22 個套件都驗證過，往前修復改用「回滾到前一個
-container image／deploy tag」取代「flip 環境變數」；或 (b) 要求恢復雙模式——需要另外解決
-`identity-core`／`oidc-auth` 在非 plugin-host 情境下的 DI 全域可見性問題（例如比照 Phase 4
-的 `@Global()` compatibility bridge 模式）。
+「校準中抓到的真實問題」帶過。
+
+**使用者決定（2026-08-20）：接受移除，不要求恢復雙模式。** 9 個 App（含 template）今後的 rollback
+機制正式改為「回滾到前一個 container image／git tag、重新部署」，不再是「flip
+`APPSPINE_PLUGIN_MODE=0` 環境變數、原地重啟」。理由：22 個套件已完成 stable publish 並經真實
+registry clean consumer 驗證，風險層級已經跟 Phase 2～4 那個「平台核心還在快速變動」的階段不同；
+維持雙模式需要額外解決 `identity-core`／`oidc-auth` 的 DI 全域可見性問題，使用者判斷這個工程成本
+不划算。
+
+**回溯性 ADR 修正**：`051-plugin-platform-engineering-task-breakdown.md` §13 中 Gate
+G5A／G5B／Wave C／PL5-14 記錄的「`APPSPINE_PLUGIN_MODE=0` legacy escape hatch 驗證通過，構成
+rollback evidence」等敘述，自 2026-08-20 M1/M2 之後**不再對 template 與 8 個 App 成立**——不是
+當時簽核有誤，是事後的架構決策使其失效；歷史記錄本身不需要、也不應該回頭改寫，這裡明確記錄
+supersede 關係即可。往後任何提到這 9 個 repo「雙模式回滾」的舊文件，都以本節的使用者決定為準。
 
 **M3 判定**：技術面 telemetry 已收斂到 0，但在使用者針對上述雙模式移除做出決定、以及另外明確授權
 breaking M3 之前，不得執行任何刪除 legacy export、移除 `@Global()`、bump major、publish 或 push

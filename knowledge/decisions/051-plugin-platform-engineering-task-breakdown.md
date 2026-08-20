@@ -19,10 +19,16 @@ updated: 2026-08-20
 > **目前狀態：051 插件平台工程計畫全部完成，Gate G5 已於 2026-08-20 簽核（見 §13）。PL5-01～14
 > 全數通過各自的獨立覆核；22 個 `@appspine/*` 套件已真的 stable publish（`latest` dist-tag），過程中
 > 發現並修好一個會讓真實外部 consumer 完全裝不起來的 `workspace:*` protocol 洩漏缺陷（見 §13
-> PL5-14）；deprecation telemetry／CI gate 已上線（389 筆 baseline）。**尚未取得授權、因此還沒做**
-> 的兩件事：(1) 把 appspine-packages 與 9 個 repo 的本機分支 `git push` 到 origin；(2) v3.0.0 的
-> legacy API 正式移除（另立計畫，見
-> [051-legacy-removal-plan.md](051-legacy-removal-plan.md)）。這兩項都需要使用者另外明確授權。**
+> PL5-14）；deprecation telemetry／CI gate 已上線；appspine-packages 與 9 個 repo 的本機分支已
+> `git push` 到 origin（各自獨立分支，未 merge main）。v3.0.0 legacy removal 的 M1／M2 已完成並經
+> 獨立覆核（見 [051-legacy-removal-plan.md](051-legacy-removal-plan.md) §5），M3（真的刪除
+> export、發 3.0.0）仍需另外明確授權。**
+>
+> **⚠️ 讀 Gate G5A／G5B／Wave C／PL5-14 記錄時請注意**：下面各項紀錄裡提到的
+> `APPSPINE_PLUGIN_MODE=0` legacy escape hatch／雙模式回滾，在 M1/M2（2026-08-20）之後**已經被移除，
+> 不再對 template 與 8 個 App 成立**——這是簽核後、經使用者同意的架構決策，不是回頭推翻當時的簽核，
+> 詳見 [051-legacy-removal-plan.md](051-legacy-removal-plan.md) §5「回溯性 ADR 修正」。這 9 個 repo
+> 現在的 rollback 機制是「回滾到前一個 container image／git tag」，不是「flip 環境變數」。
 > G2 的兩項條件式禁令（不得接 generator 到 frontend、不得在 App 套用 migration）隨 gate 關閉解除；
 > 實際套用 migration 仍受 §2.3 約束——由 App owner 在 rollout task 核准，且本文件不授權 push、
 > publish、production migration 或舊 API 移除。另外，Phase 2 目前**組出來的** schema 會 DROP 19 個
