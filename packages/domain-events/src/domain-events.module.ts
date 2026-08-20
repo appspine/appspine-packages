@@ -18,6 +18,23 @@ export interface DomainEventsModuleOptions {
   providers?: Provider[];
 }
 
+const DOMAIN_EVENTS_PROVIDERS: Provider[] = [
+  DomainEventRegistry,
+  DomainEventsService,
+  { provide: DOMAIN_EVENTS, useExisting: DomainEventsService },
+  DomainEventsAdminService,
+  DomainEventsAdminGuard,
+  DomainEventDispatcherService,
+];
+
+const DOMAIN_EVENTS_EXPORTS = [
+  DomainEventRegistry,
+  DomainEventsService,
+  DOMAIN_EVENTS,
+  DomainEventsAdminService,
+  DomainEventDispatcherService,
+];
+
 /**
  * Standard Capability Module for `@appspine/domain-events`.
  *
@@ -31,22 +48,10 @@ export interface DomainEventsModuleOptions {
 @Module({
   imports: [AppspineAuthInfrastructureModule],
   controllers: [DomainEventsAdminController],
-  providers: [
-    DomainEventRegistry,
-    DomainEventsService,
-    { provide: DOMAIN_EVENTS, useExisting: DomainEventsService },
-    DomainEventsAdminService,
-    DomainEventsAdminGuard,
-    DomainEventDispatcherService,
-  ],
-  exports: [
-    DomainEventRegistry,
-    DomainEventsService,
-    DOMAIN_EVENTS,
-    DomainEventsAdminService,
-    DomainEventDispatcherService,
-  ],
+  providers: [...DOMAIN_EVENTS_PROVIDERS],
+  exports: [...DOMAIN_EVENTS_EXPORTS],
 })
+// biome-ignore lint/complexity/noStaticOnlyClass: Nest dynamic modules expose static factory methods.
 export class DomainEventsModule {
   static forRoot(options?: DomainEventsModuleOptions): DynamicModule {
     const imports: ModuleImport[] = [AppspineAuthInfrastructureModule];
@@ -54,14 +59,7 @@ export class DomainEventsModule {
       imports.push(...options.imports);
     }
 
-    const providers: Provider[] = [
-      DomainEventRegistry,
-      DomainEventsService,
-      { provide: DOMAIN_EVENTS, useExisting: DomainEventsService },
-      DomainEventsAdminService,
-      DomainEventsAdminGuard,
-      DomainEventDispatcherService,
-    ];
+    const providers = [...DOMAIN_EVENTS_PROVIDERS];
 
     if (options?.dispatcher) {
       providers.push({
@@ -79,13 +77,7 @@ export class DomainEventsModule {
       imports,
       controllers: [DomainEventsAdminController],
       providers,
-      exports: [
-        DomainEventRegistry,
-        DomainEventsService,
-        DOMAIN_EVENTS,
-        DomainEventsAdminService,
-        DomainEventDispatcherService,
-      ],
+      exports: [...DOMAIN_EVENTS_EXPORTS],
     };
   }
 

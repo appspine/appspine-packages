@@ -7,6 +7,10 @@ import { DomainEventsAdminService } from './domain-events-admin.service';
 
 type ModuleImport = NonNullable<ModuleMetadata['imports']>[number];
 
+const ADMIN_CONTROLLERS = [DomainEventsAdminController];
+const ADMIN_PROVIDERS = [DomainEventsAdminService, DomainEventsAdminGuard];
+const ADMIN_EXPORTS = [DomainEventsAdminService];
+
 /**
  * Backward-compatible Admin Module for `@appspine/domain-events`.
  *
@@ -21,10 +25,11 @@ type ModuleImport = NonNullable<ModuleMetadata['imports']>[number];
  */
 @Module({
   imports: [AppspineAuthInfrastructureModule],
-  controllers: [DomainEventsAdminController],
-  providers: [DomainEventsAdminService, DomainEventsAdminGuard],
-  exports: [DomainEventsAdminService],
+  controllers: [...ADMIN_CONTROLLERS],
+  providers: [...ADMIN_PROVIDERS],
+  exports: [...ADMIN_EXPORTS],
 })
+// biome-ignore lint/complexity/noStaticOnlyClass: Nest dynamic modules expose static factory methods.
 export class DomainEventsAdminModule {
   static forRoot(registryModule?: ModuleImport): DynamicModule {
     const imports: ModuleImport[] = [AppspineAuthInfrastructureModule];
@@ -34,9 +39,9 @@ export class DomainEventsAdminModule {
     return {
       module: DomainEventsAdminModule,
       imports,
-      controllers: [DomainEventsAdminController],
-      providers: [DomainEventsAdminService, DomainEventsAdminGuard],
-      exports: [DomainEventsAdminService],
+      controllers: [...ADMIN_CONTROLLERS],
+      providers: [...ADMIN_PROVIDERS],
+      exports: [...ADMIN_EXPORTS],
     };
   }
 }

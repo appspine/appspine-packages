@@ -14,7 +14,7 @@ function stubMatchMedia(matches: boolean) {
       listeners.delete(listener);
     },
   };
-  window.matchMedia = vi.fn().mockReturnValue(media);
+  vi.stubGlobal('matchMedia', vi.fn().mockReturnValue(media));
   return {
     fire: (nowMatches: boolean) => {
       for (const listener of listeners) listener({ matches: nowMatches } as MediaQueryListEvent);
@@ -23,13 +23,11 @@ function stubMatchMedia(matches: boolean) {
   };
 }
 
-describe('resolveThemeMode', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    // biome-ignore lint/suspicious/noExplicitAny: restoring jsdom's own matchMedia after stubbing it away
-    (window as any).matchMedia = undefined;
-  });
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
+describe('resolveThemeMode', () => {
   it('resolves "dark" and "light" directly without touching matchMedia', () => {
     expect(resolveThemeMode('dark')).toBe('dark');
     expect(resolveThemeMode('light')).toBe('light');
@@ -47,11 +45,6 @@ describe('resolveThemeMode', () => {
 });
 
 describe('subscribeToSystemTheme', () => {
-  afterEach(() => {
-    // biome-ignore lint/suspicious/noExplicitAny: restoring jsdom's own matchMedia after stubbing it away
-    (window as any).matchMedia = undefined;
-  });
-
   it('invokes the callback with the resolved mode when the OS preference changes', () => {
     const { fire } = stubMatchMedia(false);
     const onChange = vi.fn();
@@ -78,8 +71,7 @@ describe('subscribeToSystemTheme', () => {
   });
 
   it('is a no-op when matchMedia is unavailable', () => {
-    // biome-ignore lint/suspicious/noExplicitAny: simulating an environment without matchMedia
-    (window as any).matchMedia = undefined;
+    vi.stubGlobal('matchMedia', undefined);
     const onChange = vi.fn();
     const unsubscribe = subscribeToSystemTheme(onChange);
     expect(() => unsubscribe()).not.toThrow();

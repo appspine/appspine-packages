@@ -319,8 +319,8 @@ async function main() {
     }
 
     if (crashed) {
-      console.log('\n--- server stdout ---\n' + stdout);
-      console.log('\n--- server stderr ---\n' + stderr);
+      console.log(`\n--- server stdout ---\n${stdout}`);
+      console.log(`\n--- server stderr ---\n${stderr}`);
       throw new Error('Backend crashed during/after bootstrap');
     }
 
