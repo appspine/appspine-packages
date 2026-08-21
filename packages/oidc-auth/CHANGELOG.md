@@ -1,5 +1,29 @@
 # @appspine/oidc-auth
 
+## 3.0.1
+
+### Patch Changes
+
+- 9dba588: Fix every `'use client'` component in a `*/frontend` facet resolving to `undefined` (`Element type is
+invalid`) whenever a Server Component imports it -- `CreateRoleDialog`, `CreateUserDialog`,
+  `CreateApiKeyDialog`, `NotificationBell`, `LoginButton`, etc. TypeScript's CJS `export * from` compiles
+  to a `for...in` enumeration over the re-exported module; Next.js's RSC client-reference proxy (what a
+  `'use client'` module becomes when required from a Server Component) only implements property access
+  (`get`), not enumeration, so `for...in` silently copies zero properties from it. Both barrel layers
+  (`*/frontend/index.ts` and `*/frontend.ts`) now use explicit named exports, which compile to direct
+  property access and work correctly. `@appspine/oidc-auth` additionally stops relying on
+  `identity-core`'s `findWithRolesById`/`findWithRolesByEmail` for role data -- see the companion
+  `@appspine/identity-core` changeset for why those can never populate roles -- and looks roles up
+  through its own `rbac-policy` dependency instead.
+- 9dba588: Revert 3.0.1's fix for `findWithRolesById`/`findWithRolesByEmail` always returning `roles: []`:
+  declaring `appspine.rbac-policy` in `identity-core`'s manifest creates a genuine dependency cycle
+  (`rbac` itself requires `appspine.identity-store`), which the plugin resolver correctly refuses to
+  build (`appspine build` fails with `dependency-cycle`) -- it was never a safe fix. `identity-core`
+  now stays as it was before 3.0.1 (never declaring `rbac-policy`, so those two methods keep returning
+  `roles: []`, same as always), and `@appspine/oidc-auth`'s `JwtVerifierService` -- the only real
+  caller -- looks roles up itself via its own already-cycle-free `rbac-policy` dependency instead of
+  relying on `identity-core` to have populated them.
+
 ## 3.0.0
 
 ### Patch Changes

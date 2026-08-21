@@ -1,6 +1,6 @@
 {
   "name": "@appspine/identity-core",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "private": false,
   "description": "Provider-neutral user and service-account identity for Appspine apps: the User model, Users CRUD and the appspine.identity-store capability.",
   "files": [

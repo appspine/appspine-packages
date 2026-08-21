@@ -1,6 +1,6 @@
 {
   "name": "@appspine/oidc-auth",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": false,
   "description": "OIDC interactive authentication for Appspine apps: JWKS/RS256 verification, (issuer, subject) identity mapping, JIT provisioning and inbound delegated (RFC 8693) trust profiles.",
   "files": [
