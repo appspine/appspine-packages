@@ -24,10 +24,4 @@
 
 | 契約檔案 | 類型 | 狀態 | 標題與摘要 |
 | --- | --- | --- | --- |
-| [binding.md](contracts/bindings/approve-to-wiki.knowledge-document-change-approved/versions/1.0.0/binding.md) | integration-contract | approved | approve-to-wiki.knowledge-document-change-approved |
-| [binding.md](contracts/bindings/wiki-to-approve.get-knowledge-document-change-request-status/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.get-knowledge-document-change-request-status |
-| [binding.md](contracts/bindings/wiki-to-approve.submit-knowledge-document-change/versions/1.0.0/binding.md) | integration-contract | approved | wiki-to-approve.submit-knowledge-document-change |
 | [compatibility-matrix.md](contracts/compatibility-matrix.md) | topic | active | Integration contract compatibility matrix |
-| [contract.md](contracts/capabilities/approve.get-knowledge-document-change-request-status/versions/1.0.0/contract.md) | integration-contract | approved | approve.get-knowledge-document-change-request-status |
-| [contract.md](contracts/capabilities/approve.knowledge-document-change-approved/versions/1.0.0/contract.md) | integration-contract | approved | approve.knowledge-document-change-approved |
-| [contract.md](contracts/capabilities/approve.submit-knowledge-document-change/versions/1.0.0/contract.md) | integration-contract | approved | approve.submit-knowledge-document-change |
