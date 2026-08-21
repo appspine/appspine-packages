@@ -154,22 +154,32 @@ export class JwtVerifierService {
    * probe which emails have a local account (see plan §9/§13).
    */
   async findLocalPrincipalByVerifiedEmail(email: string): Promise<JwtUser | null> {
-    const user = await this.identityStore.findWithRolesByEmail(email);
+    const user = await this.identityStore.findByEmail(email);
     if (!user?.isActive) {
       return null;
     }
-    return this.principalFrom(user.id, user.email, user.name, user.roles);
+    return this.principalFrom(user.id, user.email, user.name, await this.rolesForUser(user.id));
   }
 
   private async buildPrincipal(userId: string): Promise<JwtUser> {
-    const user = await this.identityStore.findWithRolesById(userId);
+    const user = await this.identityStore.findById(userId);
     if (!user) {
       throw new UnauthorizedException('Failed to resolve the local account for this OIDC identity');
     }
     if (!user.isActive) {
       throw new UnauthorizedException('No active local account for this OIDC identity');
     }
-    return this.principalFrom(user.id, user.email, user.name, user.roles);
+    return this.principalFrom(user.id, user.email, user.name, await this.rolesForUser(user.id));
+  }
+
+  /**
+   * `identityStore.findWithRoles*` always returns `roles: []`: `identity-core` cannot depend on
+   * `appspine.rbac-policy` without creating a cycle (rbac itself requires
+   * `appspine.identity-store`). Looking roles up through this service's own (non-cyclic)
+   * `rbacPolicy` dependency is what actually gets a real answer.
+   */
+  private rolesForUser(userId: string): Promise<RoleGrant[]> {
+    return this.rbacPolicy?.rolesForUser(userId) ?? Promise.resolve([]);
   }
 
   /**

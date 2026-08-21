@@ -35,10 +35,15 @@ export const identityCoreManifest: PluginManifestV1 = {
   provides: ['appspine.identity-store'],
   requires: ['appspine.prisma', 'appspine.principal-context'],
   // Audit is genuinely optional: identity works without it, it just stops recording
-  // administrative changes. rbac-policy is optional the same way identity works without it, but
-  // `findWithRolesById`/`findWithRolesByEmail` silently return `roles: []` without it -- this must
-  // stay declared so the resolver wires RbacModule in now that it's no longer @Global().
-  optionalRequires: ['appspine.audit-sink', 'appspine.rbac-policy'],
+  // administrative changes.
+  //
+  // Deliberately NOT declaring appspine.rbac-policy here even though `identity-store.service.ts`
+  // injects RBAC_POLICY optionally: rbac's own manifest requires appspine.identity-store, so
+  // declaring the reverse edge here is a real cycle the resolver correctly refuses to build, not
+  // just an oversight. findWithRolesById/findWithRolesByEmail always return roles: [] as a result
+  // -- @appspine/oidc-auth's JwtVerifierService is the one consumer, and it looks roles up itself
+  // via its own (non-cyclic) rbac-policy dependency instead of relying on this method for roles.
+  optionalRequires: ['appspine.audit-sink'],
   facets: {
     backend: {
       modulePath: './dist/identity-core.module.js',

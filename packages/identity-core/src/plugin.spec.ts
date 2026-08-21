@@ -161,12 +161,13 @@ describe('manifest', () => {
     expect(byFile.get('src/plugin.ts')).not.toMatch(/prisma\.role|prisma\.userRole/);
   });
 
-  it('declares audit and rbac-policy as optional, not required', () => {
-    expect(identityCoreManifest.optionalRequires).toEqual([
-      'appspine.audit-sink',
-      'appspine.rbac-policy',
-    ]);
+  it('declares audit as optional, not required', () => {
+    expect(identityCoreManifest.optionalRequires).toEqual(['appspine.audit-sink']);
     expect(identityCoreManifest.requires).not.toContain('appspine.audit-sink');
+  });
+
+  it('never declares rbac-policy: rbac requires appspine.identity-store, so the reverse edge would be a cycle', () => {
+    expect(identityCoreManifest.optionalRequires).not.toContain('appspine.rbac-policy');
     expect(identityCoreManifest.requires).not.toContain('appspine.rbac-policy');
   });
 });
@@ -183,7 +184,7 @@ describe('resolution', () => {
     expect(graph.providers['appspine.identity-store']).toEqual(['identity-core']);
   });
 
-  it('runs without audit-sink or rbac-policy, reporting the unresolved optional capabilities rather than hiding them', async () => {
+  it('runs without audit-sink, reporting the unresolved optional capability rather than hiding it', async () => {
     const { catalog } = await bootHarness({
       plugins: [{ plugin: identityCorePlugin }],
       inventory: [inventoryEntry('identity-core')],
@@ -192,10 +193,7 @@ describe('resolution', () => {
 
     expectBootOutcome(catalog, 'ready');
     expectCatalogStatus(catalog, { 'identity-core': 'ready' });
-    expect(catalog.byKey['identity-core'].unresolvedOptional).toEqual([
-      'appspine.audit-sink',
-      'appspine.rbac-policy',
-    ]);
+    expect(catalog.byKey['identity-core'].unresolvedOptional).toEqual(['appspine.audit-sink']);
   });
 
   it('registers as a dependency of anything that needs identity', () => {

@@ -57,7 +57,14 @@ function createService(
   create: (...args: never[]) => unknown = async () => ({ id: 'user-new' }),
   record: (...args: never[]) => unknown = async () => {},
 ) {
-  const row = async () => (await findUnique()) as LegacyUserRow | null;
+  // rbacPolicy.rolesForUser below reads lastRow rather than calling findUnique again: in
+  // production it queries RBAC's own Role/UserRole tables, not identity-core's User table, so it
+  // must not add to findUnique's call count the way a second row() call would.
+  let lastRow: LegacyUserRow | null = null;
+  const row = async () => {
+    lastRow = (await findUnique()) as LegacyUserRow | null;
+    return lastRow;
+  };
 
   const identityStore = {
     async findById() {
@@ -102,7 +109,7 @@ function createService(
       permissionPolicy: roles[0]?.permissionPolicy ?? 'DENY_ALL',
       permissions: roles.flatMap((role) => role.permissions.map((entry) => entry.permission)),
     }),
-    rolesForUser: async () => [],
+    rolesForUser: async () => (lastRow?.userRoles ?? []).map((entry) => entry.role),
     defaultRoleIds: async () => [],
     replaceUserRoles: async () => undefined,
   };
@@ -395,8 +402,9 @@ describe('JwtVerifierService.buildOidcJwtUser JIT provisioning', () => {
     });
 
     expect(create).not.toHaveBeenCalled();
-    // Two reads, not one, since the split: resolve the external identity to a user, then load that
-    // user's roles. Both go through appspine.identity-store rather than a direct Prisma query.
+    // Two reads, not one, since the split: resolve the external OIDC identity, then load the local
+    // User by id. Both go through appspine.identity-store. Roles come from a separate rbacPolicy
+    // lookup against RBAC's own tables, so they don't add to this count.
     expect(findUnique).toHaveBeenCalledTimes(2);
   });
 });

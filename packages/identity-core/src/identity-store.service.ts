@@ -26,6 +26,13 @@ const IDENTITY_FIELDS = {
  *
  * `findWithRoles*` returns role rows verbatim. `identity-core` deliberately does not interpret
  * them — flattening roles into an effective policy is `appspine.rbac-policy`'s job.
+ *
+ * `rbacPolicy` below can never actually resolve to a real instance: `rbac`'s manifest requires
+ * `appspine.identity-store` (this package), so declaring the reverse edge in this package's own
+ * manifest would be a genuine dependency cycle, not a wiring gap to close. `findWithRoles*` will
+ * therefore always return `roles: []` here — callers that need real roles (see
+ * `@appspine/oidc-auth`'s `JwtVerifierService`) inject `RBAC_POLICY` themselves instead of relying
+ * on this method to have populated them.
  */
 @Injectable()
 export class IdentityStoreService implements IdentityStorePort {
