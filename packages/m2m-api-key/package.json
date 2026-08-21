@@ -55,7 +55,7 @@
     "@appspine/common": "^0.3.4",
     "@appspine/frontend-shell": "^1.0.0",
     "@appspine/plugin-host-nest": "^2.0.0",
-    "@appspine/rbac": "^6.0.0",
+    "@appspine/rbac": "^6.0.1",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
