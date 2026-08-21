@@ -18,7 +18,7 @@
   },
   "provides": ["appspine.identity-store"],
   "requires": ["appspine.prisma", "appspine.principal-context"],
-  "optionalRequires": ["appspine.audit-sink"],
+  "optionalRequires": ["appspine.audit-sink", "appspine.rbac-policy"],
   "facets": {
     "backend": {
       "modulePath": "./dist/identity-core.module.js",

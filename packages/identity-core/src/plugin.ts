@@ -35,8 +35,10 @@ export const identityCoreManifest: PluginManifestV1 = {
   provides: ['appspine.identity-store'],
   requires: ['appspine.prisma', 'appspine.principal-context'],
   // Audit is genuinely optional: identity works without it, it just stops recording
-  // administrative changes.
-  optionalRequires: ['appspine.audit-sink'],
+  // administrative changes. rbac-policy is optional the same way identity works without it, but
+  // `findWithRolesById`/`findWithRolesByEmail` silently return `roles: []` without it -- this must
+  // stay declared so the resolver wires RbacModule in now that it's no longer @Global().
+  optionalRequires: ['appspine.audit-sink', 'appspine.rbac-policy'],
   facets: {
     backend: {
       modulePath: './dist/identity-core.module.js',
