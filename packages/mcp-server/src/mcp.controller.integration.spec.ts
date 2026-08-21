@@ -8,16 +8,6 @@ import { McpService } from './mcp.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpToolDefinition } from './types';
 
-vi.mock('@appspine/m2m-api-key', () => ({
-  ApiKeyGuard: class {},
-  matchScope: (grantedScopes: string[], requiredScope: string) =>
-    grantedScopes.includes('*') || grantedScopes.includes(requiredScope),
-}));
-
-vi.mock('@appspine/audit-log', () => ({
-  extractWorkflowId: () => null,
-}));
-
 const MODERN_VERSION = '2026-07-28';
 const LEGACY_VERSION = '2025-11-25';
 
@@ -94,6 +84,8 @@ describe('McpController v2 Node adapter integration', () => {
           isApiKey: true,
           roleNames: [],
           actingUserId: 'user-1',
+          permissionPolicy: 'ALLOW_ALL',
+          permissions: [],
         };
         await controller.handlePost(req as never, res as unknown as ExpressResponse);
       })().catch(() => {

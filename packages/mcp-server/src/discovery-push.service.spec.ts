@@ -1,18 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@appspine/m2m-api-key', () => ({
-  matchScope: (grantedScopes: string[], requiredScope: string) => {
-    if (grantedScopes.includes('*')) return true;
-    const [reqModule, reqAction] = requiredScope.split(':');
-    return grantedScopes.some((g) => {
-      if (g === '*') return true;
-      const [gModule, gAction] = g.split(':');
-      if (gModule !== reqModule) return false;
-      return gAction === '*' || gAction === reqAction;
-    });
-  },
-}));
-
 import { DiscoveryPushService } from './discovery-push.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpToolDefinition } from './types';

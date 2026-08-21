@@ -1,4 +1,4 @@
-// Mirrors @appspine/auth's UsersService (packages/auth/src/users/users.service.ts)
+// Mirrors @appspine/identity-core's UsersService response shape.
 // response shape. Defined locally because the frontend doesn't depend on backend packages.
 export interface UserRoleRef {
   id: string;

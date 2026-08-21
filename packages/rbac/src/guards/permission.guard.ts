@@ -1,6 +1,6 @@
-import { SYSTEM_ADMIN_ROLE } from '@appspine/auth';
 import { PermissionPolicy } from '@appspine/common';
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { SYSTEM_ADMIN_ROLE } from '../constants';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';
 
 @Injectable()

@@ -1,0 +1,16 @@
+{
+  "description": "A required plugin instance fails validate/register/ready. Host must fail-fast and abort app startup — no partial boot, no silent continue.",
+  "inventory": [
+    { "plugin": "health-check", "instanceId": "default", "enabled": true, "required": true },
+    { "plugin": "audit-log", "instanceId": "default", "enabled": true, "required": true }
+  ],
+  "simulatedFailure": {
+    "plugin": "audit-log",
+    "instanceId": "default",
+    "stage": "register",
+    "reason": "Prisma connection refused"
+  },
+  "expectedLifecycleOutcome": "boot-aborted",
+  "expectedCatalogStatus": { "health-check": "not-reached", "audit-log": "failed" },
+  "notes": "051 plan section 9: 'required 插件 validate/register/ready 失敗時 App 啟動失敗'. PL1-06 implements the actual host; this fixture freezes the expected outcome ahead of that implementation."
+}

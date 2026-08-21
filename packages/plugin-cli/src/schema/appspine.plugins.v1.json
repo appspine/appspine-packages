@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appspine.dev/schema/appspine.plugins.v1.json",
+  "title": "Appspine plugin inventory",
+  "description": "appspine.plugins.json — the declarative list of plugin instances an App runs. Owned by @appspine/plugin-cli and reviewed as a diff (051 decision 10). Holds no secret values and no package versions: pnpm-lock.yaml is the only truth for versions, and credentials come from the operator's environment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "plugins"],
+  "properties": {
+    "schemaVersion": {
+      "const": "appspine.plugins/v1"
+    },
+    "presets": {
+      "description": "Preset packages whose plugin lists are expanded into this inventory. Declared here from v1 so an inventory written today stays readable once PL2-08 ships preset expansion; until then a non-empty list is rejected rather than silently ignored.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/inventoryEntry"
+      }
+    }
+  },
+  "$defs": {
+    "inventoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plugin", "instanceId", "enabled", "required"],
+      "properties": {
+        "plugin": {
+          "description": "Package name (@appspine/health-check) or bare plugin id (health-check).",
+          "type": "string",
+          "pattern": "^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$"
+        },
+        "instanceId": {
+          "description": "Stable per-install identity. Renaming one is a migration, not a config tweak.",
+          "type": "string",
+          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
+          "maxLength": 64
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "required": {
+          "description": "true means a lifecycle failure aborts boot. false is only legal when the manifest declares an optionalFailurePolicy.",
+          "type": "boolean"
+        },
+        "configRef": {
+          "description": "Dotted path into the App's runtime config. Must match the manifest's configSchema.configRef. A reference, never a value — and never a secret.",
+          "type": "string",
+          "pattern": "^[a-zA-Z_$][a-zA-Z0-9_$]*(\\.[a-zA-Z_$][a-zA-Z0-9_$]*)*$"
+        }
+      }
+    }
+  }
+}

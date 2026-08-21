@@ -1,0 +1,36 @@
+/// Provider-neutral user account, owned by @appspine/identity-core (051 PL0-04 §2).
+///
+/// Deliberately does NOT declare the `userRoles` or `actingApiKeys` back-relations that
+/// @appspine/auth's legacy fragment carried: RBAC and m2m-api-key contribute those to this model
+/// as Prisma augmentations, so identity-core does not reverse-depend on optional plugins.
+/// The PL2-06 composer assembles the augmented model; until then an App that installs RBAC or
+/// API keys still uses @appspine/auth/prisma/user.prisma.
+///
+/// Contains a legacy password hash column; not exposed via MCP tools. @internal
+model User {
+  id        String   @id @default(cuid())
+  /// Login email, must be unique across the system. Profile/contact data — NOT the external
+  /// identity key: OIDC identity is keyed on (issuer, subject) by @appspine/oidc-auth.
+  email     String   @unique
+  /// Legacy local-credential hash. identity-core owns the column but never reads or verifies it;
+  /// a future @appspine/local-auth owns credential logic in its own model (051 plan §5.3).
+  /// Phase 1 must not drop this column (PL0-04 §2).
+  password  String?
+  /// Display name shown in UI; optional.
+  name      String?
+  /// Cross-app link key for looking up this person's canonical record in apps/org (Enterprise
+  /// Master Data). Null for accounts with no corresponding org record (service accounts,
+  /// contractors not yet onboarded in apps/org, etc.) — a null value must not be treated as
+  /// an error, only as "no org context available for this account".
+  employeeNumber String? @unique @map("employee_number")
+  /// Soft-disable without deleting — preserves audit history.
+  isActive  Boolean  @default(true) @map("is_active")
+  /// Marks a dedicated machine/integration account (not a real person's login).
+  /// Only service accounts may be bound as an API key's acting user — see the
+  /// actingUserId policy on ApiKey. @internal
+  isServiceAccount Boolean @default(false) @map("is_service_account")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}

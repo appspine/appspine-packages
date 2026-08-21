@@ -1,26 +1,21 @@
+import type { Principal } from '@appspine/plugin-api';
 import type { Request, Response } from 'express';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { McpController } from './mcp.controller';
 
-vi.mock('@appspine/m2m-api-key', () => ({
-  ApiKeyGuard: class {},
-}));
-
-vi.mock('@appspine/audit-log', () => ({
-  extractWorkflowId: () => null,
-}));
-
-const apiKeyUser = {
+const principal: Principal = {
   sub: 'api-key-1',
   scopes: [],
   isApiKey: true,
   roleNames: [],
   actingUserId: null,
+  permissionPolicy: 'ALLOW_ALL',
+  permissions: [],
 };
 
 function createRequest(host: string, origin?: string): Request {
   return {
-    user: apiKeyUser,
+    user: principal,
     body: {},
     headers: { host, ...(origin === undefined ? {} : { origin }) },
   } as unknown as Request;

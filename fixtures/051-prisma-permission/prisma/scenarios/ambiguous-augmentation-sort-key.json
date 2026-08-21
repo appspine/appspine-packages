@@ -1,0 +1,20 @@
+{
+  "description": "Regression for deterministic tuple ordering: targetModel/field pairs A/bc and Ab/c collide if the composer concatenates both strings into the ambiguous key Abc.",
+  "contributions": [
+    {
+      "plugin": "model-owner",
+      "owns": [{ "model": "A", "fields": ["id"] }, { "model": "Ab", "fields": ["id"] }],
+      "augments": []
+    },
+    {
+      "plugin": "first-augmenter",
+      "owns": [],
+      "augments": [{ "targetModel": "A", "field": "bc", "type": "String?" }]
+    },
+    {
+      "plugin": "second-augmenter",
+      "owns": [],
+      "augments": [{ "targetModel": "Ab", "field": "c", "type": "String?" }]
+    }
+  ]
+}

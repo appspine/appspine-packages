@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "oidc-delegation",
+  "displayName": "OIDC Token Delegation",
+  "cardinality": "singleton",
+  "distribution": "official",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0",
+    "frameworks": {
+      "@nestjs/common": "^11.0.5",
+      "@nestjs/core": "^11.0.5"
+    }
+  },
+  "provides": ["appspine.identity-delegation"],
+  "requires": [],
+  "configSchema": { "configRef": "oidcDelegation" },
+  "environment": [
+    {
+      "key": "OIDC_DELEGATION_ENDPOINT",
+      "required": false,
+      "secret": false,
+      "description": "Token endpoint URL for RFC 8693 token exchange."
+    },
+    {
+      "key": "OIDC_DELEGATION_SOURCE_CLIENT_ID",
+      "required": false,
+      "secret": false,
+      "description": "Confidential client ID used to perform token exchange."
+    },
+    {
+      "key": "OIDC_DELEGATION_SOURCE_CLIENT_SECRET",
+      "required": false,
+      "secret": true,
+      "description": "Client secret for the delegation client."
+    },
+    {
+      "key": "OIDC_DELEGATION_ISSUER_CLIENT_ID",
+      "required": false,
+      "secret": false,
+      "description": "Client ID that issued the subject token."
+    }
+  ],
+  "facets": {
+    "backend": {
+      "modulePath": "./dist/oidc-delegation.module.js",
+      "exportName": "OidcDelegationModule",
+      "providerTokens": ["appspine.identity-delegation"]
+    },
+    "operations": {
+      "healthIndicatorId": "oidc-delegation",
+      "metricsPrefix": "oidc_delegation",
+      "shutdownTimeoutMs": 5000
+    }
+  },
+  "integrationContracts": [
+    {
+      "contractId": "approve.submit-knowledge-document-change",
+      "version": "1.0.0",
+      "role": "delegation-transport"
+    },
+    {
+      "contractId": "wiki-to-approve.submit-knowledge-document-change",
+      "version": "1.0.0",
+      "role": "delegation-client"
+    }
+  ]
+}

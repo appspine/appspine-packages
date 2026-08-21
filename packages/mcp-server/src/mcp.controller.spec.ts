@@ -1,4 +1,4 @@
-import type { ApiKeyUser } from '@appspine/auth';
+import type { MachinePrincipal } from '@appspine/plugin-api';
 import type { Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { McpController } from './mcp.controller';
@@ -8,33 +8,23 @@ const { nodeHandler } = vi.hoisted(() => ({
   nodeHandler: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@appspine/m2m-api-key', () => ({
-  ApiKeyGuard: class {},
-}));
-
-vi.mock('@appspine/audit-log', () => ({
-  extractWorkflowId: (headers: Record<string, unknown>) => {
-    const value = headers['x-appspine-workflow-id'];
-    return typeof value === 'string' && value.length > 0 ? value : null;
-  },
-}));
-
 vi.mock('@modelcontextprotocol/node', () => ({
   hostHeaderValidation: vi.fn(() => () => true),
   originValidation: vi.fn(() => () => true),
   toNodeHandler: vi.fn(() => nodeHandler),
 }));
 
-const baseApiKeyUser = {
+const baseMachinePrincipal: MachinePrincipal = {
   sub: 'api-key-1',
   scopes: ['wiki-pages:read'],
   isApiKey: true,
   roleNames: ['ADMIN'],
   permissionPolicy: 'ALLOW_ALL',
   permissions: [],
-} satisfies Omit<ApiKeyUser, 'actingUserId'>;
+  actingUserId: null,
+};
 
-function createRequest(user: ApiKeyUser, headers: Record<string, string> = {}): Request {
+function createRequest(user: MachinePrincipal, headers: Record<string, string> = {}): Request {
   return { user, body: { jsonrpc: '2.0' }, headers } as unknown as Request;
 }
 
@@ -60,7 +50,7 @@ describe('McpController', () => {
     );
 
     await controller.handlePost(
-      createRequest({ ...baseApiKeyUser, actingUserId: 'service-user-1' }),
+      createRequest({ ...baseMachinePrincipal, actingUserId: 'service-user-1' }),
       createResponse(),
     );
 
@@ -90,7 +80,7 @@ describe('McpController', () => {
 
     await controller.handlePost(
       createRequest(
-        { ...baseApiKeyUser, actingUserId: 'service-user-1' },
+        { ...baseMachinePrincipal, actingUserId: 'service-user-1' },
         { 'x-appspine-workflow-id': 'host-conv-123' },
       ),
       createResponse(),
@@ -112,7 +102,7 @@ describe('McpController', () => {
     );
 
     await controller.handlePost(
-      createRequest({ ...baseApiKeyUser, actingUserId: 'service-user-1' }),
+      createRequest({ ...baseMachinePrincipal, actingUserId: 'service-user-1' }),
       createResponse(),
     );
 
@@ -132,7 +122,7 @@ describe('McpController', () => {
     );
 
     await controller.handlePost(
-      createRequest({ ...baseApiKeyUser, actingUserId: null }),
+      createRequest({ ...baseMachinePrincipal, actingUserId: null }),
       createResponse(),
     );
 

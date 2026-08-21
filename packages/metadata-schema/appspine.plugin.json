@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "metadata-schema",
+  "displayName": "Metadata Schema Introspection",
+  "cardinality": "singleton",
+  "distribution": "official",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0",
+    "frameworks": {
+      "@nestjs/common": "^11.0.5",
+      "@nestjs/core": "^11.0.5",
+      "@prisma/client": "^6.2.0"
+    }
+  },
+  "provides": ["appspine.metadata-schema"],
+  "requires": ["appspine.prisma"],
+  "optionalRequires": ["appspine.scope-matcher"],
+  "facets": {
+    "backend": {
+      "modulePath": "./dist/meta.module.js",
+      "exportName": "MetaModule",
+      "controllerRoutes": ["metadata"],
+      "providerTokens": ["appspine.metadata-schema"]
+    },
+    "permissions": {
+      "definitions": ["metadata:schema:read"]
+    }
+  }
+}

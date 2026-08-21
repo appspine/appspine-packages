@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "health-check",
+  "displayName": "Health Check",
+  "cardinality": "singleton",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0"
+  },
+  "provides": ["appspine.health-indicator"],
+  "requires": ["appspine.prisma"],
+  "facets": {
+    "backend": { "modulePath": "./dist/health.module.js", "exportName": "HealthModule" },
+    "operations": { "healthIndicatorId": "health-check" }
+  }
+}

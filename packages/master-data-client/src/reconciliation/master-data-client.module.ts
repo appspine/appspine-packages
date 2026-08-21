@@ -1,3 +1,4 @@
+import { MASTER_DATA_CLIENT } from '@appspine/plugin-api';
 import { DynamicModule, Module } from '@nestjs/common';
 import type { MasterDataClientModuleAsyncOptions, MasterDataClientModuleOptions } from '../types';
 import {
@@ -23,8 +24,12 @@ export class MasterDataClientModule {
           },
         },
         MasterDataReconciliationService,
+        {
+          provide: MASTER_DATA_CLIENT,
+          useExisting: MasterDataReconciliationService,
+        },
       ],
-      exports: [MasterDataReconciliationService],
+      exports: [MasterDataReconciliationService, MASTER_DATA_CLIENT],
     };
   }
 
@@ -47,8 +52,12 @@ export class MasterDataClientModule {
           inject: options.inject,
         },
         MasterDataReconciliationService,
+        {
+          provide: MASTER_DATA_CLIENT,
+          useExisting: MasterDataReconciliationService,
+        },
       ],
-      exports: [MasterDataReconciliationService],
+      exports: [MasterDataReconciliationService, MASTER_DATA_CLIENT],
     };
   }
 }

@@ -1,0 +1,16 @@
+{
+  "description": "notification augments a User model that, in this scenario, no plugin owns (identity-core contribution missing from inventory). Composer must fail-fast with missing-augmentation-target, never silently drop the augmentation.",
+  "contributions": [
+    {
+      "plugin": "notification",
+      "owns": [{ "model": "NotificationDelivery", "fields": ["id", "userId", "status"] }],
+      "augments": [
+        {
+          "targetModel": "User",
+          "field": "notificationDeliveries",
+          "type": "NotificationDelivery[]"
+        }
+      ]
+    }
+  ]
+}

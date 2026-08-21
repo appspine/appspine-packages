@@ -1,0 +1,25 @@
+{
+  "description": "An optional plugin instance fails validate/register/ready. Host must continue booting other plugins, mark this instance degraded, and surface it in catalog/health/readiness — never catch-and-ignore silently.",
+  "inventory": [
+    { "plugin": "health-check", "instanceId": "default", "enabled": true, "required": true },
+    {
+      "plugin": "master-data-client",
+      "instanceId": "hr-master-data",
+      "enabled": true,
+      "required": false
+    }
+  ],
+  "simulatedFailure": {
+    "plugin": "master-data-client",
+    "instanceId": "hr-master-data",
+    "stage": "ready",
+    "reason": "upstream endpoint unreachable"
+  },
+  "manifestFixture": "positive/master-data-client-multiple.json",
+  "expectedLifecycleOutcome": "degraded-ready",
+  "expectedCatalogStatus": {
+    "health-check": "ready",
+    "master-data-client#hr-master-data": "degraded"
+  },
+  "notes": "051 plan section 9: 'optional 插件只有在 manifest 已定義隔離邊界與 degraded behavior 時才能停用後繼續，並必須讓 readiness、catalog 與 alert 明確呈現 degraded'. Instance-qualified catalog key matches PL0-03 multi-instance namespace rule."
+}

@@ -1,0 +1,36 @@
+{
+  "before": [
+    "import { type ApiKeyUser, CurrentUser, type JwtUser, resolveActingUserId, SYSTEM_ADMIN_ROLE } from \"@appspine/auth\";",
+    "import { ApiKeysService, JwtOrApiKeyGuard as AnyAuthGuard, ScopeGuard } from \"@appspine/m2m-api-key\";",
+    "import type { ApiKeyRow, UserRow } from \"@appspine/frontend-shell\";",
+    "import { ListPagination, UsersTable } from \"@appspine/frontend-shell\";",
+    "",
+    "export function actingUser(principal: JwtUser | ApiKeyUser): string {",
+    "  void CurrentUser;",
+    "  void SYSTEM_ADMIN_ROLE;",
+    "  void ApiKeysService;",
+    "  void ScopeGuard;",
+    "  void AnyAuthGuard;",
+    "  return resolveActingUserId(principal);",
+    "}"
+  ],
+  "expected": [
+    "import { type ApiKeyUser, CurrentUser, type JwtUser, resolveActingUserId } from \"@appspine/plugin-host-nest\";",
+    "import { SYSTEM_ADMIN_ROLE } from \"@appspine/identity-core\";",
+    "import { ApiKeysService, ScopeGuard } from \"@appspine/m2m-api-key\";",
+    "import { AppspineAuthGuard as AnyAuthGuard } from \"@appspine/plugin-host-nest\";",
+    "import type { ApiKeyRow } from \"@appspine/m2m-api-key/frontend\";",
+    "import type { UserRow } from \"@appspine/identity-core/frontend\";",
+    "import { ListPagination } from \"@appspine/frontend-shell\";",
+    "import { UsersTable } from \"@appspine/identity-core/frontend\";",
+    "",
+    "export function actingUser(principal: JwtUser | ApiKeyUser): string {",
+    "  void CurrentUser;",
+    "  void SYSTEM_ADMIN_ROLE;",
+    "  void ApiKeysService;",
+    "  void ScopeGuard;",
+    "  void AnyAuthGuard;",
+    "  return resolveActingUserId(principal);",
+    "}"
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appspine.dev/schema/appspine.plugin.v1.json",
+  "title": "appspine.plugin/v1",
+  "description": "Frozen at PL0-05 (051-plugin-platform-engineering-task-breakdown.md). Structural shape only; PL1-04 implements the real loader/validation. Facet contribution bodies are intentionally left as opaque objects here — their exact shape is defined by PL1-06 (backend), PL3-02 (frontend), PL2-06 (prisma), PL2-07 (permissions), PL1-06 (operations).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "displayName",
+    "cardinality",
+    "engine",
+    "provides",
+    "requires",
+    "facets"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "appspine.plugin/v1" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Plugin ID per knowledge/topics/051-pl0-package-classification.md registry."
+    },
+    "displayName": { "type": "string", "minLength": 1 },
+    "cardinality": { "enum": ["singleton", "multiple"] },
+    "distribution": {
+      "enum": ["official", "app-local"],
+      "description": "Required when replaces is present; only app-local plugins may replace a stock contribution. Package provenance must still be independently verified by the loader."
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["appspinePluginApi", "node"],
+      "properties": {
+        "appspinePluginApi": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[\\^~]?[0-9]+\\.[0-9]+\\.[0-9]+"
+        },
+        "node": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[\\^~>=<]*[0-9]+(\\.[0-9]+)?(\\.[0-9]+)?"
+        },
+        "frameworks": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "provides": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^appspine\\.[a-z0-9-]+(\\.[a-z0-9-]+)*$" },
+      "uniqueItems": true
+    },
+    "requires": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^appspine\\.[a-z0-9-]+(\\.[a-z0-9-]+)*$" },
+      "uniqueItems": true
+    },
+    "optionalRequires": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^appspine\\.[a-z0-9-]+(\\.[a-z0-9-]+)*$" },
+      "uniqueItems": true
+    },
+    "conflicts": {
+      "type": "array",
+      "description": "Plugin IDs this plugin cannot coexist with in the same App (e.g. oidc-auth declares conflicts: [\"local-auth\"]) — NOT capability names. See plan section 6.3.",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "uniqueItems": true
+    },
+    "replaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["plugin", "facet", "contribution", "reason"],
+        "properties": {
+          "plugin": { "type": "string", "minLength": 1 },
+          "facet": { "type": "string", "minLength": 1 },
+          "contribution": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "configSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["configRef"],
+      "properties": {
+        "configRef": { "type": "string", "minLength": 1 }
+      }
+    },
+    "optionalFailurePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["isolationBoundary", "degradedBehavior"],
+      "properties": {
+        "isolationBoundary": { "enum": ["instance"] },
+        "degradedBehavior": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["readiness", "catalog", "alert"],
+          "properties": {
+            "readiness": { "enum": ["degraded"] },
+            "catalog": { "enum": ["degraded"] },
+            "alert": { "enum": ["required"] }
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "required", "secret"],
+        "properties": {
+          "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "required": { "type": "boolean" },
+          "secret": { "type": "boolean" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "facets": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "backend": { "type": "object" },
+        "frontend": { "type": "object" },
+        "prisma": { "type": "object" },
+        "permissions": { "type": "object" },
+        "operations": { "type": "object" }
+      }
+    },
+    "integrationContracts": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "appspine.plugin-lock/v1",
+  "presets": [],
+  "resolutionDigest": "sha256:29409cffb91c20d2b6cf5559e653753e1db1547beaeecdaa022351e71f7ed8cb",
+  "order": [
+    "demo-audit",
+    "demo-health",
+    "demo-identity",
+    "demo-roles"
+  ],
+  "capabilities": {
+    "appspine.audit-sink": [
+      "demo-audit"
+    ],
+    "appspine.health-indicator": [
+      "demo-health"
+    ],
+    "appspine.identity-store": [
+      "demo-identity"
+    ],
+    "appspine.rbac-policy": [
+      "demo-roles"
+    ]
+  },
+  "hostCapabilities": [
+    "appspine.authentication-strategy-registry",
+    "appspine.principal-context",
+    "appspine.prisma"
+  ],
+  "packages": [
+    {
+      "name": "@appspine/demo-audit",
+      "version": "2.1.0",
+      "digest": "sha256:92b6470b051987c5ec1dc60cf1b8a2e3c3e13849cb9074dc80079378e1e123e6",
+      "manifestDigest": "sha256:d161b88c9641a46d585459f0708e914dd9651dc112ca39b8b2042c72147a9292",
+      "schemaDigest": "sha256:84a2cc621d9dcedc2a9e4a0cd8190b693cad2875e4da40f274f80c370fc5428d",
+      "permissionDigest": null
+    },
+    {
+      "name": "@appspine/demo-health",
+      "version": "1.0.0",
+      "digest": "sha256:8ba2868533e962850fdf5a1a38adbaa87c179d12725e01499b8dacc2ff01df18",
+      "manifestDigest": "sha256:5ca53e8aa409d886aed82e03c30c4c5e718c322d26f1f9d878fd686b49f52fbe",
+      "schemaDigest": null,
+      "permissionDigest": null
+    },
+    {
+      "name": "@appspine/demo-identity",
+      "version": "1.3.0",
+      "digest": "sha256:7b7250d73c9710b0cf225549b623780bf192445dc03233362a6486f47bc0ad7b",
+      "manifestDigest": "sha256:2f51479ae168e08ead0090925e56505042b16ae6ecd947eddbdf8d12931fe746",
+      "schemaDigest": "sha256:616c100df8b0fde717ab830d665bc213363aa0a517842306d424d744a6d4af88",
+      "permissionDigest": null
+    },
+    {
+      "name": "@appspine/demo-roles",
+      "version": "4.0.0",
+      "digest": "sha256:0ccef6047c35df5571e211ff30e2634bffbfa6ad8af5fab08d14fb5a5f836ea7",
+      "manifestDigest": "sha256:235432c265d84b47a84dedd2241683861f665bdc4b67ff43c351fe38b8b323d2",
+      "schemaDigest": "sha256:4f1ba6767a3232ca3a6b294c219ac2cf9bb333b6e14830a3bcde9d22ffd21f4f",
+      "permissionDigest": null
+    }
+  ],
+  "instances": [
+    {
+      "key": "demo-audit",
+      "pluginId": "demo-audit",
+      "instanceId": "default",
+      "package": "@appspine/demo-audit",
+      "enabled": true,
+      "required": true,
+      "configRef": null,
+      "fromPreset": null,
+      "provides": [
+        "appspine.audit-sink"
+      ],
+      "requires": [
+        "appspine.prisma"
+      ],
+      "optionalRequires": [],
+      "unresolvedOptional": [],
+      "dependsOn": [],
+      "environment": []
+    },
+    {
+      "key": "demo-health",
+      "pluginId": "demo-health",
+      "instanceId": "default",
+      "package": "@appspine/demo-health",
+      "enabled": true,
+      "required": true,
+      "configRef": null,
+      "fromPreset": null,
+      "provides": [
+        "appspine.health-indicator"
+      ],
+      "requires": [
+        "appspine.prisma"
+      ],
+      "optionalRequires": [],
+      "unresolvedOptional": [],
+      "dependsOn": [],
+      "environment": []
+    },
+    {
+      "key": "demo-identity",
+      "pluginId": "demo-identity",
+      "instanceId": "default",
+      "package": "@appspine/demo-identity",
+      "enabled": true,
+      "required": true,
+      "configRef": null,
+      "fromPreset": null,
+      "provides": [
+        "appspine.identity-store"
+      ],
+      "requires": [
+        "appspine.principal-context",
+        "appspine.prisma"
+      ],
+      "optionalRequires": [],
+      "unresolvedOptional": [],
+      "dependsOn": [],
+      "environment": []
+    },
+    {
+      "key": "demo-roles",
+      "pluginId": "demo-roles",
+      "instanceId": "default",
+      "package": "@appspine/demo-roles",
+      "enabled": true,
+      "required": true,
+      "configRef": null,
+      "fromPreset": null,
+      "provides": [
+        "appspine.rbac-policy"
+      ],
+      "requires": [
+        "appspine.identity-store",
+        "appspine.prisma"
+      ],
+      "optionalRequires": [],
+      "unresolvedOptional": [],
+      "dependsOn": [
+        "demo-identity"
+      ],
+      "environment": []
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".appspine/generated/backend/composition.ts",
+      "digest": "sha256:fb66d0aa2a21d90467965801547efb6fa50540acbd3a9162f447c153d2228661"
+    },
+    {
+      "path": ".appspine/generated/catalog.json",
+      "digest": "sha256:0e7c44f84ee5470fcca9772530d36324ccbb8fd91a7c610035bafafc82c709be"
+    },
+    {
+      "path": ".appspine/generated/frontend/admin-routes.ts",
+      "digest": "sha256:f93941d43f3ad5a724f1abdb167e079a9689f9abbe3b1ed9eebae19ef2b4ed7a"
+    },
+    {
+      "path": ".appspine/generated/frontend/i18n.ts",
+      "digest": "sha256:3a3e4ddb6d9a610aa5f1d44e7dbc4296fd87d5a0dacee45b4062a4b546ca8be6"
+    },
+    {
+      "path": ".appspine/generated/frontend/navigation.ts",
+      "digest": "sha256:d6d5b43d61751bbcd281106b5e1a6dd631f597cfc2c6eddb039be6309d61f8e9"
+    },
+    {
+      "path": ".appspine/generated/frontend/slots.tsx",
+      "digest": "sha256:9a8aae6e8e735e3931ed30a526d2f36446d4f482596db2d69e01decdd8f8526c"
+    },
+    {
+      "path": ".appspine/generated/permissions.json",
+      "digest": "sha256:36a0bfba804c4f15c8a09208cbb773f871943923cd9e07faf9af875ea1937931"
+    },
+    {
+      "path": ".appspine/generated/schema.prisma",
+      "digest": "sha256:8b7d7e41968d799553057afde084a3bec07af6a0f640daadb2c362532931a9df"
+    }
+  ],
+  "note": "Generated by @appspine/plugin-cli. Review this file as a diff; run `appspine build` to update it. Package resolution and integrity live in pnpm-lock.yaml, not here."
+}

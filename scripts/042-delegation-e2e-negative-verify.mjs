@@ -3,17 +3,17 @@
 // Real Keycloak, real build-artifact negative matrix for 042-oidc-delegation-package-plan.md
 // T-17010 — extends T-17000 (042-delegation-e2e-verify.mjs) by re-verifying the SAME real
 // delegated token against deliberately wrong DelegatedOidcTrustProfile values, using the
-// actual compiled @appspine/auth delegated verifier (not source, not a synthetic JWT).
+// actual compiled @appspine/oidc-auth delegated verifier (not source, not a synthetic JWT).
 //
 // The Keycloak-side negative matrix (wrong requester, wrong audience, unknown/upscoped
 // scope, ID token, refresh token, chat-token-via-wiki-delegation) is already covered against
 // real Keycloak by dev-infra/scripts/token-exchange-smoke.mjs (T-16720) and is not repeated
 // here. This script covers the inbound-verifier-side checks T-16720 can't reach, since it
-// only calls the Keycloak token endpoint directly and never runs @appspine/auth's verifier.
+// only calls the Keycloak token endpoint directly and never runs @appspine/oidc-auth's verifier.
 //
 // Usage: node scripts/042-delegation-e2e-negative-verify.mjs
 
-import { DelegatedJwtVerifierService } from '../packages/auth/dist/delegated/delegated-jwt-verifier.service.js';
+import { DelegatedJwtVerifierService } from '../packages/oidc-auth/dist/delegated/delegated-jwt-verifier.service.js';
 import { OidcDelegationService } from '../packages/oidc-delegation/dist/index.js';
 
 const KC_BASE_URL = process.env.KC_BASE_URL;

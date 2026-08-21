@@ -1,11 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 
-// See domain-events-admin.service.spec.ts — @appspine/common's PrismaService eagerly resolves
-// @prisma/client from cwd at import time. Mocking @appspine/common alone isn't enough here:
-// @appspine/m2m-api-key/@appspine/auth ship pre-compiled CommonJS dist output that `require()`s
-// @appspine/common natively, bypassing vitest's mock interception (which only intercepts imports
-// vitest itself transforms, i.e. this package's own TS source) — so those two packages must be
-// mocked at their own boundary too, or their compiled code still reaches the real, crashing module.
 vi.mock('@appspine/common', async () => {
   const { z } = await import('zod');
   return {
@@ -21,19 +15,6 @@ vi.mock('@appspine/common', async () => {
     },
   };
 });
-vi.mock('@appspine/m2m-api-key', () => ({
-  JwtOrApiKeyGuard: class {},
-  ScopeGuard: class {},
-  Scopes:
-    (..._scopes: string[]) =>
-    () => {},
-}));
-vi.mock('@appspine/auth', () => ({
-  AdminGuard: class {},
-  CurrentUser:
-    (..._args: unknown[]) =>
-    () => {},
-}));
 
 import { DomainEventsAdminController } from './domain-events-admin.controller';
 

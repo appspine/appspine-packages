@@ -112,5 +112,5 @@ export type NotificationUpdateData = {
 export type NotificationOrderBy = { createdAt: 'asc' | 'desc' } | { id: 'asc' | 'desc' };
 
 export type NotificationServiceOptions = {
-  tx?: NotificationTxClient;
+  tx?: NotificationTxClient | unknown;
 };

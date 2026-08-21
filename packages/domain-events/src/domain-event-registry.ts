@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import type {
   DomainEventDeliveryRecord,
   DomainEventRecord,
@@ -26,6 +27,7 @@ export type HandlerKeyContributor = (
   input: { eventType: string },
 ) => Promise<string[]>;
 
+@Injectable()
 export class DomainEventRegistry {
   private readonly exactHandlers = new Map<string, DomainEventHandler[]>();
   private readonly prefixResolvers = new Map<

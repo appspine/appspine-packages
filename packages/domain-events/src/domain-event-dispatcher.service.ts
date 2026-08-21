@@ -65,8 +65,8 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
   private running = false;
 
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly registry: DomainEventRegistry,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(DomainEventRegistry) private readonly registry: DomainEventRegistry,
     @Optional() @Inject(DOMAIN_EVENT_DISPATCHER_OPTIONS) options?: DomainEventDispatcherOptions,
   ) {
     const resolved = { ...DEFAULT_DISPATCHER_OPTIONS, ...options };
@@ -106,7 +106,7 @@ export class DomainEventDispatcherService implements OnModuleInit, OnModuleDestr
     this.running = true;
     try {
       await this.reclaimStaleLocks();
-      const deliveries = await this.claimDueDeliveries();
+      const deliveries = (await this.claimDueDeliveries()) ?? [];
       for (const delivery of deliveries) {
         await this.processDelivery(delivery);
       }

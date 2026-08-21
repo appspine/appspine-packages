@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "rbac",
+  "displayName": "Role-Based Access Control",
+  "cardinality": "singleton",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0",
+    "frameworks": { "next": "^15.0.0", "react": "^19.0.0" }
+  },
+  "provides": ["appspine.rbac-policy"],
+  "requires": ["appspine.prisma", "appspine.identity-store", "appspine.audit-sink"],
+  "facets": {
+    "backend": { "modulePath": "./dist/rbac.module.js", "exportName": "RbacModule" },
+    "frontend": {
+      "adminPages": ["roles"],
+      "navigationItems": ["roles"],
+      "i18nNamespace": "rbac",
+      "clientEntry": "./dist/frontend/client.js",
+      "serverEntry": "./dist/frontend/server.js"
+    },
+    "prisma": {
+      "owns": ["Role", "RolePermission", "UserRole"],
+      "augments": [{ "targetModel": "User", "field": "userRoles", "owner": "identity-core" }],
+      "schemaFragment": "prisma/role.prisma"
+    },
+    "permissions": {
+      "definitions": ["rbac:role:create", "rbac:role:update", "rbac:role:delete", "rbac:role:read"]
+    }
+  }
+}

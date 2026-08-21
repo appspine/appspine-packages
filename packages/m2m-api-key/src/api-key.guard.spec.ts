@@ -4,13 +4,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApiKeyGuard } from './api-key.guard';
 import { KEY_PREFIX } from './api-keys.service';
 
-vi.mock('@appspine/auth', () => ({
-  buildUserContext: () => ({
+const rbacPolicy = {
+  flatten: () => ({
     roleNames: ['ADMIN'],
     permissionPolicy: 'ALLOW_ALL',
     permissions: ['USERS_READ'],
   }),
-}));
+};
 
 vi.mock('@appspine/common', () => ({
   PrismaService: class {},
@@ -50,7 +50,7 @@ function createGuard(actingUser: { id: string; isActive: boolean } | null) {
   const rateLimiter = { check: vi.fn().mockReturnValue({ allowed: true }) };
 
   return {
-    guard: new ApiKeyGuard(prisma as never, rateLimiter as never),
+    guard: new ApiKeyGuard(prisma as never, rateLimiter as never, rbacPolicy as never),
     prisma,
   };
 }
@@ -105,5 +105,26 @@ describe('ApiKeyGuard acting user binding', () => {
         }),
       }),
     );
+  });
+});
+
+describe('ApiKeyGuard without an RBAC policy provider', () => {
+  it('rejects the request instead of authorising a permission-less principal', async () => {
+    // `RBAC_POLICY` is @Optional() so an App that has not installed RBAC still boots (Gate G1
+    // finding B3). Fail-closed is what makes that safe: no policy provider means API-key auth is
+    // unavailable, not that every key gets through with an empty permission set.
+    const request: { headers: Record<string, string>; user?: unknown } = {
+      headers: { 'x-api-key': rawKey },
+    };
+    const prisma = {
+      apiKey: { findFirst: vi.fn(), update: vi.fn() },
+    };
+    const guard = new ApiKeyGuard(prisma as never, { check: vi.fn() } as never, undefined);
+
+    await expect(guard.canActivate(createContext(request))).resolves.toBe(false);
+
+    expect(request.user).toBeUndefined();
+    // Nothing was even looked up: the key is never hashed or queried when auth cannot succeed.
+    expect(prisma.apiKey.findFirst).not.toHaveBeenCalled();
   });
 });

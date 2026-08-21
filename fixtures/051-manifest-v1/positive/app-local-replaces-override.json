@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "acme-custom-notification-channel",
+  "displayName": "Acme Custom Notification Channel",
+  "cardinality": "singleton",
+  "distribution": "app-local",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0"
+  },
+  "provides": ["appspine.notification-inbox"],
+  "requires": ["appspine.prisma"],
+  "replaces": [
+    {
+      "plugin": "notification",
+      "facet": "backend",
+      "contribution": "NotificationInboxProvider",
+      "reason": "App-local channel adds a Slack delivery adapter on top of the stock inbox provider; explicit replaces per 051 plan section 4.5, not a silent Nest provider-order override."
+    }
+  ],
+  "facets": {
+    "backend": {
+      "modulePath": "./dist/acme-notification.module.js",
+      "exportName": "AcmeNotificationModule"
+    }
+  }
+}

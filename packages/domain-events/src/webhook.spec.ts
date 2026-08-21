@@ -9,7 +9,6 @@ import { DomainEventOperation, type DomainEventRecord } from './types';
 import {
   buildDomainEventWebhookPayload,
   createDomainEventWebhookSignature,
-  postDomainEventWebhook,
   postDomainEventWebhookV2,
   redactDomainEventWebhookValue,
   verifyDomainEventWebhookV2,
@@ -86,60 +85,7 @@ describe('createDomainEventWebhookSignature', () => {
   });
 });
 
-describe('postDomainEventWebhook destination policy', () => {
-  // v1 destinations are admin-supplied configuration. Before these guards it POSTed the
-  // signed payload at whatever the binding row said, making the dispatcher an SSRF proxy.
-  const base = { event: event(), secret: 'secret', timeoutMs: 1000 } as const;
-
-  it('refuses a destination resolving to the cloud metadata address', async () => {
-    await expect(
-      postDomainEventWebhook({
-        ...base,
-        url: 'https://metadata.example.invalid/webhook',
-        destinationPolicy: { resolve: async () => ['169.254.169.254'] },
-      }),
-    ).rejects.toThrow('blocked address');
-  });
-
-  it('refuses a destination resolving into a private range', async () => {
-    await expect(
-      postDomainEventWebhook({
-        ...base,
-        url: 'https://internal.example.invalid/webhook',
-        destinationPolicy: { resolve: async () => ['10.1.2.3'] },
-      }),
-    ).rejects.toThrow('blocked address');
-  });
-
-  it('refuses a non-HTTP scheme and a URL carrying credentials', async () => {
-    await expect(postDomainEventWebhook({ ...base, url: 'file:///etc/passwd' })).rejects.toThrow(
-      'HTTP or HTTPS',
-    );
-    await expect(
-      postDomainEventWebhook({
-        ...base,
-        url: 'https://user:pass@events.example.invalid/webhook',
-        destinationPolicy: { resolve: async () => ['8.8.8.8'] },
-      }),
-    ).rejects.toThrow('must not contain credentials');
-  });
-
-  it('honours an opt-in production policy the same way v2 does', async () => {
-    await expect(
-      postDomainEventWebhook({
-        ...base,
-        url: 'http://events.example.invalid/webhook',
-        destinationPolicy: {
-          production: true,
-          allowedHosts: ['events.example.invalid'],
-          resolve: async () => ['8.8.8.8'],
-        },
-      }),
-    ).rejects.toThrow('must use HTTPS');
-  });
-});
-
-describe('postDomainEventWebhook signature', () => {
+describe('legacy webhook payload signature primitives', () => {
   it('signs the timestamp and body together over the redacted payload', () => {
     const body = JSON.stringify(buildDomainEventWebhookPayload(event()));
     expect(body).toContain('"seq":"12"');

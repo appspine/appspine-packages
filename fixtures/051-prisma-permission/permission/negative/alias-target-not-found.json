@@ -1,0 +1,22 @@
+{
+  "description": "desiredState declares rbac:role:delete as an alias of rbac:role:legacy-delete, but currentState has no such permission (typo or already-removed source) — reconciler must fail-fast, not silently emit a plausible-looking alias op for a nonexistent target.",
+  "targetGeneration": 1,
+  "currentState": [
+    {
+      "id": "rbac:role:create",
+      "displayName": "Create Role",
+      "status": "active",
+      "schemaGeneration": 1
+    }
+  ],
+  "desiredState": [
+    { "id": "rbac:role:create", "displayName": "Create Role", "status": "active" },
+    {
+      "id": "rbac:role:delete",
+      "displayName": "Delete Role",
+      "status": "active",
+      "aliasOf": "rbac:role:legacy-delete-typo"
+    }
+  ],
+  "expectedFailure": "alias-target-not-found"
+}

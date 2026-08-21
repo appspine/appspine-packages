@@ -39,7 +39,7 @@ jobs:
       - run: node scripts/check-changeset-discipline.mjs HEAD^
         if: github.event_name == 'push'
 
-      # Always build/typecheck/test the full workspace (all 13 packages, ~90s), not a
+      # Always build/typecheck/test the full workspace (all 20 packages, ~90s), not a
       # pnpm --filter "...[ref]"-scoped subset. That filter's "include dependencies of
       # changed packages" walk does not pick up workspace deps declared only in
       # devDependencies (our peerDependencies + devDependencies pattern for e.g.
@@ -53,6 +53,40 @@ jobs:
       - run: pnpm run build
       - run: pnpm run typecheck
       - run: pnpm run test
+
+      # PL0-07 (051-plugin-platform-engineering-task-breakdown.md): the TypeScript project
+      # references graph must independently build a fresh checkout (no committed dist/) in
+      # correct dependency order. This does not replace the pnpm -r build/typecheck/test
+      # above — it is a second, TS-native path that will let PL1-07's architecture checker
+      # (and later affected-package incremental builds) trust `tsc -b` as ground truth.
+      - name: Verify TypeScript project-references build graph (clean)
+        run: |
+          pnpm exec tsc -b tsconfig.json --clean
+          pnpm exec tsc -b tsconfig.json
+      - name: Verify Phase 0 frozen contracts and build graph
+        run: pnpm run verify:phase0
+
+      - name: Verify Phase 1 architecture and Node 22 tarball consumer
+        run: pnpm run verify:phase1
+
+      # PL2-10: the generation gate compares every generated artefact against a committed golden,
+      # regenerates in a second directory to prove determinism means "same inputs" rather than
+      # "same run", hands the composed schema to Prisma, and — with --self-test — breaks each
+      # artefact in turn to prove it would notice. A drift check nobody has watched fail is a
+      # drift check nobody knows works.
+      - name: Verify Phase 2 deterministic generation
+        run: pnpm run verify:phase2
+
+      # Uploaded on failure only: a generation diff is unreadable in a log and obvious as a file.
+      - name: Upload generation diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appspine-generation-diagnostics
+          path: |
+            fixtures/051-pl2-generation/golden/**
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Lint knowledge base
         run: node scripts/lint-knowledge.js

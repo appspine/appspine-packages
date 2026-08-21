@@ -63,10 +63,17 @@ function createPrismaMock(user: { id: string; isServiceAccount: boolean } | null
   };
 }
 
+function createService(prisma: ReturnType<typeof createPrismaMock>) {
+  const identityStore = {
+    findById: vi.fn().mockImplementation(async () => prisma.user.findUnique()),
+  };
+  return new ApiKeysService(prisma as never, identityStore as never);
+}
+
 describe('ApiKeysService acting user binding', () => {
   it('rejects a non-service-account acting user', async () => {
     const prisma = createPrismaMock({ id: 'user-1', isServiceAccount: false });
-    const service = new ApiKeysService(prisma as never);
+    const service = createService(prisma);
 
     await expect(
       service.create({
@@ -80,7 +87,7 @@ describe('ApiKeysService acting user binding', () => {
 
   it('writes a service-account acting user on create', async () => {
     const prisma = createPrismaMock({ id: 'service-user-1', isServiceAccount: true });
-    const service = new ApiKeysService(prisma as never);
+    const service = createService(prisma);
 
     await service.create({
       name: 'integration',
@@ -98,7 +105,7 @@ describe('ApiKeysService acting user binding', () => {
 
   it('validates and writes a service-account acting user on update', async () => {
     const prisma = createPrismaMock({ id: 'service-user-1', isServiceAccount: true });
-    const service = new ApiKeysService(prisma as never);
+    const service = createService(prisma);
 
     await service.update('key-1', { actingUserId: 'service-user-1' });
 
@@ -113,7 +120,7 @@ describe('ApiKeysService acting user binding', () => {
 describe('ApiKeysService scope validation', () => {
   it('accepts a "call" scope (dev_docs 025 gateway:call for the mcp-gateway aggregator)', async () => {
     const prisma = createPrismaMock(null);
-    const service = new ApiKeysService(prisma as never);
+    const service = createService(prisma);
 
     await expect(
       service.create({
@@ -126,7 +133,7 @@ describe('ApiKeysService scope validation', () => {
 
   it('still rejects an action word outside read/write/call/*', async () => {
     const prisma = createPrismaMock(null);
-    const service = new ApiKeysService(prisma as never);
+    const service = createService(prisma);
 
     await expect(
       service.create({

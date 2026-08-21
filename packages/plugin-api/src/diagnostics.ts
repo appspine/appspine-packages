@@ -1,0 +1,131 @@
+/**
+ * Diagnostics and secret redaction.
+ *
+ * Every failure path in this package reports structured diagnostics rather than throwing raw
+ * strings, because the same objects have to reach three very different consumers: the CLI
+ * (`plugin doctor`), the host catalog, and CI. 051 plan section 9 requires config diagnostics to
+ * be redacted per declaration — so redaction lives next to the diagnostic type instead of being
+ * something each caller is trusted to remember.
+ */
+
+import type { EnvironmentContribution, PluginManifestV1 } from './manifest';
+
+export type DiagnosticSeverity = 'error' | 'warning' | 'info';
+
+export interface PluginDiagnostic {
+  /** Stable machine-readable code, e.g. `missing-required-capability`. Never localized. */
+  code: string;
+  severity: DiagnosticSeverity;
+  message: string;
+  pluginId?: string;
+  instanceId?: string;
+  /** Dotted path into the offending document, e.g. `engine.appspinePluginApi`. */
+  path?: string;
+}
+
+export function diagnostic(
+  code: string,
+  message: string,
+  extra: Omit<PluginDiagnostic, 'code' | 'message' | 'severity'> & {
+    severity?: DiagnosticSeverity;
+  } = {},
+): PluginDiagnostic {
+  const { severity = 'error', ...rest } = extra;
+  return { code, severity, message, ...rest };
+}
+
+export function hasErrors(diagnostics: readonly PluginDiagnostic[]): boolean {
+  return diagnostics.some((entry) => entry.severity === 'error');
+}
+
+/** Sorted by code then path so two runs over the same input produce byte-identical output. */
+export function sortDiagnostics(diagnostics: readonly PluginDiagnostic[]): PluginDiagnostic[] {
+  return [...diagnostics].sort((a, b) => {
+    // A literal NUL as the field separator, written as an escape rather than typed into the
+    // source: an actual 0x00 byte makes this file "binary" to grep, diff and review tools, which
+    // is how it stayed unnoticed. `\u0000` cannot appear in a code, path or message, so it is
+    // still the right separator.
+    const key = (d: PluginDiagnostic) =>
+      `${d.pluginId ?? ''}\u0000${d.instanceId ?? ''}\u0000${d.code}\u0000${d.path ?? ''}\u0000${d.message}`;
+    return key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0;
+  });
+}
+
+export const REDACTED = '[redacted]';
+
+/**
+ * Keys that must be redacted even when nobody declared them. The manifest's `environment[].secret`
+ * flags are the contract, but a config tree can hold values that never came from a declared env
+ * key, and a diagnostic dump is exactly the wrong place to discover that gap.
+ */
+const SECRET_LOOKING_KEY =
+  /secret|password|passwd|token|api[-_]?key|credential|private[-_]?key|connection[-_]?string|\bdsn\b|(?:database|db|redis|amqp|mongo|postgres|mysql|broker)[-_]?(?:url|uri)|access[-_]?key|session[-_]?key|signing[-_]?key|webhook|salt|passphrase/i;
+
+/**
+ * A value with an embedded credential does not have to be *called* one. `databaseUrl`,
+ * `connectionString` and `dsn` all routinely carry a password in userinfo, and none of them match
+ * "secret|password|token" — Gate G1's independent review pointed that out. The list below is the
+ * standing set of shapes that carry credentials in practice.
+ *
+ * This stays a heuristic and is not the contract: `environment[].secret` in the manifest is, and a
+ * value nobody declared and nobody's pattern caught can still reach a diagnostic. The heuristic
+ * exists to shrink that gap, not to close it.
+ */
+export function isSecretLookingKey(key: string): boolean {
+  return SECRET_LOOKING_KEY.test(key);
+}
+
+/** Declared secret env keys, matched case-insensitively against config keys too. */
+export function declaredSecretKeys(
+  environment: readonly EnvironmentContribution[] | undefined,
+): Set<string> {
+  const keys = new Set<string>();
+  for (const entry of environment ?? []) {
+    if (entry.secret) keys.add(entry.key.toLowerCase());
+  }
+  return keys;
+}
+
+export interface RedactOptions {
+  /** Extra keys to treat as secret, on top of the built-in heuristics. Case-insensitive. */
+  secretKeys?: Iterable<string>;
+  /** Guard against pathological nesting in untrusted config. */
+  maxDepth?: number;
+}
+
+/**
+ * Deep-copies a config tree with every secret value replaced. Structure is preserved on purpose:
+ * "this key exists but its value is hidden" is useful in a diagnostic, "this key vanished" is not.
+ */
+export function redactConfig(value: unknown, options: RedactOptions = {}): unknown {
+  const secretKeys = new Set(
+    [...(options.secretKeys ?? [])].map((key) => key.toLowerCase().replace(/_/g, '')),
+  );
+  const maxDepth = options.maxDepth ?? 12;
+
+  const isSecretKey = (key: string): boolean =>
+    isSecretLookingKey(key) || secretKeys.has(key.toLowerCase().replace(/_/g, ''));
+
+  const walk = (node: unknown, depth: number, keyHint: string | null): unknown => {
+    if (keyHint !== null && isSecretKey(keyHint) && node !== null && node !== undefined) {
+      return REDACTED;
+    }
+    if (depth >= maxDepth) return REDACTED;
+    if (Array.isArray(node)) return node.map((item) => walk(item, depth + 1, keyHint));
+    if (node !== null && typeof node === 'object') {
+      const out: Record<string, unknown> = {};
+      for (const [key, child] of Object.entries(node as Record<string, unknown>)) {
+        out[key] = walk(child, depth + 1, key);
+      }
+      return out;
+    }
+    return node;
+  };
+
+  return walk(value, 0, null);
+}
+
+/** Convenience wrapper that seeds `secretKeys` from a manifest's own declarations. */
+export function redactConfigForManifest(manifest: PluginManifestV1, config: unknown): unknown {
+  return redactConfig(config, { secretKeys: declaredSecretKeys(manifest.environment) });
+}

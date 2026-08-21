@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "appspine.preset/v1",
+  "id": "standard",
+  "displayName": "Appspine standard capabilities",
+  "description": "What appspine-app-template's AppModule imports by hand today, named once. A preset is a shorthand for a list of plugins, never a thing the host knows about: after expansion the inventory reads exactly as if these entries had been typed out.",
+  "plugins": [
+    { "plugin": "@appspine/health-check", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/audit-log", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/identity-core", "instanceId": "default", "required": true },
+    {
+      "plugin": "@appspine/oidc-auth",
+      "instanceId": "default",
+      "required": true,
+      "configRef": "oidc"
+    },
+    { "plugin": "@appspine/notification", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/rbac", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/m2m-api-key", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/metadata-schema", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/domain-events", "instanceId": "default", "required": true },
+    { "plugin": "@appspine/mcp-server", "instanceId": "default", "required": true }
+  ]
+}

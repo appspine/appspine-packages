@@ -1,5 +1,54 @@
 # @appspine/audit-log
 
+## 2.0.0
+
+### Major Changes
+
+- 057c121: Complete the v3 legacy-removal milestone: remove the `@appspine/auth` facade workspace,
+  capability-specific UI transition exports from `@appspine/frontend-shell`, the provider-specific
+  `JwtOrApiKeyGuard`, and the deprecated domain-event webhook helper. RBAC, MCP server, M2M API key,
+  and audit-log capability modules are no longer global; feature modules must import the composed
+  platform bridge explicitly.
+
+## 2.0.0-canary.0
+
+### Major Changes
+
+- Complete the v3 legacy-removal milestone: remove the `@appspine/auth` facade workspace,
+  capability-specific UI transition exports from `@appspine/frontend-shell`, the provider-specific
+  `JwtOrApiKeyGuard`, and the deprecated domain-event webhook helper. RBAC, MCP server, M2M API key,
+  and audit-log capability modules are no longer global; feature modules must import the composed
+  platform bridge explicitly.
+
+## 1.1.0
+
+### Minor Changes
+
+- 4c0ce5f: Ship the first two capability plugins (051 PL1-08, PL1-09).
+
+  Both packages now publish an `appspine.plugin.json` manifest and a `./plugin` subpath exporting a
+  `definePlugin()` descriptor. Plugin mode contributes the very same Nest module the package root
+  already exported, so legacy wiring and plugin wiring cannot diverge in behaviour.
+
+  `@appspine/audit-log` additionally binds its service to the stable `AUDIT_SINK` token and declares
+  its Prisma facet with a digest of the shipped fragment, so a consumer can depend on the audit
+  capability without importing the package. The concrete `AuditLogService` export and the module's
+  `@Global()` marker are unchanged during the transition window.
+
+### Patch Changes
+
+- Updated dependencies [4c0ce5f]
+- Updated dependencies [8e67a05]
+- Updated dependencies [b75516d]
+- Updated dependencies [b92c1c3]
+- Updated dependencies [0eaf69d]
+- Updated dependencies [9cd2838]
+- Updated dependencies [a41aab9]
+- Updated dependencies [aeb861d]
+- Updated dependencies [96f92e8]
+- Updated dependencies [fdff215]
+  - @appspine/plugin-api@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

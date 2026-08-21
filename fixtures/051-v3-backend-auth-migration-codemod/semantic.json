@@ -1,0 +1,31 @@
+{
+  "before": [
+    "import { CurrentUser, resolveActingUserId, SYSTEM_ADMIN_ROLE } from '@appspine/auth';",
+    "import { JwtOrApiKeyGuard } from '@appspine/m2m-api-key';",
+    "",
+    "export function exercise() {",
+    "  const guard = new JwtOrApiKeyGuard();",
+    "  return {",
+    "    actingUserId: resolveActingUserId({ sub: 'machine', actingUserId: 'user-7' }),",
+    "    authenticated: guard.authenticate('credential'),",
+    "    currentUser: CurrentUser('user-7'),",
+    "    systemRole: SYSTEM_ADMIN_ROLE,",
+    "  };",
+    "}"
+  ],
+  "expected": [
+    "import { CurrentUser, resolveActingUserId } from '@appspine/plugin-host-nest';",
+    "import { SYSTEM_ADMIN_ROLE } from '@appspine/identity-core';",
+    "import { AppspineAuthGuard as JwtOrApiKeyGuard } from '@appspine/plugin-host-nest';",
+    "",
+    "export function exercise() {",
+    "  const guard = new JwtOrApiKeyGuard();",
+    "  return {",
+    "    actingUserId: resolveActingUserId({ sub: 'machine', actingUserId: 'user-7' }),",
+    "    authenticated: guard.authenticate('credential'),",
+    "    currentUser: CurrentUser('user-7'),",
+    "    systemRole: SYSTEM_ADMIN_ROLE,",
+    "  };",
+    "}"
+  ]
+}

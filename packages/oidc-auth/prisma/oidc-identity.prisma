@@ -1,0 +1,27 @@
+/// External OIDC identity, owned by @appspine/oidc-auth (051 PL0-04 §4).
+///
+/// The stable external key is (issuer, subject), never email: an IdP-side email change must not
+/// create a second account, and the same `sub` from two realms must stay two identities.
+///
+/// `userId` is a snapshot reference with no Prisma relation on purpose. Declaring a relation would
+/// require @appspine/identity-core's `User` model to carry a back-relation field for an *optional*
+/// plugin, which is exactly the reverse dependency the 051 split removes (plan §5.3). Referential
+/// integrity for this table is enforced by the delete path in the owning app, not by an FK.
+model OidcIdentity {
+  id        String   @id @default(cuid())
+  /// OIDC `iss` claim.
+  issuer    String
+  /// OIDC `sub` claim — stable per issuer, opaque, never an email.
+  subject   String
+  /// @appspine/identity-core User id. Snapshot reference, no FK (see the note above).
+  userId    String   @map("user_id")
+  /// True when this mapping was created by linking a pre-existing email-keyed account during the
+  /// PL0-04 §4.1 transition, rather than by provisioning a new one. Operators watch this drop to
+  /// zero before the email fallback is switched off at cutover.
+  linkedFromLegacyEmail Boolean @default(false) @map("linked_from_legacy_email")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([issuer, subject])
+  @@index([userId])
+  @@map("oidc_identities")
+}

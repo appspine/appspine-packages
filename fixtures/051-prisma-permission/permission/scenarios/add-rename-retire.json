@@ -1,0 +1,47 @@
+{
+  "description": "Realistic upgrade plan covering all 5 op codes: rbac:role:create is unchanged (no-op), health-check:status:read gets a display-name-only edit (update-display), rbac:role:legacy-delete is renamed (via alias) to rbac:role:delete, notification:digest:send is removed from desired state (must retire, never delete), audit-log:entry:read is newly added.",
+  "targetGeneration": 2,
+  "currentState": [
+    {
+      "id": "rbac:role:create",
+      "displayName": "Create Role",
+      "status": "active",
+      "schemaGeneration": 1
+    },
+    {
+      "id": "health-check:status:read",
+      "displayName": "Read health status",
+      "status": "active",
+      "schemaGeneration": 1
+    },
+    {
+      "id": "rbac:role:legacy-delete",
+      "displayName": "Delete Role (legacy)",
+      "status": "active",
+      "schemaGeneration": 1
+    },
+    {
+      "id": "notification:digest:send",
+      "displayName": "Send Digest Notification",
+      "status": "active",
+      "schemaGeneration": 1
+    }
+  ],
+  "desiredState": [
+    { "id": "rbac:role:create", "displayName": "Create Role", "status": "active" },
+    {
+      "id": "health-check:status:read",
+      "displayName": "Read Health Check Status",
+      "status": "active"
+    },
+    {
+      "id": "rbac:role:delete",
+      "displayName": "Delete Role",
+      "status": "active",
+      "aliasOf": "rbac:role:legacy-delete"
+    },
+    { "id": "audit-log:entry:read", "displayName": "Read Audit Entries", "status": "active" }
+  ],
+  "expectedPlanOpCodes": ["no-op", "update-display", "add", "alias", "retire"],
+  "expectedOpsNeverIncluding": ["delete", "drop-table"]
+}

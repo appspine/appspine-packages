@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "local-auth",
+  "displayName": "Local Credential Authentication",
+  "cardinality": "singleton",
+  "engine": { "appspinePluginApi": "^1.0.0", "node": ">=22.0.0" },
+  "provides": ["appspine.interactive-auth-provider"],
+  "requires": ["appspine.identity-store"],
+  "facets": {
+    "backend": { "modulePath": "./dist/local-auth.module.js", "exportName": "LocalAuthModule" }
+  }
+}

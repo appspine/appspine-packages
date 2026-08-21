@@ -1,0 +1,56 @@
+{
+  "name": "@appspine/plugin-host-nest",
+  "version": "2.0.0",
+  "private": false,
+  "description": "NestJS host for Appspine plugins: composition from a resolved inventory, lifecycle, catalog and diagnostics, plus the host-owned authentication strategy registry and principal context.",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appspine/appspine-packages.git",
+    "directory": "packages/plugin-host-nest"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "peerDependencies": {
+    "@appspine/plugin-api": "^1.1.0",
+    "@nestjs/common": "^11.0.5",
+    "@nestjs/core": "^11.0.5",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@appspine/plugin-api": "workspace:*",
+    "@appspine/plugin-testkit": "workspace:*",
+    "@nestjs/common": "^11.0.5",
+    "@nestjs/core": "^11.0.5",
+    "@nestjs/testing": "^11.0.5",
+    "@types/node": "^22.10.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

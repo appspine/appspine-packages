@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { extractWorkflowId } from '@appspine/audit-log';
-import type { ApiKeyUser } from '@appspine/auth';
-import { ApiKeyGuard } from '@appspine/m2m-api-key';
+import { actingUserIdOf, isMachinePrincipal, type Principal } from '@appspine/plugin-api';
+import { MachineAuthGuard } from '@appspine/plugin-host-nest';
 import {
   hostHeaderValidation,
   type NodeIncomingMessageLike,
@@ -16,7 +15,17 @@ import { McpService } from './mcp.service';
 import { McpToolRegistry } from './mcp-tool.registry';
 import type { McpCallContext } from './types';
 
-// MCP is for external agents (n8n, AI clients) authenticated via M2M API key —
+const WORKFLOW_ID_HEADER = 'x-appspine-workflow-id';
+
+/**
+ * Extracts the correlation workflow id from request headers.
+ */
+export function extractWorkflowId(headers: Record<string, unknown>): string | null {
+  const value = headers[WORKFLOW_ID_HEADER];
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+// MCP is for external agents (n8n, AI clients) authenticated via machine authentication (M2M API key) —
 // same auth layer as the rest of the M2M surface (dev_docs 001 "MCP Server transport").
 @Controller('mcp')
 export class McpController {
@@ -26,17 +35,21 @@ export class McpController {
   ) {}
 
   @Post()
-  @UseGuards(ApiKeyGuard)
+  @UseGuards(MachineAuthGuard)
   async handlePost(@Req() req: Request, @Res({ passthrough: false }) res: Response): Promise<void> {
-    const user = (req as unknown as { user?: ApiKeyUser }).user;
+    const user = (req as unknown as { user?: Principal }).user;
+
+    const isApiKey = user ? isMachinePrincipal(user) : false;
+    const scopes = user && 'scopes' in user && Array.isArray(user.scopes) ? user.scopes : [];
+    const actingUserId = user ? actingUserIdOf(user) : null;
 
     const ctx: McpCallContext = {
-      scopes: user?.scopes ?? [],
-      isApiKey: user?.isApiKey ?? false,
+      scopes,
+      isApiKey,
       roleNames: user?.roleNames ?? [],
-      actingUserId: user?.actingUserId ?? null,
+      actingUserId,
       sub: user?.sub ?? '',
-      workflowId: extractWorkflowId(req.headers as Record<string, unknown>),
+      workflowId: extractWorkflowId((req.headers ?? {}) as Record<string, unknown>),
     };
 
     if (

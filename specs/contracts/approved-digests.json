@@ -1,0 +1,8 @@
+{
+  "approve-to-wiki.knowledge-document-change-approved@1.0.0": "sha256:c26c1b1a4a613785fd724d4314860e8a8584e3168142df7860094e4aad266154",
+  "approve.get-knowledge-document-change-request-status@1.0.0": "sha256:b97dc750830d83532922877ce543437053cc8f6da64a2ee27bf21e01d7d2fbbe",
+  "approve.knowledge-document-change-approved@1.0.0": "sha256:28896c7a209f49c430e74565f00058d4cac11475f8000421668dc502b9108742",
+  "approve.submit-knowledge-document-change@1.0.0": "sha256:6b022f160e3035d8a609128bf84189f87f9230e5edb6ebd493435d78d8f47c66",
+  "wiki-to-approve.get-knowledge-document-change-request-status@1.0.0": "sha256:d1d3701ca2bd663d9b5f5fc462f0a5577519adcb84bc40fef8d02e83f2d1838f",
+  "wiki-to-approve.submit-knowledge-document-change@1.0.0": "sha256:b697cb8d52d7d8046ed22972dd374851e4eb4d612e7b8e4c49b2191919523bea"
+}

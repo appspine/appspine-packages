@@ -1,0 +1,68 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/plugin-cli/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/preset-standard/tsconfig.build.json"
+    },
+    {
+      "path": "packages/audit-log/tsconfig.build.json"
+    },
+    {
+      "path": "packages/common/tsconfig.build.json"
+    },
+    {
+      "path": "packages/domain-events/tsconfig.build.json"
+    },
+    {
+      "path": "packages/e2e-kit/tsconfig.build.json"
+    },
+    {
+      "path": "packages/frontend-shell/tsconfig.build.json"
+    },
+    {
+      "path": "packages/health-check/tsconfig.build.json"
+    },
+    {
+      "path": "packages/identity-core/tsconfig.build.json"
+    },
+    {
+      "path": "packages/integration-contracts/tsconfig.build.json"
+    },
+    {
+      "path": "packages/m2m-api-key/tsconfig.build.json"
+    },
+    {
+      "path": "packages/master-data-client/tsconfig.build.json"
+    },
+    {
+      "path": "packages/mcp-server/tsconfig.build.json"
+    },
+    {
+      "path": "packages/metadata-schema/tsconfig.build.json"
+    },
+    {
+      "path": "packages/notification/tsconfig.build.json"
+    },
+    {
+      "path": "packages/oidc-auth/tsconfig.build.json"
+    },
+    {
+      "path": "packages/oidc-delegation/tsconfig.build.json"
+    },
+    {
+      "path": "packages/plugin-api/tsconfig.build.json"
+    },
+    {
+      "path": "packages/plugin-host-nest/tsconfig.build.json"
+    },
+    {
+      "path": "packages/plugin-testkit/tsconfig.build.json"
+    },
+    {
+      "path": "packages/rbac/tsconfig.build.json"
+    }
+  ]
+}

@@ -1,18 +1,19 @@
 # appspine Packages & Governance — Agent Guide
 
-`appspine-packages` is the central monorepo hosting shared core packages (`@appspine/*`), integration contracts (`knowledge/contracts/`), and system-wide governance knowledge documents (`knowledge/`).
+`appspine-packages` is the central monorepo hosting shared core packages (`@appspine/*`), integration contracts (`specs/contracts/`), and system-wide governance specifications (`specs/`).
 
 ## Architecture & Knowledge Base
 
 System-wide architectural standards, conventions, and decision logs:
-- `knowledge/topics/001-app-framework-plan.md` — Tech stack, topology, template mechanism, and capability list.
-- `knowledge/topics/002-app-dev-conventions.md` — Coding conventions, Prisma standards, API design, commit rules, and CRUD module workflows.
-- `knowledge/decisions/` — Architecture decision records (ADRs).
-- `knowledge/log.md` — Historical ingest and cleanup logs.
+- `specs/topics/app-framework.md` — Tech stack, topology, template mechanism, and capability list.
+- `specs/topics/dev-conventions.md` — Coding conventions, Prisma standards, API design, commit rules, and CRUD module workflows.
+- `specs/topics/plugin-platform.md` — Plugin platform specifications and SSoT guide.
+- `specs/decisions/` — Architecture decision records (ADRs).
+- `specs/log.md` — Historical specs and cleanup logs.
 
-Validate knowledge files across repositories:
+Validate specifications across repositories:
 ```bash
-node scripts/lint-knowledge.js
+node scripts/lint-specs.mjs
 ```
 
 ## Integration Contracts Toolchain

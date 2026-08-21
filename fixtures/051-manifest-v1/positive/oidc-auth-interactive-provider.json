@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "oidc-auth",
+  "displayName": "OIDC Authentication",
+  "cardinality": "singleton",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0"
+  },
+  "provides": ["appspine.interactive-auth-provider", "appspine.delegated-identity-verifier"],
+  "requires": [
+    "appspine.identity-store",
+    "appspine.audit-sink",
+    "appspine.authentication-strategy-registry"
+  ],
+  "conflicts": ["local-auth"],
+  "environment": [
+    { "key": "OIDC_ISSUER", "required": true, "secret": false },
+    { "key": "OIDC_AUDIENCE", "required": true, "secret": false },
+    { "key": "OIDC_JWKS_URL", "required": true, "secret": false }
+  ],
+  "facets": {
+    "backend": { "modulePath": "./dist/oidc-auth.module.js", "exportName": "OidcAuthModule" },
+    "frontend": {
+      "loginProviderUi": true,
+      "i18nNamespace": "oidc-auth",
+      "clientEntry": "./dist/frontend/client.js",
+      "serverEntry": "./dist/frontend/server.js"
+    }
+  }
+}

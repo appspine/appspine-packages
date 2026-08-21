@@ -1,13 +1,18 @@
 {
   "name": "@appspine/domain-events",
-  "version": "8.0.0",
+  "version": "10.0.0",
   "files": [
     "dist",
     "docs",
+    "prisma",
     "admin.js",
     "admin.d.ts",
     "testing.js",
     "testing.d.ts",
+    "appspine.plugin.json",
+    "plugin.js",
+    "plugin.d.ts",
+    "README.md",
     "CHANGELOG.md"
   ],
   "private": false,
@@ -34,7 +39,18 @@
     "./admin": {
       "types": "./dist/admin.d.ts",
       "default": "./dist/admin.js"
-    }
+    },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./frontend": {
+      "types": "./dist/frontend.d.ts",
+      "default": "./dist/frontend.js"
+    },
+    "./appspine.plugin.json": "./appspine.plugin.json",
+    "./prisma/domain-events.prisma": "./prisma/domain-events.prisma",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -43,34 +59,53 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@appspine/frontend-shell": "workspace:*",
     "@appspine/integration-contracts": "0.4.0",
+    "@appspine/plugin-api": "workspace:*",
     "reflect-metadata": "^0.2.2"
   },
   "peerDependencies": {
-    "@appspine/auth": "^6.2.2",
     "@appspine/common": "^0.3.4",
-    "@appspine/m2m-api-key": "^5.0.0",
+    "@appspine/frontend-shell": "^1.0.0",
+    "@appspine/plugin-host-nest": "^2.0.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
     "@prisma/client": "^6.2.0",
+    "lucide-react": "^1.22.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "zod": "^4.4.3"
   },
   "peerDependenciesMeta": {
-    "@appspine/auth": {
+    "@appspine/frontend-shell": {
       "optional": true
     },
-    "@appspine/m2m-api-key": {
+    "lucide-react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@appspine/auth": "workspace:*",
     "@appspine/common": "workspace:*",
-    "@appspine/m2m-api-key": "workspace:*",
+    "@appspine/frontend-shell": "workspace:*",
+    "@appspine/plugin-host-nest": "workspace:*",
+    "@appspine/plugin-testkit": "workspace:*",
     "@nestjs/common": "^11.0.5",
     "@nestjs/core": "^11.0.5",
+    "@nestjs/platform-express": "^11.0.5",
+    "@nestjs/testing": "^11.0.5",
     "@prisma/client": "^6.2.0",
     "@types/node": "^22.10.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "lucide-react": "^1.22.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4",
     "zod": "^4.4.3"

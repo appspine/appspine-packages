@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "appspine.plugin/v1",
+  "id": "notification-fork",
+  "displayName": "Official Notification Fork",
+  "cardinality": "singleton",
+  "distribution": "official",
+  "engine": {
+    "appspinePluginApi": "^1.0.0",
+    "node": ">=22.0.0"
+  },
+  "provides": ["appspine.notification-inbox"],
+  "requires": ["appspine.prisma"],
+  "replaces": [
+    {
+      "plugin": "notification",
+      "facet": "backend",
+      "contribution": "NotificationInboxProvider",
+      "reason": "Only an app-local plugin may replace an official contribution."
+    }
+  ],
+  "facets": { "backend": {} }
+}

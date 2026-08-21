@@ -1,0 +1,2603 @@
+{
+  "schemaVersion": "051-pl0-snapshot/v1",
+  "note": "Deterministic snapshot for PL0-02. Re-run with the recorded clean consumer HEADs to get byte-identical, Biome-formatted output. This script does not embed Date.now() or other non-deterministic values.",
+  "packages": {
+    "@appspine/audit-log": {
+      "dir": "packages/audit-log",
+      "version": "1.0.1",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./prisma/audit-log.prisma": "./prisma/audit-log.prisma",
+        "./plugin": {
+          "types": "./dist/plugin.d.ts",
+          "default": "./dist/plugin.js"
+        },
+        "./appspine.plugin.json": "./appspine.plugin.json",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localPeerDependencies": {
+        "@appspine/common": "^0.3.4"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/common": "^0.3.4",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0"
+      }
+    },
+    "@appspine/auth": {
+      "dir": "packages/auth",
+      "version": "6.2.2",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./prisma/user.prisma": "./prisma/user.prisma",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/identity-core": "^1.0.0",
+        "@appspine/oidc-auth": "^1.0.0",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@appspine/rbac": "^4.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/common": "workspace:*",
+        "@appspine/identity-core": "workspace:*",
+        "@appspine/oidc-auth": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/rbac": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/common": "workspace:*",
+        "@appspine/identity-core": "workspace:*",
+        "@appspine/oidc-auth": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/rbac": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/identity-core": "^1.0.0",
+        "@appspine/oidc-auth": "^1.0.0",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@appspine/rbac": "^4.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/common": {
+      "dir": "packages/common",
+      "version": "0.3.4",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "express": "^5.0.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/domain-events": {
+      "dir": "packages/domain-events",
+      "version": "8.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./testing": {
+          "types": "./dist/testing.d.ts",
+          "default": "./dist/testing.js"
+        },
+        "./admin": {
+          "types": "./dist/admin.d.ts",
+          "default": "./dist/admin.js"
+        }
+      },
+      "localDependencies": {
+        "@appspine/integration-contracts": "0.4.0"
+      },
+      "localPeerDependencies": {
+        "@appspine/auth": "^6.2.2",
+        "@appspine/common": "^0.3.4",
+        "@appspine/m2m-api-key": "^5.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/auth": "workspace:*",
+        "@appspine/common": "workspace:*",
+        "@appspine/m2m-api-key": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/auth": "workspace:*",
+        "@appspine/common": "workspace:*",
+        "@appspine/integration-contracts": "0.4.0",
+        "@appspine/m2m-api-key": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/auth": "^6.2.2",
+        "@appspine/common": "^0.3.4",
+        "@appspine/m2m-api-key": "^5.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/e2e-kit": {
+      "dir": "packages/e2e-kit",
+      "version": "1.0.2",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {
+        "@playwright/test": "^1.54.2"
+      }
+    },
+    "@appspine/frontend-shell": {
+      "dir": "packages/frontend-shell",
+      "version": "0.16.3",
+      "type": "module",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./notification": {
+          "types": "./dist/notification/index.d.ts",
+          "default": "./dist/notification/index.js"
+        },
+        "./server": {
+          "types": "./dist/server/index.d.ts",
+          "default": "./dist/server/index.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "date-fns": "^4.4.0",
+        "lucide-react": "^1.22.0",
+        "next": "^16.2.9",
+        "radix-ui": "^1.6.0",
+        "react": "^19.2.7",
+        "react-day-picker": "^10.0.1",
+        "react-dom": "^19.2.7",
+        "tailwind-merge": "^3.6.0",
+        "tailwindcss": "^4.1.5"
+      }
+    },
+    "@appspine/health-check": {
+      "dir": "packages/health-check",
+      "version": "0.1.9",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./plugin": {
+          "types": "./dist/plugin.d.ts",
+          "default": "./dist/plugin.js"
+        },
+        "./appspine.plugin.json": "./appspine.plugin.json",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "peerDependencies": {
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@nestjs/terminus": "^11.1.1",
+        "@prisma/client": "^6.2.0"
+      }
+    },
+    "@appspine/identity-core": {
+      "dir": "packages/identity-core",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./plugin": {
+          "types": "./dist/plugin.d.ts",
+          "default": "./dist/plugin.js"
+        },
+        "./frontend": {
+          "types": "./dist/frontend.d.ts",
+          "default": "./dist/frontend.js"
+        },
+        "./appspine.plugin.json": "./appspine.plugin.json",
+        "./prisma/user.prisma": "./prisma/user.prisma",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localPeerDependencies": {
+        "@appspine/common": "^0.3.4",
+        "@appspine/plugin-host-nest": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/common": "^0.3.4",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/integration-contracts": {
+      "dir": "packages/integration-contracts",
+      "version": "0.4.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {}
+    },
+    "@appspine/m2m-api-key": {
+      "dir": "packages/m2m-api-key",
+      "version": "5.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./prisma/api-key.prisma": "./prisma/api-key.prisma",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localPeerDependencies": {
+        "@appspine/audit-log": "^1.0.1",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@appspine/rbac": "^4.0.8"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/rbac": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/rbac": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/audit-log": "^1.0.1",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@appspine/rbac": "^4.0.8",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/master-data-client": {
+      "dir": "packages/master-data-client",
+      "version": "0.1.4",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {
+        "@nestjs/common": "^11.0.5"
+      }
+    },
+    "@appspine/mcp-server": {
+      "dir": "packages/mcp-server",
+      "version": "0.6.8",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/m2m-api-key": "workspace:*"
+      },
+      "localPeerDependencies": {
+        "@appspine/plugin-host-nest": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-host-nest": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/m2m-api-key": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "express": "^5.0.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/metadata-schema": {
+      "dir": "packages/metadata-schema",
+      "version": "0.2.22",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "localDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/m2m-api-key": "workspace:*"
+      },
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {
+        "@appspine/common": "workspace:*",
+        "@appspine/m2m-api-key": "workspace:*"
+      },
+      "peerDependencies": {
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0"
+      }
+    },
+    "@appspine/notification": {
+      "dir": "packages/notification",
+      "version": "0.2.2",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./testing": {
+          "types": "./dist/testing.d.ts",
+          "default": "./dist/testing.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/common": "^0.3.4"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/common": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/common": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/common": "^0.3.4",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/oidc-auth": {
+      "dir": "packages/oidc-auth",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./plugin": {
+          "types": "./dist/plugin.d.ts",
+          "default": "./dist/plugin.js"
+        },
+        "./frontend": {
+          "types": "./dist/frontend.d.ts",
+          "default": "./dist/frontend.js"
+        },
+        "./appspine.plugin.json": "./appspine.plugin.json",
+        "./prisma/oidc-identity.prisma": "./prisma/oidc-identity.prisma",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localPeerDependencies": {
+        "@appspine/common": "^0.3.4",
+        "@appspine/plugin-host-nest": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/common": "^0.3.4",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@nestjs/passport": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    },
+    "@appspine/oidc-delegation": {
+      "dir": "packages/oidc-delegation",
+      "version": "0.3.1",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./testing": {
+          "types": "./dist/testing/index.d.ts",
+          "default": "./dist/testing/index.js"
+        }
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5"
+      }
+    },
+    "@appspine/plugin-api": {
+      "dir": "packages/plugin-api",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./schema": {
+          "types": "./dist/schema.d.ts",
+          "default": "./dist/schema.js"
+        },
+        "./loader": {
+          "types": "./dist/loader/index.d.ts",
+          "default": "./dist/loader/index.js"
+        },
+        "./resolver": {
+          "types": "./dist/resolver/index.d.ts",
+          "default": "./dist/resolver/index.js"
+        },
+        "./runtime": {
+          "types": "./dist/runtime/index.d.ts",
+          "default": "./dist/runtime/index.js"
+        },
+        "./schema/appspine.plugin.v1.json": "./dist/schema/appspine.plugin.v1.json",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {},
+      "localDevWorkspaceDependencies": {},
+      "localWorkspaceDependencyUnion": {},
+      "peerDependencies": {}
+    },
+    "@appspine/plugin-cli": {
+      "dir": "packages/plugin-cli",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./schema/appspine.plugins.v1.json": "./dist/schema/appspine.plugins.v1.json",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      }
+    },
+    "@appspine/plugin-host-nest": {
+      "dir": "packages/plugin-host-nest",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-testkit": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/plugin-api": "^1.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "rxjs": "^7.8.1"
+      }
+    },
+    "@appspine/plugin-testkit": {
+      "dir": "packages/plugin-testkit",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      }
+    },
+    "@appspine/preset-standard": {
+      "dir": "packages/preset-standard",
+      "version": "1.0.0",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./appspine.preset.json": "./appspine.preset.json",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {},
+      "localPeerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/plugin-api": "^1.0.0"
+      }
+    },
+    "@appspine/rbac": {
+      "dir": "packages/rbac",
+      "version": "4.0.8",
+      "type": "commonjs",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        },
+        "./prisma/role.prisma": "./prisma/role.prisma",
+        "./package.json": "./package.json"
+      },
+      "localDependencies": {
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*"
+      },
+      "localPeerDependencies": {
+        "@appspine/audit-log": "^1.0.1",
+        "@appspine/plugin-host-nest": "^1.0.0"
+      },
+      "localDevWorkspaceDependencies": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*"
+      },
+      "localWorkspaceDependencyUnion": {
+        "@appspine/audit-log": "workspace:*",
+        "@appspine/common": "workspace:*",
+        "@appspine/plugin-api": "workspace:*",
+        "@appspine/plugin-host-nest": "workspace:*"
+      },
+      "peerDependencies": {
+        "@appspine/audit-log": "^1.0.1",
+        "@appspine/plugin-host-nest": "^1.0.0",
+        "@nestjs/common": "^11.0.5",
+        "@nestjs/core": "^11.0.5",
+        "@prisma/client": "^6.2.0",
+        "zod": "^4.4.3"
+      }
+    }
+  },
+  "crossPackageImports": {
+    "@appspine/audit-log -> @appspine/common": [
+      "packages/audit-log/src/audit-log.service.ts",
+      "packages/audit-log/src/record-audit.spec.ts",
+      "packages/audit-log/src/record-audit.ts"
+    ],
+    "@appspine/audit-log -> @appspine/plugin-api": [
+      "packages/audit-log/src/audit-log.module.ts",
+      "packages/audit-log/src/plugin.spec.ts",
+      "packages/audit-log/src/plugin.ts"
+    ],
+    "@appspine/audit-log -> @appspine/plugin-api/loader": ["packages/audit-log/src/plugin.spec.ts"],
+    "@appspine/audit-log -> @appspine/plugin-testkit": ["packages/audit-log/src/plugin.spec.ts"],
+    "@appspine/auth -> @appspine/identity-core": [
+      "packages/auth/src/auth.module.ts",
+      "packages/auth/src/index.ts"
+    ],
+    "@appspine/auth -> @appspine/oidc-auth": [
+      "packages/auth/src/auth.module.ts",
+      "packages/auth/src/index.ts"
+    ],
+    "@appspine/auth -> @appspine/plugin-host-nest": [
+      "packages/auth/src/auth.module.ts",
+      "packages/auth/src/index.ts"
+    ],
+    "@appspine/auth -> @appspine/rbac": ["packages/auth/src/index.ts"],
+    "@appspine/domain-events -> @appspine/auth": [
+      "packages/domain-events/src/admin/domain-events-admin.controller.ts",
+      "packages/domain-events/src/admin/domain-events-admin.module.spec.ts",
+      "packages/domain-events/src/admin/domain-events-admin.module.ts"
+    ],
+    "@appspine/domain-events -> @appspine/common": [
+      "packages/domain-events/src/admin/domain-events-admin.controller.ts",
+      "packages/domain-events/src/admin/domain-events-admin.service.ts",
+      "packages/domain-events/src/admin/dto/domain-event-admin.dto.ts",
+      "packages/domain-events/src/domain-event-dispatcher.service.ts",
+      "packages/domain-events/src/schema-drift-check.ts"
+    ],
+    "@appspine/domain-events -> @appspine/integration-contracts": [
+      "packages/domain-events/src/domain-events.service.spec.ts",
+      "packages/domain-events/src/domain-events.service.ts",
+      "packages/domain-events/src/receipt.spec.ts",
+      "packages/domain-events/src/receipt.ts",
+      "packages/domain-events/src/types.ts",
+      "packages/domain-events/src/webhook.spec.ts",
+      "packages/domain-events/src/webhook.ts"
+    ],
+    "@appspine/domain-events -> @appspine/m2m-api-key": [
+      "packages/domain-events/src/admin/domain-events-admin.controller.ts",
+      "packages/domain-events/src/admin/domain-events-admin.module.spec.ts",
+      "packages/domain-events/src/admin/domain-events-admin.module.ts"
+    ],
+    "@appspine/health-check -> @appspine/common": [
+      "packages/health-check/src/health.controller.ts"
+    ],
+    "@appspine/health-check -> @appspine/plugin-api": ["packages/health-check/src/plugin.ts"],
+    "@appspine/health-check -> @appspine/plugin-api/loader": [
+      "packages/health-check/src/plugin.spec.ts"
+    ],
+    "@appspine/health-check -> @appspine/plugin-testkit": [
+      "packages/health-check/src/plugin.spec.ts"
+    ],
+    "@appspine/identity-core -> @appspine/common": [
+      "packages/identity-core/src/identity-store.service.ts",
+      "packages/identity-core/src/users/users.controller.ts",
+      "packages/identity-core/src/users/users.service.spec.ts",
+      "packages/identity-core/src/users/users.service.ts"
+    ],
+    "@appspine/identity-core -> @appspine/plugin-api": [
+      "packages/identity-core/src/constants.ts",
+      "packages/identity-core/src/identity-core.module.ts",
+      "packages/identity-core/src/identity-store.service.ts",
+      "packages/identity-core/src/plugin.ts",
+      "packages/identity-core/src/users/users.controller.ts",
+      "packages/identity-core/src/users/users.service.spec.ts",
+      "packages/identity-core/src/users/users.service.ts"
+    ],
+    "@appspine/identity-core -> @appspine/plugin-api/loader": [
+      "packages/identity-core/src/plugin.spec.ts"
+    ],
+    "@appspine/identity-core -> @appspine/plugin-host-nest": [
+      "packages/identity-core/src/guards/admin.guard.ts",
+      "packages/identity-core/src/identity-core.module.ts",
+      "packages/identity-core/src/users/users.controller.ts"
+    ],
+    "@appspine/identity-core -> @appspine/plugin-testkit": [
+      "packages/identity-core/src/plugin.spec.ts"
+    ],
+    "@appspine/m2m-api-key -> @appspine/audit-log": [
+      "packages/m2m-api-key/src/api-keys.controller.ts"
+    ],
+    "@appspine/m2m-api-key -> @appspine/common": [
+      "packages/m2m-api-key/src/api-key.guard.ts",
+      "packages/m2m-api-key/src/api-keys.controller.ts",
+      "packages/m2m-api-key/src/api-keys.service.ts"
+    ],
+    "@appspine/m2m-api-key -> @appspine/plugin-api": [
+      "packages/m2m-api-key/src/api-key.guard.ts",
+      "packages/m2m-api-key/src/api-keys.service.ts"
+    ],
+    "@appspine/m2m-api-key -> @appspine/plugin-host-nest": [
+      "packages/m2m-api-key/src/api-key.guard.ts",
+      "packages/m2m-api-key/src/api-keys.controller.ts",
+      "packages/m2m-api-key/src/api-keys.module.ts",
+      "packages/m2m-api-key/src/guards/admin.guard.ts",
+      "packages/m2m-api-key/src/guards/jwt-or-api-key.guard.ts"
+    ],
+    "@appspine/mcp-server -> @appspine/audit-log": ["packages/mcp-server/src/mcp.controller.ts"],
+    "@appspine/mcp-server -> @appspine/m2m-api-key": [
+      "packages/mcp-server/src/mcp-tool.registry.ts",
+      "packages/mcp-server/src/mcp.controller.ts"
+    ],
+    "@appspine/mcp-server -> @appspine/plugin-host-nest": [
+      "packages/mcp-server/src/mcp.controller.spec.ts",
+      "packages/mcp-server/src/mcp.controller.ts"
+    ],
+    "@appspine/metadata-schema -> @appspine/common": [
+      "packages/metadata-schema/src/meta.service.ts"
+    ],
+    "@appspine/metadata-schema -> @appspine/m2m-api-key": [
+      "packages/metadata-schema/src/meta.controller.ts"
+    ],
+    "@appspine/notification -> @appspine/common": [
+      "packages/notification/src/notification.service.ts",
+      "packages/notification/src/schema-drift-check.ts"
+    ],
+    "@appspine/oidc-auth -> @appspine/common": [
+      "packages/oidc-auth/src/auth-audit-log.ts",
+      "packages/oidc-auth/src/oidc-identity.service.ts"
+    ],
+    "@appspine/oidc-auth -> @appspine/plugin-api": [
+      "packages/oidc-auth/src/jwt-verifier.service.ts",
+      "packages/oidc-auth/src/oidc-auth.module.ts",
+      "packages/oidc-auth/src/oidc-identity.service.ts",
+      "packages/oidc-auth/src/oidc-interactive.strategy.ts",
+      "packages/oidc-auth/src/plugin.ts"
+    ],
+    "@appspine/oidc-auth -> @appspine/plugin-api/loader": ["packages/oidc-auth/src/plugin.spec.ts"],
+    "@appspine/oidc-auth -> @appspine/plugin-host-nest": [
+      "packages/oidc-auth/src/oidc-auth.module.ts",
+      "packages/oidc-auth/src/oidc-interactive.strategy.ts",
+      "packages/oidc-auth/src/plugin.spec.ts"
+    ],
+    "@appspine/oidc-auth -> @appspine/plugin-testkit": ["packages/oidc-auth/src/plugin.spec.ts"],
+    "@appspine/plugin-cli -> @appspine/plugin-api": [
+      "packages/plugin-cli/src/cli.spec.ts",
+      "packages/plugin-cli/src/commands/add.ts",
+      "packages/plugin-cli/src/commands/build.ts",
+      "packages/plugin-cli/src/commands/commands.spec.ts",
+      "packages/plugin-cli/src/commands/doctor.ts",
+      "packages/plugin-cli/src/commands/list.ts",
+      "packages/plugin-cli/src/commands/remove.ts",
+      "packages/plugin-cli/src/commands/shared.ts",
+      "packages/plugin-cli/src/commands/test-support.ts",
+      "packages/plugin-cli/src/commands/validate.ts",
+      "packages/plugin-cli/src/composition.ts",
+      "packages/plugin-cli/src/config-boundary.ts",
+      "packages/plugin-cli/src/diagnostics.ts",
+      "packages/plugin-cli/src/generate.ts",
+      "packages/plugin-cli/src/inventory-file.ts",
+      "packages/plugin-cli/src/lockfile.ts",
+      "packages/plugin-cli/src/manifest-source.ts",
+      "packages/plugin-cli/src/permission-reconciler.ts",
+      "packages/plugin-cli/src/plan.ts",
+      "packages/plugin-cli/src/preset.ts",
+      "packages/plugin-cli/src/prisma-composer.ts"
+    ],
+    "@appspine/plugin-cli -> @appspine/plugin-api/loader": [
+      "packages/plugin-cli/src/commands/shared.ts",
+      "packages/plugin-cli/src/manifest-source.ts"
+    ],
+    "@appspine/plugin-cli -> @appspine/plugin-api/resolver": [
+      "packages/plugin-cli/src/commands/shared.ts",
+      "packages/plugin-cli/src/generate.ts"
+    ],
+    "@appspine/plugin-host-nest -> @appspine/plugin-api": [
+      "packages/plugin-host-nest/src/auth/admin.guard.ts",
+      "packages/plugin-host-nest/src/auth/auth-infrastructure.module.ts",
+      "packages/plugin-host-nest/src/auth/auth.spec.ts",
+      "packages/plugin-host-nest/src/auth/guards.ts",
+      "packages/plugin-host-nest/src/auth/principal-context.ts",
+      "packages/plugin-host-nest/src/auth/principal.ts",
+      "packages/plugin-host-nest/src/auth/strategy-registry.ts",
+      "packages/plugin-host-nest/src/config/composition.ts",
+      "packages/plugin-host-nest/src/config/host-config.ts",
+      "packages/plugin-host-nest/src/host/appspine-host.ts",
+      "packages/plugin-host-nest/src/host/host.module.ts",
+      "packages/plugin-host-nest/src/host/host.spec.ts"
+    ],
+    "@appspine/plugin-host-nest -> @appspine/plugin-api/resolver": [
+      "packages/plugin-host-nest/src/host/appspine-host.ts",
+      "packages/plugin-host-nest/src/host/host.module.ts"
+    ],
+    "@appspine/plugin-host-nest -> @appspine/plugin-api/runtime": [
+      "packages/plugin-host-nest/src/host/appspine-host.ts",
+      "packages/plugin-host-nest/src/host/host.module.ts"
+    ],
+    "@appspine/plugin-host-nest -> @appspine/plugin-testkit": [
+      "packages/plugin-host-nest/src/host/host.spec.ts"
+    ],
+    "@appspine/plugin-testkit -> @appspine/plugin-api": [
+      "packages/plugin-testkit/src/assertions.ts",
+      "packages/plugin-testkit/src/builders.ts",
+      "packages/plugin-testkit/src/fakes.ts",
+      "packages/plugin-testkit/src/harness.ts",
+      "packages/plugin-testkit/src/recorder.ts",
+      "packages/plugin-testkit/src/testkit.spec.ts"
+    ],
+    "@appspine/plugin-testkit -> @appspine/plugin-api/resolver": [
+      "packages/plugin-testkit/src/assertions.ts",
+      "packages/plugin-testkit/src/harness.ts"
+    ],
+    "@appspine/plugin-testkit -> @appspine/plugin-api/runtime": [
+      "packages/plugin-testkit/src/assertions.ts",
+      "packages/plugin-testkit/src/harness.ts"
+    ],
+    "@appspine/preset-standard -> @appspine/plugin-api": ["packages/preset-standard/src/index.ts"],
+    "@appspine/rbac -> @appspine/audit-log": ["packages/rbac/src/roles/roles.controller.ts"],
+    "@appspine/rbac -> @appspine/common": [
+      "packages/rbac/src/guards/permission.guard.ts",
+      "packages/rbac/src/rbac-policy.service.ts",
+      "packages/rbac/src/roles/dto/role.dto.ts",
+      "packages/rbac/src/roles/roles.controller.ts",
+      "packages/rbac/src/roles/roles.service.ts"
+    ],
+    "@appspine/rbac -> @appspine/plugin-api": [
+      "packages/rbac/src/constants.ts",
+      "packages/rbac/src/rbac-policy.service.ts",
+      "packages/rbac/src/rbac.module.ts",
+      "packages/rbac/src/user-context.util.ts"
+    ],
+    "@appspine/rbac -> @appspine/plugin-host-nest": [
+      "packages/rbac/src/guards/admin.guard.ts",
+      "packages/rbac/src/rbac.module.ts",
+      "packages/rbac/src/roles/roles.controller.ts"
+    ]
+  },
+  "prismaFragments": {
+    "@appspine/audit-log": ["packages/audit-log/prisma/audit-log.prisma"],
+    "@appspine/auth": ["packages/auth/prisma/user.prisma"],
+    "@appspine/identity-core": ["packages/identity-core/prisma/user.prisma"],
+    "@appspine/m2m-api-key": ["packages/m2m-api-key/prisma/api-key.prisma"],
+    "@appspine/oidc-auth": ["packages/oidc-auth/prisma/oidc-identity.prisma"],
+    "@appspine/rbac": ["packages/rbac/prisma/role.prisma"]
+  },
+  "frontendOwnership": {
+    "currentOwner": "@appspine/frontend-shell",
+    "targetOwnerByFeature": {
+      "Users Admin": "@appspine/identity-core (Phase 1/3, not yet created)",
+      "Roles Admin": "@appspine/rbac",
+      "API Keys Admin": "@appspine/m2m-api-key",
+      "Domain Events Admin": "@appspine/domain-events",
+      "Notification Bell/Inbox": "@appspine/notification",
+      "OIDC Login": "@appspine/oidc-auth (Phase 1, not yet created)"
+    },
+    "currentFiles": {
+      "admin": [
+        "packages/frontend-shell/src/components/admin/actions-core.spec.ts",
+        "packages/frontend-shell/src/components/admin/actions-core.ts",
+        "packages/frontend-shell/src/components/admin/api-key-row-actions.tsx",
+        "packages/frontend-shell/src/components/admin/api-keys-table.tsx",
+        "packages/frontend-shell/src/components/admin/create-api-key-dialog.tsx",
+        "packages/frontend-shell/src/components/admin/create-role-dialog.tsx",
+        "packages/frontend-shell/src/components/admin/create-user-dialog.tsx",
+        "packages/frontend-shell/src/components/admin/created-api-key-reveal.tsx",
+        "packages/frontend-shell/src/components/admin/domain-event-catalog-table.tsx",
+        "packages/frontend-shell/src/components/admin/domain-event-deliveries-panel.tsx",
+        "packages/frontend-shell/src/components/admin/domain-event-detail-panel.tsx",
+        "packages/frontend-shell/src/components/admin/domain-events-table.tsx",
+        "packages/frontend-shell/src/components/admin/role-row-actions.tsx",
+        "packages/frontend-shell/src/components/admin/roles-table.tsx",
+        "packages/frontend-shell/src/components/admin/types.ts",
+        "packages/frontend-shell/src/components/admin/user-row-actions.tsx",
+        "packages/frontend-shell/src/components/admin/users-table.tsx"
+      ],
+      "auth": ["packages/frontend-shell/src/components/auth/login-button.tsx"],
+      "notification": [
+        "packages/frontend-shell/src/notification/index.ts",
+        "packages/frontend-shell/src/notification/notification-bell.tsx",
+        "packages/frontend-shell/src/notification/types.ts",
+        "packages/frontend-shell/src/notification/use-notification-polling.spec.ts",
+        "packages/frontend-shell/src/notification/use-notification-polling.ts"
+      ]
+    }
+  },
+  "consumers": {
+    "approve": {
+      "repo": {
+        "head": "56e396f74d35bd6f2edc03a21c2bed3063d9efbf",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/integration-contracts": "0.4.0",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/master-data-client": "^0.1.3",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/notification": "0.2.2",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/approval/approval-instances/approval-instances.controller.ts",
+            "backend/src/approval/approval-instances/approval-instances.service.ts",
+            "backend/src/domain-events/domain-events-admin-audit.hook.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.service.ts",
+            "backend/src/expense-claims/expense-claims.controller.ts",
+            "backend/src/expense-claims/expense-claims.service.ts",
+            "backend/src/leave-requests/leave-requests.controller.ts",
+            "backend/src/leave-requests/leave-requests.service.ts",
+            "backend/src/user-delegations/user-delegations.controller.ts",
+            "backend/src/user-delegations/user-delegations.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/approval/approval-instances/approval-instances.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/expense-claims/expense-claims.controller.ts",
+            "backend/src/leave-requests/leave-requests.controller.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/user-delegations/user-delegations.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/scripts/test-approval-submit-rollback.ts",
+            "backend/scripts/test-notification-ownership.ts",
+            "backend/src/app.module.ts",
+            "backend/src/approval/approval-instances/approval-instances.controller.ts",
+            "backend/src/approval/approval-instances/approval-instances.service.ts",
+            "backend/src/approval/shared/access.ts",
+            "backend/src/domain-events/domain-events-admin-audit.hook.ts",
+            "backend/src/domain-events/handlers/audit-record.handler.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.service.ts",
+            "backend/src/expense-claims/expense-claims.controller.ts",
+            "backend/src/expense-claims/expense-claims.service.ts",
+            "backend/src/leave-requests/leave-requests.controller.ts",
+            "backend/src/leave-requests/leave-requests.service.ts",
+            "backend/src/main.ts",
+            "backend/src/master-data-sync/master-data-reconciliation.options.ts",
+            "backend/src/master-data-sync/master-data-sync.service.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/org-integration/org-app-client.service.ts",
+            "backend/src/org/org-context.resolver.ts",
+            "backend/src/user-delegations/user-delegations.controller.ts",
+            "backend/src/user-delegations/user-delegations.service.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/scripts/test-approval-submit-rollback.ts",
+            "backend/scripts/test-webhook-post-handler.ts",
+            "backend/src/approval/approval-instances/approval-instances.service.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/handlers/audit-record.handler.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/integration-contracts": [
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/generated/integration-contracts/approve-to-wiki_knowledge-document-change-approved/validators.ts",
+            "backend/src/generated/integration-contracts/approve_get-knowledge-document-change-request-status/validators.ts",
+            "backend/src/generated/integration-contracts/approve_knowledge-document-change-approved/validators.ts",
+            "backend/src/generated/integration-contracts/approve_submit-knowledge-document-change/validators.ts"
+          ],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/approval/approval-instances/approval-instances.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/expense-claims/expense-claims.controller.ts",
+            "backend/src/leave-requests/leave-requests.controller.ts",
+            "backend/src/master-data-sync/master-data-sync.module.ts",
+            "backend/src/master-data-sync/sync-rate-limit.guard.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/user-delegations/user-delegations.controller.ts"
+          ],
+          "@appspine/master-data-client": [
+            "backend/src/app.module.ts",
+            "backend/src/master-data-sync/master-data-reconciliation.options.ts",
+            "backend/src/master-data-sync/master-data-sync.service.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/approval/approval-instances/approval-instances.mcp.ts",
+            "backend/src/expense-claims/expense-claims.mcp.ts",
+            "backend/src/leave-requests/leave-requests.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/notification": [
+            "backend/scripts/check-notification-schema-drift.ts",
+            "backend/scripts/test-approval-submit-rollback.ts",
+            "backend/scripts/test-notification-ownership.ts",
+            "backend/src/approval/approval-instances/approval-instances.service.spec.ts",
+            "backend/src/approval/approval-instances/approval-instances.service.ts",
+            "backend/src/notifications/notifications.module.ts",
+            "backend/src/notifications/notifications.service.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/approval/approval-instances/approval-instances.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/expense-claims/expense-claims.controller.ts",
+            "backend/src/leave-requests/leave-requests.controller.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/user-delegations/user-delegations.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/error.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/webhooks/error.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/webhooks/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/notification-bell.tsx",
+            "frontend/src/app/(main)/dashboard/approvals/[id]/_components/action-dialogs.tsx",
+            "frontend/src/app/(main)/dashboard/approvals/actioned/page.tsx",
+            "frontend/src/app/(main)/dashboard/approvals/inbox/page.tsx",
+            "frontend/src/app/(main)/dashboard/approvals/submitted/page.tsx",
+            "frontend/src/app/(main)/dashboard/delegations/_components/create-delegation-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/delegations/_components/edit-delegation-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/delegations/_components/remove-delegation-button.tsx",
+            "frontend/src/app/(main)/dashboard/expense-claims/_components/attachments-section.tsx",
+            "frontend/src/app/(main)/dashboard/expense-claims/_components/expense-claim-form.tsx",
+            "frontend/src/app/(main)/dashboard/expense-claims/_components/row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/expense-claims/page.tsx",
+            "frontend/src/app/(main)/dashboard/leave-requests/_components/leave-request-form.tsx",
+            "frontend/src/app/(main)/dashboard/leave-requests/_components/row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/leave-requests/page.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/notification": [
+            "frontend/src/app/(main)/dashboard/_components/sidebar/notification-bell.tsx",
+            "frontend/src/lib/notifications-api.ts"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "appspine-app-template": {
+      "repo": {
+        "head": "1f12738f790c785633787235ed694ce584ac9f80",
+        "branch": "051-pl2-09-dual-mode-host",
+        "dirty": true
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.3",
+          "@appspine/domain-events": "7.1.5",
+          "@appspine/health-check": "^0.1.8",
+          "@appspine/integration-contracts": "0.3.1",
+          "@appspine/m2m-api-key": "^4.0.7",
+          "@appspine/mcp-server": "0.6.7",
+          "@appspine/metadata-schema": "0.2.21",
+          "@appspine/notification": "0.2.2",
+          "@appspine/rbac": "^4.0.7"
+        },
+        "directImports": {
+          "@appspine/audit-log": ["backend/src/app.module.ts"],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/notifications/notifications.controller.spec.ts",
+            "backend/src/notifications/notifications.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/main.ts",
+            "backend/src/notifications/notifications.controller.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/src/domain-events/domain-events.module.spec.ts",
+            "backend/src/domain-events/domain-events.module.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/notifications/notifications.controller.ts"
+          ],
+          "@appspine/mcp-server": ["backend/src/app.module.ts"],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/notification": [
+            "backend/scripts/check-notification-schema-drift.ts",
+            "backend/src/notifications/notifications.module.ts",
+            "backend/src/notifications/notifications.service.ts"
+          ],
+          "@appspine/plugin-host-nest": [
+            "backend/src/app.module.ts",
+            "backend/src/appspine.config.ts"
+          ],
+          "@appspine/rbac": ["backend/src/app.module.ts"]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.21"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/notification-bell.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/notification": [
+            "frontend/src/app/(main)/dashboard/_components/sidebar/notification-bell.tsx",
+            "frontend/src/lib/notifications-api.ts"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/m2m-api-key.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "calendar": {
+      "repo": {
+        "head": "5ae4e11354a96de9335678a4f52a15d68442fcb9",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/calendars/calendars.controller.ts",
+            "backend/src/calendars/calendars.module.ts",
+            "backend/src/calendars/calendars.service.ts",
+            "backend/src/events/events.controller.ts",
+            "backend/src/events/events.module.ts",
+            "backend/src/events/events.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/calendars/calendars.controller.ts",
+            "backend/src/calendars/calendars.service.ts",
+            "backend/src/events/events.controller.ts",
+            "backend/src/events/events.service.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/calendars/calendars.controller.ts",
+            "backend/src/calendars/calendars.module.ts",
+            "backend/src/calendars/calendars.service.ts",
+            "backend/src/events/events.controller.ts",
+            "backend/src/events/events.service.ts",
+            "backend/src/main.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/scripts/test-calendar-domain-events.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/events/events.service.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/domain-events/testing": ["backend/scripts/test-calendar-domain-events.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/calendars/calendars.controller.ts",
+            "backend/src/events/events.controller.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/calendars/calendars.mcp.ts",
+            "backend/src/events/events.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/calendars/calendars.controller.ts",
+            "backend/src/events/events.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/calendar-page-client.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/calendar-shell.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/calendar-sidebar.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/event-detail-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/event-form-modal.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/recurrence-scope-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/_components/rrule-builder.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/calendar/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/m2m-api-key.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "chat": {
+      "repo": {
+        "head": "b75cd17010beabdaa1633415889f3eb1493d6fa9",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/chat/channels/channel-members.controller.ts",
+            "backend/src/chat/channels/channel-members.service.ts",
+            "backend/src/chat/channels/channels.controller.ts",
+            "backend/src/chat/channels/channels.service.ts",
+            "backend/src/chat/messages/messages.controller.ts",
+            "backend/src/chat/messages/messages.module.ts",
+            "backend/src/chat/messages/messages.service.ts",
+            "backend/src/chat/webhooks/webhooks.controller.ts",
+            "backend/src/chat/webhooks/webhooks.module.ts",
+            "backend/src/chat/webhooks/webhooks.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/chat/attachments/attachments.controller.ts",
+            "backend/src/chat/attachments/attachments.service.ts",
+            "backend/src/chat/channels/channel-members.controller.ts",
+            "backend/src/chat/channels/channel-members.service.ts",
+            "backend/src/chat/channels/channels.controller.ts",
+            "backend/src/chat/channels/channels.service.ts",
+            "backend/src/chat/chat.gateway.spec.ts",
+            "backend/src/chat/chat.gateway.ts",
+            "backend/src/chat/dms/dms.controller.ts",
+            "backend/src/chat/messages/messages.controller.ts",
+            "backend/src/chat/reactions/reactions.controller.ts",
+            "backend/src/chat/read-state/read-state.controller.ts",
+            "backend/src/chat/webhooks/webhooks.controller.ts",
+            "backend/src/push/push.controller.ts",
+            "backend/src/users/user-directory.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/chat/attachments/attachments.module.ts",
+            "backend/src/chat/attachments/attachments.service.ts",
+            "backend/src/chat/calls/calls.module.ts",
+            "backend/src/chat/calls/calls.service.ts",
+            "backend/src/chat/channels/channel-members.controller.ts",
+            "backend/src/chat/channels/channel-members.service.spec.ts",
+            "backend/src/chat/channels/channel-members.service.ts",
+            "backend/src/chat/channels/channels.controller.ts",
+            "backend/src/chat/channels/channels.module.ts",
+            "backend/src/chat/channels/channels.service.ts",
+            "backend/src/chat/chat-permissions.ts",
+            "backend/src/chat/chat.gateway.ts",
+            "backend/src/chat/dms/dms.controller.ts",
+            "backend/src/chat/dms/dms.module.ts",
+            "backend/src/chat/dms/dms.service.ts",
+            "backend/src/chat/messages/messages.controller.ts",
+            "backend/src/chat/messages/messages.module.ts",
+            "backend/src/chat/messages/messages.service.ts",
+            "backend/src/chat/reactions/reactions.controller.ts",
+            "backend/src/chat/reactions/reactions.module.ts",
+            "backend/src/chat/reactions/reactions.service.ts",
+            "backend/src/chat/read-state/read-state.controller.ts",
+            "backend/src/chat/read-state/read-state.module.ts",
+            "backend/src/chat/read-state/read-state.service.ts",
+            "backend/src/chat/webhooks/webhooks.controller.ts",
+            "backend/src/chat/webhooks/webhooks.module.ts",
+            "backend/src/chat/webhooks/webhooks.service.ts",
+            "backend/src/main.ts",
+            "backend/src/push/push-notification.listener.ts",
+            "backend/src/push/push.controller.ts",
+            "backend/src/push/push.service.ts",
+            "backend/src/users/users.module.ts",
+            "backend/src/users/users.service.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/scripts/test-chat-domain-events.ts",
+            "backend/src/chat/channels/channels.service.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/domain-events/testing": ["backend/scripts/test-chat-domain-events.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/chat/attachments/attachments.controller.ts",
+            "backend/src/chat/channels/channel-members.controller.ts",
+            "backend/src/chat/channels/channels.controller.ts",
+            "backend/src/chat/dms/dms.controller.ts",
+            "backend/src/chat/messages/messages.controller.ts",
+            "backend/src/chat/reactions/reactions.controller.ts",
+            "backend/src/chat/read-state/read-state.controller.ts",
+            "backend/src/chat/webhooks/webhook-rate-limit.guard.ts",
+            "backend/src/chat/webhooks/webhooks.controller.ts",
+            "backend/src/push/push.controller.ts",
+            "backend/src/users/user-directory.controller.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/chat/channels/channels.mcp.ts",
+            "backend/src/chat/messages/messages.mcp.ts",
+            "backend/src/chat/reactions/reactions.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/chat/channels/channel-members.controller.ts",
+            "backend/src/chat/channels/channels.controller.ts",
+            "backend/src/chat/messages/messages.controller.ts",
+            "backend/src/chat/read-state/read-state.controller.ts",
+            "backend/src/users/user-directory.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/attachment-file.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/attachment-image.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/call-room-view.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/channel-members-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/channel-webhooks-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/chat-shell.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/contacts-view.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/conversation-sidebar.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/create-channel-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/incoming-call-banner.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/message-input.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/message-item.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/message-list.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/push-preference-toggle.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/search-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/chat/_components/start-dm-dialog.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "drive": {
+      "repo": {
+        "head": "3a522b27dc9d0161f433493cfd00b255d0e04fd8",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.3",
+          "@appspine/domain-events": "7.1.5",
+          "@appspine/health-check": "^0.1.8",
+          "@appspine/m2m-api-key": "^4.0.7",
+          "@appspine/mcp-server": "0.6.7",
+          "@appspine/metadata-schema": "0.2.21",
+          "@appspine/rbac": "^4.0.7"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/drive/files/files.controller.ts",
+            "backend/src/drive/files/files.service.spec.ts",
+            "backend/src/drive/files/files.service.ts",
+            "backend/src/drive/files/whiteboard-acceptance.spec.ts",
+            "backend/src/drive/folders/folders.controller.ts",
+            "backend/src/drive/folders/folders.service.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/spaces/spaces.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/drive/files/files.controller.ts",
+            "backend/src/drive/files/files.mcp.ts",
+            "backend/src/drive/folders/folders.controller.ts",
+            "backend/src/drive/folders/folders.mcp.ts",
+            "backend/src/drive/shares/shares.controller.ts",
+            "backend/src/spaces/guards/space-member.guard.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/spaces/spaces.mcp.ts",
+            "backend/src/wopi/wopi.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/drive/files/files.controller.ts",
+            "backend/src/drive/files/files.service.spec.ts",
+            "backend/src/drive/files/files.service.ts",
+            "backend/src/drive/files/whiteboard-acceptance.spec.ts",
+            "backend/src/drive/folders/folders.controller.ts",
+            "backend/src/drive/folders/folders.service.spec.ts",
+            "backend/src/drive/folders/folders.service.ts",
+            "backend/src/drive/shares/public-shares.controller.ts",
+            "backend/src/drive/shares/shares.controller.ts",
+            "backend/src/drive/shares/shares.service.ts",
+            "backend/src/main.ts",
+            "backend/src/spaces/guards/space-member.guard.ts",
+            "backend/src/spaces/space-access.service.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/spaces/spaces.module.ts",
+            "backend/src/spaces/spaces.service.ts",
+            "backend/src/storage/blob-cleanup.service.ts",
+            "backend/src/wopi/wopi.controller.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/scripts/test-drive-domain-events.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/drive/files/files.service.spec.ts",
+            "backend/src/drive/files/files.service.ts",
+            "backend/src/drive/files/whiteboard-acceptance.spec.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/domain-events/testing": ["backend/scripts/test-drive-domain-events.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/drive/files/files.controller.ts",
+            "backend/src/drive/folders/folders.controller.ts",
+            "backend/src/drive/shares/public-shares.controller.ts",
+            "backend/src/drive/shares/share-unlock-rate-limit.guard.ts",
+            "backend/src/drive/shares/shares.controller.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/wopi/wopi.controller.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/drive/files/files.mcp.ts",
+            "backend/src/drive/folders/folders.mcp.ts",
+            "backend/src/spaces/spaces.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/drive/files/files.controller.ts",
+            "backend/src/drive/folders/folders.controller.ts",
+            "backend/src/drive/shares/shares.controller.ts",
+            "backend/src/spaces/spaces.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.21"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(editor)/editor/files/[id]/edit/page.tsx",
+            "frontend/src/app/(editor)/editor/whiteboard/[id]/edit/page.tsx",
+            "frontend/src/app/(editor)/editor/whiteboard/[id]/edit/whiteboard-editor.tsx",
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(external)/share/[token]/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/create-folder-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/folder-browser.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/preview-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/rename-file-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/rename-folder-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/upload-zone.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/_components/add-member-form.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/_components/add-role-grant-form.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/_components/delete-space-button.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/_components/member-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/_components/role-grant-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/page.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/trash/_components/empty-trash-button.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/trash/_components/trash-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/_components/create-space-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/_components/space-folder-tree.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/_components/spaces-sidebar-nav.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/new-doc-button.tsx",
+            "frontend/src/components/share-dialog.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/components/version-history-dialog.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/members/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "master-data": {
+      "repo": {
+        "head": "0965bc6fcecb9bb613eb16446697bfa77ed1807e",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/integration-contracts": "^0.4.0",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/delegations/delegations.service.ts",
+            "backend/src/domain-events/domain-events-admin-audit.hook.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.service.ts",
+            "backend/src/org-units/org-units.service.ts",
+            "backend/src/user-profiles/user-profiles.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/delegations/delegations.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/org-units/org-units.controller.ts",
+            "backend/src/user-profiles/user-profiles.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/audit-actor.ts",
+            "backend/src/delegations/delegations.controller.ts",
+            "backend/src/delegations/delegations.service.ts",
+            "backend/src/domain-events/domain-events-admin-audit.hook.ts",
+            "backend/src/domain-events/handlers/audit-record.handler.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.service.ts",
+            "backend/src/main.ts",
+            "backend/src/org-units/org-units.controller.ts",
+            "backend/src/org-units/org-units.service.ts",
+            "backend/src/sync-export/sync-export.service.ts",
+            "backend/src/user-profiles/user-profiles.controller.ts",
+            "backend/src/user-profiles/user-profiles.service.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/src/delegations/delegations.service.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/handlers/audit-record.handler.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/org-units/org-units.service.ts",
+            "backend/src/user-profiles/user-profiles.service.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/integration-contracts": [
+            "backend/src/domain-events/handlers/webhook-post.handler.ts"
+          ],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/delegations/delegations.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/org-units/org-units.controller.ts",
+            "backend/src/sync-export/sync-export.controller.ts",
+            "backend/src/user-profiles/user-profiles.controller.ts"
+          ],
+          "@appspine/mcp-server": ["backend/src/app.module.ts", "backend/src/mcp/org.mcp.ts"],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/delegations/delegations.controller.ts",
+            "backend/src/domain-events/webhook-subscriptions.controller.ts",
+            "backend/src/org-units/org-units.controller.ts",
+            "backend/src/user-profiles/user-profiles.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/delegations/delegations-client.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/org-units/org-units-client.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/user-profiles/user-profiles-client.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/m2m-api-key.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "mcp-gateway": {
+      "repo": {
+        "head": "2d43ec24b7b8f8693e4e3ac226cf9d6eb80926e1",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/discovery/discovery.controller.ts",
+            "backend/src/discovery/discovery.module.ts",
+            "backend/src/discovery/discovery.service.ts",
+            "backend/src/dlp/dlp-rule.controller.ts",
+            "backend/src/dlp/dlp-rule.service.ts",
+            "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+            "backend/src/gateway-profile/gateway-profile-api-key.service.ts",
+            "backend/src/gateway-profile/gateway-profile.controller.ts",
+            "backend/src/gateway-profile/gateway-profile.module.ts",
+            "backend/src/gateway-profile/gateway-profile.service.ts",
+            "backend/src/vault/vault.module.ts",
+            "backend/src/vault/vaulted-app-key.controller.ts",
+            "backend/src/vault/vaulted-app-key.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/discovery/discovery.controller.ts",
+            "backend/src/dlp/dlp-rule.controller.ts",
+            "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+            "backend/src/gateway-profile/gateway-profile.controller.ts",
+            "backend/src/gateway/gateway-audit-log.controller.ts",
+            "backend/src/vault/vaulted-app-key.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/discovery/discovery.controller.ts",
+            "backend/src/discovery/discovery.module.ts",
+            "backend/src/discovery/discovery.service.ts",
+            "backend/src/discovery/push-token.guard.ts",
+            "backend/src/dlp/dlp-rule.controller.ts",
+            "backend/src/dlp/dlp-rule.service.ts",
+            "backend/src/dlp/dlp-scan.service.ts",
+            "backend/src/dlp/dlp.module.ts",
+            "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+            "backend/src/gateway-profile/gateway-profile-api-key.service.ts",
+            "backend/src/gateway-profile/gateway-profile.controller.ts",
+            "backend/src/gateway-profile/gateway-profile.module.ts",
+            "backend/src/gateway-profile/gateway-profile.service.ts",
+            "backend/src/gateway/call-tool.mcp.ts",
+            "backend/src/gateway/dto/gateway-audit-log-query.dto.ts",
+            "backend/src/gateway/gateway-audit-log.controller.ts",
+            "backend/src/gateway/gateway-audit-log.service.ts",
+            "backend/src/gateway/gateway-catalog.service.ts",
+            "backend/src/gateway/gateway-profile-resolver.service.ts",
+            "backend/src/gateway/gateway.module.ts",
+            "backend/src/gateway/search-tools.mcp.ts",
+            "backend/src/gateway/vaulted-key-resolver.service.ts",
+            "backend/src/main.ts",
+            "backend/src/vault/vault.module.ts",
+            "backend/src/vault/vaulted-app-key.controller.ts",
+            "backend/src/vault/vaulted-app-key.service.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/src/domain-events/domain-events.module.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/discovery/discovery.controller.ts",
+            "backend/src/dlp/dlp-rule.controller.ts",
+            "backend/src/gateway-profile/gateway-profile-api-key.controller.ts",
+            "backend/src/gateway-profile/gateway-profile.controller.ts",
+            "backend/src/gateway/gateway-audit-log.controller.ts",
+            "backend/src/vault/vaulted-app-key.controller.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/gateway/call-tool.mcp.ts",
+            "backend/src/gateway/gateway-catalog.service.ts",
+            "backend/src/gateway/search-tools.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/discovery/discovery.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/_components/gateway-bindings-panel.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page-content.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/audit-logs/_components/audit-log-filter-form.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/audit-logs/page-content.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/dlp-rules/_components/create-dlp-rule-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/dlp-rules/_components/dlp-rules-error.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/dlp-rules/_components/dlp-rules-table.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/gateway-profiles/_components/create-gateway-profile-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/gateway-profiles/_components/gateway-profile-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page-content.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page-content.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/vault/_components/create-vaulted-key-dialog.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/vault/_components/created-vaulted-key-reveal.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/vault/_components/vaulted-key-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/admin-list-search-form.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page-content.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/dlp-rules/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page-content.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    },
+    "projects": {
+      "repo": {
+        "head": "4604c2ca2912f1a9101ffc59730ae442d8cfe639",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/integration-contracts": "0.4.0",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/notification": "0.2.2",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/projects/context/actor-context.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/notifications/notifications.controller.spec.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/preferences/preferences.controller.ts",
+            "backend/src/projects/access/project-access.guard.spec.ts",
+            "backend/src/projects/access/project-access.guard.ts",
+            "backend/src/projects/access/project-access.service.spec.ts",
+            "backend/src/projects/access/project-access.service.ts",
+            "backend/src/projects/access/project-access.types.ts",
+            "backend/src/projects/board/project-board.controller.ts",
+            "backend/src/projects/board/project-board.service.ts",
+            "backend/src/projects/comments/project-comments.controller.ts",
+            "backend/src/projects/comments/project-comments.service.ts",
+            "backend/src/projects/common/projects-permission.guard.ts",
+            "backend/src/projects/context/actor-context.service.spec.ts",
+            "backend/src/projects/context/actor-context.service.ts",
+            "backend/src/projects/context/project-mcp-context.service.ts",
+            "backend/src/projects/labels/project-label.controller.ts",
+            "backend/src/projects/labels/project-label.service.ts",
+            "backend/src/projects/members/project-members.controller.ts",
+            "backend/src/projects/members/project-members.service.ts",
+            "backend/src/projects/projects/projects.controller.ts",
+            "backend/src/projects/projects/projects.service.ts",
+            "backend/src/projects/tasks/project-tasks.controller.ts",
+            "backend/src/projects/tasks/project-tasks.service.ts",
+            "backend/src/projects/tasks/tasks.controller.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/preferences/preferences.controller.ts",
+            "backend/src/preferences/preferences.service.ts",
+            "backend/src/projects/access/project-access.service.ts",
+            "backend/src/projects/board/project-board.controller.ts",
+            "backend/src/projects/board/project-board.service.ts",
+            "backend/src/projects/comments/project-comments.controller.ts",
+            "backend/src/projects/comments/project-comments.service.ts",
+            "backend/src/projects/common/projects-permission.guard.spec.ts",
+            "backend/src/projects/common/projects-permission.guard.ts",
+            "backend/src/projects/context/project-mcp-context.service.spec.ts",
+            "backend/src/projects/context/project-mcp-context.service.ts",
+            "backend/src/projects/labels/project-label.controller.ts",
+            "backend/src/projects/labels/project-label.service.ts",
+            "backend/src/projects/members/project-members.controller.ts",
+            "backend/src/projects/members/project-members.service.ts",
+            "backend/src/projects/projects/projects.controller.ts",
+            "backend/src/projects/projects/projects.service.ts",
+            "backend/src/projects/tasks/project-tasks.controller.ts",
+            "backend/src/projects/tasks/project-tasks.service.ts",
+            "backend/src/projects/tasks/tasks.controller.ts",
+            "backend/src/projects/transactions/project-transaction.service.ts",
+            "backend/test/integration/db-fixture.ts",
+            "backend/test/integration/seed.ts",
+            "backend/test/integration/task-concurrency.integration.spec.ts",
+            "backend/test/integration/transaction-atomicity.integration.spec.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/src/domain-events/domain-events.module.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/notifications/notifications.controller.ts",
+            "backend/src/preferences/preferences.controller.ts",
+            "backend/src/projects/board/project-board.controller.ts",
+            "backend/src/projects/comments/project-comments.controller.ts",
+            "backend/src/projects/labels/project-label.controller.ts",
+            "backend/src/projects/members/project-members.controller.ts",
+            "backend/src/projects/projects/projects.controller.ts",
+            "backend/src/projects/tasks/project-tasks.controller.ts",
+            "backend/src/projects/tasks/tasks.controller.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/projects/comments/project-comments.mcp.ts",
+            "backend/src/projects/context/actor-context.service.ts",
+            "backend/src/projects/context/project-mcp-context.service.spec.ts",
+            "backend/src/projects/context/project-mcp-context.service.ts",
+            "backend/src/projects/labels/project-label.mcp.ts",
+            "backend/src/projects/mcp/project-mcp-contract.spec.ts",
+            "backend/src/projects/projects/projects.mcp.ts",
+            "backend/src/projects/tasks/project-tasks.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-data-dictionary-drift.ts",
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/metadata/projects-meta.service.ts",
+            "backend/src/metadata/projects-metadata.module.ts"
+          ],
+          "@appspine/notification": [
+            "backend/scripts/check-notification-schema-drift.ts",
+            "backend/src/notifications/notifications.module.ts",
+            "backend/src/notifications/notifications.service.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/projects/board/project-board.controller.ts",
+            "backend/src/projects/comments/project-comments.controller.ts",
+            "backend/src/projects/common/projects-permission.guard.spec.ts",
+            "backend/src/projects/common/projects-permission.guard.ts",
+            "backend/src/projects/labels/project-label.controller.ts",
+            "backend/src/projects/members/project-members.controller.ts",
+            "backend/src/projects/projects/projects.controller.ts",
+            "backend/src/projects/tasks/project-tasks.controller.ts",
+            "backend/src/projects/tasks/tasks.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/_components/workspace-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/notification-bell.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/project-switcher.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/search-dialog.tsx",
+            "frontend/src/app/(main)/error.tsx",
+            "frontend/src/app/(main)/my-tasks/_components/my-tasks-filters.tsx",
+            "frontend/src/app/(main)/my-tasks/_components/quick-create-task.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/projects/project-tabs.tsx",
+            "frontend/src/components/projects/settings-tabs.tsx",
+            "frontend/src/components/projects/settings/board-column-settings.tsx",
+            "frontend/src/components/projects/settings/member-settings.tsx",
+            "frontend/src/components/tasks/move-task-dialog.tsx",
+            "frontend/src/components/tasks/project-task-toolbar.tsx",
+            "frontend/src/components/tasks/task-detail-content.tsx",
+            "frontend/src/components/tasks/task-detail-sheet.tsx",
+            "frontend/src/components/tasks/task-sort-control.tsx",
+            "frontend/src/components/ui/breadcrumb.tsx",
+            "frontend/src/components/ui/carousel.tsx",
+            "frontend/src/components/ui/dialog.tsx",
+            "frontend/src/components/ui/pagination.tsx",
+            "frontend/src/components/ui/sheet.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/notification": [
+            "frontend/src/app/(main)/dashboard/_components/sidebar/notification-bell.tsx",
+            "frontend/src/lib/notifications-api.ts"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": ["e2e/playwright.config.ts", "e2e/specs/m2m-api-key.spec.ts"]
+        }
+      }
+    },
+    "wiki": {
+      "repo": {
+        "head": "d2e54b28b188aa42d9e6152f2e60d139e5c6159c",
+        "branch": "main",
+        "dirty": false
+      },
+      "backend": {
+        "declaredDependencies": {
+          "@appspine/audit-log": "^1.0.1",
+          "@appspine/auth": "^6.2.2",
+          "@appspine/common": "^0.3.4",
+          "@appspine/domain-events": "8.0.0",
+          "@appspine/health-check": "^0.1.9",
+          "@appspine/integration-contracts": "0.4.0",
+          "@appspine/m2m-api-key": "^5.0.0",
+          "@appspine/mcp-server": "0.6.8",
+          "@appspine/metadata-schema": "0.2.22",
+          "@appspine/rbac": "^4.0.8"
+        },
+        "directImports": {
+          "@appspine/audit-log": [
+            "backend/src/app.module.ts",
+            "backend/src/pages/pages.controller.ts",
+            "backend/src/pages/pages.service.ts",
+            "backend/src/pages/trash.controller.ts",
+            "backend/src/spaces/space-members.controller.ts",
+            "backend/src/spaces/space-members.service.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/spaces/spaces.service.ts"
+          ],
+          "@appspine/auth": [
+            "backend/prisma/seed.ts",
+            "backend/src/app.module.ts",
+            "backend/src/attachments/attachments.controller.ts",
+            "backend/src/attachments/attachments.service.ts",
+            "backend/src/pages/pages.controller.ts",
+            "backend/src/pages/pages.service.ts",
+            "backend/src/pages/trash.controller.ts",
+            "backend/src/search/search.controller.ts",
+            "backend/src/search/search.service.ts",
+            "backend/src/spaces/space-members.controller.ts",
+            "backend/src/spaces/space-members.service.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/spaces/spaces.service.ts"
+          ],
+          "@appspine/common": [
+            "backend/src/app.module.ts",
+            "backend/src/attachments/attachments.module.ts",
+            "backend/src/attachments/attachments.service.ts",
+            "backend/src/main.ts",
+            "backend/src/pages/page-versions.service.ts",
+            "backend/src/pages/pages.controller.ts",
+            "backend/src/pages/pages.module.ts",
+            "backend/src/pages/pages.service.spec.ts",
+            "backend/src/pages/pages.service.ts",
+            "backend/src/pages/trash.controller.ts",
+            "backend/src/search/search.module.ts",
+            "backend/src/search/search.service.ts",
+            "backend/src/spaces/space-members.controller.ts",
+            "backend/src/spaces/space-members.service.spec.ts",
+            "backend/src/spaces/space-members.service.ts",
+            "backend/src/spaces/spaces.controller.ts",
+            "backend/src/spaces/spaces.module.ts",
+            "backend/src/spaces/spaces.service.ts"
+          ],
+          "@appspine/domain-events": [
+            "backend/scripts/check-domain-events-schema-drift.ts",
+            "backend/scripts/test-wiki-domain-events.ts",
+            "backend/src/domain-events/domain-events.module.ts",
+            "backend/src/domain-events/handlers/webhook-post.handler.ts",
+            "backend/src/pages/pages.service.ts"
+          ],
+          "@appspine/domain-events/admin": ["backend/src/app.module.ts"],
+          "@appspine/domain-events/testing": ["backend/scripts/test-wiki-domain-events.ts"],
+          "@appspine/health-check": ["backend/src/app.module.ts"],
+          "@appspine/integration-contracts": [
+            "backend/src/generated/integration-contracts/approve-to-wiki_knowledge-document-change-approved/validators.ts",
+            "backend/src/generated/integration-contracts/wiki-to-approve_get-knowledge-document-change-request-status/validators.ts",
+            "backend/src/generated/integration-contracts/wiki-to-approve_submit-knowledge-document-change/validators.ts"
+          ],
+          "@appspine/m2m-api-key": [
+            "backend/src/app.module.ts",
+            "backend/src/attachments/attachments.controller.ts",
+            "backend/src/pages/pages.controller.ts",
+            "backend/src/pages/trash.controller.ts",
+            "backend/src/search/search.controller.ts",
+            "backend/src/spaces/space-members.controller.ts",
+            "backend/src/spaces/spaces.controller.ts"
+          ],
+          "@appspine/mcp-server": [
+            "backend/src/app.module.ts",
+            "backend/src/pages/pages.mcp.ts",
+            "backend/src/spaces/spaces.mcp.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "backend/scripts/check-enum-i18n.ts",
+            "backend/scripts/check-schema-docs.ts",
+            "backend/scripts/gen-data-dictionary.ts",
+            "backend/src/app.module.ts"
+          ],
+          "@appspine/rbac": [
+            "backend/src/app.module.ts",
+            "backend/src/attachments/attachments.controller.ts",
+            "backend/src/pages/pages.controller.ts",
+            "backend/src/pages/trash.controller.ts",
+            "backend/src/search/search.controller.ts",
+            "backend/src/spaces/space-members.controller.ts",
+            "backend/src/spaces/spaces.controller.ts"
+          ]
+        }
+      },
+      "frontend": {
+        "declaredDependencies": {
+          "@appspine/frontend-shell": "^0.16.3",
+          "@appspine/metadata-schema": "0.2.22"
+        },
+        "directImports": {
+          "@appspine/frontend-shell": [
+            "frontend/src/app/(external)/login/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/[id]/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/catalog/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/domain-events/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/users/actions.ts",
+            "frontend/src/app/(main)/dashboard/(admin)/users/page.tsx",
+            "frontend/src/app/(main)/dashboard/_components/admin-modal.tsx",
+            "frontend/src/app/(main)/dashboard/_components/dashboard-shell-bridge.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/header-breadcrumbs.tsx",
+            "frontend/src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/new-page-button.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/sidebar/page-tree.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/_components/sidebar/space-switcher.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/pages/[pageId]/_components/page-editor-client.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/settings/_components/add-member-form.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/settings/_components/edit-space-form.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/settings/_components/member-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/trash/_components/trash-row-actions.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/_components/create-space-dialog.tsx",
+            "frontend/src/app/layout.tsx",
+            "frontend/src/components/app-link.tsx",
+            "frontend/src/components/editor/mermaid-node.tsx",
+            "frontend/src/components/editor/wiki-editor.tsx",
+            "frontend/src/components/ui/sidebar.tsx",
+            "frontend/src/components/wiki/page-actions.tsx",
+            "frontend/src/components/wiki/version-history-drawer.tsx",
+            "frontend/src/lib/cookie.client.ts",
+            "frontend/src/scripts/theme-boot.tsx",
+            "frontend/src/server/api-client.ts",
+            "frontend/src/server/list-url.ts",
+            "frontend/src/stores/preferences/preferences-provider.tsx"
+          ],
+          "@appspine/frontend-shell/server": [
+            "frontend/src/server/current-user.ts",
+            "frontend/src/server/locale-action.ts",
+            "frontend/src/server/require-admin.ts",
+            "frontend/src/server/server-actions.ts"
+          ],
+          "@appspine/metadata-schema": [
+            "frontend/src/app/(main)/dashboard/(admin)/api-keys/page.tsx",
+            "frontend/src/app/(main)/dashboard/(admin)/roles/page.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/pages/[pageId]/page.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/[spaceId]/settings/page.tsx",
+            "frontend/src/app/(main)/dashboard/spaces/page.tsx"
+          ]
+        }
+      },
+      "e2e": {
+        "declaredDependencies": {
+          "@appspine/e2e-kit": "^1.0.2"
+        },
+        "directImports": {
+          "@appspine/e2e-kit": [
+            "e2e/fixtures.ts",
+            "e2e/playwright.config.ts",
+            "e2e/specs/auth.spec.ts",
+            "e2e/specs/m2m-api-key.spec.ts",
+            "e2e/specs/rbac.spec.ts"
+          ]
+        }
+      }
+    }
+  }
+}

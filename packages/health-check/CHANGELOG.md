@@ -1,5 +1,53 @@
 # @appspine/health-check
 
+## 2.0.0
+
+### Patch Changes
+
+- 057c121: Accept the v3 frontend-shell major while retaining compatibility with the final v2 transition
+  release. This lets the canary fleet consume the new shell without peer-dependency conflicts.
+- Updated dependencies [057c121]
+  - @appspine/frontend-shell@1.0.0
+
+## 1.0.2-canary.0
+
+### Patch Changes
+
+- Accept the v3 frontend-shell major while retaining compatibility with the final v2 transition
+  release. This lets the canary fleet consume the new shell without peer-dependency conflicts.
+
+## 1.0.0
+
+### Minor Changes
+
+- 4c0ce5f: Ship the first two capability plugins (051 PL1-08, PL1-09).
+
+  Both packages now publish an `appspine.plugin.json` manifest and a `./plugin` subpath exporting a
+  `definePlugin()` descriptor. Plugin mode contributes the very same Nest module the package root
+  already exported, so legacy wiring and plugin wiring cannot diverge in behaviour.
+
+  `@appspine/audit-log` additionally binds its service to the stable `AUDIT_SINK` token and declares
+  its Prisma facet with a digest of the shipped fragment, so a consumer can depend on the audit
+  capability without importing the package. The concrete `AuditLogService` export and the module's
+  `@Global()` marker are unchanged during the transition window.
+
+### Patch Changes
+
+- Updated dependencies [4c0ce5f]
+- Updated dependencies [8e67a05]
+- Updated dependencies [b75516d]
+- Updated dependencies [b92c1c3]
+- Updated dependencies [0eaf69d]
+- Updated dependencies [9cd2838]
+- Updated dependencies [a41aab9]
+- Updated dependencies [aeb861d]
+- Updated dependencies [96f92e8]
+- Updated dependencies [fdff215]
+- Updated dependencies [6a0e839]
+  - @appspine/plugin-api@1.1.0
+  - @appspine/plugin-host-nest@2.0.0
+  - @appspine/frontend-shell@0.16.4
+
 ## 0.1.9
 
 ### Patch Changes

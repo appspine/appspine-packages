@@ -17,7 +17,7 @@ the package; it doesn't repeat that document's threat model.
 - Ships one provider adapter: Keycloak Standard Token Exchange V2. No second IdP adapter is
   planned for the first version.
 - Does **not** verify or decode the delegated token it returns, map it to a local user, or
-  enforce any RBAC — that is entirely `@appspine/auth`'s job on the target app side. The two
+  enforce any RBAC — that is `@appspine/oidc-auth` and `@appspine/rbac`'s job on the target app side. These
   packages have no runtime dependency on each other.
 - Does **not** cache tokens across requests, retry internally, or support refresh tokens,
   offline access, DPoP, or mTLS in this version.
@@ -159,7 +159,7 @@ The first version ships with exactly one policy per deployment (e.g.
    for the first policy.
 3. Add a new entry to this module's `policies` map with the new `targetAudience`,
    `requestedScopes`, and `maxExpiresInSeconds`.
-4. On the target app, add a matching `@appspine/auth` `DelegatedOidcTrustProfile` entry with the
+4. On the target app, add a matching `@appspine/oidc-auth` `DelegatedOidcTrustProfile` entry with the
    same scope in its `requiredScopes` — see that package's README for the inbound side,
    including how to enable/disable a delegated profile per endpoint.
 

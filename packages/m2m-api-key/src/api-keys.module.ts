@@ -1,15 +1,70 @@
-import { Global, Module } from '@nestjs/common';
+import { SCOPE_MATCHER } from '@appspine/plugin-api';
+import {
+  AppspineAuthGuard,
+  AppspineAuthInfrastructureModule,
+  AuthenticationStrategyRegistry,
+} from '@appspine/plugin-host-nest';
+import { Inject, Module, type OnModuleInit } from '@nestjs/common';
 import { ApiKeyGuard } from './api-key.guard';
+import { ApiKeyMachineStrategy } from './api-key-machine.strategy';
 import { ApiKeyRateLimiter } from './api-key-rate-limiter';
 import { ApiKeysController } from './api-keys.controller';
 import { ApiKeysService } from './api-keys.service';
-import { JwtOrApiKeyGuard } from './guards/jwt-or-api-key.guard';
+import { ApiKeyAdminGuard } from './guards/admin.guard';
 import { ScopeGuard } from './guards/scope.guard';
+import { ScopeMatcherService } from './scope-matcher.service';
 
-@Global()
+/**
+ * Machine-to-Machine API Keys capability module (051 PL4-03).
+ *
+ * Provides:
+ *  - `appspine.machine-auth-provider`: registers `ApiKeyMachineStrategy` into `AuthenticationStrategyRegistry`.
+ *  - `appspine.scope-matcher`: bound to `SCOPE_MATCHER` token via `ScopeMatcherService`.
+ *  - Admin key management CRUD endpoints (`ApiKeysController` / `ApiKeysService`).
+ *
+ * The module is deliberately scoped. Consumers must import it explicitly or import a generated
+ * plugin composition module that exports it.
+ */
 @Module({
+  imports: [AppspineAuthInfrastructureModule],
   controllers: [ApiKeysController],
-  providers: [ApiKeysService, ApiKeyGuard, ApiKeyRateLimiter, JwtOrApiKeyGuard, ScopeGuard],
-  exports: [ApiKeysService, ApiKeyGuard, ApiKeyRateLimiter, JwtOrApiKeyGuard, ScopeGuard],
+  providers: [
+    ApiKeysService,
+    ApiKeyGuard,
+    ApiKeyRateLimiter,
+    ApiKeyAdminGuard,
+    AppspineAuthGuard,
+    ScopeGuard,
+    ApiKeyMachineStrategy,
+    ScopeMatcherService,
+    { provide: SCOPE_MATCHER, useExisting: ScopeMatcherService },
+  ],
+  exports: [
+    ApiKeysService,
+    ApiKeyGuard,
+    ApiKeyRateLimiter,
+    ApiKeyAdminGuard,
+    AppspineAuthGuard,
+    ScopeGuard,
+    ApiKeyMachineStrategy,
+    ScopeMatcherService,
+    SCOPE_MATCHER,
+  ],
 })
-export class ApiKeysModule {}
+export class ApiKeysModule implements OnModuleInit {
+  constructor(
+    @Inject(AuthenticationStrategyRegistry)
+    private readonly registry: AuthenticationStrategyRegistry,
+    @Inject(ApiKeyMachineStrategy)
+    private readonly strategy: ApiKeyMachineStrategy,
+  ) {}
+
+  /**
+   * Registers the machine strategy with the host (PL1-11, PL4-03).
+   */
+  onModuleInit(): void {
+    if (!this.registry.has(this.strategy.id)) {
+      this.registry.register(this.strategy);
+    }
+  }
+}
